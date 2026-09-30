@@ -1598,3 +1598,14 @@
 /* The image is the ring plus its glow; the ring is 70% of it. The span is the ring, the glow spills out. */
 .ix-mark { position: relative; display: inline-block; flex: none; }
 .ix-mark img { position: absolute; left: 50%; top: 50%; translate: -50% -50%; pointer-events: none; user-select: none; }
+
+/* -------------------------------------------------------------------- Orb */
+/* The release blurs the glow and then masks it to the ring, so the blur is cut off again: a flat grey disc
+   with a hard edge round a sharp ring, which reads as unsharp. Here the softness is in the mask itself and
+   there is no blur: the glow fades out in colour, as the Mark's does. Goes upstream into the release. */
+.iris-orb .glow {
+  filter: none; opacity: .45; transform: scale(1.45);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 40%, #000 62%, #000 70%, transparent 100%);
+          mask: radial-gradient(circle closest-side, transparent 40%, #000 62%, #000 70%, transparent 100%);
+}
+.iris-orb-away .glow { filter: grayscale(1); }
