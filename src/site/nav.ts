@@ -44,7 +44,7 @@ export function groupOf(c: Component): string {
 }
 
 export const FOUNDATIONS: { id: string; label: string; blurb: string }[] = [
-  { id: "meaning", label: "Meaning: what may go where", blurb: "An orb is Iris; never a picture to fill a corner." },
+  { id: "meaning", label: "Meaning: what may go where", blurb: "Every drawing says something: an orb is Iris, light is work, her hand is personal." },
   { id: "colour", label: "Colour", blurb: "Near-black, one accent, fifteen topics." },
   { id: "type", label: "Type", blurb: "The system stack, eight named sizes, mono for labels." },
   { id: "shape", label: "Shape", blurb: "Glass, 18px cards, pills." },
