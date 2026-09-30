@@ -783,4 +783,86 @@ The track (scroll-snap), the slides, the dots, and optional arrows for a pointer
 
 \`role="group"\` with a label; each dot is a button labelled with its slide number and the current one is
 \`aria-current\`. The track scrolls with the keyboard and with a trackpad, so nothing depends on the swipe.`,
+  Photo: `# Photo
+
+A photo with a depth map: a grey image of the same size, white near and black far. From the Photos lab.
+
+## Kinds
+
+- \`back\`: the photo, then the word, then only the near part on top again, so the word stands behind the person.
+- \`duotone\`: the photo's light mapped from the topic's ground (\`--kd\`) to its accent (\`--k\`); without a topic,
+  \`--bg\` to \`--accent\`.
+- \`parallax\`: four depth layers that move with the pointer, or gently with the scroll (\`motion="scroll"\`).
+
+## Where the photo comes from
+
+No photo ships with the system. Without \`src\` the part paints its own neutral scene (sky, sun, two ridges and a
+figure) in the tokens, with a depth map that matches it. With a \`src\` and no \`depth\` the depth is guessed: lower
+and central is nearer. A real depth map (Depth Pro) is far better. The pixels are read back, so a photo from
+another origin must allow it (CORS); one that does not leaves the frame empty.
+
+## Rules
+
+- The word behind a person stays at least 65% visible and whole inside the photo: the part searches the height,
+  and failing that a smaller size, for about 25% hidden. \`threshold\` (0.05 to 0.9) is where the near part starts.
+- Parallax moves at most 6% of the width, softly (\`--motion-slow\`); with reduced motion it stands still.
+- Never a real user's photo in a demo. Never a photo hero and a \`Word\` together. Never the text fully hidden.
+
+## Not here
+
+The lab also has filters (trip flat, retro dither, colour shift, halftone, glow, a blurred background, light on
+the person), tilt on a phone, and the photo pulled apart in 3D layers. They are left out of the part.
+
+## Accessibility
+
+\`role="img"\` named by \`alt\`; with \`kind="back"\` the word is added to the name.`,
+  BorderPattern: `# BorderPattern
+
+A pattern that runs along a rounded edge, one for each moment. From the border lab, where it ran along the rim of
+the phone.
+
+| pattern | when |
+| --- | --- |
+| \`comet\` | refreshing: two comets run down both sides and meet |
+| \`breathe\` | listening: the whole rim breathes |
+| \`orbit\` | thinking: one light goes round with a tail |
+| \`sparks\` | working on a loop: sparks drift and flicker |
+| \`wave\` | she speaks: a wave of thickness travels round |
+| \`stream\` | a question waits on you: three colours stream round |
+| \`heartbeat\` | a new loop or a notification: two beats, then rest |
+| \`zip\` | saving or sending: the rim zips closed and open |
+
+## Rules
+
+- One pattern at a time, and only while the moment lasts.
+- Violet (\`--violet\`), the accent and the "you" pink (\`--phase-you\`) only: the rim belongs to the ring's family.
+- The radius is the box's own (\`--radius-card\`), or \`radius\` for a phone-shaped frame.
+- With reduced motion the pattern is drawn once, still.
+
+## Accessibility
+
+The canvas is hidden from assistive tech. \`label\` says the moment in words, in a status region.`,
+  ChatStack: `# ChatStack
+
+Every chat with its loops as a card in its topic's colour, lying in a stack with depth. From the chat-stack sketch.
+
+\`CircleStack\` is the plain, compact cousin for the strip. This one carries the topic colours and opens a chat.
+
+## States
+
+- At rest: the top card whole, the next two peek out above it, smaller, dimmer and softer; a count says how
+  many more. The one that waits on you is on top.
+- Fanned: a tap spreads the cards upward (\`--motion-slow\`, \`--ease-house\`). Escape folds them back.
+- Open: a tap on a card opens that chat on its own sheet: its message, its loops with their phase, its actions
+  (the house \`Button\`, in the topic) and Back. The other chats are two edges behind it.
+
+## The parts
+
+A \`ChatCircle\` has \`id\`, \`title\`, \`line\`, and optionally \`topic\`, \`eyebrow\`, \`loops\` (a \`LoopBubble\` each, with a
+\`line\` in the open chat), \`message\` and \`actions\`. \`fanned\` and \`current\` say where it starts.
+
+## Accessibility
+
+Cards are buttons; at rest only the top one can be reached, named with how many more there are. The open chat is
+a region named by its title.`,
 };

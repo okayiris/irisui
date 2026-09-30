@@ -547,6 +547,110 @@ const SPECS: Spec[] = [
       { label: "With a label", code: `() => h(Divider, { label: "Only you can open this" })` },
     ],
   },
+  {
+    name: "Photo",
+    group: "Surfaces",
+    height: 450,
+    summary:
+      "A photo with a depth map: a word behind the person, duotone in the topic's colours, or parallax in four depth layers. No photo ships: without a src it paints its own neutral scene with a matching depth map, and without a depth map it guesses one (lower and central is nearer).",
+    props: [
+      { name: "alt", type: "string", required: true },
+      { name: "src", type: "string" },
+      { name: "depth", type: "string" },
+      { name: "kind", type: "'back' | 'duotone' | 'parallax'" },
+      { name: "word", type: "string" },
+      { name: "threshold", type: "number" },
+      { name: "topic", type: "TopicName" },
+      { name: "ratio", type: "number" },
+      { name: "motion", type: "'pointer' | 'scroll'" },
+    ],
+    variants: [
+      {
+        label: "The word behind the person",
+        code: `() => {
+  const [edge, setEdge] = React.useState(0.5);
+  return h("div", { style: { display: "grid", gap: 12, maxWidth: 380 } },
+    h(Photo, { kind: "back", word: "CALM", threshold: edge, alt: "A figure in front of two ridges at dusk" }),
+    h(Slider, { label: "Where the near part starts", min: 5, max: 90, value: Math.round(edge * 100), onChange: (v) => setEdge(v / 100) }));
+}`,
+      },
+      {
+        label: "Parallax and duotone",
+        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 } },
+    h(Photo, { kind: "parallax", alt: "A figure in front of two ridges, moving with the pointer" }),
+    h(Photo, { kind: "duotone", topic: "money", alt: "The same scene in the money topic's two colours" }),
+    h(Photo, { kind: "duotone", topic: "weather", alt: "The same scene in the weather topic's two colours" }))`,
+      },
+    ],
+  },
+  {
+    name: "BorderPattern",
+    group: "Feedback",
+    height: 470,
+    summary: "A pattern running along a rounded edge, one per moment: refreshing, listening, thinking, working, speaking, a question waiting, news, saving.",
+    props: [
+      { name: "pattern", type: "BorderPatternName" },
+      { name: "radius", type: "number" },
+      { name: "label", type: "string" },
+      { name: "children", type: "ReactNode" },
+    ],
+    variants: [
+      {
+        label: "All eight",
+        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 14 } },
+    [["comet", "Refreshing"], ["breathe", "Listening"], ["orbit", "Thinking"], ["sparks", "Working on a loop"], ["wave", "She speaks"], ["stream", "Waits on you"], ["heartbeat", "A new loop"], ["zip", "Saving"]].map(([p, when]) =>
+      h("div", { key: p, style: { display: "grid", gap: 6, justifyItems: "center" } },
+        h("div", { style: { width: 96, height: 180 } }, h(BorderPattern, { pattern: p, radius: 22, label: when }, h("div", { style: { height: 180 } }))),
+        h("div", { style: { fontSize: 12, color: "var(--label)", textAlign: "center" } }, when))))`,
+      },
+      {
+        label: "Round a card",
+        code: `() => h(BorderPattern, { pattern: "orbit", label: "Iris is thinking" },
+    h("div", { style: { padding: "var(--pad-card)", display: "grid", gap: 4 } },
+      h("div", { style: { fontSize: 17 } }, "Comparing three quotes"),
+      h("div", { style: { fontSize: 12, color: "var(--label)" } }, "Iris is reading the small print")))`,
+      },
+    ],
+  },
+  {
+    name: "ChatStack",
+    group: "Navigation",
+    height: 440,
+    summary: "Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.",
+    props: [
+      { name: "items", type: "ChatCircle[]", required: true },
+      { name: "fanned", type: "boolean" },
+      { name: "current", type: "string | null" },
+      { name: "onSelect", type: "(id: string | null) => void" },
+    ],
+    variants: [
+      {
+        label: "At rest, tap to fan out",
+        code: `() => h("div", { style: { display: "grid", alignContent: "end", minHeight: 300 } },
+    h(ChatStack, { items: [
+      { id: "debtors", topic: "money", eyebrow: "Money", title: "Debtors", line: "Van Dijk waits on you", loops: [{ title: "Van Dijk", step: 3 }, { title: "Korenaar", step: 1 }, { title: "Noorderlicht", step: 1 }, { title: "Debtors", step: 1 }] },
+      { id: "groceries", topic: "groceries", eyebrow: "Groceries", title: "Groceries", line: "Saturday delivery, 8 on the list", loops: [{ title: "Jumbo", step: 4 }] },
+      { id: "renovation", topic: "home", eyebrow: "Home", title: "Renovation", line: "Comparing 3 quotes", loops: [{ title: "Quotes", step: 2 }, { title: "Tiles", step: 1 }] },
+      { id: "dentist", topic: "health", eyebrow: "Health", title: "Dentist", line: "Pick a time", loops: [{ title: "Dentist", step: 3 }] },
+    ] }))`,
+      },
+      {
+        label: "One chat open",
+        code: `() => h(ChatStack, { current: "debtors", items: [
+    { id: "debtors", topic: "money", eyebrow: "Money", title: "Debtors", line: "Van Dijk waits on you",
+      message: "Only Van Dijk is 34 days late, 4,840 euros. My suggestion: one last reminder with a deadline, and only then a delivery stop.",
+      loops: [
+        { title: "Debtors", step: 0, line: "the house rules" },
+        { title: "Van Dijk", step: 3, line: "34 days late, 4,840 euros" },
+        { title: "Korenaar", step: 1, line: "12 days late, 1,210 euros" },
+      ],
+      actions: [{ label: "Send the reminder", primary: true }] },
+    { id: "groceries", topic: "groceries", title: "Groceries", line: "Saturday delivery" },
+    { id: "renovation", topic: "home", title: "Renovation", line: "Comparing 3 quotes" },
+  ] })`,
+      },
+    ],
+  },
 ];
 
 export const EXT_COMPONENTS: Component[] = SPECS.map((s) => ({

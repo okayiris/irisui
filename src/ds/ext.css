@@ -1338,3 +1338,258 @@
   background: var(--state-hover);
   color: var(--fg);
 }
+
+/* ---------- Photo ---------- */
+
+.ix-photo {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-radius: var(--radius-card);
+  background: var(--glass);
+  box-shadow: var(--elev-1);
+}
+
+.ix-photo canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Parallax: every layer moves with --px/--py (-1..1) by its depth --z, at most 3% each way: 6% of the width. The
+   scale keeps the moved edge inside the frame. */
+.ix-photo[data-kind="parallax"] canvas {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(calc(var(--px, 0) * var(--z, 0) * -3%), calc(var(--py, 0) * var(--z, 0) * -3%), 0) scale(1.08);
+  transition: transform var(--motion-slow) var(--ease-house);
+}
+
+/* ---------- BorderPattern ---------- */
+
+.ix-border {
+  position: relative;
+  border-radius: var(--radius-card);
+  background: var(--glass);
+}
+
+.ix-border-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- ChatStack ---------- */
+
+.ix-chats {
+  --card: 64px;
+  --peek: 11px;
+  position: relative;
+  height: calc(var(--card) + 2 * var(--peek));
+  transition: height var(--motion-slow) var(--ease-house);
+}
+
+.ix-chats[data-fanned] {
+  height: calc(var(--n) * (var(--card) + 8px) - 8px);
+}
+
+.ix-chat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--card);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 14px;
+  text-align: left;
+  color: var(--fg);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--kd, var(--bg)) 70%, transparent), var(--glass));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transform-origin: 50% 0;
+  transform: translateY(calc(var(--i) * var(--peek) * -1)) scale(calc(1 - var(--i) * 0.06));
+  filter: blur(calc(var(--i) * 0.4px)) brightness(calc(1 - var(--i) * 0.12));
+  opacity: calc(1 - var(--i) * 0.2);
+  transition: transform var(--motion-slow) var(--ease-house), opacity var(--motion-slow) var(--ease-house),
+    filter var(--motion-slow) var(--ease-house), border-color var(--motion-fast) var(--ease-house);
+}
+
+.ix-chat:hover {
+  border-color: color-mix(in srgb, var(--k, var(--accent)) 40%, var(--edge));
+}
+
+.ix-chat[data-far] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ix-chats:not([data-fanned]) .ix-chat[tabindex="-1"] {
+  pointer-events: none;
+}
+
+.ix-chats[data-fanned] .ix-chat {
+  transform: translateY(calc(var(--i) * (var(--card) + 8px) * -1));
+  filter: none;
+  opacity: 1;
+}
+
+.ix-chats-count {
+  top: -14px;
+  z-index: 9;
+}
+
+.ix-chat-text {
+  display: grid;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ix-chat-eyebrow {
+  font: var(--text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--k, var(--label));
+}
+
+.ix-chat-title,
+.ix-chat-line,
+.ix-chat-loop-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ix-chat-title {
+  font: 600 15px/20px var(--font-text);
+}
+
+.ix-chat-line {
+  font: var(--text-sub);
+  color: var(--label);
+}
+
+.ix-chat-line[data-you] {
+  color: var(--phase-you);
+}
+
+.ix-chat-open {
+  position: relative;
+  padding-top: 12px;
+}
+
+.ix-chat-peek {
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 14px;
+  border: 1px solid color-mix(in srgb, var(--k, var(--edge)) 25%, transparent);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  background: color-mix(in srgb, var(--kd, var(--bg)) 80%, var(--bg));
+}
+
+.ix-chat-peek[data-depth="0"] {
+  top: 5px;
+  left: 16px;
+  right: 16px;
+  z-index: 1;
+}
+
+.ix-chat-sheet {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 10px;
+  padding: 18px var(--pad-card) var(--pad-card);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--kd, var(--bg)) 55%, var(--bg)), var(--bg) 45%);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sheet);
+  animation: ix-circles-fan var(--motion-base) var(--ease-house) both;
+}
+
+.ix-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ix-chat-message {
+  margin: 0;
+  padding: 10px 12px;
+  font: var(--text-body);
+  color: var(--fg);
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: 16px 16px 16px 4px;
+}
+
+.ix-chat-section {
+  font: var(--text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.ix-chat-loops {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ix-chat-loop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+}
+
+.ix-chat-loop[data-you] {
+  border-color: color-mix(in srgb, var(--phase-you) 55%, transparent);
+  box-shadow: 0 0 16px -6px var(--phase-you);
+}
+
+.ix-chat-loop-title {
+  font: 600 13px/18px var(--font-text);
+}
+
+.ix-chat-phase {
+  font-weight: 600;
+}
+
+.ix-chat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-chats,
+  .ix-chat,
+  .ix-photo[data-kind="parallax"] canvas {
+    transition: none;
+  }
+}
+
+/* At rest the cards behind show only their edge: their words would read through the glass on top. */
+.ix-chat > * {
+  transition: opacity var(--motion-base) var(--ease-house);
+}
+
+.ix-chats:not([data-fanned]) .ix-chat[tabindex="-1"] > * {
+  opacity: 0;
+}

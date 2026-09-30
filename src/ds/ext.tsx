@@ -1106,7 +1106,660 @@ export function Carousel({
 
 /* --------------------------------------------------------------- register */
 
+/* ------------------------------------------------------ shared for the labs */
+
+/** A topic's colours as CSS variables (--k, --k2, --kd), from the release, so these parts colour like Button. */
+const topicVars = (topic?: string): Any => (topic ? (window as Any).IrisUi?.design?.topicStyle?.(topic) : undefined);
+
+/** A token's value, read off the element: a topic on the element or a parent is honoured. */
+const tokenOf = (el: Element, name: string) => getComputedStyle(el).getPropertyValue(name).trim();
+
+/** Any CSS colour as [r, g, b]: the canvas parses it, so a token may be a hex, an rgb() or an oklch(). */
+function rgbOf(colour: string): number[] {
+  const c = document.createElement("canvas").getContext("2d") as CanvasRenderingContext2D;
+  c.fillStyle = colour;
+  c.fillRect(0, 0, 1, 1);
+  return Array.from(c.getImageData(0, 0, 1, 1).data.slice(0, 3));
+}
+
+const smooth = (a: number, b: number, x: number) => {
+  const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+
+const stillMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function canvasOf(w: number, h: number) {
+  return Object.assign(document.createElement("canvas"), { width: w, height: h });
+}
+
+/* ------------------------------------------------------------------ Photo */
+
+// A photo with a depth map: a grey image of the same size where white is near and black is far. From the Photos
+// lab: the word behind the person (photo, then the word, then only the near part on top again), duotone in the
+// topic's ground and accent, and parallax in four depth layers that move with the hand or the scroll.
+//
+// No photo ships with the system. Without `src` the part paints its own neutral scene (sky, sun, two ridges and a
+// figure) in the tokens, with a depth map that matches it. With a `src` but no `depth`, the depth is derived: far
+// at the top, near at the bottom and in the middle. A real depth map (Depth Pro) does far better.
+
+type Pair = { photo: HTMLCanvasElement; depth: HTMLCanvasElement };
+
+const PHOTO_WIDTH = 720; // ponytail: one working size, crisp at 360 css px on a 2x screen; size from the box if a hero needs more
+
+function grey(ctx: CanvasRenderingContext2D, z: number) {
+  const v = Math.round(z * 255);
+  ctx.fillStyle = `rgb(${v}, ${v}, ${v})`;
+}
+
+function sceneOf(el: Element, W: number, H: number): Pair {
+  const photo = canvasOf(W, H), depth = canvasOf(W, H);
+  const p = photo.getContext("2d") as CanvasRenderingContext2D, d = depth.getContext("2d") as CanvasRenderingContext2D;
+  const bg = tokenOf(el, "--bg"), k = tokenOf(el, "--k") || tokenOf(el, "--accent"), k2 = tokenOf(el, "--k2") || tokenOf(el, "--violet");
+  const sky = p.createLinearGradient(0, 0, 0, H * 0.75);
+  sky.addColorStop(0, bg);
+  sky.addColorStop(1, k2);
+  p.fillStyle = sky;
+  p.fillRect(0, 0, W, H);
+  grey(d, 0.04);
+  d.fillRect(0, 0, W, H);
+  p.fillStyle = tokenOf(el, "--wait");
+  p.beginPath();
+  p.arc(W * 0.72, H * 0.3, W * 0.07, 0, 7);
+  p.fill();
+  // Two ridges, far then near: the ground, then the tint at a share, so the scene stays inside the tokens.
+  const ridge = (base: number, amp: number, freq: number, tint: number, z: number) => {
+    const path = new Path2D();
+    path.moveTo(0, H);
+    for (let x = 0; x <= W; x += 8) path.lineTo(x, H * base - Math.sin((x / W) * Math.PI * freq + base * 9) * H * amp);
+    path.lineTo(W, H);
+    p.fillStyle = bg;
+    p.fill(path);
+    p.globalAlpha = tint;
+    p.fillStyle = k;
+    p.fill(path);
+    p.globalAlpha = 1;
+    grey(d, z);
+    d.fill(path);
+  };
+  ridge(0.58, 0.05, 3, 0.35, 0.22);
+  ridge(0.74, 0.04, 2, 0.18, 0.4);
+  // The figure: a head and shoulders, lit from the sun's side.
+  const figure = new Path2D();
+  figure.arc(W * 0.34, H * 0.5, H * 0.1, 0, 7);
+  figure.ellipse(W * 0.34, H * 0.98, W * 0.19, H * 0.32, 0, 0, 7);
+  const lit = p.createLinearGradient(W * 0.18, 0, W * 0.5, 0);
+  lit.addColorStop(0, bg);
+  lit.addColorStop(1, tokenOf(el, "--dim"));
+  p.fillStyle = lit;
+  p.fill(figure);
+  grey(d, 0.88);
+  d.fill(figure);
+  return { photo, depth };
+}
+
+function load(src: string) {
+  return new Promise<HTMLImageElement>((ok, fail) => {
+    const i = new Image();
+    i.crossOrigin = "anonymous"; // the pixels are read back: a photo from another origin must allow it
+    i.onload = () => ok(i);
+    i.onerror = fail;
+    i.src = src;
+  });
+}
+
+async function pairOf(el: Element, src: string | undefined, depthSrc: string | undefined, ratio: number): Promise<Pair> {
+  if (!src) return sceneOf(el, PHOTO_WIDTH, Math.round(PHOTO_WIDTH / ratio));
+  const img = await load(src);
+  const W = PHOTO_WIDTH, H = Math.round((W * img.height) / img.width);
+  const photo = canvasOf(W, H), depth = canvasOf(W, H);
+  (photo.getContext("2d") as CanvasRenderingContext2D).drawImage(img, 0, 0, W, H);
+  const d = depth.getContext("2d") as CanvasRenderingContext2D;
+  if (depthSrc) d.drawImage(await load(depthSrc), 0, 0, W, H);
+  else {
+    // ponytail: a guessed depth (lower and central is nearer); a real depth map is the upgrade
+    const down = d.createLinearGradient(0, 0, 0, H);
+    down.addColorStop(0, "rgb(20, 20, 20)");
+    down.addColorStop(1, "rgb(170, 170, 170)");
+    d.fillStyle = down;
+    d.fillRect(0, 0, W, H);
+    const mid = d.createRadialGradient(W / 2, H * 0.6, 0, W / 2, H * 0.6, W * 0.45);
+    mid.addColorStop(0, "rgb(90, 90, 90)");
+    mid.addColorStop(1, "rgb(0, 0, 0)");
+    d.globalCompositeOperation = "lighter";
+    d.fillStyle = mid;
+    d.fillRect(0, 0, W, H);
+  }
+  return { photo, depth };
+}
+
+const pixelsOf = (c: HTMLCanvasElement) => (c.getContext("2d") as CanvasRenderingContext2D).getImageData(0, 0, c.width, c.height);
+
+/** The near part only: the photo with every pixel beyond the threshold made clear, softly over 0.07 of depth. */
+function nearOf({ photo, depth }: Pair, threshold: number) {
+  const f = pixelsOf(photo), z = pixelsOf(depth).data, alpha = new Float32Array(photo.width * photo.height);
+  for (let i = 0; i < alpha.length; i++) {
+    alpha[i] = smooth(threshold - 0.035, threshold + 0.035, z[i * 4] / 255);
+    f.data[i * 4 + 3] = 255 * alpha[i];
+  }
+  const near = canvasOf(photo.width, photo.height);
+  (near.getContext("2d") as CanvasRenderingContext2D).putImageData(f, 0, 0);
+  return { near, alpha };
+}
+
+/** Where the word goes: the height (and failing that a smaller size) where about a quarter of it is behind the
+ *  near part and never more than 35%, so at least 65% stays readable. Measured at a quarter of the size. */
+function placeWord(word: string, font: (px: number) => string, alpha: Float32Array, W: number, H: number) {
+  const m = canvasOf(W / 4, H / 4), mc = m.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D;
+  let px = W * 0.26;
+  mc.font = font(px / 4);
+  while (mc.measureText(word).width > m.width * 0.9 && px > 20) {
+    px *= 0.94;
+    mc.font = font(px / 4);
+  }
+  let best = { y: 0.4, px, hidden: 0, score: Infinity };
+  for (const size of [1, 0.86, 0.74]) {
+    if (best.hidden <= 0.35 && best.score < Infinity) break;
+    for (let y = 0.14; y <= 0.8; y += 0.02) {
+      mc.clearRect(0, 0, m.width, m.height);
+      mc.font = font((px * size) / 4);
+      mc.textAlign = "center";
+      mc.textBaseline = "middle";
+      mc.fillStyle = "#fff"; // only the alpha is read
+      mc.fillText(word, m.width / 2, m.height * y);
+      const t = mc.getImageData(0, 0, m.width, m.height).data;
+      let all = 0, gone = 0;
+      for (let yy = 0; yy < m.height; yy++)
+        for (let xx = 0; xx < m.width; xx++) {
+          const a = t[(yy * m.width + xx) * 4 + 3] / 255;
+          if (!a) continue;
+          all += a;
+          gone += a * alpha[yy * 4 * W + xx * 4];
+        }
+      const hidden = all ? gone / all : 0;
+      const score = (hidden > 0.35 ? 10 + hidden : Math.abs(hidden - 0.25)) + (1 - size) * 0.3;
+      if (score < best.score) best = { y, px: px * size, hidden, score };
+    }
+  }
+  return best;
+}
+
+function paintPhoto(el: HTMLElement, pair: Pair, kind: string, word: string, threshold: number): HTMLCanvasElement[] {
+  const { photo } = pair, W = photo.width, H = photo.height;
+  if (kind === "parallax") {
+    // Four layers, far to near; each holds everything from its depth on, so a near layer moving never opens a hole.
+    return [0, 0.18, 0.4, 0.7].map((limit, i) => {
+      const layer = i ? nearOf(pair, limit).near : photo;
+      layer.style.setProperty("--z", String(i / 3));
+      return layer;
+    });
+  }
+  const out = canvasOf(W, H), ctx = out.getContext("2d") as CanvasRenderingContext2D;
+  if (kind === "duotone") {
+    const f = pixelsOf(photo), a = rgbOf(tokenOf(el, "--kd") || tokenOf(el, "--bg")), b = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
+    for (let i = 0; i < f.data.length; i += 4) {
+      const L = smooth(0.05, 0.95, (0.2126 * f.data[i] + 0.7152 * f.data[i + 1] + 0.0722 * f.data[i + 2]) / 255);
+      for (let c = 0; c < 3; c++) f.data[i + c] = a[c] + (b[c] - a[c]) * L;
+    }
+    ctx.putImageData(f, 0, 0);
+    return [out];
+  }
+  // back: the photo, the word, then the near part again on top.
+  const { near, alpha } = nearOf(pair, threshold);
+  const family = tokenOf(el, "--font-display") || "system-ui";
+  const font = (px: number) => `900 ${px}px ${family}`;
+  const spot = placeWord(word, font, alpha, W, H), y = H * spot.y;
+  ctx.drawImage(photo, 0, 0);
+  ctx.font = font(spot.px);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const ink = ctx.createLinearGradient(0, y - spot.px / 2, 0, y + spot.px / 2);
+  ink.addColorStop(0, tokenOf(el, "--k") || tokenOf(el, "--fg"));
+  ink.addColorStop(1, tokenOf(el, "--k2") || tokenOf(el, "--accent"));
+  ctx.fillStyle = ink;
+  ctx.fillText(word, W / 2, y);
+  ctx.drawImage(near, 0, 0);
+  return [out];
+}
+
+export function Photo({
+  src,
+  depth,
+  alt,
+  kind = "parallax",
+  word = "",
+  threshold = 0.5,
+  topic,
+  ratio = 4 / 3,
+  motion = "pointer",
+}: {
+  src?: string;
+  depth?: string;
+  alt: string;
+  kind?: "back" | "duotone" | "parallax";
+  word?: string;
+  threshold?: number;
+  topic?: string;
+  ratio?: number;
+  motion?: "pointer" | "scroll";
+}) {
+  const host = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = host.current;
+    if (!el) return;
+    let gone = false;
+    pairOf(el, src, depth, ratio)
+      .then((pair) => {
+        if (gone) return;
+        el.style.aspectRatio = `${pair.photo.width} / ${pair.photo.height}`;
+        el.replaceChildren(...paintPhoto(el, pair, kind, word, Math.max(0.05, Math.min(0.9, threshold))));
+      })
+      .catch(() => {
+        // A photo that does not load, or one from an origin that forbids reading it back, leaves the frame empty.
+      });
+    return () => {
+      gone = true;
+    };
+  }, [src, depth, kind, word, threshold, topic, ratio]);
+
+  useEffect(() => {
+    const el = host.current;
+    if (!el || kind !== "parallax" || stillMotion()) return;
+    const set = (x: number, y: number) => {
+      el.style.setProperty("--px", Math.max(-1, Math.min(1, x)).toFixed(3));
+      el.style.setProperty("--py", Math.max(-1, Math.min(1, y)).toFixed(3));
+    };
+    if (motion === "scroll") {
+      const on = () => {
+        const r = el.getBoundingClientRect();
+        set(0, ((r.top + r.height / 2) / innerHeight - 0.5) * 2);
+      };
+      on();
+      addEventListener("scroll", on, { passive: true });
+      return () => removeEventListener("scroll", on);
+    }
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      set(((e.clientX - r.left) / r.width - 0.5) * 2, ((e.clientY - r.top) / r.height - 0.5) * 2);
+    };
+    const leave = () => set(0, 0);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerleave", leave);
+    return () => {
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerleave", leave);
+    };
+  }, [kind, motion]);
+
+  return h("div", {
+    ref: host,
+    className: "ix-photo",
+    "data-kind": kind,
+    role: "img",
+    "aria-label": word && kind === "back" ? `${alt}, with the word ${word}` : alt,
+    style: { ...topicVars(topic), aspectRatio: String(ratio) },
+  });
+}
+
+/* ---------------------------------------------------------- BorderPattern */
+
+// A pattern that runs along a rounded edge: what the phone's rim does while Iris refreshes, listens, thinks,
+// works, speaks, waits on you, brings news or saves. From the border lab; eight patterns, each for one moment.
+// Violet, the accent and the "you" pink only: the rim is the ring's family, not a new colour.
+
+type Edge = (u: number) => [number, number];
+type Pen = { c: CanvasRenderingContext2D; at: Edge; length: number; violet: string; ice: string; you: string };
+
+function edgeOf(W: number, H: number, R: number, IN: number): { at: Edge; length: number } {
+  const w = W - 2 * IN, h = H - 2 * IN, r = Math.max(0.001, Math.min(R - IN, w / 2, h / 2));
+  const arc = (Math.PI * r) / 2, x0 = IN, y0 = IN, x1 = IN + w, y1 = IN + h;
+  const legs = [w / 2 - r, arc, h - 2 * r, arc, w - 2 * r, arc, h - 2 * r, arc, w / 2 - r];
+  const on: ((t: number) => [number, number])[] = [
+    (t) => [W / 2 + t, y0],
+    (t) => [x1 - r + r * Math.cos(-Math.PI / 2 + t / r), y0 + r + r * Math.sin(-Math.PI / 2 + t / r)],
+    (t) => [x1, y0 + r + t],
+    (t) => [x1 - r + r * Math.cos(t / r), y1 - r + r * Math.sin(t / r)],
+    (t) => [x1 - r - t, y1],
+    (t) => [x0 + r + r * Math.cos(Math.PI / 2 + t / r), y1 - r + r * Math.sin(Math.PI / 2 + t / r)],
+    (t) => [x0, y1 - r - t],
+    (t) => [x0 + r + r * Math.cos(Math.PI + t / r), y0 + r + r * Math.sin(Math.PI + t / r)],
+    (t) => [x0 + r + t, y0],
+  ];
+  const length = legs.reduce((a, b) => a + b, 0);
+  return {
+    length,
+    at: (u) => {
+      let d = ((((u % 1) + 1) % 1) * length);
+      for (let i = 0; i < 9; i++) {
+        if (d <= legs[i]) return on[i](d);
+        d -= legs[i];
+      }
+      return [W / 2, y0];
+    },
+  };
+}
+
+/** A stretch of the edge from a to b (0..1, clockwise from the top middle), stroked with a glow of its own colour. */
+function stretch(p: Pen, a: number, b: number, colour: string, width: number, glow = 8) {
+  if (b < a) [a, b] = [b, a];
+  const { c } = p, n = Math.max(2, Math.ceil(((b - a) * p.length) / 2));
+  c.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const [x, y] = p.at(a + ((b - a) * i) / n);
+    i ? c.lineTo(x, y) : c.moveTo(x, y);
+  }
+  c.strokeStyle = colour;
+  c.lineWidth = width;
+  c.lineCap = "round";
+  c.shadowColor = colour;
+  c.shadowBlur = glow;
+  c.stroke();
+}
+
+const easeOut = (f: number) => 1 - Math.pow(1 - f, 3);
+const hairline = (p: Pen, o = 0.18) => {
+  p.c.globalAlpha = o;
+  stretch(p, 0, 1, p.violet, 1.5, 0);
+  p.c.globalAlpha = 1;
+};
+
+const BORDER_PATTERNS: Record<string, (p: Pen, t: number) => void> = {
+  // Refreshing: two comets from the top run down both sides and meet at the bottom.
+  comet(p, t) {
+    hairline(p);
+    for (const [v, colour] of [[0, p.violet], [0.5, p.ice]] as [number, string][]) {
+      const k = 0.5 * easeOut((t / 1.3 + v) % 1);
+      stretch(p, k, Math.max(0, k - 0.09), colour, 3);
+      stretch(p, 1 - k, 1 - Math.max(0, k - 0.09), colour, 3);
+    }
+  },
+  // Listening: the whole rim breathes in and out.
+  breathe(p, t) {
+    const a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 2.4));
+    p.c.globalAlpha = a;
+    stretch(p, 0, 1, p.violet, 2.5, 18 * a);
+    p.c.globalAlpha = 1;
+  },
+  // Thinking: one light goes round with a fading tail.
+  orbit(p, t) {
+    hairline(p);
+    const k = (t / 2.2) % 1;
+    for (let i = 0; i < 14; i++) {
+      p.c.globalAlpha = 1 - i / 14;
+      stretch(p, k - i * 0.012, k - (i + 1) * 0.012, i < 3 ? p.ice : p.violet, 3);
+    }
+    p.c.globalAlpha = 1;
+  },
+  // Working on a loop: sparks drift round and flicker.
+  sparks(p, t) {
+    for (let i = 0; i < 26; i++) {
+      const [x, y] = p.at((i / 26 + t * 0.12) % 1), f = 0.5 + 0.5 * Math.sin(t * 5 + i * 1.7);
+      p.c.beginPath();
+      p.c.arc(x, y, 1.2 + 1.3 * f, 0, 7);
+      p.c.fillStyle = p.c.shadowColor = i % 3 ? p.violet : p.ice;
+      p.c.shadowBlur = 8;
+      p.c.globalAlpha = 0.35 + 0.65 * f;
+      p.c.fill();
+    }
+    p.c.globalAlpha = 1;
+  },
+  // She speaks: a wave of thickness travels round.
+  wave(p, t) {
+    const n = 120;
+    for (let i = 0; i < n; i++) {
+      const u = i / n, g = 0.5 + 0.5 * Math.sin(u * Math.PI * 8 - t * 4);
+      stretch(p, u, u + 1 / n + 0.002, g > 0.6 ? p.ice : p.violet, 0.8 + 3.2 * g, 6 * g);
+    }
+  },
+  // A question waits on you: the three colours stream round.
+  stream(p, t) {
+    const n = 90;
+    for (let i = 0; i < n; i++) {
+      const u = i / n, k = (u + t * 0.25) % 1;
+      stretch(p, u, u + 1 / n + 0.003, k < 1 / 3 ? p.violet : k < 2 / 3 ? p.ice : p.you, 2.4, 10);
+    }
+  },
+  // A new loop or a notification: two quick beats, then rest.
+  heartbeat(p, t) {
+    hairline(p, 0.12);
+    const f = (t % 1.8) / 1.8;
+    for (const [start, colour] of [[0, p.violet], [0.18, p.ice]] as [number, string][]) {
+      const g = (f - start) / 0.5;
+      if (g <= 0 || g >= 1) continue;
+      const k = 0.5 * easeOut(g);
+      p.c.globalAlpha = 1 - g * 0.6;
+      stretch(p, k, Math.max(0, k - 0.12), colour, 3);
+      stretch(p, 1 - k, 1 - Math.max(0, k - 0.12), colour, 3);
+    }
+    p.c.globalAlpha = 1;
+  },
+  // Saving or sending: the rim zips closed from the top and opens again.
+  zip(p, t) {
+    const f = (t % 2.4) / 2.4, fill = f < 0.5 ? easeOut(f * 2) : 1 - easeOut((f - 0.5) * 2);
+    stretch(p, 0, fill * 0.5, p.violet, 2.6, 10);
+    stretch(p, 1, 1 - fill * 0.5, p.ice, 2.6, 10);
+  },
+};
+
+export type BorderPatternName = "comet" | "breathe" | "orbit" | "sparks" | "wave" | "stream" | "heartbeat" | "zip";
+
+export function BorderPattern({
+  pattern = "comet",
+  radius,
+  label,
+  children,
+}: {
+  pattern?: BorderPatternName;
+  radius?: number;
+  label?: string;
+  children?: Any;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const paper = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const el = box.current, cv = paper.current;
+    if (!el || !cv) return;
+    const draw = BORDER_PATTERNS[pattern] ?? BORDER_PATTERNS.comet;
+    const still = stillMotion();
+    let pen: Pen | null = null, frame = 0;
+    const size = () => {
+      const dpr = Math.min(2, devicePixelRatio || 1), W = el.clientWidth, H = el.clientHeight;
+      cv.width = W * dpr;
+      cv.height = H * dpr;
+      const c = cv.getContext("2d") as CanvasRenderingContext2D;
+      c.scale(dpr, dpr);
+      const R = radius ?? (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0);
+      pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--phase-you") };
+    };
+    const paint = (ms: number) => {
+      if (pen) {
+        pen.c.clearRect(0, 0, cv.width, cv.height);
+        draw(pen, still ? 0.6 : ms / 1000);
+      }
+      if (!still) frame = requestAnimationFrame(paint);
+    };
+    const watch = new ResizeObserver(() => {
+      size();
+      if (still) paint(0);
+    });
+    watch.observe(el);
+    size();
+    frame = requestAnimationFrame(paint);
+    return () => {
+      watch.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [pattern, radius]);
+
+  return h(
+    "div",
+    { ref: box, className: "ix-border", "data-pattern": pattern, style: radius != null ? { borderRadius: radius } : undefined },
+    h("canvas", { ref: paper, className: "ix-border-rim", "aria-hidden": "true" }),
+    label ? h("span", { className: "ix-visually-hidden", role: "status" }, label) : null,
+    children,
+  );
+}
+
+/* -------------------------------------------------------------- ChatStack */
+
+// The chat-stack sketch: every chat with its loops is a card in its topic's colour, and the cards lie in a stack
+// with depth (each one further back is smaller, dimmer and softer). A tap fans the stack upward; a tap on a card
+// opens that chat on its own sheet, the rest reduced to two edges behind it. CircleStack is the plain, compact
+// cousin for the strip; this is the one with the topic colours and the open chat.
+
+export type ChatLoop = CircleLoop & { line?: string };
+export type ChatCircle = {
+  id: string;
+  title: string;
+  line: string;
+  topic?: string;
+  eyebrow?: string;
+  loops?: ChatLoop[];
+  message?: string;
+  actions?: { label: string; primary?: boolean; onClick?: () => void }[];
+};
+
+export function ChatStack({
+  items,
+  fanned: fannedAtStart = false,
+  current: currentAtStart = null,
+  onSelect,
+}: {
+  items: ChatCircle[];
+  fanned?: boolean;
+  current?: string | null;
+  onSelect?: (id: string | null) => void;
+}) {
+  const [fanned, setFanned] = useState(fannedAtStart);
+  const [current, setCurrent] = useState<string | null>(currentAtStart);
+  const design = (window as Any).IrisUi?.design ?? {};
+  const urgency = (c: ChatCircle) => (waits(c) ? 0 : 1);
+  const circles = items
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => urgency(a.c) - urgency(b.c) || a.i - b.i)
+    .map((x) => x.c);
+  if (!circles.length) return null;
+  const pick = (id: string | null) => {
+    setCurrent(id);
+    onSelect && onSelect(id);
+  };
+  const open = circles.find((c) => c.id === current);
+
+  if (open) {
+    const loops = open.loops ?? [];
+    const lead = loops.find((l) => l.step === YOU) ?? loops[0];
+    return h(
+      "section",
+      {
+        className: "ix-chat-open",
+        style: topicVars(open.topic),
+        "aria-label": open.title,
+        onKeyDown: (e: Any) => e.key === "Escape" && pick(null),
+      },
+      circles
+        .filter((c) => c !== open)
+        .slice(0, 2)
+        .map((c, i) => h("i", { key: c.id, className: "ix-chat-peek", "data-depth": i, style: topicVars(c.topic) })),
+      h(
+        "div",
+        { className: "ix-chat-sheet" },
+        h(
+          "div",
+          { className: "ix-chat-head" },
+          lead ? h(LoopBubble, { title: lead.title, step: lead.step, size: 28 }) : null,
+          h(
+            "span",
+            { className: "ix-chat-text" },
+            open.eyebrow ? h("span", { className: "ix-chat-eyebrow" }, open.eyebrow) : null,
+            h("span", { className: "ix-chat-title" }, open.title),
+          ),
+        ),
+        open.message ? h("p", { className: "ix-chat-message" }, open.message) : null,
+        loops.length ? h("span", { className: "ix-chat-section" }, "Loops") : null,
+        loops.length
+          ? h(
+              "ul",
+              { className: "ix-chat-loops" },
+              loops.map((l, i) =>
+                h(
+                  "li",
+                  { key: i, className: "ix-chat-loop", "data-you": l.step === YOU ? "1" : undefined },
+                  h(LoopBubble, { title: l.title, step: l.step, size: 24 }),
+                  h(
+                    "span",
+                    { className: "ix-chat-text" },
+                    h("span", { className: "ix-chat-loop-title" }, l.title),
+                    h(
+                      "span",
+                      { className: "ix-chat-line" },
+                      h("span", { className: "ix-chat-phase", style: { color: design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
+                      l.line ? `, ${l.line}` : "",
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : null,
+        h(
+          "div",
+          { className: "ix-chat-actions" },
+          (open.actions ?? []).map((a, i) =>
+            houseButton({ key: i, variant: a.primary ? "primary" : "glass", size: "sm", topic: open.topic, onClick: a.onClick }, a.label),
+          ),
+          houseButton({ key: "back", variant: "ghost", size: "sm", onClick: () => pick(null) }, "Back"),
+        ),
+      ),
+    );
+  }
+
+  return h(
+    "div",
+    {
+      className: "ix-chats",
+      "data-fanned": fanned ? "1" : undefined,
+      style: { "--n": fanned ? circles.length : Math.min(3, circles.length) },
+      onKeyDown: (e: Any) => e.key === "Escape" && setFanned(false),
+    },
+    circles.map((c, i) => {
+      const live = fanned || i === 0;
+      const loops = c.loops ?? [];
+      return h(
+        "button",
+        {
+          key: c.id,
+          type: "button",
+          className: "ix-chat ix-focus",
+          style: { ...topicVars(c.topic), "--i": i, zIndex: circles.length - i },
+          "data-far": !fanned && i > 2 ? "1" : undefined,
+          tabIndex: live ? 0 : -1,
+          "aria-hidden": live ? undefined : "true",
+          "aria-expanded": fanned ? undefined : "false",
+          "aria-label": fanned || circles.length < 2 ? undefined : `${c.title}, and ${circles.length - 1} more`,
+          onClick: () => (fanned ? pick(c.id) : setFanned(true)),
+        },
+        h(
+          "span",
+          { className: "ix-chat-text" },
+          c.eyebrow ? h("span", { className: "ix-chat-eyebrow" }, c.eyebrow) : null,
+          h("span", { className: "ix-chat-title" }, c.title),
+          h("span", { className: "ix-chat-line", "data-you": waits(c) ? "1" : undefined }, c.line),
+        ),
+        loops.length
+          ? h("span", { className: "ix-circle-loops" }, loops.slice(0, 3).map((l, j) => h(LoopBubble, { key: j, title: l.title, step: l.step, size: 24 })))
+          : null,
+        loops.length > 3 ? h("span", { className: "ix-circle-more" }, `+${loops.length - 3}`) : null,
+      );
+    }),
+    !fanned && circles.length > 1 ? h("span", { className: "ix-circles-count ix-chats-count", "aria-hidden": "true" }, `+${circles.length - 1}`) : null,
+  );
+}
+
 const SHIPPED = {
+  Photo,
+  BorderPattern,
+  ChatStack,
   Tooltip,
   Menu,
   Dialog,

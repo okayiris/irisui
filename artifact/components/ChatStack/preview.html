@@ -1,0 +1,40 @@
+<!-- @dsCard group="Navigation" height=440 -->
+<!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  window.__dsPreview = {
+    "At rest, tap to fan out": () => h("div", { style: { display: "grid", alignContent: "end", minHeight: 300 } },
+    h(ChatStack, { items: [
+      { id: "debtors", topic: "money", eyebrow: "Money", title: "Debtors", line: "Van Dijk waits on you", loops: [{ title: "Van Dijk", step: 3 }, { title: "Korenaar", step: 1 }, { title: "Noorderlicht", step: 1 }, { title: "Debtors", step: 1 }] },
+      { id: "groceries", topic: "groceries", eyebrow: "Groceries", title: "Groceries", line: "Saturday delivery, 8 on the list", loops: [{ title: "Jumbo", step: 4 }] },
+      { id: "renovation", topic: "home", eyebrow: "Home", title: "Renovation", line: "Comparing 3 quotes", loops: [{ title: "Quotes", step: 2 }, { title: "Tiles", step: 1 }] },
+      { id: "dentist", topic: "health", eyebrow: "Health", title: "Dentist", line: "Pick a time", loops: [{ title: "Dentist", step: 3 }] },
+    ] })),
+    "One chat open": () => h(ChatStack, { current: "debtors", items: [
+    { id: "debtors", topic: "money", eyebrow: "Money", title: "Debtors", line: "Van Dijk waits on you",
+      message: "Only Van Dijk is 34 days late, 4,840 euros. My suggestion: one last reminder with a deadline, and only then a delivery stop.",
+      loops: [
+        { title: "Debtors", step: 0, line: "the house rules" },
+        { title: "Van Dijk", step: 3, line: "34 days late, 4,840 euros" },
+        { title: "Korenaar", step: 1, line: "12 days late, 1,210 euros" },
+      ],
+      actions: [{ label: "Send the reminder", primary: true }] },
+    { id: "groceries", topic: "groceries", title: "Groceries", line: "Saturday delivery" },
+    { id: "renovation", topic: "home", title: "Renovation", line: "Comparing 3 quotes" },
+  ] }),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>
