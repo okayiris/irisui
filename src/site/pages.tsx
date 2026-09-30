@@ -372,7 +372,10 @@ export function HomePage(): Rendered {
           go.
         </p>
         <div className="hero-actions">
-          <a className="btn-primary" href="/foundations/colour">
+          <a className="btn-primary" href="/examples/">
+            See it as an app
+          </a>
+          <a className="btn-ghost" href="/foundations/colour">
             Start with the foundations
           </a>
           <a className="btn-ghost" href="/components/orb">

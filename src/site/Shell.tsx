@@ -112,6 +112,9 @@ export function Shell({ title, description, path, headings = [], components, chi
               <NavLink href="/" path={path}>
                 Overview
               </NavLink>
+              <NavLink href="/examples/" path={path}>
+                Examples: the app
+              </NavLink>
 
               <p className="nav-head">Foundations</p>
               {FOUNDATIONS.map((f) => (

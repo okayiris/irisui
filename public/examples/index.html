@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Iris UI examples</title>
+<meta name="description" content="The Iris app built from the design system, screen by screen, with the rules each screen keeps.">
+<link rel="stylesheet" href="../ds/tokens.css">
+<link rel="stylesheet" href="../ds/bundle.css">
+<link rel="stylesheet" href="../ds/ext.css">
+<link rel="stylesheet" href="../ds/extra.css">
+<link rel="stylesheet" href="../ds/placeholder.css">
+<link rel="icon" href="../favicon.svg">
+<style>
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-text); }
+  * { box-sizing: border-box; }
+
+  /* The page around the phone. */
+  .ex { display: grid; grid-template-columns: 220px 390px minmax(0, 320px); gap: 40px; justify-content: center;
+        align-items: start; padding: 28px 16px 60px; }
+  .ex-top { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--line); }
+  .ex-top a { color: var(--dim); text-decoration: none; font: var(--text-body); }
+  .ex-top a:hover { color: var(--fg); }
+  .ex-top h1 { font: var(--text-row-title); font-weight: 600; margin: 0; }
+  .ex-top .sp { flex: 1; }
+  .lab { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 10px; }
+  .list { display: grid; gap: 4px; position: sticky; top: 20px; }
+  .list button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 10px; color: var(--dim);
+                 font: var(--text-body); display: flex; justify-content: space-between; gap: 8px; }
+  .list button:hover { background: var(--glass); color: var(--fg); }
+  .list button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .list button[aria-current="true"] { background: var(--glass); color: var(--fg); box-shadow: inset 0 0 0 1px var(--edge); }
+  .list .n { font-family: var(--font-mono); font-size: 11px; color: var(--label); }
+  .list .sep { margin: 14px 0 6px; }
+
+  /* The phone. */
+  .phone { width: 390px; height: min(844px, calc(100vh - 120px)); min-height: 640px; border-radius: 54px; position: relative; overflow: hidden;
+           box-shadow: 0 0 0 1px var(--edge), 0 0 0 10px #0d1015, 0 0 0 11px var(--edge); background: var(--bg); }
+  .island { position: absolute; top: 11px; left: 50%; translate: -50% 0; width: 124px; height: 36px;
+            border-radius: 20px; background: #000; z-index: 50; pointer-events: none; }
+  .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; justify-content: space-between;
+            align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; z-index: 40; pointer-events: none; }
+  .app { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 62px 16px 130px; scrollbar-width: none; }
+  .app::-webkit-scrollbar { display: none; }
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 30; }
+  /* ponytail: Dialog ships inside a demo Stage (dashed box). Undo it here, so the scrim covers the phone:
+     the transform makes the phone the box a fixed scrim fills. Fix belongs in ext.tsx. */
+  .phone { transform: translateZ(0); }
+  .app .ix-stage { position: static; min-height: 0; border: 0; background: none; overflow: visible; border-radius: 0; }
+  .app .ix-scrim { position: fixed; }
+
+  /* What goes inside a screen. */
+  .eyebrow { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 8px 0 6px; }
+  .title { font: var(--text-page-title); margin: 0 0 8px; letter-spacing: -.01em; }
+  .say { font: var(--text-body); color: var(--dim); line-height: 1.45; margin: 0 0 20px; }
+  .say b { color: var(--fg); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; justify-items: center; }
+  .stack { display: grid; gap: 12px; }
+  .tap { all: unset; cursor: pointer; display: block; border-radius: 26px; }
+  .tap:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .back { all: unset; cursor: pointer; color: var(--accent); font: var(--text-body); padding: 6px 0; display: inline-flex; gap: 4px; }
+  .back:focus-visible { outline: 2px solid var(--accent); border-radius: 6px; }
+  .hero { display: flex; align-items: center; gap: 18px; margin: 4px 0 18px; }
+  .chips { display: flex; gap: 8px; margin: 0 0 14px; flex-wrap: wrap; }
+  .centre { display: grid; justify-items: center; text-align: center; gap: 14px; padding-top: 70px; }
+  .centre .say { max-width: 300px; }
+  .errline { color: var(--error); font: var(--text-body); margin: 10px 0 0; }
+
+  /* The rules panel. */
+  .rules { position: sticky; top: 20px; display: grid; gap: 14px; }
+  .score { display: flex; gap: 4px; }
+  .score i { flex: 1; height: 8px; border-radius: 4px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
+  .score i.on { background: var(--accent); box-shadow: none; }
+  .score.over i.on { background: var(--error); }
+  .cost { display: grid; gap: 4px; font: var(--text-body); color: var(--dim); }
+  .cost div { display: flex; justify-content: space-between; }
+  .cost span:last-child { font-family: var(--font-mono); color: var(--label); }
+  .checks { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font: var(--text-body); }
+  .checks li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; color: var(--dim); }
+  .checks li::before { content: ""; width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--ok); }
+  .checks li.q::before { background: var(--wait); }
+  .checks li.q { color: var(--fg); }
+  .legend { font-size: 12px; color: var(--label); display: flex; gap: 14px; }
+  .legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--ok); }
+  .legend span.q::before { background: var(--wait); }
+
+  /* All screens side by side. */
+  .wall { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; padding: 28px 16px 60px; }
+  .wall figure { margin: 0; display: grid; gap: 10px; justify-items: center; }
+  .wall .mini { zoom: .7; }
+  .wall .phone { height: 844px; }
+  .wall figcaption { font: var(--text-body); color: var(--dim); }
+  .wall figcaption button { all: unset; cursor: pointer; color: var(--accent); }
+
+
+  @media (max-width: 1040px) {
+    .ex { grid-template-columns: 390px; }
+    .list { position: static; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .rules { position: static; }
+  }
+  @media (max-width: 430px) {
+    .ex { padding: 0 0 40px; grid-template-columns: 100%; }
+    .phone { width: 100%; height: 100svh; border-radius: 0; box-shadow: none; }
+    .island, .status { display: none; }
+    .list, .rules { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="../ds/vendor/react.js"></script>
+<script src="../ds/vendor/react-dom.js"></script>
+<script src="../ds/bundle.js"></script>
+<script src="../ds/ext.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState, useEffect } = React;
+  const I = window.IrisUi;
+  const { PreviewI18nProvider, Icon, Card, Row, Toggle, Button, ButtonGroup, Orb, StatusPill, TalkOrb, TabBar,
+          Skeleton, Topic, Widget, LoopScreen, Pen, Anchor, Chip, Progress, CheckList, Segmented, Field,
+          Dialog, Snackbar, EmptyState } = I;
+
+  const params = new URLSearchParams(location.search);
+
+  /* ---------------------------------------------------------------- screens */
+
+  const Today = ({ go }) => h("div", null,
+    h("p", { className: "eyebrow" }, "Tuesday 30 September"),
+    h("h2", { className: "title" }, "Good evening, Alex"),
+    h("p", { className: "say" }, h("b", null, "Alex"), ", after the dentist you still have time for the groceries."),
+    h("div", { className: "grid2" },
+      h("button", { className: "tap", onClick: () => go("groceries"), "aria-label": "Open groceries" },
+        h(Widget, { topic: "groceries", look: "ring", size: "small", label: "Groceries", value: "3", unit: "/8",
+                    progress: 3 / 8 })),
+      h(Widget, { topic: "weather", look: "glass", size: "small", label: "Weather", value: "14°" })),
+    h("div", { style: { height: 12 } }),
+    h("div", { style: { display: "grid", justifyItems: "center" } },
+      h(Widget, { topic: "agenda", look: "list", size: "wide", label: "Tomorrow",
+                  items: [["09:30", "Dentist"], ["12:00", "Lunch with Sam"], ["17:30", "Groceries"]], note: "bring the old card" })));
+
+  const ITEMS = ["Bread", "Milk", "Eggs", "Tomatoes", "Pasta", "Candles", "Balloons", "Lemonade"];
+  function Groceries({ go }) {
+    const [items, setItems] = useState(ITEMS);
+    const [done, setDone] = useState([0, 1, 2]);
+    const [filter, setFilter] = useState(0);
+    const [draft, setDraft] = useState("");
+    const left = items.length - done.length;
+    const shown = items.map((t, i) => [t, i]).filter(([, i]) => filter === 0 || (filter === 1 ? !done.includes(i) : done.includes(i)));
+    const toggle = (k) => { const i = shown[k][1]; setDone((d) => d.includes(i) ? d.filter((x) => x !== i) : [...d, i]); };
+    return h(Topic, { name: "groceries" },
+      h("button", { className: "back", onClick: () => go("today") }, "‹ Today"),
+      h("div", { className: "hero" },
+        h(Progress, { ring: true, size: 92, value: done.length / items.length, centre: `${done.length}/${items.length}`, topic: "groceries" }),
+        h("div", null,
+          h("h2", { className: "title", style: { marginBottom: 2 } }, "Groceries"),
+          h(Pen, { kind: "underline", look: "clean" }, `${left} still to get`),
+          h("div", { style: { marginTop: 10 } }, h(Anchor, null, "for Sam's party")))),
+      h("p", { className: "say" }, h("b", null, "Alex"), ", the candles are at the Hema, next to the dentist."),
+      h("div", { className: "chips" },
+        ["All", "To get", "Got"].map((l, i) => h(Chip, { key: l, on: filter === i, topic: "groceries", onClick: () => setFilter(i) }, l))),
+      h(Card, null,
+        h(CheckList, { topic: "groceries", items: shown.map(([t]) => t),
+                       done: shown.map(([, i], k) => done.includes(i) ? k : -1).filter((k) => k >= 0), onToggle: toggle })),
+      h("form", { style: { margin: "12px 0" }, onSubmit: (e) => { e.preventDefault(); if (draft.trim()) { setItems([...items, draft.trim()]); setDraft(""); } } },
+        h(Field, { topic: "groceries", placeholder: "Add something", "aria-label": "Add something", value: draft, onChange: (e) => setDraft(e.target.value) })),
+      h(ButtonGroup, { topic: "groceries", stack: true },
+        h(Button, { variant: "primary", size: "lg", topic: "groceries", onClick: () => go("error") }, "Order at Albert Heijn"),
+        h(Button, { variant: "glass" }, "Share the list")));
+  }
+
+  const LOOPS = [
+    { t: "Parcel from Coolblue", s: "On its way, arrives 17:00 to 18:00", p: .6, topic: "parcel" },
+    { t: "Rent to Vesteda", s: "Paid, waiting for the receipt", p: .85, topic: "money" },
+    { t: "Dentist, Wednesday", s: "Planned, reminder at 08:30", p: .3, topic: "agenda" },
+  ];
+  const Loops = ({ go }) => h("div", null,
+    h("p", { className: "eyebrow" }, "3 running"),
+    h("h2", { className: "title" }, "Loops"),
+    h("p", { className: "say" }, "What comes back, and where each one is."),
+    h("div", { className: "stack" }, LOOPS.map((l) =>
+      h(Card, { key: l.t, padding: 4 }, h(Row, { title: l.t, subtitle: l.s, chevron: true, onClick: () => go("loop"),
+        icon: h(Progress, { ring: true, size: 30, value: l.p, topic: l.topic }) })))),
+    h("div", { style: { marginTop: 20 } }, h(Button, { variant: "text", onClick: () => go("empty") }, "See it with no loops")));
+
+  const Loop = ({ go }) => h("div", { style: { margin: "0 -16px" } },
+    h(LoopScreen, { title: "Parcel from Coolblue", when: "Today, 18:00", sub: "Your new headphones", phase: "busy", progress: .6,
+                    now: "On its way. The driver is four stops away.", onDone: () => go("loops"), onLoops: () => go("loops") }));
+
+  function Talk() {
+    const states = ["listening", "thinking", "talking", "muted"];
+    const [s, setS] = useState(0);
+    const said = ["Go ahead, I am listening.", "Looking at your agenda...", "Tomorrow you have the dentist at half past nine.", "Muted. Tap the orb to talk again."];
+    return h("div", { className: "centre" },
+      h(StatusPill, { state: s === 1 ? "busy" : s === 2 ? "talking" : s === 3 ? "away" : "listening", label: states[s] }),
+      h("div", { style: { margin: "30px 0" } }, h(TalkOrb, { size: 220, state: states[s], onPress: () => setS((s + 1) % 4) })),
+      h("p", { className: "say" }, said[s]),
+      h(Segmented, { items: ["Listen", "Think", "Talk", "Mute"], active: s, onSelect: setS }));
+  }
+
+  function You({ go }) {
+    const [near, setNear] = useState(true);
+    const [push, setPush] = useState(false);
+    const [ask, setAsk] = useState(false);
+    const [gone, setGone] = useState(false);
+    return h("div", null,
+      h("p", { className: "eyebrow" }, "alex@example.com"),
+      h("h2", { className: "title" }, "You"),
+      h("p", { className: "say" }, "How Iris works on this phone."),
+      h("div", { className: "stack" },
+        h(Card, { padding: 4 },
+          h(Row, { icon: h(Icon, { name: "phone" }), title: "This device", subtitle: "Listens here, even when locked", trailing: h(Toggle, { on: near, onChange: setNear }) }),
+          h(Row, { icon: h(Icon, { name: "speaker" }), title: "Voice", subtitle: "How Iris sounds", trailing: h("span", { style: { color: "var(--dim)" } }, "Wiep"), chevron: true }),
+          h(Row, { icon: h(Icon, { name: "sparkles" }), title: "Notifications", subtitle: "Only when a loop needs you", trailing: h(Toggle, { on: push, onChange: setPush }) })),
+        h(Card, { padding: 4 },
+          h(Row, { icon: h(Icon, { name: "shield" }), title: "Privacy", subtitle: "What Iris keeps, and for how long", external: true }),
+          h(Row, { icon: h(Icon, { name: "globe" }), title: "Language", trailing: h("span", { style: { color: "var(--dim)" } }, "English"), chevron: true })),
+        h(Card, { padding: 4 },
+          h(Row, { icon: h(Icon, { name: "trash" }), title: "Delete everything", subtitle: "Loops, lists, voice and history", danger: true, onClick: () => setAsk(true) }))),
+      h(Dialog, { open: ask, onClose: () => setAsk(false), title: "Delete everything?", body: "Your loops, lists and voice go, on every device. This cannot be undone.",
+                  actions: [{ label: "Delete", danger: true, onClick: () => setGone(true) }, { label: "Keep it" }] }),
+      gone ? h("div", { style: { marginTop: 16 } }, h(Snackbar, { text: "Everything is deleted", tone: "ok", action: "Undo", onAction: () => setGone(false) })) : null);
+  }
+
+  const Loading = () => h("div", null,
+    h("p", { className: "eyebrow" }, "Tuesday 30 September"),
+    h("h2", { className: "title" }, "Good evening, Alex"),
+    h("div", { style: { marginBottom: 20 } }, h(Skeleton, { height: 18, width: "80%" })),
+    h("div", { className: "grid2" }, h(Skeleton, { height: 170, width: 170 }), h(Skeleton, { height: 170, width: 170 })),
+    h("div", { style: { height: 12 } }),
+    h(Skeleton, { height: 170 }));
+
+  const Empty = ({ go }) => h("div", null,
+    h("p", { className: "eyebrow" }, "Nothing running"),
+    h("h2", { className: "title" }, "Loops"),
+    h("div", { style: { marginTop: 60 } },
+      h(EmptyState, { title: "No loops yet", line: "Say what should come back, and Iris keeps track of it.",
+                      action: { label: "Talk to Iris", onClick: () => go("talk") } })));
+
+  function Failed({ go }) {
+    const [busy, setBusy] = useState(false);
+    return h(Topic, { name: "groceries" },
+      h("button", { className: "back", onClick: () => go("groceries") }, "‹ Groceries"),
+      h("h2", { className: "title" }, "Order"),
+      h("p", { className: "say" }, "5 things for Sam's party, delivered tomorrow between 16:00 and 18:00."),
+      h(Card, null,
+        h(Row, { icon: h(Icon, { name: "car" }), title: "Albert Heijn", subtitle: "Tomorrow, 16:00 to 18:00" }),
+        h("p", { className: "errline", role: "alert" }, "Albert Heijn did not answer. Nothing was ordered or paid.")),
+      h("div", { style: { marginTop: 16 } },
+        h(ButtonGroup, { topic: "groceries", stack: true },
+          h(Button, { variant: "primary", size: "lg", topic: "groceries", busy, onClick: () => { setBusy(true); setTimeout(() => setBusy(false), 1400); } }, "Try again"),
+          h(Button, { variant: "glass", onClick: () => go("groceries") }, "Back to the list"))));
+  }
+
+  const Camera = ({ go }) => h("div", { className: "centre" },
+    h(Orb, { size: 96, state: "idle" }),
+    h("h2", { className: "title" }, "Show Iris what you see"),
+    h("p", { className: "say" }, "Only while you hold the button. Nothing is kept after Iris answers."),
+    h("div", { style: { width: "100%", display: "grid" } },
+      h(ButtonGroup, { stack: true },
+        h(Button, { variant: "primary", size: "lg", onClick: () => go("today") }, "Allow the camera"),
+        h(Button, { variant: "glass", onClick: () => go("today") }, "Not now"))));
+
+  /* ----------------------------------------- the list, and each screen's check */
+
+  // busy: what each loud part costs (screens.md, the busy budget of 5). ok: rules this screen keeps.
+  // ask: where the rule is not clear yet. That list is the point of this page.
+  const SCREENS = [
+    { id: "today", name: "Today", tab: 0, el: Today,
+      busy: [["Ring widget", 1], ["Glass widget", 0], ["List widget", 0]],
+      ok: ["Every widget is one answer", "One anchor: the note on the agenda", "Her sentence names Alex and ties the dentist to the groceries"],
+      ask: ["The anchor did not fit next to the label of a small ring widget: forbid it there?", "Does a home screen need an anchor, or only screens about one thing?", "Is 'Tomorrow' allowed next to 'Good evening' on one screen?"] },
+    { id: "groceries", name: "Groceries", tab: 0, el: Groceries,
+      busy: [["Progress ring", 1], ["Pen, clean", 0], ["Buttons", 0]],
+      ok: ["Hero is the answer: the ring is the count", "One pen, one anchor", "Primary in the topic accent, secondary glass", "Tick, add, filter all work"],
+      ask: ["Chips plus a tick list: is that two controls for one job?", "Does 'Share the list' earn its place?", "Anchor counts one per page, not per screen: under All screens this one is drawn plain. Count per screen?"] },
+    { id: "loops", name: "Loops", tab: 1, el: Loops,
+      busy: [["Three small rings", 0]],
+      ok: ["Rows stack with 12px", "Each ring shows where the loop is"],
+      ask: ["Three topic colours on one list: allowed, or one accent?", "Small rings: do they count in the busy budget?"] },
+    { id: "loop", name: "One loop", tab: 1, el: Loop,
+      busy: [["PhaseRing", 2], ["Pen round the phase", 1]],
+      ok: ["The LoopScreen as shipped", "Phase colours fixed"],
+      ask: ["No anchor here: is a loop screen exempt?"] },
+    { id: "talk", name: "Talking", tab: -1, el: Talk,
+      busy: [["TalkOrb", 0]],
+      ok: ["Tap the orb or the switch: listening, thinking, talking, muted"],
+      ask: ["StatusPill and Segmented both say the state: one too many?", "What does the busy budget say about her orb?"] },
+    { id: "you", name: "You", tab: 3, el: You,
+      busy: [],
+      ok: ["Rows, values, danger at the bottom", "Delete asks first, then Undo"],
+      ask: ["Undo after 'cannot be undone': which one is true?", "Dialog ships inside a dashed demo box, so in a real screen it lands under the list. Take Stage out of Dialog and Sheet?"] },
+    { id: "camera", name: "Permission", tab: 2, el: Camera,
+      busy: [["Orb", 0]],
+      ok: ["Asks once, says what for", "One primary, one way out"],
+      ask: [] },
+    { sep: "States" },
+    { id: "loading", name: "Loading", tab: 0, el: Loading,
+      busy: [],
+      ok: ["Skeleton in the shape of what is coming", "The header is already there"],
+      ask: ["Show her sentence as a skeleton, or leave it out until it is ready?"] },
+    { id: "empty", name: "Empty", tab: 1, el: Empty,
+      busy: [],
+      ok: ["Never an empty black screen", "One action out"],
+      ask: ["The EmptyState draws its own circle: should that be her Orb?"] },
+    { id: "error", name: "Error", tab: 0, el: Failed,
+      busy: [["Buttons", 0]],
+      ok: ["The error sits next to the thing", "Says what did not happen: nothing paid"],
+      ask: ["Red text only, or also a red edge on the card?"] },
+  ];
+  const real = SCREENS.filter((s) => s.id);
+  const find = (id) => real.find((s) => s.id === id) ?? real[0];
+
+  /* ------------------------------------------------------------------- phone */
+
+  function Phone({ id, go }) {
+    const s = find(id);
+    const tabs = ["Iris", "Loops", "Camera", "You"];
+    const toTab = (i) => go(["today", "loops", "camera", "you"][i]);
+    return h("div", { className: "phone" },
+      h("div", { className: "island", "aria-hidden": "true" }),
+      h("div", { className: "status", "aria-hidden": "true" }, h("span", null, "21:04"), h("span", null, "●●●")),
+      h("main", { className: "app", key: id, "aria-label": s.name }, h(s.el, { go })),
+      h("div", { className: "bar" },
+        h(TabBar, { tabs, active: s.tab < 0 ? 0 : s.tab, talk: id === "talk" ? "listening" : "rest", onSelect: toTab, onTalk: () => go("talk") })));
+  }
+
+  function Rules({ s }) {
+    const total = s.busy.reduce((a, [, c]) => a + c, 0);
+    return h("aside", { className: "rules", "aria-label": "Rules on this screen" },
+      h("div", null,
+        h("p", { className: "lab" }, `Busy ${total} of 5`),
+        h("div", { className: "score" + (total > 5 ? " over" : "") }, [0, 1, 2, 3, 4].map((i) => h("i", { key: i, className: i < total ? "on" : "" })))),
+      s.busy.length ? h("div", { className: "cost" }, s.busy.map(([p, c]) => h("div", { key: p }, h("span", null, p), h("span", null, c)))) : null,
+      h("div", null,
+        h("p", { className: "lab" }, "Rules"),
+        h("ul", { className: "checks" },
+          s.ok.map((t) => h("li", { key: t }, t)),
+          s.ask.map((t) => h("li", { key: t, className: "q" }, t)))),
+      h("div", { className: "legend" }, h("span", null, "keeps"), h("span", { className: "q" }, "to decide")));
+  }
+
+  function App() {
+    const [id, setId] = useState(params.get("s") || "today");
+    const [all, setAll] = useState(params.has("all"));
+    const go = (next) => {
+      setId(next);
+      const u = new URL(location.href); u.searchParams.set("s", next); u.searchParams.delete("all");
+      history.replaceState(null, "", u);
+    };
+    useEffect(() => {
+      const u = new URL(location.href);
+      all ? u.searchParams.set("all", "") : u.searchParams.delete("all");
+      history.replaceState(null, "", u);
+    }, [all]);
+
+    const top = h("header", { className: "ex-top" },
+      h("a", { href: "../" }, "‹ Iris UI"),
+      h("h1", null, "Examples"),
+      h("span", { className: "sp" }),
+      h(Button, { variant: all ? "glass" : "primary", size: "sm", onClick: () => setAll(false) }, "As an app"),
+      h(Button, { variant: all ? "primary" : "glass", size: "sm", onClick: () => setAll(true) }, "All screens"));
+
+    if (all) return h("div", null, top,
+      h("div", { className: "wall" }, real.map((s) =>
+        h("figure", { key: s.id },
+          // ponytail: live phones, not iframes; each iframe held a dev-server reload stream and six hung the page
+          h("div", { className: "mini" }, h(Phone, { id: s.id, go: () => {} })),
+          h("figcaption", null, h("button", { onClick: () => { setAll(false); go(s.id); } }, s.name))))));
+
+    const cur = find(id);
+    return h("div", null, top,
+      h("div", { className: "ex" },
+        h("nav", { className: "list", "aria-label": "Screens" },
+          h("p", { className: "lab" }, "Screens"),
+          SCREENS.map((s, i) => s.sep
+            ? h("p", { key: s.sep, className: "lab sep" }, s.sep)
+            : h("button", { key: s.id, "aria-current": s.id === cur.id ? "true" : "false", onClick: () => go(s.id) },
+                h("span", null, s.name), s.ask.length ? h("span", { className: "n" }, s.ask.length) : null))),
+        h(Phone, { id: cur.id, go }),
+        h(Rules, { s: cur })));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(h(PreviewI18nProvider, null, h(App)));
+})();
+</script>
+</body>
+</html>
