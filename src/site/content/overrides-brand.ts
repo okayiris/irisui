@@ -52,7 +52,7 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
     specs: [
       { label: "canvas", value: "230 across, ball 38% of size, the ring fades out before the edge" },
       { label: "white", value: "capped, only the hottest cores add white, at most 55% of the way" },
-      { label: "thinking", value: "time runs 3x, a neon arc #2ee6d6 races round" },
+      { label: "thinking", value: "time runs 3x, the thinking comets run up both sides, as on the TalkOrb" },
       { label: "muted", value: "grey-violet, dim, slow, struck-through mic in front" },
       { label: "particles", value: "count 1 to 512, maxSize default 6, maxLight default 1.6, react 0 to 3" },
       { label: "particleStyle", value: "each shape starts from its own values, Orb3D.shapeStyle(shape); sprite is dot, star, blob, square, ring or streak" },
@@ -74,7 +74,7 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
       { name: "core", what: "the ring inside, 22/60 of the disc" },
       { name: "spectrum", what: "48 mirrored pitch bars while she talks, low at the bottom, high at the top" },
       { name: "echo", what: "three ice-blue echoes that run out to 1.35x the disc while it listens" },
-      { name: "arc", what: "the neon #2ee6d6 arc that races round while she thinks" },
+      { name: "arc", what: "while she thinks: a violet and a cyan comet run from the bottom up both sides at once, half a round apart, as in the apps" },
       { name: "muted-mic", what: "the struck-through mic, drawn in front when her voice is off" },
     ],
     rules: [
@@ -89,7 +89,7 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
       { label: "rest", value: "one turn in 30s, nothing else moves" },
       { label: "spectrum", value: "48 pitches, 90Hz to 7kHz, mirrored, each pitch its own colour, low ice blue via violet to high magenta" },
       { label: "listening", value: "echoes run out to 1.35x the disc, 1.35s, ease-out, infinite" },
-      { label: "thinking", value: "arc races round, ring pulses .96 to 1.04 in .7s" },
+      { label: "thinking", value: "comets #8b5cf6 and #22d3ee, 1.3s a round, eased out; ring pulses .96 to 1.04 in .7s" },
       { label: "muted", value: "core steps back to opacity .2 and scale .65" },
       { label: "away", value: "grey and still" },
     ],
