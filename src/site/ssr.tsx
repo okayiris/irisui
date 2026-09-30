@@ -355,6 +355,11 @@ function collectPages(): Page[] {
             <h1>{m.name}</h1>
             {m.blurb ? <p className="lede">{m.blurb}</p> : null}
           </header>
+          <p className="note is-warn">
+            <span className="note-tag">lab</span>
+            Nothing here has a meaning yet, so nothing here goes in a product screen. First give it one on{" "}
+            <a href="/foundations/meaning">Meaning: what may go where</a>.
+          </p>
           <iframe className="lab-frame" src={LAB.url + m.path} title={m.name} />
           <p className="foot-dim">
             From Ringlab, <a href={LAB.url + m.path}>{LAB.url + m.path}</a>. Never published.
