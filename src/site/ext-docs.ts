@@ -773,6 +773,7 @@ Three drawings of her, and each has its own sizes. What counts is the ring you s
 | A field you type to her (the ring stands in for the mic) | \`Orb\` | 28 |
 | A list row, a card head | \`Orb\` | 34 |
 | The Mac pill | \`TalkOrb\` | 60 |
+| The phone's tab bar | \`TalkOrb\` | 66 |
 | A logo: sign-in, lock screen, PIN pad | \`Mark\` | 48 to 96 |
 | The talk screen, the hero | \`TalkOrb\` | 120 or more |
 

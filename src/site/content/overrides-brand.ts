@@ -13,12 +13,13 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
       { name: "state", what: "idle, listening, busy, talking, away" },
     ],
     rules: [
-      { do: "22pt in the header, 64pt or more on a hero screen.", dont: "Never a filled circle, never a face." },
+      { do: "Only four sizes: 16 in a line of text, 22 in a header or status, 28 in a field you type to her, 34 in a list row.", dont: "Never a size between the steps, never bigger than 34: a big live Iris is the TalkOrb, a still one the Mark." },
+      { do: "The ring is as tall as the text beside it.", dont: "Never a filled circle, never a face." },
       { do: "One or two orbs per page.", dont: "Never decoration in a list or a row; a list keeps the flat orb and nothing more." },
       { do: "Away stays grey and still.", dont: "Never let the grey alone say what is wrong: the word beside it says it." },
     ],
     specs: [
-      { label: "size", value: "22pt header, 64pt or more hero" },
+      { label: "size", value: "16, 22, 28 or 34 only; the table \"Which Iris, how big\" is on the Mark page" },
       { label: "ring thickness", value: "5px * --k, cut from the disc with a radial mask" },
       { label: "--orb-gradient", value: "conic from 200deg, #6d5cf6, #38bdf8, #c026d3, #8b5cf6, #6d5cf6" },
       { label: "turn", value: "6s idle, 2s busy, 3s talking, linear" },
@@ -77,6 +78,7 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
       { name: "muted-mic", what: "the struck-through mic, drawn in front when her voice is off" },
     ],
     rules: [
+      { do: "Never under 60: its ring is a third of its size, so smaller is a dot. Small and live is the Orb.", dont: "Never in a field, a row or a header." },
       { do: "66pt in the tab bar, standing 14pt above it.", dont: "Never wider than about 1.5x the disc: effects stay close to the button." },
       { do: "It is always drawn above everything around it: the highest z-index of its row." },
       { do: "Hold to talk; swipe up to lock, swipe left for a note, swipe right for the tab bar." },
