@@ -94,7 +94,7 @@ export const FOUNDATIONS_INTERACTION: Record<string, Doc> = {
           {
             kind: "ol",
             items: [
-              "At most two actions show under a row. A long swipe runs the first one, the way Mail does.",
+              "A swipe only opens or closes the row; an action is always a tap on its button. A long swipe never picks one by itself.",
               "One light haptic when the swipe passes the point where letting go keeps the row open.",
               "Past the last action the row keeps following, slower: travel beyond the edge is `over^0.7`, never a hard stop.",
               "Opening a row closes the one that was open. Only one row is open at a time.",
