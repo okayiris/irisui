@@ -15,6 +15,7 @@ window.exampleScenes = ({ title, scenes, all, stage }) => {
       h(stage, { key: scene.id, scene, go }),
       h("aside", { className: "rules", "aria-label": "Rules" },
         h("p", { className: "lab" }, scene.name),
+        scene.note ? h("p", { className: "note" }, scene.note) : null,
         h("ul", { className: "checks" }, scene.ok.map((t) => h("li", { key: t }, t)), scene.ask.map((t) => h("li", { key: t, className: "q" }, t))),
         all.items.length ? h("p", { className: "lab" }, all.label) : null,
         h("ul", { className: "checks" }, all.items.map((t) => h("li", { key: t, className: "q" }, t)))));

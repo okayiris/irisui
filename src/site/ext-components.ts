@@ -531,6 +531,20 @@ const SPECS: Spec[] = [
     ],
   },
   {
+    name: "Mark",
+    group: "Brand",
+    height: 260,
+    summary: "Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.",
+    props: [
+      { name: "size", type: "number" },
+      { name: "label", type: "string" },
+    ],
+    variants: [
+      { label: "Lock screen size", code: `h(Mark, { size: 64 })` },
+      { label: "Three sizes", code: `h("div", { style: { display: "flex", gap: 40, alignItems: "center", padding: 24 } }, h(Mark, { size: 22 }), h(Mark, { size: 48 }), h(Mark, { size: 96 }))` },
+    ],
+  },
+  {
     name: "Divider",
     group: "Surfaces",
     height: 180,

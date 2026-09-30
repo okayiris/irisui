@@ -19,6 +19,34 @@ function houseButton(props: Any, children: Any): Any {
   return h("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
 }
 
+/* ------------------------------------------------------------------- Mark */
+
+/** Where ext.js was loaded from, so the mark's images resolve under any base path. */
+const DS_BASE = ((document.currentScript as HTMLScriptElement | null)?.src ?? "").replace(/ext\.js(\?.*)?$/, "");
+
+/**
+ * Her ring as a still, sharp mark: the brand kit's own render (1024px, with its glow), not the CSS Orb. For a
+ * logo, a lock screen, an empty page. For her state (listening, busy) take the Orb, which moves.
+ */
+export function Mark({ size = 64, label = "Iris" }: { size?: number; label?: string }) {
+  // The image is the ring plus its glow, cut from the brand kit's 1024px render with the kit's pale backdrop
+  // taken out. The ring is 70% of it: draw it at size / 0.7, centred, and the glow spills over as light does.
+  const px = Math.round(size / 0.7);
+  return h(
+    "span",
+    { className: "ix-mark", style: { width: size, height: size }, role: "img", "aria-label": label },
+    h("img", {
+      src: `${DS_BASE}mark/iris-mark-512.png`,
+      srcSet: `${DS_BASE}mark/iris-mark-128.png 128w, ${DS_BASE}mark/iris-mark-256.png 256w, ${DS_BASE}mark/iris-mark-512.png 512w`,
+      sizes: `${px}px`,
+      width: px,
+      height: px,
+      alt: "",
+      draggable: false,
+    }),
+  );
+}
+
 /* ---------------------------------------------------------------- Tooltip */
 
 export function Tooltip({ label, children, delay = 320 }: { label: string; children: Any; delay?: number }) {
@@ -1786,3 +1814,4 @@ const SHIPPED = {
 (window as Any).IrisUi = Object.assign((window as Any).IrisUi ?? {}, SHIPPED);
 
 export default SHIPPED;
+  Mark,

@@ -745,6 +745,23 @@ its trigger.
 ## Accessibility
 
 Two focusable controls in order: the action, then the caret with \`aria-haspopup="menu"\` behaviour from Menu itself.`,
+  Mark: `# Mark
+
+Her ring as a still, sharp mark. It is the brand kit's own render (1024px, with its glow), served in three
+sizes, so it stays crisp at any size and on any screen.
+
+## When
+
+- A logo: the top of a sign-in, a lock screen, the PIN pad, an empty page, a mail.
+- Anywhere the ring stands still and means "this is Iris".
+
+For her state (listening, thinking, talking, away) take the \`Orb\` or the \`TalkOrb\`: those move and change
+with her. Never put a Mark and an Orb on one screen.
+
+## Size
+
+\`size\` is the ring. The glow reaches past it on every side, as light does: leave about a ring's width of room.
+`,
   Carousel: `# Carousel
 
 A strip of cards you swipe or scroll sideways, with dots that say where you are.

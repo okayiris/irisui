@@ -100,7 +100,7 @@
   .lock .under button { all: unset; cursor: pointer; border-radius: 6px; }
   .lock .under button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .lock .under .link { color: var(--accent); }
-  .lock .demo { font: var(--text-sub); color: var(--label); margin: 0; }
+  .lock .under .eye { display: inline-flex; align-items: center; gap: 6px; }
   @media (max-width: 760px) { .three { grid-template-columns: 1fr; } .vault { grid-template-columns: 1fr; } .vault nav { border-right: 0; } }
 </style>
 </head>
@@ -116,7 +116,7 @@
 (() => {
   const h = React.createElement;
   const { useState } = React;
-  const { Button, Orb, Skeleton } = window.IrisUi;
+  const { Button, Orb, Skeleton, Mark } = window.IrisUi;
 
   // The fields src/vault-ask.ts sends; every surface renders the same ones, in the same order.
   const SCOPE = {
@@ -221,7 +221,7 @@
     const msg = state === "ok" ? (mode === "choose" ? "Your PIN is set." : "The vault is open, on this Mac and in Chrome.")
       : state === "bad" ? (step === "choose" && mode === "choose" ? "The two did not match. Choose again." : "Wrong PIN. Try again.") : "";
     return h("div", { className: "lock-stage" }, h("div", { className: "lock", role: "dialog", "aria-label": title },
-      h(Orb, { size: 64 }),
+      h(Mark, { size: 64 }),
       h("h2", null, "Iris"),
       h("p", { className: "ask" }, title),
       h("label", { className: "pins" + (shake ? " shake" : "") },
@@ -233,9 +233,13 @@
       h("p", { className: "msg " + (state ?? ""), role: "status" }, msg),
       mode === "enter" ? h("p", { className: "ask" }, h("b", null, "Chrome"), " wants the vault: fills in your password on shop.example.com.") : null,
       h("div", { className: "under" },
-        h("button", { onClick: () => setShow(!show), "aria-pressed": show }, show ? "Hide" : "Show"),
+        h("button", { className: "eye", onClick: () => setShow(!show), "aria-pressed": show },
+          h("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true" },
+            h("path", { d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" }), h("circle", { cx: 12, cy: 12, r: 3 }),
+            show ? h("path", { d: "M3 3l18 18" }) : null),
+          show ? "Hide" : "Show"),
         mode === "enter" ? h(React.Fragment, null, h("span", { "aria-hidden": "true" }, "·"), h("button", { className: "link" }, "Forgot your PIN?")) : null),
-      mode === "enter" ? h("p", { className: "demo" }, "Demo: 123456 opens, anything else shakes.") : null));
+      ));
   }
 
   const Stage = ({ scene }) => scene.id === "pin" ? h("main", null, h(Pin, { mode: "enter" }))
@@ -260,10 +264,10 @@
       { sep: "Unlock" },
       { id: "pin", name: "Unlock with PIN",
         ok: ["Face ID or Touch ID first, the PIN only when they cannot", "Six digits open by themselves: no OK button", "A wrong PIN shakes once, short, and clears", "Who wants the vault and why stands under the PIN", "Open on the Mac means open in Chrome too"],
-        ask: [] },
+        ask: [], note: "Type 123456 to open. Anything else shakes." },
       { id: "choose", name: "Choose a PIN",
         ok: ["Twice, the title says which time", "Two that do not match start over, with one line why"],
-        ask: [] },
+        ask: [], note: "Type any six digits, then the same six again." },
       { sep: "Vault" },
       { id: "vault", name: "The vault itself",
         ok: ["Each item says when Iris last used it", "Values stay dots"],
