@@ -7,6 +7,9 @@
     ["android", "Android", "?p=android"],
     ["macos", "macOS", "mac/"],
     ["web", "Web", "web/"],
+    ["chrome", "Chrome", "chrome/"],
+    ["tv", "TV", "tv/"],
+    ["vault", "Vault", "vault/"],
   ];
   const style = document.createElement("style");
   style.textContent = `
@@ -16,10 +19,11 @@
     .plat a:hover { color: var(--fg); }
     .plat a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .plat .name { font: var(--text-row-title); font-weight: 600; color: var(--fg); margin: 0 8px 0 0; }
-    .plat nav { display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
+    .plat nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; border-radius: 999px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
     .plat nav a { padding: 6px 14px; border-radius: 999px; }
     .plat nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
     .plat .story { margin-left: auto; color: var(--label); font: var(--text-sub); }
+    @media (max-width: 1100px) { .plat .story { display: none; } }
     @media (max-width: 640px) { .plat { flex-wrap: wrap; gap: 10px; padding: 10px 16px; } .plat .story { display: none; } }
   `;
   document.head.appendChild(style);

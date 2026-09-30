@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Iris UI examples: TV</title>
+<meta name="description" content="Iris on a TV or a second screen: what it shows at rest, a window she puts on it, a meeting, and picking the screen.">
+<link rel="stylesheet" href="../../ds/tokens.css">
+<link rel="stylesheet" href="../../ds/bundle.css">
+<link rel="stylesheet" href="../../ds/ext.css">
+<link rel="stylesheet" href="../../ds/extra.css">
+<link rel="stylesheet" href="../shared.css">
+<link rel="icon" href="../../favicon.svg">
+<style>
+  /* A 16:9 screen. Everything inside is sized from its width (cqw), as a TV is read from three metres. */
+  .tv-wrap { display: grid; justify-items: center; gap: 10px; }
+  .tv { width: 100%; aspect-ratio: 16 / 9; container-type: inline-size; position: relative; overflow: hidden; border-radius: 10px;
+        background: radial-gradient(60% 50% at 50% 110%, rgba(125, 211, 252, .12), transparent 70%), var(--bg);
+        box-shadow: 0 0 0 10px #050608, 0 0 0 11px var(--edge); }
+  .stand { width: 22%; height: 10px; border-radius: 0 0 8px 8px; background: #0d1015; box-shadow: 0 0 0 1px var(--edge); margin-top: 10px; }
+
+  .corner { position: absolute; left: 3cqw; top: 3cqw; display: flex; align-items: center; gap: 1.2cqw; font: 500 1.6cqw var(--font-text); color: #cfe8f6; }
+  .clock { position: absolute; right: 3cqw; top: 2.6cqw; font: 500 2.2cqw var(--font-mono); color: var(--dim); }
+  .rest { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 1.4cqw; }
+  .rest .time { font: 200 13cqw/1 var(--font-display); letter-spacing: -.03em; }
+  .rest .date { font: 400 2.4cqw var(--font-text); color: var(--dim); }
+  .rest .next { margin-top: 2cqw; font: 400 2cqw var(--font-text); color: var(--fg); }
+  .rest .next b { color: var(--accent); font-weight: 500; }
+
+  /* A window on the TV: the big name, the window under it. */
+  .bigname { position: absolute; left: 0; right: 0; top: 7cqw; text-align: center; font: 700 8cqw/1 var(--font-display); letter-spacing: -.02em;
+          background: linear-gradient(90deg, var(--accent), var(--violet-light, #c4b5fd), var(--accent)); background-size: 200% 100%;
+          -webkit-background-clip: text; background-clip: text; color: transparent; animation: flow 8s linear infinite; }
+  @keyframes flow { to { background-position: 200% 0; } }
+  .win { position: absolute; left: 50%; top: 19cqw; translate: -50% 0; width: 52cqw; padding: 2.2cqw 2.6cqw; border-radius: 1.6cqw;
+         background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+         animation: rise var(--motion-slow) var(--ease-house); }
+  .line { list-style: none; margin: 0; padding: 0 0 0 2.4cqw; border-left: 1px solid var(--line); display: grid; gap: 1.6cqw; }
+  .line li { position: relative; display: grid; grid-template-columns: 8cqw 1fr; font: 400 2.2cqw var(--font-text); }
+  .line li::before { content: ""; position: absolute; left: -2.85cqw; top: .8cqw; width: .9cqw; height: .9cqw; border-radius: 50%; background: var(--label); }
+  .line li.fixed::before { background: var(--accent); box-shadow: 0 0 1.2cqw rgba(125, 211, 252, .6); }
+  .line li.now::before { background: var(--fg); }
+  .line .t { font: 500 1.8cqw var(--font-mono); color: var(--label); padding-top: .3cqw; }
+  .line small { display: block; font-size: 1.6cqw; color: var(--dim); }
+  .from { position: absolute; left: 50%; bottom: 3cqw; translate: -50% 0; font: 400 1.5cqw var(--font-text); color: var(--label); }
+
+  /* A meeting keeps the screen awake. */
+  .meet { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; padding: 8cqw 5cqw 4cqw; gap: 2cqw; }
+  .meet h2 { margin: 0; font: 600 4.4cqw var(--font-display); }
+  .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6cqw; }
+  .person { border-radius: 1.4cqw; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); display: grid; place-items: center; font: 500 2cqw var(--font-text); color: var(--dim); }
+  .person.talk { box-shadow: inset 0 0 0 .3cqw var(--accent); color: var(--fg); }
+  .caption { font: 400 2.4cqw var(--font-text); text-align: center; }
+  .caption span { color: var(--dim); }
+
+  /* Picking the screen, on the phone. */
+  .pick { display: grid; grid-template-columns: 290px 1fr; gap: 24px; align-items: center; }
+  .mini-phone { width: 290px; height: 600px; border-radius: 42px; position: relative; overflow: hidden; background: #0b0e13; box-shadow: 0 0 0 1px var(--edge), 0 0 0 8px #0d1015, 0 0 0 9px var(--edge); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 22px; border-radius: 26px 26px 0 0; background: rgba(16, 20, 27, .96); box-shadow: inset 0 1px 0 var(--edge); }
+  .sheet h3 { font: 600 17px var(--font-display); margin: 6px 0 12px; }
+  .dev { all: unset; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 11px 12px; border-radius: 12px; }
+  .dev:hover { background: var(--glass); }
+  .dev:focus-visible { outline: 2px solid var(--accent); }
+  .dev[aria-pressed="true"] { background: var(--accent-soft, rgba(125, 211, 252, .12)); box-shadow: inset 0 0 0 1px var(--accent-line, rgba(125, 211, 252, .45)); }
+  .dev span { flex: 1; display: grid; gap: 2px; }
+  .dev small { font: var(--text-sub); color: var(--dim); }
+  @media (max-width: 760px) { .pick { grid-template-columns: 1fr; justify-items: center; } }
+</style>
+</head>
+<body data-platform="tv">
+<script src="../nav.js"></script>
+<div id="root"></div>
+<script src="../../ds/vendor/react.js"></script>
+<script src="../../ds/vendor/react-dom.js"></script>
+<script src="../../ds/bundle.js"></script>
+<script src="../../ds/ext.js"></script>
+<script src="../scenes.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState } = React;
+  const { Orb, Icon } = window.IrisUi;
+
+  // The small ring, as the web's status: it stays a ring at any TV size, the TalkOrb's glow does not scale.
+  const ORB = { rest: "idle", talking: "talking", listening: "listening" };
+  const Corner = ({ state = "rest", word = "resting" }) => h("div", { className: "corner" }, h(Orb, { size: 22, state: ORB[state] }), word);
+  const Tv = ({ children }) => h("div", { className: "tv-wrap" }, h("div", { className: "tv", role: "img", "aria-label": "Living room TV" }, children), h("div", { className: "stand", "aria-hidden": "true" }));
+
+  const Rest = () => h(Tv, null,
+    h(Corner, null),
+    h("div", { className: "rest" },
+      h("div", { className: "time" }, "21:04"),
+      h("div", { className: "date" }, "Tuesday 30 September"),
+      h("div", { className: "next" }, "Tomorrow ", h("b", null, "09:30"), " dentist")));
+
+  const Plan = () => h(Tv, null,
+    h(Corner, { state: "talking", word: "talking" }),
+    h("div", { className: "clock" }, "21:04"),
+    h("div", { className: "bigname" }, "Saturday"),
+    h("section", { className: "win", "aria-label": "Saturday" },
+      h("ol", { className: "line" },
+        h("li", null, h("span", { className: "t" }, "14:00"), h("span", null, "Pick up the candles", h("small", null, "They are on your grocery list"))),
+        h("li", { className: "fixed" }, h("span", { className: "t" }, "20:00"), h("span", null, "Da Mario, table for six", h("small", null, "Iris booked it by phone"))),
+        h("li", null, h("span", { className: "t" }, "22:30"), h("span", null, "Cake, when Sam turns 30")))),
+    h("div", { className: "from" }, "From Alex's iPhone. Say 'close' or press back to clear."));
+
+  const Meet = () => h(Tv, null,
+    h(Corner, { state: "listening", word: "taking notes" }),
+    h("div", { className: "clock" }, "21:04"),
+    h("div", { className: "meet" },
+      h("h2", null, "Planning Sam's party"),
+      h("div", { className: "people" }, h("div", { className: "person talk" }, "Alex"), h("div", { className: "person" }, "Kim"), h("div", { className: "person" }, "Noor")),
+      h("p", { className: "caption" }, h("span", null, "Kim: "), "Can Iris ask Da Mario for one more chair?")));
+
+  function Pick() {
+    const [to, setTo] = useState("tv");
+    const DEVS = [
+      ["tv", "Living room TV", "Shows windows and plays her voice", "globe"],
+      ["mac", "Second screen, Mac", "A window of the talk page, as a display", "sparkles"],
+      ["speaker", "Kitchen speaker", "Voice only, no picture", "speaker"],
+      ["phone", "This phone", "Keep it here", "phone"],
+    ];
+    return h("div", { className: "pick" },
+      h("div", { className: "mini-phone" }, h("div", { className: "sheet", role: "dialog", "aria-label": "Show on" },
+        h("h3", null, "Show Saturday on"),
+        DEVS.map(([id, t, s, i]) => h("button", { key: id, className: "dev", "aria-pressed": to === id, onClick: () => setTo(id) },
+          h(Icon, { name: i }), h("span", null, t, h("small", null, s)))))),
+      to === "tv" ? h(Plan) : to === "speaker" ? h(Tv, null, h(Corner, { state: "talking", word: "on the kitchen speaker" }), h("div", { className: "rest" }, h("div", { className: "date" }, "Nothing on this screen: Iris talks in the kitchen.")))
+        : to === "mac" ? h(Tv, null, h(Corner, null), h("div", { className: "rest" }, h("div", { className: "date" }, "Saturday is on the Mac's second screen.")))
+        : h(Rest));
+  }
+
+  const STAGES = { rest: Rest, plan: Plan, meet: Meet, pick: Pick };
+  window.exampleScenes({
+    title: "TV and screens",
+    stage: ({ scene }) => h("main", null, h(STAGES[scene.id])),
+    scenes: [
+      { id: "rest", name: "At rest",
+        ok: ["Large and calm: the time, the date, one next thing", "Her ring and one word in the corner, as on the web"],
+        ask: ["Should an idle TV go dark after a while, or keep the clock?"] },
+      { id: "plan", name: "A window on it",
+        ok: ["The big name above, the window under it", "The same timeline as the web, only larger", "Says where it came from and how to clear it"],
+        ask: ["The big name moves: stop after one pass, so it is still at rest?", "The web chapter loads a display face from a font host for this name. Keep the system face instead?"] },
+      { id: "meet", name: "A meeting",
+        ok: ["A running meeting keeps the screen awake", "Who talks gets the ring"], ask: ["Live captions: always, or only on request?"] },
+      { id: "pick", name: "Pick the screen",
+        ok: ["Each screen says what it can do: picture, voice or both", "The TV follows the choice at once"],
+        ask: ["The house Icon has no TV and no Mac. Draw them, or keep globe and sparkles?"] },
+    ],
+    all: { label: "Whole TV", items: ["There is no TV chapter: sizes read from three metres, the remote, and when to go dark.", "No hover and no small text on a TV. Smallest size 1.5% of the width?"] },
+  });
+})();
+</script>
+</body>
+</html>

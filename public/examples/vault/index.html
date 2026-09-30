@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Iris UI examples: vault</title>
+<meta name="description" content="The vault: one question for access, asked the same way on the phone, the Mac and in Chrome.">
+<link rel="stylesheet" href="../../ds/tokens.css">
+<link rel="stylesheet" href="../../ds/bundle.css">
+<link rel="stylesheet" href="../../ds/ext.css">
+<link rel="stylesheet" href="../../ds/extra.css">
+<link rel="stylesheet" href="../shared.css">
+<link rel="icon" href="../../favicon.svg">
+<style>
+  .three { display: grid; grid-template-columns: 290px 1fr; gap: 22px; align-items: start; }
+  .three .right { display: grid; gap: 22px; }
+  .cap { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 8px; }
+
+  /* The phone: the question as a sheet. */
+  .mini-phone { width: 290px; height: 600px; border-radius: 42px; position: relative; overflow: hidden; background: #0b0e13;
+                box-shadow: 0 0 0 1px var(--edge), 0 0 0 8px #0d1015, 0 0 0 9px var(--edge); }
+  .mini-phone .behind { position: absolute; inset: 0; padding: 60px 16px; opacity: .35; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 16px 22px; border-radius: 26px 26px 0 0;
+           background: rgba(16, 20, 27, .96); box-shadow: inset 0 1px 0 var(--edge); animation: rise var(--motion-slow) var(--ease-house); }
+  .grip { width: 38px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 14px; }
+
+  /* The Mac: a window with Touch ID. */
+  .mac { border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--edge);
+         background: radial-gradient(420px 260px at 20% 20%, rgba(56, 189, 248, .22), transparent 70%), linear-gradient(to bottom left, #291f52, #0a0d1f);
+         padding: 26px; display: grid; place-items: center; }
+  .win { width: 100%; max-width: 440px; border-radius: 14px; background: rgba(12, 16, 22, .92); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 20px 50px rgba(0, 0, 0, .4);
+         backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); animation: rise var(--motion-base) var(--ease-house); }
+  .win-top { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 12px; }
+  .win-top i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, .16); }
+  .win-body { padding: 4px 20px 20px; }
+  .touch { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; margin: 4px auto 8px;
+           box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent); }
+
+  /* Chrome: the toolbar popup. */
+  .chrome { border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: #0e1116; }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #161a21; }
+  .url { flex: 1; height: 28px; border-radius: 14px; background: #0b0e13; display: flex; align-items: center; padding: 0 12px; font: var(--text-sub); color: var(--dim); }
+  .ext { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--accent-line, rgba(125,211,252,.45)); }
+  .page { position: relative; height: 230px; padding: 18px; }
+  .popup { position: absolute; right: 12px; top: 6px; width: 300px; padding: 14px; border-radius: 14px; background: rgba(16, 20, 27, .97);
+           box-shadow: inset 0 0 0 1px var(--edge), 0 12px 30px rgba(0, 0, 0, .45); animation: rise var(--motion-base) var(--ease-house); }
+
+  /* The question itself: the same lines on every surface. */
+  .q-title { font: 600 17px var(--font-display); margin: 0 0 12px; line-height: 1.3; }
+  .facts { display: grid; gap: 8px; margin: 0 0 12px; }
+  .fact { display: grid; grid-template-columns: 58px 1fr; gap: 10px; font: var(--text-body); line-height: 1.35; }
+  .fact dt { font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--label); padding-top: 3px; }
+  .fact dd { margin: 0; }
+  .fact dd.unknown { color: var(--wait); }
+  .scope { font: var(--text-sub); color: var(--dim); margin: 0 0 14px; padding: 8px 10px; border-radius: 10px; background: var(--glass); }
+  .shot { height: 64px; border-radius: 10px; margin: 0 0 12px; background: #12161c; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); padding: 8px 10px; font: 11px var(--font-text); display: grid; gap: 4px; }
+  .shot b { font-size: 12px; }
+  .shot span { display: block; height: 10px; border-radius: 3px; background: var(--line); width: 70%; }
+  .btns { display: grid; gap: 8px; }
+  .wait { display: flex; align-items: center; gap: 8px; font: var(--text-sub); color: var(--dim); margin-top: 10px; }
+  .wait i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.4s ease infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+
+  /* The vault itself. */
+  .vault { display: grid; grid-template-columns: 170px 1fr; min-height: 420px; }
+  .vault nav { border-right: 1px solid var(--line); padding: 8px; display: grid; align-content: start; gap: 2px; }
+  .vault nav button { all: unset; cursor: pointer; padding: 7px 10px; border-radius: 8px; color: var(--dim); font: var(--text-body); display: flex; justify-content: space-between; }
+  .vault nav button[aria-current="true"] { background: var(--glass); color: var(--fg); }
+  .vault nav button:focus-visible { outline: 2px solid var(--accent); }
+  .vault nav small { font: var(--text-value); color: var(--label); }
+  .vault .items { padding: 8px 16px; }
+  .item { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .item b { font-weight: 500; }
+  .item small { color: var(--dim); font: var(--text-sub); grid-column: 1; }
+  .item .dots { font: var(--text-value); color: var(--label); grid-row: 1 / 3; grid-column: 2; align-self: center; }
+
+  @media (max-width: 760px) { .three { grid-template-columns: 1fr; } .vault { grid-template-columns: 1fr; } .vault nav { border-right: 0; } }
+</style>
+</head>
+<body data-platform="vault">
+<script src="../nav.js"></script>
+<div id="root"></div>
+<script src="../../ds/vendor/react.js"></script>
+<script src="../../ds/vendor/react-dom.js"></script>
+<script src="../../ds/bundle.js"></script>
+<script src="../../ds/ext.js"></script>
+<script src="../scenes.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState } = React;
+  const { Button, Orb, Skeleton } = window.IrisUi;
+
+  // The fields src/vault-ask.ts sends; every surface renders the same ones, in the same order.
+  const SCOPE = {
+    names: "Only the names are read. No value leaves the vault.",
+    use: "One value is used for this, and never shown to Iris.",
+    store: "A new secret is stored in your vault.",
+  };
+  const NOT_SAID = "the asker did not say";
+  const ASKS = {
+    use: { title: "Iris wants your shop.example.com login", who: "Iris, your assistant", from: "Chrome on this Mac, shop.example.com",
+           why: "You asked her to order the groceries for Saturday", what: "Fills in your password on shop.example.com", scope: "use", shot: true },
+    names: { title: "Iris wants to see which logins you have", who: "Iris, your assistant", from: "Her own house",
+             why: "You asked which shops she can order from", what: "Reads the list of names", scope: "names" },
+    store: { title: "Save the new da-mario.example password?", who: "The Chrome extension", from: "Chrome on this Mac, da-mario.example",
+             why: "You made an account to book the table for Sam's party", what: "Stores it, so Iris can sign in next time", scope: "store" },
+    blind: { title: "Iris wants a card", who: "Iris, your assistant", from: "Her own house", why: null, what: null, scope: "use" },
+  };
+
+  const Facts = ({ a }) => h(React.Fragment, null,
+    h("p", { className: "q-title" }, a.title),
+    a.shot ? h("div", { className: "shot", "aria-label": "What Iris sees now" }, h("b", null, "shop.example.com  Sign in"), h("span"), h("span", { style: { width: "45%" } })) : null,
+    h("dl", { className: "facts" },
+      [["Who", a.who], ["From", a.from], ["Why", a.why], ["Does", a.what]].map(([k, v]) =>
+        h("div", { key: k, className: "fact" }, h("dt", null, k), h("dd", { className: v ? "" : "unknown" }, v ?? NOT_SAID)))),
+    h("p", { className: "scope" }, SCOPE[a.scope]));
+
+  function Phone({ a }) {
+    const [said, setSaid] = useState(null);
+    return h("div", null, h("p", { className: "cap" }, "iPhone and Android"),
+      h("div", { className: "mini-phone" },
+        h("div", { className: "behind", "aria-hidden": "true" }, h(Skeleton, { height: 18, width: "60%" }), h("div", { style: { height: 12 } }), h(Skeleton, { height: 140 })),
+        h("div", { className: "sheet", role: "dialog", "aria-label": a.title },
+          h("div", { className: "grip" }),
+          h("div", { style: { display: "flex", justifyContent: "center", marginBottom: 8 } }, h(Orb, { size: 34 })),
+          h(Facts, { a }),
+          said ? h("p", { className: "scope", role: "status", style: { color: said === "No" ? "var(--dim)" : "var(--ok)" } }, said === "No" ? "Nothing was shared. Iris is told no." : `${said}. Face ID confirmed.`)
+            : h("div", { className: "btns" },
+                h(Button, { variant: "primary", onClick: () => setSaid(a.scope === "store" ? "Saved" : "Allowed once") }, a.scope === "store" ? "Save with Face ID" : "Allow once with Face ID"),
+                a.scope === "use" && a.why ? h(Button, { variant: "glass", onClick: () => setSaid("Allowed for this site") }, "Always for this site") : null,
+                h(Button, { variant: "text", onClick: () => setSaid("No") }, "No")))));
+  }
+
+  const Mac = ({ a }) => h("div", null, h("p", { className: "cap" }, "Mac"),
+    h("div", { className: "mac" }, h("div", { className: "win", role: "dialog", "aria-label": a.title },
+      h("div", { className: "win-top", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
+      h("div", { className: "win-body" }, h(Facts, { a }),
+        h("div", { className: "touch", "aria-hidden": "true" }, h("svg", { width: 28, height: 28, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" },
+          h("path", { d: "M12 11v3M8.5 8.5a5 5 0 0 1 8.5 3.5v2M7 12v1a5 5 0 0 0 2 4M17 16a5 5 0 0 1-1 2M5 9a8 8 0 0 1 14 0M19 13v1" }))),
+        h("p", { style: { textAlign: "center", color: "var(--dim)", font: "var(--text-sub)", margin: "0 0 12px" } }, "Touch ID to allow"),
+        h(Button, { variant: "glass" }, "Cancel")))));
+
+  const Chrome = ({ a }) => h("div", null, h("p", { className: "cap" }, "Chrome"),
+    h("div", { className: "chrome" },
+      h("div", { className: "bar" }, h("div", { className: "url" }, a.from.split(", ")[1] ?? "okayiris.com"), h("div", { className: "ext", "aria-hidden": "true" }, h(Orb, { size: 16 }))),
+      h("div", { className: "page" },
+        h(Skeleton, { height: 16, width: "40%" }), h("div", { style: { height: 10 } }), h(Skeleton, { height: 36, width: "55%" }), h("div", { style: { height: 8 } }), h(Skeleton, { height: 36, width: "55%" }),
+        h("div", { className: "popup", role: "dialog", "aria-label": "Iris in Chrome" },
+          h("p", { className: "q-title", style: { fontSize: 15 } }, a.title),
+          h("p", { className: "scope", style: { margin: 0 } }, SCOPE[a.scope]),
+          h("div", { className: "wait" }, h("i", { "aria-hidden": "true" }), "Waiting for your phone or Touch ID")))));
+
+  const ITEMS = {
+    Logins: [["shop.example.com", "alex@example.com", "Used by Iris today, 14:10"], ["da-mario.example", "alex@example.com", "Saved today"], ["bank.example", "alex", "Iris may only read the name"]],
+    Cards: [["Visa ending 4412", "Alex", "Used once, 12 September"]],
+    "2FA codes": [["shop.example.com", "6 digits, every 30 s", "Filled in by Chrome today"]],
+    Notes: [["Wi-Fi at home", "", "Never shared"]],
+  };
+  function Vault() {
+    const [group, setGroup] = useState("Logins");
+    return h("div", null, h("p", { className: "cap" }, "The vault, on the Mac"),
+      h("div", { className: "chrome vault" },
+        h("nav", { "aria-label": "Vault groups" }, Object.keys(ITEMS).map((g) =>
+          h("button", { key: g, "aria-current": g === group ? "true" : "false", onClick: () => setGroup(g) }, g, h("small", null, ITEMS[g].length)))),
+        h("div", { className: "items" }, ITEMS[group].map(([t, u, s]) =>
+          h("div", { key: t + s, className: "item" }, h("b", null, t), h("span", { className: "dots", "aria-label": "hidden" }, "••••••"), h("small", null, [u, s].filter(Boolean).join(" · ")))))));
+  }
+
+  const Stage = ({ scene }) => scene.id === "vault" ? h("main", null, h(Vault))
+    : h("main", { className: "three" }, h(Phone, { a: ASKS[scene.id] }), h("div", { className: "right" }, h(Mac, { a: ASKS[scene.id] }), h(Chrome, { a: ASKS[scene.id] })));
+
+  window.exampleScenes({
+    title: "Vault",
+    stage: Stage,
+    scenes: [
+      { id: "use", name: "Use one login",
+        ok: ["The same five lines on every device: who, from, why, what it does, how far", "A picture of the page she is on", "Names only, never a value, in the question"],
+        ask: ["Which device asks first: the phone, the Mac, or both at once?", "'Always for this site': how long is always?"] },
+      { id: "names", name: "Only the names",
+        ok: ["Says plainly that no value leaves the vault"], ask: ["Does reading names need Face ID at all?"] },
+      { id: "store", name: "Save a new one",
+        ok: ["The extension asks, not Iris: 'who' says so"], ask: [] },
+      { id: "blind", name: "Nobody said why",
+        ok: ["What nobody said shows as 'the asker did not say', in amber"],
+        ask: ["No 'why': may she still ask, or does the vault refuse on its own?"] },
+      { sep: "Vault" },
+      { id: "vault", name: "The vault itself",
+        ok: ["Each item says when Iris last used it", "Values stay dots"],
+        ask: ["Where does the vault live on the phone: under You, or its own tab?"] },
+    ],
+    all: { label: "Whole vault", items: ["Real brands in the question (a bank, a shop) or always the site's own name?"] },
+  });
+})();
+</script>
+</body>
+</html>
