@@ -8,7 +8,7 @@ import { Shell } from "./Shell";
 import { ChapterPage, ComponentPage, DocBody, HomePage, LlmPage, TokensPage } from "./pages";
 import { FOUNDATION_DOCS, OVERRIDES, PATTERN_DOCS, RESOURCE_DOCS, chapters, components } from "./content";
 import type { Block, Doc } from "./content";
-import { FOUNDATIONS, PATTERNS, RESOURCES, SITE } from "./nav";
+import { FOUNDATIONS, GROUPS, PATTERNS, RESOURCES, SITE, groupOf } from "./nav";
 import { loadTokens, ROOT, type Component } from "./parse";
 import { demoFrame, previewFrame } from "./demos";
 import { BASE, CANONICAL, rewriteBase, rewriteBaseText, url } from "./base";
@@ -189,6 +189,43 @@ function collectPages(): Page[] {
       md: componentMarkdown(c),
     });
   }
+
+  // Every part at a glance: its first live frame as a picture, grouped the way the menu is.
+  const byGroup = GROUPS.map((g) => ({ ...g, items: components.filter((c) => groupOf(c) === g.key) })).filter(
+    (g) => g.items.length,
+  );
+  pages.push({
+    path: "/components",
+    title: "All components",
+    description: "Every part of the system as a live picture. Pick one by how it looks.",
+    headings: byGroup.map((g) => ({ id: g.key.replace(/ /g, "-"), text: g.label, level: 2 })),
+    md: ["# All components", "", ...components.map((c) => `- [${c.name}](/components/${c.id}.md): ${c.summary}`)].join("\n"),
+    content: (
+      <>
+        <header className="page-head">
+          <p className="eyebrow">Components</p>
+          <h1>All components</h1>
+          <p className="lede">Every part as a live picture. Pick one by how it looks.</p>
+        </header>
+        {byGroup.map((g) => (
+          <section className="sec" key={g.key}>
+            <h2 id={g.key.replace(/ /g, "-")}>{g.label}</h2>
+            <p className="gal-blurb">{g.blurb}</p>
+            <div className="gal">
+              {g.items.map((c) => (
+                <a className="gal-card" href={`/components/${c.id}`} key={c.id}>
+                  <span className="gal-shot">
+                    <iframe data-src={`/demos/${c.id}/0.html`} title={c.name} tabIndex={-1} aria-hidden="true" />
+                  </span>
+                  <b>{c.name}</b>
+                </a>
+              ))}
+            </div>
+          </section>
+        ))}
+      </>
+    ),
+  });
 
   for (const p of PATTERNS) {
     const doc = PATTERN_DOCS[p.id];

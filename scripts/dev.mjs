@@ -45,6 +45,9 @@ const TYPES = {
 
 const LIVE = `<script>
 (() => {
+  // Only the top page listens: a browser keeps six lines open per server, so a page of demo frames that
+  // each held one would stall every frame after the sixth. Reloading the top reloads its frames too.
+  if (window !== top) return;
   const es = new EventSource("/__dev");
   es.addEventListener("built", () => location.reload());
   es.addEventListener("failed", (e) => console.error("[irisui]", e.data));

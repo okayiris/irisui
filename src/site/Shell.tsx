@@ -124,6 +124,9 @@ export function Shell({ title, description, path, headings = [], components, chi
               ))}
 
               <p className="nav-head">Components</p>
+              <NavLink href="/components" path={path}>
+                All, at a glance
+              </NavLink>
               {byGroup.map((g) => (
                 <div className="nav-group" key={g.key}>
                   <p className="nav-sub">{g.label}</p>
