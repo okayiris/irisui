@@ -1,0 +1,36 @@
+# Snackbar
+
+What happened next, next to the thing it happened to.
+
+## When
+
+- A result the person needs to see but does not need to answer: added, archived, sent.
+- A failure that has a next step ("Try again").
+- A wait that is worth saying out loud ("Reading the invoice").
+
+Never for something that needs a decision (that is a Dialog), never stacked, never more than one at a time.
+
+## The parts
+
+A dot in the tone, one line of text, and at most one action. `tone` is `accent`, `ok`, `wait` or `error`;
+those are the only four, and they are the tokens the app already has.
+
+## Rules
+
+- One line. If it needs two, it is a card in the flow, not a snackbar.
+- Only the error tone uses `--error`, and only when something really failed.
+- It never covers the control that caused it.
+- It leaves on its own after a few seconds unless it carries an action.
+
+## Values
+
+| value | where |
+| --- | --- |
+| surface | `--sheet-bg`, 1px `--edge`, radius 14px, `--elev-2` |
+| padding | 11px 12px 11px 14px |
+| dot | 8px in the tone |
+| text | 13.5px `--fg`; action 13px `--accent` |
+
+## Accessibility
+
+`role="status"` and `aria-live="polite"`: it is read out without taking focus.

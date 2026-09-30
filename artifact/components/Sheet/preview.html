@@ -1,0 +1,32 @@
+<!-- @dsCard group="Overlays" height=380 -->
+<!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider } = window.IrisUi;
+  window.__dsPreview = {
+    "Bottom, choosing a voice": () => { const [open, setOpen] = React.useState(true);
+  return h(Sheet, { open, onClose: () => setOpen(false), title: "Voice", sub: "How she sounds on this device",
+    children: [
+      h(Row, { key: "a", title: "Alex", subtitle: "Dutch, warm and clear", trailing: h(Toggle, { on: true }) }),
+      h(Row, { key: "b", title: "Calmer", subtitle: "Dutch, softer" }),
+      h(Row, { key: "c", title: "No voice", subtitle: "She only writes here" }),
+    ] }); },
+    "Side, on a wide window": () => { const [open, setOpen] = React.useState(true);
+  return h(Sheet, { open, onClose: () => setOpen(false), side: "end", title: "Details", sub: "The invoice she read",
+    children: [ h(Card, { key: "a" }, h("div", { style: { fontSize: 17 } }, "Van Dijk Contractors"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "€ 1.240,00 · 14 days")),
+      h(Card, { key: "b" }, h("div", { style: { fontSize: 17 } }, "Two prices to compare"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "She marked the difference")) ] }); },
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

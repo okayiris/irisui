@@ -1,0 +1,38 @@
+{
+  "name": "irisui",
+  "version": "32.0.0",
+  "private": false,
+  "description": "The Iris design system, and the site where people and LLMs explore it \u2014 ui.okayiris.com",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "serve": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "typecheck": "tsc --noEmit",
+    "build-artifact": "node scripts/build-artifact.mjs",
+    "publish:pages": "node scripts/publish-pages.mjs",
+    "check:live": "node scripts/check.mjs --base=https://okayiris.github.io/irisui",
+    "blobs": "node scripts/import-blobs.mjs",
+    "check:artifact": "node scripts/check-artifact.mjs",
+    "test": "node scripts/build.mjs && node scripts/check.mjs && node scripts/check-artifact.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "esbuild": "^0.24.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

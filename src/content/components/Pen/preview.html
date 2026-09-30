@@ -1,0 +1,23 @@
+<!-- @dsCard group="Screen parts" height=420 width=760 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  ...Object.fromEntries(["circle", "check", "strike", "underline", "mark", "arrow", "bracket", "box", "spotlight", "pulse", "star", "number"].map((kind) => [kind, () =>
+    h("div", { className: "iris-screen", style: { width: 150, height: 64, display: "grid", alignItems: "center", padding: "0 30px", boxSizing: "border-box", background: "var(--glass)", border: "1px solid var(--edge)", borderRadius: 18, overflow: "hidden", fontSize: 17, color: "var(--fg)", "--k": "#7dd3fc" } },
+      h("span", null, h(UI.Pen, { kind, n: 2 }, kind === "bracket" ? h("span", { style: { display: "inline-block", lineHeight: 1.25 } }, "Milk", h("br"), "Bread") : "14:00")))])),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

@@ -1,0 +1,32 @@
+<!-- @dsCard group="Screen parts" height=1500 width=1000 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  ...Object.fromEntries([["lanes", "groceries"], ["grid", "agenda"], ["bubbles", "mail"], ["band", "parcel"], ["rain", "weather"], ["drift", "tasks"]].map(([kind, topic]) =>
+    ["widget: " + kind, () => h("div", { style: { width: 200 } }, h(UI.Pattern, { kind, topic, height: 100 }, h("span", { style: { fontSize: 13 } }, topic)))])),
+  ...Object.fromEntries([
+    ["lanes", ["capsule", "circle"], "#04241f", ["#4ade80", "#38bdf8", "#a7f3d0"]], ["grid", ["square"], "#08183a", ["#7dd3fc", "#38bdf8", "#e8f2f7"]],
+    ["lanes-round", ["circle", "dot"], "#140f33", ["#8b5cf6", "#7dd3fc", "#f0abfc"]], ["bubbles", ["ring", "circle"], "#18123c", ["#a78bfa", "#c4b5fd", "#7dd3fc"]],
+    ["rain", ["triangle", "dot"], "#081a34", ["#38bdf8", "#7dd3fc", "#e8f2f7"]], ["keys", ["square"], "#0b1026", ["#7dd3fc", "#8b5cf6", "#2ee6d6"]],
+    ["band", ["capsule"], "#221a0e", ["#fbbf24", "#fde68a", "#7dd3fc"]], ["scan", ["circle"], "#052331", ["#2ee6d6", "#7dd3fc", "#a7f3d0"]],
+    ["drift", ["circle", "ring", "arc"], "#140f33", ["#8b5cf6", "#7dd3fc", "#f0abfc", "#2ee6d6"]], ["eq", ["capsule"], "#2c0b26", ["#f0abfc", "#c026d3", "#8b5cf6"]],
+    ["spiral", ["plus", "half"], "#0b1026", ["#7dd3fc", "#f0abfc", "#fbbf24"]], ["swarm", ["dot", "circle"], "#062016", ["#a7f3d0", "#4ade80", "#2ee6d6"]],
+    ["wave", ["circle"], "#081a34", ["#38bdf8", "#7dd3fc", "#c4b5fd"]],
+  ].map(([layout, shapes, background, palette]) => ["recipe: " + layout, () =>
+    h("div", { style: { width: 280 } }, h(UI.Pattern, { recipe: { layout, shapes, background, palette, density: 0.45, pop: 0.5, fill: 0.6, confetti: layout === "drift" ? 0.6 : 0.2 } }))])),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

@@ -1,0 +1,24 @@
+<!-- @dsCard group="Surfaces" height=420 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, Card, Row, Toggle, Button, Orb, StatusPill, TabBar, Skeleton } = window.IrisUi;
+  window.__dsPreview = {
+  Chevron: () => h(Row, {icon:h(Icon,{name:"phone"}), title:"This device", subtitle:"Blocks, voice, notifications and how the assistant talks here.", chevron:true}),
+  Toggle: () => h(Row, {icon:h(Icon,{name:"car"}), title:"On the road", subtitle:"The assistant listens and talks through this iPhone, even when locked.", trailing:h(Toggle,{on:false})}),
+  Menu: () => h(Row, {icon:h(Icon,{name:"wave"}), title:"Voice", subtitle:"the voice, warm and clear", trailing:h("span",{style:{fontSize:17}},"the voice \u2195")}),
+  Danger: () => h(Row, {icon:h(Icon,{name:"trash"}), title:"Delete account", subtitle:"Deletes your assistant and everything she stored.", danger:true}),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

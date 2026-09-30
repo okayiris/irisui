@@ -1,0 +1,22 @@
+<!-- @dsCard group="Screen parts" height=700 width=680 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  Planned: () => h(UI.LoopScreen, { title: "Bins out", when: "In 16 hours", sub: "even weeks green, odd weeks grey", phase: "planned", progress: 0.35, now: "even weeks green, odd weeks grey" }),
+  Done: () => h(UI.LoopScreen, { title: "Bins out", when: "done", phase: "done", now: "next time: Tuesday, grey", pen: false }),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

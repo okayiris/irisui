@@ -1,0 +1,168 @@
+{
+  "note": "The parts this project added, in the shape the Design System artifact wants: publish components/ into the release's project/components/.",
+  "libraries": [
+    {
+      "name": "react",
+      "version": "18",
+      "global": "React"
+    },
+    {
+      "name": "react-dom",
+      "version": "18",
+      "global": "ReactDOM"
+    }
+  ],
+  "extraFiles": [
+    "project/components/ext.js",
+    "project/components/ext.css"
+  ],
+  "components": [
+    {
+      "name": "Menu",
+      "group": "Controls",
+      "summary": "A list of choices on its own surface: a filter, a sort, a set of actions, anchored to the thing it belongs to.",
+      "reads": "components/Menu/README.md",
+      "preview": "components/Menu/preview.html"
+    },
+    {
+      "name": "Dialog",
+      "group": "Overlays",
+      "summary": "The one place Iris interrupts: a decision that cannot wait, with the action that matters first.",
+      "reads": "components/Dialog/README.md",
+      "preview": "components/Dialog/preview.html"
+    },
+    {
+      "name": "Sheet",
+      "group": "Overlays",
+      "summary": "Secondary content anchored to an edge: the bottom on a phone, the side on a wide window.",
+      "reads": "components/Sheet/README.md",
+      "preview": "components/Sheet/preview.html"
+    },
+    {
+      "name": "Snackbar",
+      "group": "Feedback",
+      "summary": "What happened next, next to the thing it happened to: one line and at most one action.",
+      "reads": "components/Snackbar/README.md",
+      "preview": "components/Snackbar/preview.html"
+    },
+    {
+      "name": "Tooltip",
+      "group": "Feedback",
+      "summary": "The name of a thing that is only an icon, on hover and on focus.",
+      "reads": "components/Tooltip/README.md",
+      "preview": "components/Tooltip/preview.html"
+    },
+    {
+      "name": "Badge",
+      "group": "Navigation",
+      "summary": "A count or a dot on the thing it belongs to: a tab, an icon, a word.",
+      "reads": "components/Badge/README.md",
+      "preview": "components/Badge/preview.html"
+    },
+    {
+      "name": "Slider",
+      "group": "Controls",
+      "summary": "One value on a line: how much, how far, how loud.",
+      "reads": "components/Slider/README.md",
+      "preview": "components/Slider/preview.html"
+    },
+    {
+      "name": "TextArea",
+      "group": "Controls",
+      "summary": "The multi-line field: a note, a message, anything longer than a line.",
+      "reads": "components/TextArea/README.md",
+      "preview": "components/TextArea/preview.html"
+    },
+    {
+      "name": "Select",
+      "group": "Controls",
+      "summary": "One choice out of a few, in the shape of the fields around it.",
+      "reads": "components/Select/README.md",
+      "preview": "components/Select/preview.html"
+    },
+    {
+      "name": "SearchField",
+      "group": "Controls",
+      "summary": "Finding something: a pill field that says what it is doing and clears itself.",
+      "reads": "components/SearchField/README.md",
+      "preview": "components/SearchField/preview.html"
+    },
+    {
+      "name": "Tabs",
+      "group": "Navigation",
+      "summary": "A few angles on one thing, under its title, with the ink sliding to the active one.",
+      "reads": "components/Tabs/README.md",
+      "preview": "components/Tabs/preview.html"
+    },
+    {
+      "name": "Steps",
+      "group": "Navigation",
+      "summary": "Where you are in a short flow, and what is still coming.",
+      "reads": "components/Steps/README.md",
+      "preview": "components/Steps/preview.html"
+    },
+    {
+      "name": "EmptyState",
+      "group": "Feedback",
+      "summary": "Nothing here yet, said properly: what this place is for and the one thing to do about it.",
+      "reads": "components/EmptyState/README.md",
+      "preview": "components/EmptyState/preview.html"
+    },
+    {
+      "name": "Toolbar",
+      "group": "Navigation",
+      "summary": "A bar of actions that belong together, docked in a screen or floating over the content.",
+      "reads": "components/Toolbar/README.md",
+      "preview": "components/Toolbar/preview.html"
+    },
+    {
+      "name": "DatePicker",
+      "group": "Controls",
+      "summary": "A month you pick a day in: one accent on the chosen day, today marked with a ring.",
+      "reads": "components/DatePicker/README.md",
+      "preview": "components/DatePicker/preview.html"
+    },
+    {
+      "name": "TimePicker",
+      "group": "Controls",
+      "summary": "A time you set with two strips: the hour, then the minute. The chosen time reads big, in mono.",
+      "reads": "components/TimePicker/README.md",
+      "preview": "components/TimePicker/preview.html"
+    },
+    {
+      "name": "AppBar",
+      "group": "Navigation",
+      "summary": "The top line of a screen or a window: what this is, and the few actions that belong to it.",
+      "reads": "components/AppBar/README.md",
+      "preview": "components/AppBar/preview.html"
+    },
+    {
+      "name": "NavRail",
+      "group": "Navigation",
+      "summary": "The wide-window version of the tab bar: a rail of sections that collapses to icons.",
+      "reads": "components/NavRail/README.md",
+      "preview": "components/NavRail/preview.html"
+    },
+    {
+      "name": "SplitButton",
+      "group": "Controls",
+      "summary": "One action, and the caret that opens the others that belong to it.",
+      "reads": "components/SplitButton/README.md",
+      "preview": "components/SplitButton/preview.html"
+    },
+    {
+      "name": "Carousel",
+      "group": "Surfaces",
+      "summary": "A strip of cards you swipe or scroll sideways, with dots that say where you are.",
+      "reads": "components/Carousel/README.md",
+      "preview": "components/Carousel/preview.html"
+    },
+    {
+      "name": "Divider",
+      "group": "Surfaces",
+      "summary": "A hairline that groups what is above it from what is below.",
+      "reads": "components/Divider/README.md",
+      "preview": "components/Divider/preview.html"
+    }
+  ]
+}

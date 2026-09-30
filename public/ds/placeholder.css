@@ -1,0 +1,37 @@
+/* A stand-in for an asset that a release of the design system points at but does not carry.
+ *
+ * An export of a release can list asset files (design-system.json, assetGroups) without including the bytes,
+ * and a preview can point at one. This project carries no such asset and no preview points at one, so this
+ * tile never appears here; the rule stays as part of the design system's own files. */
+
+:root {
+  --ph-tint: var(--k, var(--accent));
+}
+
+.ph {
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 18px;
+  background: linear-gradient(150deg, rgba(180, 225, 255, 0.09), rgba(180, 225, 255, 0.02) 60%, transparent),
+    var(--kd, #0a0d12);
+  border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
+  color: var(--dim, #8fa3b0);
+  text-align: center;
+  padding: 14px;
+}
+
+.ph-name {
+  font: 500 10.5px var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint, #5a6b78);
+}
+
+.ph-what {
+  font-size: 12.5px;
+  max-width: 22ch;
+}

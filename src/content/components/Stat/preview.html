@@ -1,0 +1,22 @@
+<!-- @dsCard group="surfaces" height=250 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  Pair: () => h("div", { style: { display: "flex", gap: 28 } }, h(UI.Stat, { topic: "groceries", value: "5", label: "to get" }), h(UI.Stat, { topic: "groceries", value: "€42", label: "estimate" })),
+  "Per topic": () => h("div", { style: { display: "flex", gap: 28 } }, h(UI.Stat, { topic: "agenda", value: "14:00", label: "next" }), h(UI.Stat, { topic: "mail", value: "3", label: "important" }), h(UI.Stat, { topic: "parcel", value: "2", label: "parcels" })),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

@@ -1,0 +1,24 @@
+<!-- @dsCard group="Screen parts" height=1100 width=1060 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  ...Object.fromEntries([["gradient", "loop", "Done"], ["pop", "party", "Done"], ["wave", "parcel", "on the way"], ["shine", "explain", "Iris"], ["neon", "sport", "Done"], ["echo", "tasks", "TOP"], ["fill", "groceries", "3 / 8"], ["split", "money", "Done"],
+    ["lanes", "groceries", "Milk"], ["tiles", "agenda", "Dentist"], ["stretch", "mail", "MAIL 3"], ["outline", "weather", "Rain"], ["long-shadow", "sport", "RUN"], ["stamp", "parcel", "Delivered"]].map(([effect, topic, text]) =>
+    [effect, () => h("div", { style: { width: 300 } }, h(UI.Word, { text, effect, topic, level: 0.6, height: 100 }))])),
+  ...Object.fromEntries([["frozen", "Frost"], ["fire", "Hot"], ["autumn", "Autumn"]].map(([theme, text]) => [theme, () => h("div", { style: { width: 300 } }, h(UI.Word, { text, theme, height: 100 }))])),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

@@ -1,0 +1,129 @@
+<!-- @dsCard group="Controls" height=860 -->
+<style>
+  .mp-desk { position: relative; height: 230px; border-radius: 16px; overflow: hidden;
+    background: radial-gradient(420px 260px at 18% 22%, rgba(56,189,248,.28), transparent 70%),
+                radial-gradient(380px 260px at 84% 78%, rgba(192,38,211,.22), transparent 70%),
+                linear-gradient(to bottom left, #291f52, #0a0d1f); }
+  .mp-pill { position: absolute; left: 50%; top: 56%; width: 0; height: 0; }
+  .mp-bar { position: absolute; top: -22px; height: 44px; border-radius: 22px; display: flex; align-items: center; padding: 0 6px;
+    background: rgba(7,9,12,.78); box-shadow: inset 0 0 0 1px rgba(190,230,255,.14), 0 0 0 1px rgba(0,0,0,.25), 0 0 5px rgba(0,0,0,.3);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    transition: transform .42s cubic-bezier(.34,1.3,.64,1), opacity .25s, filter .3s; }
+  .mp-bar.closed { transform: scaleX(.3) scaleY(.8); opacity: 0; filter: blur(6px); pointer-events: none; }
+  .mp-side { display: flex; gap: 2px; }
+  .mp-gap { width: 68px; flex: none; }
+  .mp-btn { position: relative; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: rgba(232,242,247,.85); }
+  .mp-btn:hover, .mp-btn.on { color: #2ee6d6; background: rgba(46,230,214,.16); }
+  .mp-btn.on { box-shadow: inset 0 0 0 1px rgba(46,230,214,.6), 0 0 6px rgba(46,230,214,.35); }
+  .mp-btn .tip { position: absolute; bottom: 42px; left: 50%; transform: translate(-50%, 3px); background: #fff; color: #0b0f13;
+    font: 500 11px var(--font); padding: 3px 8px; border-radius: 6px; white-space: nowrap; opacity: 0; transition: .12s; pointer-events: none;
+    box-shadow: 0 3px 6px rgba(0,0,0,.35); }
+  .mp-btn:hover .tip { opacity: 1; transform: translate(-50%, 0); }
+  .mp-orb { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; cursor: pointer; }
+  .mp-work { position: absolute; left: -35px; top: -35px; width: 70px; height: 70px; border-radius: 50%; pointer-events: none;
+    animation: mp-turn 4s linear infinite; }
+  @keyframes mp-turn { to { transform: rotate(360deg); } }
+  /* Badge on the orb's rim at 45 degrees (the orb is 60pt, so its centre sits 21pt right and up): magenta `badge`, white digits
+     (4.7:1), a 2pt ring in the page ink so it reads on the ring and the desk, a soft magenta glow. */
+  .mp-badge { position: absolute; left: 21px; top: -21px; transform: translate(-50%, -50%); min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 10px;
+    background: #c026d3; color: #fff; font: 700 11px var(--font); font-variant-numeric: tabular-nums; display: grid; place-items: center; cursor: pointer; z-index: 3;
+    box-shadow: 0 0 0 2px #07090c, 0 0 8px rgba(192,38,211,.55); }
+  .mp-label { position: absolute; left: -200px; width: 400px; top: 36px; text-align: center; font: 500 9.5px var(--mono); letter-spacing: 1.4px; color: #8fa3b0; }
+  .mp-here { position: absolute; left: -60px; width: 120px; top: 34px; display: flex; justify-content: center; }
+  .mp-here span { height: 22px; padding: 0 10px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font: 600 11px var(--font);
+    color: #2ee6d6; background: rgba(46,230,214,.14); box-shadow: inset 0 0 0 1px rgba(46,230,214,.6); }
+  .mp-above { position: absolute; left: -250px; width: 500px; top: -72px; display: flex; justify-content: center; align-items: center; gap: 8px;
+    font: 500 12px var(--font); color: rgba(232,242,247,.9); }
+  .mp-dot { width: 6px; height: 6px; border-radius: 50%; background: #7dd3fc; box-shadow: 0 0 3px rgba(125,211,252,.8); }
+  .mp-chip { height: 20px; padding: 0 8px 0 10px; border-radius: 10px; display: flex; align-items: center; gap: 5px; font: 500 9px var(--mono);
+    letter-spacing: 1.4px; color: #8fa3b0; box-shadow: inset 0 0 0 1px rgba(190,230,255,.14); cursor: pointer; }
+  .mp-chip:hover { color: #2ee6d6; background: rgba(46,230,214,.16); box-shadow: inset 0 0 0 1px rgba(46,230,214,.7); }
+  .mp-stats { position: absolute; left: -250px; width: 500px; top: 64px; display: flex; justify-content: center; }
+  .mp-stats span { height: 14px; padding: 0 10px; border-radius: 7px; background: rgba(7,9,12,.6); font: 400 9.5px var(--mono); color: var(--dim); display: flex; align-items: center; }
+  .mp-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mp-controls button { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); background: rgba(255,255,255,.05);
+    border: 1px solid rgba(190,230,255,.14); border-radius: 999px; padding: 6px 11px; cursor: pointer; }
+  .mp-controls button.on { color: #2ee6d6; border-color: rgba(46,230,214,.7); background: rgba(46,230,214,.12); }
+</style>
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:18px;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { TalkOrb } = window.IrisUi;
+  const svg = (d, fill) => h("svg", { width: 16, height: 16, viewBox: "0 0 24 24" },
+    d.map((p, i) => h("path", { key: i, d: p, fill: fill ? "currentColor" : "none", stroke: fill ? "none" : "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" })));
+  const ICON = {
+    loop: svg(["M19.5 9A8 8 0 0 0 5 7.5M4.5 15A8 8 0 0 0 19 16.5", "M4 3.5v5h5M20 20.5v-5h-5"]),
+    chats: svg(["M3 5.5A2.5 2.5 0 0 1 5.5 3h8A2.5 2.5 0 0 1 16 5.5v5a2.5 2.5 0 0 1-2.5 2.5H8l-3.5 3v-3A2.5 2.5 0 0 1 3 10.5z", "M18 8h.5A2.5 2.5 0 0 1 21 10.5v5a2.5 2.5 0 0 1-1.5 2.3V21l-3.5-3h-4.5A2.5 2.5 0 0 1 9 16v-1h5a4 4 0 0 0 4-4z"], true),
+    vault: svg(["M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6z"], true),
+    gear: svg(["M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z", "M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"]),
+    mic: svg(["M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z", "M19 11a7 7 0 0 1-14 0M12 18v3"]),
+    here: svg(["M4 9v6h4l5 4V5L8 9z", "M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"]),
+  };
+  const BarButton = ({ i, tip, on, onClick }) => h("div", { className: "mp-btn" + (on ? " on" : ""), onClick }, ICON[i], h("span", { className: "tip" }, tip));
+
+  // One pill on a small desk. `bar`: forced open; otherwise it follows the mouse like on the Mac (180 ms in, 700 ms out).
+  function Pill({ state = "rest", label, bar, working, steps, elsewhere, badge, words, vault = true, open }) {
+    const [mouse, setMouse] = React.useState(false);
+    const [out, setOut] = React.useState(false);
+    React.useEffect(() => { const t = setTimeout(() => setOut(mouse), mouse ? 180 : 700); return () => clearTimeout(t); }, [mouse]);
+    const barOpen = bar || out;
+    const l = (elsewhere ? 3 : 2) * 36 + (elsewhere ? 2 : 1) * 2, r = (vault ? 3 : 2) * 36 + (vault ? 2 : 1) * 2;
+    const width = 12 + l + 68 + r;
+    return h("div", { className: "mp-desk" }, h("div", { className: "mp-pill" },
+      words ? h("div", { className: "mp-above" }, "“" + words + "”")
+        : steps ? h("div", { className: "mp-above" }, h("span", { className: "mp-dot" }), steps + " steps",
+            h("span", { className: "mp-chip" }, "STEPS", svg(["M6 9l6 6 6-6"]))) : null,
+      h("div", { className: "mp-bar" + (barOpen ? "" : " closed"), style: { left: -width / 2 + (r - l) / 2, width: width - 12 },
+          onMouseEnter: () => setMouse(true), onMouseLeave: () => setMouse(false) },
+        h("div", { className: "mp-side", style: { width: l, justifyContent: "flex-end" } },
+          elsewhere ? h(BarButton, { i: "here", tip: "Continue here" }) : null,
+          h(BarButton, { i: "loop", tip: "Loops", on: open === "loops" }), h(BarButton, { i: "chats", tip: "Chats", on: open === "chats" })),
+        h("div", { className: "mp-gap" }),
+        h("div", { className: "mp-side", style: { width: r } },
+          vault ? h(BarButton, { i: "vault", tip: "Vault" }) : null,
+          h(BarButton, { i: "gear", tip: "Settings", on: open === "settings" }), h(BarButton, { i: "mic", tip: "Hold to talk" }))),
+      working ? h("svg", { className: "mp-work", viewBox: "-35 -35 70 70" },
+        h("circle", { r: 34, fill: "none", stroke: "#7dd3fc", strokeWidth: 1.4, strokeLinecap: "round", strokeDasharray: "0.1 5.4", style: { filter: "drop-shadow(0 0 2px rgba(125,211,252,.8))" } })) : null,
+      h("div", { className: "mp-orb", onMouseEnter: () => setMouse(true), onMouseLeave: () => setMouse(false) }, h(TalkOrb, { state, size: 60 })),
+      badge ? h("div", { className: "mp-badge" }, badge) : null,
+      elsewhere && !label ? h("div", { className: "mp-here" }, h("span", null, svg(["M4 9v6h4l5 4V5L8 9z"], true), "Continue here"))
+        : label ? h("div", { className: "mp-label" }, label) : null,
+      steps ? h("div", { className: "mp-stats" }, h("span", null, "359 tok/s · 46k tok · cache 99% · context 18k/200k")) : null));
+  }
+
+  const STATES = [
+    ["Rest", { state: "rest", badge: 3 }],
+    ["Talking", { state: "talking", words: "Dim the kitchen lights", bar: true }],
+    ["Listening", { state: "listening", label: "LISTENING" }],
+    ["Thinking", { state: "thinking", label: "THINKING" }],
+    ["Working", { state: "rest", label: "WORKING", working: true, steps: 6 }],
+    ["Muted", { state: "muted", label: "MUTED" }],
+    ["Away", { state: "away", label: "CONNECTION LOST" }],
+    ["Elsewhere", { state: "rest", elsewhere: true }],
+  ];
+  function Playground() {
+    const [k, setK] = React.useState(0);
+    return h("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
+      h("div", { className: "mp-controls" }, STATES.map(([n], i) => h("button", { key: n, className: i === k ? "on" : "", onClick: () => setK(i) }, n))),
+      h(Pill, { key: k, ...STATES[k][1] }),
+      h("div", { style: { fontSize: 12, color: "var(--dim)" } }, "Rest the mouse on the orb: the bar grows out from behind it. Hover a button for its tip."));
+  }
+
+  window.__dsPreview = {
+    "Pill (hover the orb)": () => h(Playground),
+    "Bar open, settings panel open": () => h(Pill, { state: "rest", bar: true, open: "settings", badge: 3 }),
+    "Bar without vault, on another device": () => h(Pill, { state: "rest", bar: true, vault: false, elsewhere: true }),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

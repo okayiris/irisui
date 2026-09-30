@@ -1,0 +1,29 @@
+<!-- @dsCard group="Controls" height=420 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, Card, Row, Toggle, Button, Orb, StatusPill, TabBar, Skeleton } = window.IrisUi;
+  window.__dsPreview = {
+  Primary: () => h(Button, {variant:"primary", size:"lg"}, "Agree and continue"),
+  Accent: () => h(Button, {variant:"accent", size:"sm", icon:h(Icon,{name:"speaker",size:14})}, "Continue here"),
+  Glass: () => h(Button, {variant:"glass"}, "Edit"),
+  Ghost: () => h(Button, {variant:"ghost"}, "Don't agree"),
+  Danger: () => h(Button, {variant:"danger"}, "Unpair"),
+  Text: () => h(Button, {variant:"text"}, "Details"),
+  Icon: () => h(Button, {variant:"icon", label:"Speaker", icon:h(Icon,{name:"speaker",size:18})}),
+  Busy: () => h(Button, {variant:"primary", busy:true}, "Busy"),
+  "Primary in a topic": () => h(Button, {variant:"primary", topic:"parcel"}, "Track parcel"),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

@@ -1,0 +1,23 @@
+<!-- @dsCard group="controls" height=280 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  Choices: () => { const [on, set] = React.useState(0); return h("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } }, ["the supermarket", "the bookshop", "the market"].map((c, i) => h(UI.Chip, { key: c, topic: "groceries", on: i === on, onClick: () => set(i) }, c))); },
+  "Per topic": () => h("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } }, ["agenda", "mail", "parcel", "sport", "money"].map(t => h(UI.Chip, { key: t, topic: t, on: true }, t))),
+  "Without a topic": () => h("div", { style: { display: "flex", gap: 6 } }, h(UI.Chip, { on: true }, "Today"), h(UI.Chip, null, "This week")),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

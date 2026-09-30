@@ -1,0 +1,23 @@
+<!-- @dsCard group="Screen parts" height=150 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  Groceries: () => h(UI.Topic, { name: "groceries" }, h(UI.ButtonGroup, null, h(UI.Button, { variant: "primary" }, "Add to list"), h(UI.Button, { variant: "glass" }, "Later"))),
+  Parcel: () => h(UI.Topic, { name: "parcel" }, h(UI.ButtonGroup, null, h(UI.Button, { variant: "primary" }, "Track"), h(UI.Button, { variant: "text" }, "Details"))),
+  Sport: () => h(UI.Topic, { name: "sport" }, h(UI.ButtonGroup, null, h(UI.Button, { variant: "primary" }, "Start run"), h(UI.Button, { variant: "glass" }, "Skip"))),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

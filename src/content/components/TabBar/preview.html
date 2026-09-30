@@ -1,0 +1,35 @@
+<!-- @dsCard group="Navigation" height=520 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { TabBar } = window.IrisUi;
+  const pad = c => h("div", { style: { paddingTop: 30 } }, c);
+  // A page swipe, looped: the bar opens, the pill flows Iris -> Loops, then the bar folds back in.
+  function Swipe() {
+    const [t, setT] = React.useState(0);
+    React.useEffect(() => { let raf; const go = n => { setT((n / 1000) % 4); raf = requestAnimationFrame(go); }; raf = requestAnimationFrame(go); return () => cancelAnimationFrame(raf); }, []);
+    const e = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+    const p = t < 2 ? e((t - 0.5) / 0.9) : 1 - e((t - 2.3) / 0.9);
+    const active = p > 0.999 ? 1 : 0;
+    return pad(h(TabBar, { active, progress: active === 1 ? 0 : p, collapsed: t > 3.3 || t < 0.3 }));
+  }
+  window.__dsPreview = {
+    Open: () => pad(h(TabBar, { active: 0 })),
+    Collapsed: () => pad(h(TabBar, { active: 0, collapsed: true })),
+    "Swipe halfway": () => pad(h(TabBar, { active: 0, progress: 0.5 })),
+    "Swipe (live)": () => h(Swipe),
+    Talking: () => pad(h(TabBar, { active: 1, talk: "talking" })),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

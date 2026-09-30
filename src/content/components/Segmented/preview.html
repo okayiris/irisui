@@ -1,0 +1,22 @@
+<!-- @dsCard group="navigation" height=220 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  Tabs: () => { const [a, set] = React.useState(0); return h(UI.Segmented, { topic: "groceries", items: ["List", "Shops", "History"], active: a, onSelect: set }); },
+  "Per topic": () => h("div", { style: { display: "grid", gap: 10, justifyItems: "start", width: 420 } }, h(UI.Segmented, { topic: "agenda", items: ["Day", "Week", "Month"], active: 1 }), h(UI.Segmented, { topic: "mail", items: ["Important", "All", "Sent"], active: 0 })),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

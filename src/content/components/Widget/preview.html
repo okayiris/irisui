@@ -1,0 +1,25 @@
+<!-- @dsCard group="Screen parts" height=620 width=780 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap">
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  "Glass, small": () => h(UI.Widget, { topic: "agenda", look: "glass", size: "small", label: "Today", value: "14:00", unit: "Dentist" }),
+  "Pattern, wide": () => h(UI.Widget, { topic: "groceries", look: "pattern", size: "wide", pattern: "lanes", label: "On the list", value: "8", unit: "things", note: "home-baked" }),
+  "Ring, tall": () => h(UI.Widget, { topic: "tasks", look: "ring", size: "tall", label: "To do", value: "3", unit: "to go", progress: 0.4, items: ["Sign quote", "Fix tyre", "the neighbour's birthday", "Tax", "Water plants"], done: 2 }),
+  "List, large": () => h(UI.Widget, { topic: "mail", look: "list", size: "large", label: "Mail", value: "3", unit: "important", items: ["Contractor: quote", "Tax office", "Alex: Saturday?", "Newsletter", "Dentist: confirmation", "Parents' evening"], done: 1 }),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

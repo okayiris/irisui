@@ -1,0 +1,25 @@
+<!-- @dsCard group="Screen parts" height=620 width=760 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const UI = window.IrisUi;
+  window.__dsPreview = {
+  Busy: () => h(UI.PhaseRing, { phase: "busy", progress: 0.45, title: "Contractor quote", sub: "comparing 3 prices", size: 220 }),
+  "Waiting on you": () => h(UI.PhaseRing, { phase: "you", progress: 0.7, title: "Dentist", sub: "pick a time", size: 220 }),
+  Done: () => h(UI.PhaseRing, { phase: "done", progress: 1, title: "Passport", size: 220 }),
+  ...Object.fromEntries(["none", "glass", "pattern", "word"].map((center) => ["Middle: " + center, () =>
+    h(UI.PhaseRing, { phase: "planned", progress: 0.35, eyebrow: "In 16 hours", title: center === "word" ? "Bins" : "Bins out", size: 220, center })])),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>
