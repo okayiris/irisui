@@ -85,7 +85,13 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
                 "as a heading style, in running text, twice on one screen",
               ],
               [
-                "Lab rings, forms and patterns",
+                "Ringlab form (a /orbs recipe)",
+                "The personality of one of her roles in a team room",
+                "only on that role's card or the governance screen, as one Orb3D per screen",
+                "in the rail, the chat or the canvas, as the role's avatar",
+              ],
+              [
+                "Other lab rings, forms and patterns",
                 "Nothing yet",
                 "the lab",
                 "in a product screen, until a row is added here",
@@ -258,6 +264,47 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
             tone: "llm",
             text:
               "Building a screen about the person: mark every guess of hers as a guess with its reason, keep feelings and scores uncoloured, and give each question a Not now. A role or a part of life is a word, not a colour: one topic per screen still holds.",
+          },
+        ],
+      },
+      {
+        title: "Many of her: roles in a team room",
+        blocks: [
+          {
+            kind: "p",
+            text:
+              "A team room is Iris working as several roles at once (Keeper, Scout, Maker, Checker, Designer). The room is her; the members are her roles. So they may carry her orb, under these rules.",
+          },
+          {
+            kind: "ul",
+            items: [
+              "The name is always 'Iris · Scout', never 'Scout' alone: in the member list, above every message, on a cursor.",
+              "A role speaks in the first person as Iris. Roles may address each other and disagree in the open ('Iris · Checker → Maker: that fails on Outlook'): Iris thinking out loud with named hats.",
+              "The flat Orb, 22 or 28, with a true state. The role is told apart by its word, never by its own colour or ring gradient.",
+              "An orb only on a role that works or has the floor right now. Busy may show on several roles at once; talking only on the one who speaks. A resting role shows its word, no orb.",
+              "Who is not Iris never gets an orb: a human team member or an outside agent gets an initial in a phase ring.",
+              "A role's personality (its Ringlab recipe) shows only on its own role card, one Orb3D per screen.",
+              "Cursor colours are a neutral, low-chroma set that means nothing: never ice blue, violet, red or the ring gradient, never a fill, always with a name flag.",
+            ],
+          },
+          {
+            kind: "table",
+            head: ["Team room, desktop", "Where"],
+            rows: [
+              ["The room's name, her orb, the StatusPill", "the app bar, top left"],
+              ["The members ('4 roles')", "in the app bar beside her orb, a menu; not a second rail"],
+              ["What happened since you left", "one sentence as the lede; the details in the canvas"],
+              ["Decisions (3)", "one button top right; it opens the sheet from the right"],
+              ["The canvas", "content only, no hero"],
+              ["Snackbar", "above the composer"],
+              ["Composer, talk", "bottom centre"],
+            ],
+          },
+          {
+            kind: "note",
+            tone: "rule",
+            text:
+              "What she may do on her own has one source: the initiative setting (asks, guesses, does) is the default, and the tap list holds exceptions per action, loosened only by the owner's tap and always visible. Anything that leaves under the owner's name stays a signed tap, whatever the initiative: that is security, a separate layer.",
           },
         ],
       },
