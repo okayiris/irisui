@@ -386,7 +386,7 @@ export const PATTERNS_A: Record<string, Doc> = {
           {
             kind: "p",
             text:
-              "What is written: a loop has a schedule (\"Every workday 07:30\"), a switch, and it lives under Loops with chips (All, Loops, Chats, Questions). A loop she runs can feed a screen, for example a price alarm that feeds Compare.",
+              "What is written: a loop has a schedule (\"Every workday 07:30\"), a switch, and in the release it lives under Loops with chips (All, Loops, Chats, Questions). The iPhone app dropped that page on 29 September: a loop now hangs under its chat as a `LoopBubble` in the `CircleStack` above the strip. A loop she runs can feed a screen, for example a price alarm that feeds Compare.",
           },
           {
             kind: "note",

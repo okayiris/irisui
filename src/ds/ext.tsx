@@ -344,7 +344,7 @@ export function Badge({
   tone = "accent",
   max = 99,
 }: {
-  children: Any;
+  children?: Any;
   count?: number;
   dot?: boolean;
   tone?: "accent" | "violet" | "error";
@@ -1133,6 +1133,138 @@ export function Carousel({
 }
 
 /* --------------------------------------------------------------- register */
+
+/* ------------------------------------------------------------ LoopBubble */
+
+// One loop, small: a disc with the loop's first letter and six short arcs round it, one per phase. Phases already
+// done stay lit, the current one is lit full (with a glow when the loop waits on you), the rest are a hairline.
+// The iPhone app's LoopBubble, designed at 34px; the colours are the release's own PHASE_COLOURS.
+
+const YOU = 3;
+
+function bubbleArc(i: number) {
+  const at = (deg: number) => {
+    const a = ((deg - 90) * Math.PI) / 180;
+    return `${(17 + 15 * Math.cos(a)).toFixed(2)} ${(17 + 15 * Math.sin(a)).toFixed(2)}`;
+  };
+  return `M ${at(i * 60 + 7)} A 15 15 0 0 1 ${at((i + 1) * 60 - 7)}`;
+}
+
+export function LoopBubble({ title, step = 0, size = 34 }: { title: string; step?: number; size?: number }) {
+  const design = (window as Any).IrisUi?.design ?? {};
+  const colours: string[] = design.PHASE_COLOURS ?? [];
+  const phases: string[] = design.PHASES ?? [];
+  const now = Math.max(0, Math.min(5, Math.round(step)));
+  return h(
+    "span",
+    { className: "ix-bubble", role: "img", "aria-label": `${title}, ${phases[now] ?? ""}`, style: { width: size, height: size } },
+    h(
+      "svg",
+      { viewBox: "0 0 34 34", width: size, height: size, "aria-hidden": "true" },
+      h("circle", { className: "ix-bubble-disc", cx: 17, cy: 17, r: 14 }),
+      [0, 1, 2, 3, 4, 5].map((i) =>
+        h("path", {
+          key: i,
+          d: bubbleArc(i),
+          pathLength: 1,
+          className: "ix-bubble-arc",
+          "data-state": i === now ? (now === YOU ? "you" : "now") : i < now ? "done" : "next",
+          style: { "--arc": colours[i], animationDelay: `${i * 70}ms` },
+        }),
+      ),
+      h("text", { className: "ix-bubble-letter", x: 17, y: 17 }, title.slice(0, 1).toUpperCase()),
+    ),
+  );
+}
+
+/* ----------------------------------------------------------- CircleStack */
+
+// Circles: every chat with its own loops is one circle, stacked with depth behind the strip (the live conversation
+// at the bottom of the iPhone app, which replaced the Loops tab). Closed, only the top edges of the next two peek
+// out, with a count; a tap fans the stack upward into cards, the most urgent nearest the strip. A tap on a card
+// opens that chat. Waiting on you first, then unread, then the order given; at most six.
+
+export type CircleLoop = { title: string; step?: number };
+export type Circle = { id: string; title: string; line: string; unread?: number; loops?: CircleLoop[] };
+
+const waits = (c: Circle) => (c.loops ?? []).some((l) => l.step === YOU);
+
+export function CircleStack({
+  items,
+  open: openProp,
+  onOpenChange,
+  onSelect,
+}: {
+  items: Circle[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onSelect?: (id: string) => void;
+}) {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (o: boolean) => {
+    setOpenState(o);
+    onOpenChange && onOpenChange(o);
+  };
+  const rank = (c: Circle) => (waits(c) ? 0 : (c.unread ?? 0) > 0 ? 1 : 2);
+  const circles = items
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => rank(a.c) - rank(b.c) || a.i - b.i)
+    .slice(0, 6)
+    .map((x) => x.c);
+  if (!circles.length) return null;
+
+  if (!open)
+    return h(
+      "button",
+      { type: "button", className: "ix-circles-edges ix-focus", onClick: () => setOpen(true), "aria-label": `${circles.length} conversations`, "aria-expanded": "false" },
+      circles.slice(0, 2).map((c, i) => h("i", { key: c.id, "data-depth": i })),
+      h("span", { className: "ix-circles-count" }, `+${circles.length}`),
+    );
+
+  return h(
+    "ul",
+    {
+      className: "ix-circles",
+      "aria-label": "Conversations",
+      onKeyDown: (e: Any) => {
+        if (e.key === "Escape") setOpen(false);
+      },
+    },
+    [...circles].reverse().map((c) => {
+      const loops = c.loops ?? [];
+      const you = waits(c);
+      return h(
+        "li",
+        { key: c.id },
+        h(
+        "button",
+        {
+          type: "button",
+          className: "ix-circle ix-hit",
+          onClick: () => {
+            setOpen(false);
+            onSelect && onSelect(c.id);
+          },
+        },
+        h(
+          "span",
+          { className: "ix-circle-text" },
+          h("span", { className: "ix-circle-title" }, c.title),
+          h("span", { className: "ix-circle-line", "data-you": you ? "1" : undefined }, c.line),
+        ),
+        loops.length
+          ? h("span", { className: "ix-circle-loops" }, loops.slice(0, 3).map((l, i) => h(LoopBubble, { key: i, title: l.title, step: l.step, size: 26 })))
+          : null,
+        loops.length > 3 ? h("span", { className: "ix-circle-more" }, `+${loops.length - 3}`) : null,
+        (c.unread ?? 0) > 0
+          ? h("span", { className: "ix-circle-unread" }, h("span", { className: "ix-visually-hidden" }, "unread"))
+          : null,
+        ),
+      );
+    }),
+  );
+}
 
 /* ------------------------------------------------------ shared for the labs */
 
@@ -1940,6 +2072,8 @@ const SHIPPED = {
   Photo,
   BorderPattern,
   ChatStack,
+  LoopBubble,
+  CircleStack,
   Tooltip,
   Menu,
   Dialog,

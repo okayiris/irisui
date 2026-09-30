@@ -128,16 +128,16 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
   },
 
   tabbar: {
-    when: "The bottom of every iPhone screen: four tabs and her talk button in the middle.",
+    when: "The bottom of every iPhone screen: her talk button in the middle, the tabs either side of it.",
     parts: [
-      { name: "tabs", what: "Iris, Loops, Camera, You, with their icons" },
+      { name: "tabs", what: "Iris, Loops, Camera, You in the release. The app since 29 September: Iris, then Camera and You; Loops is no tab any more, the loops live in the CircleStack above the strip." },
       { name: "active", what: "the active tab in ice blue on a faint blue pill" },
       { name: "talk", what: "the TalkOrb state passed to the middle button" },
       { name: "progress", what: "-1 to 1: a page swipe in flight, the pill follows the finger" },
       { name: "collapsed", what: "at rest only the orb shows, the glass folds into it" },
     ],
     rules: [
-      { do: "Four tabs and no more.", dont: "Never a fifth tab: the middle is the orb." },
+      { do: "Two halves of equal width, so the orb stays in the middle. The app now puts Iris alone on the left and Camera and You on the right; the release TabBar still splits four tabs two and two and cannot draw that yet.", dont: "Never a fifth tab: the middle is the orb." },
       { do: "The orb stays on top; the pill slides under it and its effects fall over the tabs." },
       { do: "The bar keeps 22pt into the bottom safe area and leaves the home indicator free." },
       { do: "collapsed at rest; it opens on a page swipe or a swipe right on the orb, and folds back after 2.5s without touch." },
@@ -154,7 +154,7 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
       "Active is ice blue on a faint blue pill and keeps its label, so colour is never the only sign.",
       "The talk button has no word of its own and needs one (Talk); it stands above the bar with the highest z-index of its row.",
     ],
-    related: ["talkorb", "orb", "pagedots"],
+    related: ["talkorb", "orb", "pagedots", "circlestack"],
   },
 
   pagedots: {

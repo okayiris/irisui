@@ -601,6 +601,63 @@ const SPECS: Spec[] = [
     ],
   },
   {
+    name: "CircleStack",
+    group: "Navigation",
+    height: 330,
+    summary: "Every chat with its loops as a circle, stacked behind the strip: where the loops live now that the iPhone app has no Loops tab.",
+    props: [
+      { name: "items", type: "Circle[]", required: true },
+      { name: "open", type: "boolean" },
+      { name: "onOpenChange", type: "(open: boolean) => void" },
+      { name: "onSelect", type: "(id: string) => void" },
+    ],
+    variants: [
+      {
+        label: "Closed, above the strip",
+        code: `() => h("div", { style: { display: "grid", alignContent: "end", minHeight: 150, paddingTop: 30 } },
+    h(CircleStack, { items: [
+      { id: "debtors", title: "Debtors", line: "Van Dijk is 34 days late", unread: 1, loops: [{ title: "Van Dijk", step: 3 }, { title: "Bakker", step: 2 }] },
+      { id: "groceries", title: "Groceries", line: "Saturday delivery, 8 on the list", loops: [{ title: "Groceries", step: 1 }] },
+      { id: "renovation", title: "Renovation", line: "Comparing 3 quotes" },
+      { id: "dentist", title: "Dentist", line: "Pick a time" },
+    ] }),
+    h(Card, null, h("div", { style: { fontSize: 15 } }, "The dentist at 9:30, lunch with Tom at 13:00")))`,
+      },
+      {
+        label: "Fanned out",
+        code: `() => {
+  const [picked, setPicked] = React.useState("");
+  return h("div", { style: { display: "grid", gap: 8 } },
+    h(CircleStack, { open: true, onSelect: setPicked, items: [
+      { id: "debtors", title: "Debtors", line: "Van Dijk is 34 days late", unread: 1, loops: [{ title: "Van Dijk", step: 3 }, { title: "Bakker", step: 2 }, { title: "Peters", step: 4 }, { title: "Jansen", step: 1 }] },
+      { id: "groceries", title: "Groceries", line: "Saturday delivery, 8 on the list", loops: [{ title: "Groceries", step: 1 }] },
+      { id: "renovation", title: "Renovation", line: "Comparing 3 quotes" },
+      { id: "dentist", title: "Dentist", line: "Pick a time" },
+    ] }),
+    h("div", { style: { fontSize: 13, color: "var(--dim)", paddingLeft: 8 } }, picked ? "Opens: " + picked : "Tap a circle"));
+}`,
+      },
+    ],
+  },
+  {
+    name: "LoopBubble",
+    group: "Feedback",
+    height: 120,
+    summary: "One loop, small: its first letter in a disc and the six phases round it, the current one lit.",
+    props: [
+      { name: "title", type: "string", required: true },
+      { name: "step", type: "0 | 1 | 2 | 3 | 4 | 5" },
+      { name: "size", type: "number" },
+    ],
+    variants: [
+      {
+        label: "Every phase",
+        code: `() => h("div", { style: { display: "flex", gap: 14, alignItems: "center", paddingTop: 8 } },
+    ["Recognised", "Planned", "Busy", "You", "Check", "Done"].map((t, i) => h(LoopBubble, { key: t, title: t, step: i })))`,
+      },
+    ],
+  },
+  {
     name: "Photo",
     group: "Surfaces",
     height: 450,

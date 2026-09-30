@@ -61,7 +61,7 @@ export const RESOURCE_DOCS_EXT: Record<string, Doc> = {
           },
           {
             kind: "p",
-            text: "ext.js adds the parts this project added: Tooltip, Menu, Dialog, Sheet, Snackbar, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Divider, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton and Carousel. A page reads all of them from the one object, so an editor suggests the name after window.IrisUi and nothing else has to be imported.",
+            text: "ext.js adds the parts this project added: Tooltip, Menu, Dialog, Sheet, Snackbar, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Divider, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, CircleStack and LoopBubble. A page reads all of them from the one object, so an editor suggests the name after window.IrisUi and nothing else has to be imported.",
           },
           {
             kind: "p",
@@ -222,6 +222,8 @@ export const RESOURCE_DOCS_EXT: Record<string, Doc> = {
               ["Steps", "navigation", "where you are in a short sequence."],
               ["EmptyState", "feedback", "what a screen says when there is nothing in it yet."],
               ["Divider", "surfaces", "a line that separates, with an optional label."],
+              ["CircleStack", "navigation", "every chat with its loops, stacked behind the strip; the iPhone app's home for loops since the Loops tab went."],
+              ["LoopBubble", "feedback", "one loop, small: its letter and its six phases, the current one lit."],
             ],
           },
           {

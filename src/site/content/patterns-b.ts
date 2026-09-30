@@ -786,7 +786,7 @@ export const PATTERNS_B: Record<string, Doc> = {
           {
             kind: "ul",
             items: [
-              "The tab bar is a frosted capsule with four tabs, Iris, Loops, Camera and You, and the talk orb in the middle of them.",
+              "The tab bar is a frosted capsule with the talk orb in the middle. The release has four tabs, Iris, Loops, Camera and You; the app since 29 September has three, Iris on the left and Camera and You on the right, and the loops moved to the `CircleStack` above the strip.",
               "Collapsed, at rest only the orb shows: the glass shrinks into it and the tabs fold toward it.",
               "It opens on a page swipe, or on a swipe right on the orb, and folds back in after 2.5 s without touch.",
               "The orb is always on top: the pill slides under it and its effects fall over the tabs.",

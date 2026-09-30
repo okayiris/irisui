@@ -163,6 +163,41 @@
       "summary": "A hairline that groups what is above it from what is below.",
       "reads": "components/Divider/README.md",
       "preview": "components/Divider/preview.html"
+    },
+    {
+      "name": "CircleStack",
+      "group": "Navigation",
+      "summary": "Every chat with its loops as a circle, stacked behind the strip: where the loops live now that the iPhone app has no Loops tab.",
+      "reads": "components/CircleStack/README.md",
+      "preview": "components/CircleStack/preview.html"
+    },
+    {
+      "name": "LoopBubble",
+      "group": "Feedback",
+      "summary": "One loop, small: its first letter in a disc and the six phases round it, the current one lit.",
+      "reads": "components/LoopBubble/README.md",
+      "preview": "components/LoopBubble/preview.html"
+    },
+    {
+      "name": "Photo",
+      "group": "Surfaces",
+      "summary": "A photo with a depth map: a word behind the person, duotone in the topic's colours, or parallax in four depth layers. No photo ships: without a src it paints its own neutral scene with a matching depth map, and without a depth map it guesses one (lower and central is nearer).",
+      "reads": "components/Photo/README.md",
+      "preview": "components/Photo/preview.html"
+    },
+    {
+      "name": "BorderPattern",
+      "group": "Feedback",
+      "summary": "A pattern running along a rounded edge, one per moment: refreshing, listening, thinking, working, speaking, a question waiting, news, saving.",
+      "reads": "components/BorderPattern/README.md",
+      "preview": "components/BorderPattern/preview.html"
+    },
+    {
+      "name": "ChatStack",
+      "group": "Navigation",
+      "summary": "Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.",
+      "reads": "components/ChatStack/README.md",
+      "preview": "components/ChatStack/preview.html"
     }
   ]
 }

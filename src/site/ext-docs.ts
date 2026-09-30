@@ -876,6 +876,86 @@ The track (scroll-snap), the slides, the dots, and optional arrows for a pointer
 
 \`role="group"\` with a label; each dot is a button labelled with its slide number and the current one is
 \`aria-current\`. The track scrolls with the keyboard and with a trackpad, so nothing depends on the swipe.`,
+  CircleStack: `# CircleStack
+
+Every chat with its own loops is one circle, stacked with depth behind the strip.
+
+Since 29 September the iPhone app has no Loops tab and no Loops page. The strip at the bottom is the live
+conversation; the other chats, each with the loops hanging under it, wait behind it as circles. The release still
+describes the Loops tab (TabBar, the app chapter); the app is ahead of it here.
+
+## When
+
+- The iPhone app, directly above the strip: the one place a person sees every chat and every running loop.
+- Not on the Mac: the \`MacPill\` keeps its own Loops button.
+
+## The parts
+
+Closed, only the top edges of the next two circles peek out above the strip, each a step narrower, higher and
+dimmer, with the count on the right. A tap fans the stack upward into cards; the most urgent card sits nearest the
+strip. A tap on a card opens that chat and closes the fan. Escape closes it too.
+
+A card: the chat's title, one line under it (pink when a loop waits on you, since that line is her question), up to
+three \`LoopBubble\`s overlapping, \`+n\` for the rest, and the accent dot when there is something unread.
+
+\`items\` is a list of \`{ id, title, line, unread?, loops? }\`, each loop \`{ title, step }\`. \`open\` and
+\`onOpenChange\` make it controlled; \`onSelect\` hands over the id of the chat to open.
+
+## Rules
+
+- Order: a loop waiting on you first, then unread, then the order given (newest first). Six at most.
+- The stack never covers the strip: it sits above it, and the strip stays the conversation.
+- Nothing shows when there are no circles; the strip stands alone.
+
+## Values
+
+| value | where |
+| --- | --- |
+| edges | 16px tall, top radius 16px, \`--glass\` with 1px \`--edge\`; the second 10px narrower each side, 8px higher, 65% |
+| count | \`--text-label\` in \`--accent\` on \`--state-selected\`, a pill |
+| card | padding 11px 14px, \`--radius-card\`, \`--bg\` at 60% over a 20px blur, 1px \`--edge\`, 8px apart |
+| title | 600 15px, \`--fg\` |
+| line | \`--text-sub\`, \`--dim\`, or \`--phase-you\` when a loop waits |
+| bubbles | 26px, 6px overlap |
+| unread | 7px dot, \`--accent\` |
+
+## Accessibility
+
+Closed it is one button, named with the count ("4 conversations") and \`aria-expanded\`. Open it is a list of
+buttons, each read as its title, its line and its loops. The unread dot carries the word "unread" for a screen
+reader.`,
+  LoopBubble: `# LoopBubble
+
+One loop, small: a disc with the loop's first letter, and six short arcs round it, one per phase.
+
+The same six phases and colours as \`PhaseRing\` (recognised, planned, busy, you, check, done), at the size of an
+avatar. It is how a loop shows inside a \`CircleStack\` card and next to her answer in the strip.
+
+## The parts
+
+\`title\` gives the letter and the name, \`step\` (0 to 5) the phase it is in, \`size\` scales the whole bubble
+(designed at 34px, 26px in a card).
+
+## Rules
+
+- Phases already done stay lit at 70%, the current one is lit full, the rest are a hairline.
+- When the loop waits on you (step 3) the current arc glows: it is the one thing on the bubble that asks for a hand.
+- The arcs draw themselves round once when the bubble appears, one after the other; with reduced motion they are
+  simply there.
+
+## Values
+
+| value | where |
+| --- | --- |
+| disc | radius 14 of 34, \`--bubble-disc\` |
+| arcs | radius 15, 2.5px, round caps, 7 degrees clear at each end |
+| colours | the release's \`PHASE_COLOURS\`, read from \`window.IrisUi.design\` |
+| letter | 600 13px, \`--fg\` |
+| draw | \`--motion-slow\`, \`--ease-house\`, 70ms apart |
+
+## Accessibility
+
+\`role="img"\`, named with the loop and its phase ("Van Dijk, you").`,
   Photo: `# Photo
 
 A photo with a depth map: a grey image of the same size, white near and black far. From the Photos lab.

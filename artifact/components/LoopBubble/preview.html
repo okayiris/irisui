@@ -1,4 +1,4 @@
-<!-- @dsCard group="Navigation" height=200 -->
+<!-- @dsCard group="Feedback" height=120 -->
 <!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
 <div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
 <script>
@@ -6,9 +6,8 @@
   const h = React.createElement;
   const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
   window.__dsPreview = {
-    "Three angles": () => { const [i, setI] = React.useState(0); return h("div", { style: { display: "grid", gap: 14 } },
-    h(Tabs, { items: ["Today", "Loops", "Kept"], active: i, onSelect: setI }),
-    h("div", { style: { fontSize: 14, color: "var(--dim)" } }, "Showing: " + ["Today", "Loops", "Kept"][i])); },
+    "Every phase": () => h("div", { style: { display: "flex", gap: 14, alignItems: "center", paddingTop: 8 } },
+    ["Recognised", "Planned", "Busy", "You", "Check", "Done"].map((t, i) => h(LoopBubble, { key: t, title: t, step: i }))),
   };
 })();
 

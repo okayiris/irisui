@@ -10,6 +10,7 @@
     ["chrome", "Chrome", "chrome/"],
     ["tv", "TV", "tv/"],
     ["vault", "Vault", "vault/"],
+    ["labs", "Labs", "labs/"],
   ];
   const style = document.createElement("style");
   style.textContent = `

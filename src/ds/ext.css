@@ -36,6 +36,11 @@
   --sheet-bg: rgba(10, 13, 18, 0.92);
   --scrim: rgba(4, 6, 9, 0.62);
 
+  /* The disc inside a loop bubble: the app's LoopBubble fill, the tab bar's glass without its alpha. */
+  --bubble-disc: #141a22;
+  /* The "you" phase as a colour a stylesheet can reach: the release keeps it only in PHASE_COLOURS[3]. */
+  --phase-you: #f0abfc;
+
   /* Radii the system had not named yet. */
   --radius-menu: 14px;
   --radius-sheet: 22px;
@@ -1339,6 +1344,186 @@
   color: var(--fg);
 }
 
+/* ---------- LoopBubble ---------- */
+
+.ix-bubble {
+  display: inline-flex;
+  flex: none;
+}
+
+.ix-bubble-disc {
+  fill: var(--bubble-disc);
+}
+
+.ix-bubble-arc {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ix-bubble-draw var(--motion-slow) var(--ease-house) both;
+}
+
+.ix-bubble-arc[data-state="done"] {
+  stroke: var(--arc);
+  stroke-opacity: 0.7;
+}
+
+.ix-bubble-arc[data-state="now"],
+.ix-bubble-arc[data-state="you"] {
+  stroke: var(--arc);
+}
+
+.ix-bubble-arc[data-state="you"] {
+  filter: drop-shadow(0 0 2px var(--arc));
+}
+
+@keyframes ix-bubble-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ix-bubble-letter {
+  font: 600 13px var(--font-text);
+  fill: var(--fg);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ---------- CircleStack ---------- */
+
+.ix-circles-edges {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  isolation: isolate;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  cursor: pointer;
+}
+
+.ix-circles-edges i {
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  right: 16px;
+  height: 16px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  transition: transform var(--motion-fast) var(--ease-house);
+}
+
+.ix-circles-edges i[data-depth="1"] {
+  left: 26px;
+  right: 26px;
+  bottom: 8px;
+  opacity: 0.65;
+  z-index: -1;
+}
+
+.ix-circles-edges:hover i {
+  transform: translateY(-2px);
+}
+
+.ix-circles-count {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  padding: 1px 6px;
+  font: var(--text-label);
+  color: var(--accent);
+  background: var(--state-selected);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-pill);
+}
+
+.ix-circles {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 8px;
+  list-style: none;
+  animation: ix-circles-fan var(--motion-base) var(--ease-house) both;
+}
+
+@keyframes ix-circles-fan {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.ix-circle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  text-align: left;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+}
+
+.ix-circle-text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ix-circle-title,
+.ix-circle-line {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ix-circle-title {
+  font: 600 15px/20px var(--font-text);
+}
+
+.ix-circle-line {
+  font: var(--text-sub);
+  color: var(--dim);
+}
+
+.ix-circle-line[data-you] {
+  color: var(--phase-you);
+}
+
+.ix-circle-loops {
+  display: flex;
+}
+
+.ix-circle-loops > * + * {
+  margin-left: -6px;
+}
+
+.ix-circle-more {
+  font: var(--text-label);
+  color: var(--label);
+}
+
+.ix-circle-unread {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
 /* ---------- Photo ---------- */
 
 .ix-photo {
@@ -1628,9 +1813,9 @@
 .ix-edgetext-zip .ix-edgetext-light { animation-name: ix-edgetext-zip; animation-timing-function: cubic-bezier(.33, 1, .68, 1); animation-direction: alternate; }
 .ix-edgetext-party .ix-edgetext-light { stroke-dasharray: calc(var(--u) * 24) calc(var(--u) * 24); animation-name: ix-edgetext-run, ix-edgetext-party; }
 @keyframes ix-edgetext-run { to { stroke-dashoffset: calc(var(--u) * -200); } }
+/* Sparks drift two dots a round: running as fast as the comet, they raced. */
+@keyframes ix-edgetext-drift { to { stroke-dashoffset: calc(var(--u) * -28); } }
 @keyframes ix-edgetext-twinkle { 50% { opacity: .35; } }
 @keyframes ix-edgetext-zip { from { stroke-dasharray: 0 calc(var(--u) * 400); } to { stroke-dasharray: calc(var(--u) * 400) 0; } }
 @keyframes ix-edgetext-party { 50% { filter: hue-rotate(160deg); } }
 @media (prefers-reduced-motion: reduce) { .ix-edgetext-light { animation: none; } }
-/* Sparks drift two dots a round: running as fast as the comet, they raced. */
-@keyframes ix-edgetext-drift { to { stroke-dashoffset: calc(var(--u) * -28); } }

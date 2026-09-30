@@ -1,8 +1,8 @@
 {
   "name": "irisui",
   "version": "32.0.0",
-  "private": false,
-  "description": "The Iris design system, and the site where people and LLMs explore it \u2014 ui.okayiris.com",
+  "private": true,
+  "description": "The Iris design system, and the site where people and LLMs explore it — ui.okayiris.com",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -19,7 +19,8 @@
     "check:live": "node scripts/check.mjs --base=https://okayiris.github.io/irisui",
     "blobs": "node scripts/import-blobs.mjs",
     "check:artifact": "node scripts/check-artifact.mjs",
-    "test": "node scripts/build.mjs && node scripts/check.mjs && node scripts/check-artifact.mjs"
+    "test": "node scripts/build.mjs && node scripts/check.mjs && node scripts/check-artifact.mjs",
+    "build:npm": "node scripts/build-npm.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
