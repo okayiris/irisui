@@ -8,6 +8,7 @@ import { FOUNDATIONS_A } from "./content/foundations-a";
 import { FOUNDATIONS_B } from "./content/foundations-b";
 import { FOUNDATIONS_C } from "./content/foundations-c";
 import { FOUNDATIONS_MEANING } from "./content/foundations-meaning";
+import { FOUNDATIONS_INTERACTION } from "./content/foundations-interaction";
 import { PATTERNS_A } from "./content/patterns-a";
 import { PATTERNS_B } from "./content/patterns-b";
 import { OVERRIDES_CORE } from "./content/overrides-core";
@@ -57,6 +58,7 @@ export const FOUNDATION_DOCS: Record<string, Doc> = {
   ...FOUNDATIONS_B,
   ...FOUNDATIONS_C,
   ...FOUNDATIONS_MEANING,
+  ...FOUNDATIONS_INTERACTION,
 };
 
 export const PATTERN_DOCS: Record<string, Doc> = {

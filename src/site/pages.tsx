@@ -14,15 +14,18 @@ const h = (level: number, text: string, headings: Heading[]) => {
   return <Tag id={id}>{text}</Tag>;
 };
 
+/** Text between backticks in written content is code. */
+const ink = (t: string) => t.split("`").map((s, i) => (i % 2 ? <code key={i}>{s}</code> : s));
+
 function BlockView({ b }: { b: Block }) {
   switch (b.kind) {
     case "p":
-      return <p>{b.text}</p>;
+      return <p>{ink(b.text)}</p>;
     case "ul":
       return (
         <ul>
           {b.items.map((t, i) => (
-            <li key={i}>{t}</li>
+            <li key={i}>{ink(t)}</li>
           ))}
         </ul>
       );
@@ -30,7 +33,7 @@ function BlockView({ b }: { b: Block }) {
       return (
         <ol>
           {b.items.map((t, i) => (
-            <li key={i}>{t}</li>
+            <li key={i}>{ink(t)}</li>
           ))}
         </ol>
       );
@@ -55,7 +58,7 @@ function BlockView({ b }: { b: Block }) {
               {b.rows.map((r, i) => (
                 <tr key={i}>
                   {r.map((c, j) => (
-                    <td key={j}>{c}</td>
+                    <td key={j}>{ink(c)}</td>
                   ))}
                 </tr>
               ))}
@@ -67,7 +70,7 @@ function BlockView({ b }: { b: Block }) {
       return (
         <p className={"note is-" + b.tone}>
           <span className="note-tag">{b.tone === "llm" ? "llm" : b.tone === "warn" ? "watch" : "rule"}</span>
-          {b.text}
+          {ink(b.text)}
         </p>
       );
     case "swatches":
@@ -297,7 +300,7 @@ export function ComponentPage({ c, o }: { c: Component; o: Override }): Rendered
           {h(2, "Accessibility", headings)}
           <ul>
             {o.a11y.map((t, i) => (
-              <li key={i}>{t}</li>
+              <li key={i}>{ink(t)}</li>
             ))}
           </ul>
         </section>

@@ -175,6 +175,7 @@ export const FOUNDATIONS_B: Record<string, Doc> = {
               "The house curve arrives and stops. It never passes its own control points, so nothing overshoots.",
               "Three duration values, and nothing in the UI above 0.32s.",
               "The interface stays near 0.2s. The long motion is the ring and one pen draw, and those run on the part's own clock rather than on a token.",
+              "One exception: where a finger lets go (a swipe, a dragged sheet) a spring carries the hand's speed on, damped so it never bounces. See Interaction.",
             ],
           },
         ],

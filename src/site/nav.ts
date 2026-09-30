@@ -50,6 +50,7 @@ export const FOUNDATIONS: { id: string; label: string; blurb: string }[] = [
   { id: "shape", label: "Shape", blurb: "Glass, 18px cards, pills." },
   { id: "elevation", label: "Elevation", blurb: "No shadows: light on the edge." },
   { id: "motion", label: "Motion", blurb: "Two durations, one curve, her ring." },
+  { id: "interaction", label: "Interaction", blurb: "Press, swipe, sheets, the done moment, haptics: every hand gets an answer." },
   { id: "state", label: "State", blurb: "Hover, press, focus, disabled, busy." },
   { id: "spacing", label: "Spacing", blurb: "12 and 16, 8 inside." },
   { id: "layout", label: "Layout", blurb: "Phone, window, wide: what changes." },
