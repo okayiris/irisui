@@ -9,7 +9,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
-import { watch } from "node:fs";
+import { existsSync, watch, watchFile } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, extname, join, normalize } from "node:path";
 
@@ -178,3 +178,6 @@ for (const dir of ["src", "public", "scripts"]) {
     timer = setTimeout(build, debounce);
   });
 }
+// Switching a Ringlab module on or off rebuilds too (src/site/lab.ts).
+const modules = join(process.env.IRISUI_RINGLAB ?? join(ROOT, "../Ringlab"), "modules.json");
+if (existsSync(modules)) watchFile(modules, { interval: 1000 }, () => watching && build());
