@@ -224,6 +224,42 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
         ],
       },
       {
+        title: "Where each thing lives",
+        blocks: [
+          {
+            kind: "p",
+            text:
+              "Every part has a home. A person learns where to look once, and then finds it there on every screen. Put a thing somewhere else only when this table has no row for it.",
+          },
+          {
+            kind: "table",
+            head: ["Part", "Phone", "Window and wide", "Never"],
+            rows: [
+              ["Her orb (presence)", "top left, in the app bar or the status pill", "top left, beside the app name", "on a card, below the fold, twice"],
+              ["StatusPill", "top left, beside her orb", "top left, beside her orb", "in the content, at the bottom"],
+              ["TalkOrb", "bottom centre, in the tab bar", "the Mac pill; bottom centre of the talk screen", "in the content, in a card"],
+              ["Her words (what she says about this screen)", "the lede under the title, above the fold", "the lede under the title", "in a card further down, repeated in a card"],
+              ["The one action", "top right in the header, or a full-width button in thumb reach at the bottom", "top right in the header", "below the fold, two primaries"],
+              ["Search", "top, under the title or in the app bar", "top right in the app bar", "halfway down the page"],
+              ["Hero moment (Word, Orb3D, emphasis block)", "the first screen, right under the title", "the first row", "below the fold: then it is not the hero"],
+              ["Anchor", "within 24px of the thing it is about", "same", "on its own, in a corner"],
+              ["Badge", "top right on the thing it counts", "same", "loose in a row"],
+              ["Dialog", "centred, or a sheet from the bottom", "centred over the window", "anywhere else"],
+              ["Sheet", "from the bottom", "from the right side", "from the top"],
+              ["Snackbar", "bottom, above the tab bar", "bottom, near what it is about", "top, over her orb"],
+              ["Tab bar, NavRail", "bottom", "a rail on the left", "both at once"],
+              ["Settings danger (delete, unpair)", "the last row, at the bottom", "same", "near the top, next to a normal action"],
+            ],
+          },
+          {
+            kind: "note",
+            tone: "rule",
+            text:
+              "Above the fold: on a phone the first 600px under the status bar. Her presence, her words, the hero and the one action live there. What scrolls is the content, never her.",
+          },
+        ],
+      },
+      {
         title: "Quick test",
         blocks: [
           {
@@ -232,6 +268,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
               "Cover the thing. Is something missing? Then it belongs. Nothing missing? Take it out.",
               "Say what it means here, in one short sentence. No sentence: leave it out.",
               "For an orb: what is she doing there, in one verb? No verb: no orb.",
+              "Scroll to the top of a phone screen. Can you see her, what she says and the one action without scrolling? If not, move them up.",
               "Count the orbs that move. More than one outside a list of her own tasks: one too many.",
             ],
           },
