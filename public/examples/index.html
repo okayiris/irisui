@@ -126,7 +126,7 @@
   const I = window.IrisUi;
   const { PreviewI18nProvider, Icon, Card, Row, Toggle, Button, ButtonGroup, Orb, StatusPill, TalkOrb, TabBar,
           Skeleton, Topic, Widget, Word, Pen, Anchor, Chip, Progress, CheckList, Segmented, Field,
-          Dialog, Snackbar, EmptyState } = I;
+          Dialog, Snackbar, EmptyState, Mark } = I;
 
   const params = new URLSearchParams(location.search);
 
@@ -270,7 +270,7 @@
   }
 
   const Camera = ({ go }) => h("div", { className: "centre" },
-    h(Orb, { size: 96, state: "idle" }),
+    h(Mark, { size: 64 }),
     h("h2", { className: "title" }, "Show Iris what you see"),
     h("p", { className: "say" }, "Only while you hold the button. Nothing is kept after Iris answers."),
     h("div", { style: { width: "100%", display: "grid" } },

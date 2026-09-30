@@ -86,6 +86,44 @@
   .spot input::placeholder { color: var(--label); }
   .spot .hint { font: var(--text-sub); color: var(--label); }
 
+  /* A Mac window: Iris' own window, or her settings. Traffic lights close it. */
+  .win { position: absolute; left: 50%; top: 52px; translate: -50% 0; border-radius: 12px; overflow: hidden;
+         background: rgba(16, 20, 27, .94); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 24px 60px rgba(0, 0, 0, .5);
+         backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); animation: rise var(--motion-base) var(--ease-house); }
+  .win-top { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; font: 600 13px var(--font-text); color: var(--dim); }
+  .win-top .t { flex: 1; text-align: center; margin-right: 52px; }
+  .lights { display: flex; gap: 8px; }
+  .lights button { all: unset; width: 12px; height: 12px; border-radius: 50%; background: #3a3f47; cursor: pointer; }
+  .lights button:first-child { background: #ff5f57; }
+  .lights button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .win-body { padding: 4px 22px 20px; }
+  .win-body h2 { font: 700 28px var(--font-display); letter-spacing: -.01em; margin: 0 0 14px; }
+  .win-foot { padding: 10px 22px; border-top: 1px solid var(--line); font: var(--text-sub); color: var(--label); }
+
+  .prefs { display: grid; grid-template-columns: 170px 1fr; height: 330px; }
+  .prefs nav { display: grid; align-content: start; gap: 2px; padding: 8px; border-right: 1px solid var(--line); }
+  .prefs nav button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; font: var(--text-body); color: var(--dim); }
+  .prefs nav button:hover { color: var(--fg); }
+  .prefs nav button[aria-current="true"] { background: var(--glass); color: var(--fg); }
+  .prefs nav button:focus-visible { outline: 2px solid var(--accent); }
+  .prefs .pane { padding: 6px 22px 20px; overflow: auto; }
+  .prefs .pane h3 { font: 600 20px var(--font-display); margin: 4px 0 4px; }
+  .prefs .pane .say { color: var(--dim); font: var(--text-body); margin: 0 0 14px; }
+
+  /* The chat bar: at the foot of Chats, and what the Spotlight field sends to. */
+  .chatbar { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding: 6px 6px 6px 14px; border-radius: 22px;
+             background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
+  .chatbar:focus-within { box-shadow: inset 0 0 0 1px var(--accent-line, rgba(125, 211, 252, .45)); }
+  .chatbar input { all: unset; flex: 1; font: var(--text-body); color: var(--fg); }
+  .chatbar input::placeholder { color: var(--label); }
+  .round { all: unset; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--dim); }
+  .round:hover { color: var(--fg); background: var(--glass); }
+  .round.send { background: var(--accent); color: #07090c; }
+  .round:disabled { opacity: .35; cursor: default; }
+  .round:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .log .wait { color: var(--label); }
+  .log .wait::before { background: var(--label); }
+
   .rules { display: grid; gap: 14px; }
   .checks { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font: var(--text-body); }
   .checks li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; color: var(--dim); }
@@ -94,7 +132,7 @@
   .checks li.q::before { background: var(--wait); }
 
   @media (max-width: 1180px) { .ex { grid-template-columns: minmax(0, 880px); } .list { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
-  @media (max-width: 620px) { .panel, .spot { width: calc(100% - 32px); } .desk { height: 620px; } }
+  @media (max-width: 620px) { .prefs { grid-template-columns: 1fr; } .prefs nav { display: none; } .win { width: calc(100% - 24px) !important; } .panel, .spot { width: calc(100% - 32px); } .desk { height: 620px; } }
   @media (prefers-reduced-motion: reduce) { .mp-work, .panel, .spot { animation: none; } }
 </style>
 </head>
@@ -109,7 +147,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect } = React;
-  const { PreviewI18nProvider, TalkOrb, Card, Row, Toggle, Icon } = window.IrisUi;
+  const { PreviewI18nProvider, TalkOrb, Orb, Card, Row, Toggle, Icon, Segmented } = window.IrisUi;
 
   // The pill's own icons, as the MacPill preview draws them; phone is Lucide, for Calls.
   const svg = (d, fill) => h("svg", { width: 16, height: 16, viewBox: "0 0 24 24", "aria-hidden": "true" },
@@ -120,16 +158,31 @@
     vault: svg(["M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6z"], true),
     settings: svg(["M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z", "M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"]),
     mic: svg(["M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z", "M19 11a7 7 0 0 1-14 0M12 18v3"]),
+    send: svg(["M12 19V5M5 12l7-7 7 7"]),
+    screen: svg(["M3 4h18v12H3z", "M8 20h8M12 16v4"]),
   };
 
   /* ------------------------------------------------------------------ panels */
 
-  const Chats = () => h("div", null,
-    h("h2", null, "Chats"),
-    h("p", { className: "say" }, "The same talk as on your phone."),
-    h("ol", { className: "log" },
-      h("li", { className: "you" }, h("span", { className: "time" }, "14:02"), "Can you move the dentist to Wednesday?"),
-      h("li", null, h("span", { className: "time" }, "14:05"), "Done, Alex. Wednesday at 09:30. That leaves Saturday free for Sam's party.")));
+  // Chats with its chat bar. What you send shows at once; her answer comes from Iris, so the demo shows only that she is on it.
+  const hhmm = () => new Date().toTimeString().slice(0, 5);
+  function Chats({ first }) {
+    const [sent, setSent] = useState(first ? [first] : []);
+    const [text, setText] = useState("");
+    const send = (e) => { e.preventDefault(); if (!text.trim()) return; setSent([...sent, { at: hhmm(), text: text.trim() }]); setText(""); };
+    return h("div", null,
+      h("h2", null, "Chats"),
+      h("p", { className: "say" }, "The same talk as on your phone."),
+      h("ol", { className: "log" },
+        h("li", { className: "you" }, h("span", { className: "time" }, "14:02"), "Can you move the dentist to Wednesday?"),
+        h("li", null, h("span", { className: "time" }, "14:05"), "Done, Alex. Wednesday at 09:30. That leaves Saturday free for Sam's party."),
+        sent.map((m, i) => h("li", { key: i, className: "you" }, h("span", { className: "time" }, m.at), m.text)),
+        sent.length ? h("li", { className: "wait", role: "status" }, "Iris is on it") : null),
+      h("form", { className: "chatbar", onSubmit: send },
+        h("input", { autoFocus: !!first || undefined, value: text, onChange: (e) => setText(e.target.value), placeholder: "Message Iris", "aria-label": "Message Iris" }),
+        text ? null : h("button", { type: "button", className: "round", "aria-label": "Hold to talk" }, ICON.mic),
+        h("button", { className: "round send", "aria-label": "Send", disabled: !text.trim() }, ICON.send)));
+  }
 
   const Calls = () => h("div", null,
     h("h2", null, "Calls"),
@@ -139,17 +192,53 @@
       h(Row, { icon: h(Icon, { name: "phone" }), title: "Pizzeria Da Mario", subtitle: "Table for six on Saturday, 20:00" }),
       h(Row, { icon: h(Icon, { name: "phone" }), title: "Coolblue", subtitle: "No answer. Iris tries again at 16:00." })));
 
-  function Settings() {
-    const [near, setNear] = useState(true);
-    const [start, setStart] = useState(true);
-    return h("div", null,
-      h("h2", null, "Settings"),
-      h("p", { className: "say" }, "How Iris works on this Mac."),
-      h(Card, { padding: 4 },
-        h(Row, { icon: h(Icon, { name: "mic" }), title: "Listens on this Mac", subtitle: "The phone stays quiet while this one hears you", trailing: h(Toggle, { on: near, onChange: setNear }) }),
-        h(Row, { icon: h(Icon, { name: "sparkles" }), title: "Open at login", trailing: h(Toggle, { on: start, onChange: setStart }) }),
-        h(Row, { icon: h(Icon, { name: "speaker" }), title: "Voice", trailing: h("span", { style: { color: "var(--dim)" } }, "Wiep"), chevron: true })));
+  // A Mac window. The red light closes it, as every Mac window does.
+  const Win = ({ title, width, onClose, children, foot }) => h("section", { className: "win", style: { width }, "aria-label": title },
+    h("div", { className: "win-top" },
+      h("div", { className: "lights" }, h("button", { "aria-label": "Close", onClick: onClose }), h("button", { tabIndex: -1, "aria-hidden": "true" }), h("button", { tabIndex: -1, "aria-hidden": "true" })),
+      h("span", { className: "t" }, title)),
+    children,
+    foot ? h("div", { className: "win-foot" }, foot) : null);
+
+  // Settings is a real window: a Mac user looks for it there, and it has more than fits in a panel.
+  function Settings({ onClose }) {
+    const [tab, setTab] = useState("general");
+    const [on, setOn] = useState({ login: true, listen: true, windows: true, ask: false, touch: true });
+    const [where, setWhere] = useState(0);
+    const T = (k) => h(Toggle, { on: on[k], onChange: (v) => setOn({ ...on, [k]: v }) });
+    const TABS = [["general", "General", "sparkles"], ["listen", "Listening", "mic"], ["voice", "Voice", "speaker"], ["screens", "Screens", "globe"], ["vault", "Vault", "shield"]];
+    const PANES = {
+      general: ["General", "How Iris starts on this Mac.", [
+        h(Row, { key: 1, title: "Open at login", trailing: T("login") }),
+        h(Row, { key: 2, title: "Light or dark", subtitle: "Follows the Mac", trailing: h("span", { style: { color: "var(--dim)" } }, "Automatic") })]],
+      listen: ["Listening", "Which device hears you.", [
+        h(Row, { key: 1, title: "Listens on this Mac", subtitle: "The phone stays quiet while this one hears you", trailing: T("listen") }),
+        h(Row, { key: 2, title: "Hold to talk", trailing: h("span", { style: { color: "var(--dim)", font: "500 12px var(--font-mono)" } }, "fn") })]],
+      voice: ["Voice", "How Iris sounds.", [
+        h(Row, { key: 1, title: "Voice", trailing: h("span", { style: { color: "var(--dim)" } }, "Wiep"), chevron: true }),
+        h(Row, { key: 2, title: "Speaks out loud", subtitle: "Off: she only writes", trailing: T("ask") })]],
+      screens: ["Screens", "Where Iris may put a window.", [
+        h(Row, { key: 1, title: "Iris may open windows here", subtitle: "A plan, a list, a call. Never over full screen apps.", trailing: T("windows") }),
+        on.windows ? h("div", { key: 2, style: { padding: "10px 12px" } }, h(Segmented, { items: ["This screen", "Second screen"], active: where, onSelect: setWhere })) : null]],
+      vault: ["Vault", "What Iris may use, and how it opens.", [
+        h(Row, { key: 1, title: "Open with Touch ID", trailing: T("touch") }),
+        h(Row, { key: 2, title: "Logins", trailing: h("span", { style: { color: "var(--dim)" } }, "2"), chevron: true })]],
+    };
+    const [title, say, rows] = PANES[tab];
+    return h(Win, { title: "Iris Settings", width: 600, onClose },
+      h("div", { className: "prefs" },
+        h("nav", { "aria-label": "Settings" }, TABS.map(([k, t, i]) => h("button", { key: k, "aria-current": tab === k ? "true" : "false", onClick: () => setTab(k) }, h(Icon, { name: i }), t))),
+        h("div", { className: "pane" }, h("h3", null, title), h("p", { className: "say" }, say), h(Card, { padding: 4 }, rows))));
   }
+
+  // A window Iris puts on the desk herself: the answer, big, with where it came from.
+  const Shown = ({ onClose }) => h(Win, { title: "Iris", width: 440, onClose, foot: "Iris opened this for you. Say 'close' or press the red light." },
+    h("div", { className: "win-body" },
+      h("h2", null, "Saturday"),
+      h("ol", { className: "log" },
+        h("li", null, h("span", { className: "time" }, "14:00"), "Pick up the candles"),
+        h("li", { className: "you" }, h("span", { className: "time" }, "20:00"), "Da Mario, table for six. Iris booked it by phone."),
+        h("li", null, h("span", { className: "time" }, "22:30"), "Cake, when Sam turns 30"))));
 
   const Vault = () => h("div", null,
     h("h2", null, "Vault"),
@@ -158,7 +247,7 @@
       h(Row, { icon: h(Icon, { name: "shield" }), title: "Albert Heijn", subtitle: "Used for the grocery order, 30 September" }),
       h(Row, { icon: h(Icon, { name: "shield" }), title: "Coolblue", subtitle: "Not used yet" })));
 
-  const PANELS = { calls: Calls, chats: Chats, settings: Settings, vault: Vault };
+  const PANELS = { calls: Calls, chats: Chats, vault: Vault };
 
   /* ------------------------------------------------------------------ scenes */
 
@@ -167,19 +256,22 @@
       ok: ["Only the orb: the bar hides until the mouse rests on it", "Badge on the rim at 45 degrees, never cut off"],
       ask: ["The badge is magenta: a third colour next to ice and violet. Keep it only here?"] },
     { id: "chats", name: "Chats", orb: "rest", panel: "chats",
-      ok: ["The panel opens above the pill", "The same conversation as the phone and the web"],
+      ok: ["The panel opens above the pill", "The same conversation as the phone and the web", "The chat bar at the foot: type and send, or hold the mic", "The mic gives way to send as soon as you type"],
       ask: ["Panel cards: the app's 18px or the web's .9rem?"] },
     { id: "calls", name: "Calls", orb: "rest", panel: "calls",
       ok: ["Calls took the place of Loops in the bar"],
       ask: ["The bar had Loops and Chats on the left. Calls there now, or does Chats go first?"] },
     { id: "settings", name: "Settings", orb: "rest", panel: "settings",
-      ok: ["Rows and toggles as on the You page", "One card per group: rows inside it lose their own frame"],
-      ask: ["Toggles are violet (on), the bar hover is neon teal. Two 'on' colours on one screen?"] },
+      ok: ["A real window with a sidebar, as Mac users expect", "Screens: may Iris open windows, and on which screen", "Light or dark follows the Mac"],
+      ask: ["Toggles are violet (on), the bar hover is neon teal. Two 'on' colours on one screen?", "The house Icon has no screen and no gear: globe and sparkles stand in."] },
+    { id: "screen", name: "A window from Iris", orb: "talking", words: "Here is Saturday", window: true,
+      ok: ["Iris opens a window herself: the answer, big", "Says where it came from and how to close it", "Only when Screens allows it in Settings"],
+      ask: ["Close it by itself after a while, or keep it until you close it?"] },
     { id: "vault", name: "Vault", orb: "rest", panel: "vault",
       ok: ["Says when each login was last used"],
       ask: [] },
     { id: "type", name: "Type to Iris", orb: "listening", type: true,
-      ok: ["Click the orb: one field, like Spotlight", "Escape closes it"],
+      ok: ["Click the orb: one field, like Spotlight", "Enter sends it to Chats, Escape closes it"],
       ask: [] },
     { sep: "States" },
     { id: "talking", name: "Talking", orb: "talking", words: "Move the dentist to Wednesday",
@@ -192,7 +284,7 @@
       ok: ["Says what happened"], ask: ["Say what Iris does next, as the web error does?"] },
   ];
   const real = SCENES.filter((s) => s.id);
-  const ALL = ["There is no macOS chapter beyond the MacPill card. Panels, the Spotlight field and the menu bar item need one.",
+  const ALL = ["There is no macOS chapter beyond the MacPill card. Panels, windows, the chat bar and the Spotlight field need one.",
                "The pill's icons are its own drawings, not the house Icon."];
 
   /* -------------------------------------------------------------------- pill */
@@ -220,11 +312,11 @@
       scene.label ? h("div", { className: "mp-label", role: "status" }, scene.label) : null);
   }
 
-  function Spot({ onClose }) {
+  function Spot({ onClose, onSend }) {
     useEffect(() => { const k = (e) => e.key === "Escape" && onClose(); document.addEventListener("keydown", k); return () => document.removeEventListener("keydown", k); }, [onClose]);
-    return h("form", { className: "spot", onSubmit: (e) => { e.preventDefault(); onClose(); } },
-      h(TalkOrb, { state: "listening", size: 28 }),
-      h("input", { autoFocus: true, placeholder: "Ask Iris anything", "aria-label": "Ask Iris" }),
+    return h("form", { className: "spot", onSubmit: (e) => { e.preventDefault(); const t = e.target.elements.q.value.trim(); t ? onSend(t) : onClose(); } },
+      h(Orb, { state: "listening", size: 28 }),
+      h("input", { name: "q", autoFocus: true, placeholder: "Ask Iris anything", "aria-label": "Ask Iris" }),
       h("span", { className: "hint" }, "esc"));
   }
 
@@ -233,12 +325,14 @@
     const scene = real.find((s) => s.id === id) ?? real[0];
     const [panel, setPanel] = useState(scene.panel ?? null);
     const [type, setType] = useState(!!scene.type);
+    const [shown, setShown] = useState(!!scene.window);
+    const [first, setFirst] = useState(null);
     const go = (next) => {
       const s = real.find((x) => x.id === next);
-      setId(next); setPanel(s.panel ?? null); setType(!!s.type);
+      setId(next); setPanel(s.panel ?? null); setType(!!s.type); setShown(!!s.window); setFirst(null);
       const u = new URL(location.href); u.searchParams.set("s", next); history.replaceState(null, "", u);
     };
-    const Panel = panel ? PANELS[panel] : null;
+    const Panel = panel && PANELS[panel];
 
     return h("div", { className: "ex" },
       h("nav", { className: "list", "aria-label": "Scenes" },
@@ -248,8 +342,10 @@
       h("main", { className: "desk", "aria-label": "Mac desktop" },
         h("div", { className: "menubar", "aria-hidden": "true" }, h("b", null, "Finder"), h("span", null, "File"), h("span", null, "Edit"), h("span", null, "View"),
           h("span", { className: "sp" }), h("span", null, "Tue 30 Sep  21:04")),
-        Panel ? h("section", { className: "panel", "aria-label": panel }, h(Panel)) : null,
-        type ? h(Spot, { onClose: () => setType(false) }) : null,
+        shown ? h(Shown, { onClose: () => setShown(false) }) : null,
+        panel === "settings" ? h(Settings, { onClose: () => setPanel(null) }) : null,
+        Panel ? h("section", { className: "panel", "aria-label": panel }, h(Panel, { key: first?.text, first })) : null,
+        type ? h(Spot, { onClose: () => setType(false), onSend: (text) => { setFirst({ at: hhmm(), text }); setType(false); setPanel("chats"); } }) : null,
         h(Pill, { key: scene.id, scene, panel, setPanel, setType })),
       h("aside", { className: "rules", "aria-label": "Rules" },
         h("p", { className: "lab" }, scene.name),

@@ -224,6 +224,18 @@ const ASSETS = [
 
 // The published files first: no key, no token, nothing that looks like one.
 for (const hit of scanForSecrets(DIST)) failures.push(hit);
+
+// Her size: the steps in "Which Iris, how big" (the Mark page). A TalkOrb draws its ring at a third of its
+// size, so under 60 it is a dot; an Orb only takes the four small steps.
+// ponytail: reads literal sizes in the example pages only; a size from a variable is not seen.
+const ORB_STEPS = [16, 22, 28, 34];
+for (const file of walk(join(DIST, "examples")).filter((f) => f.endsWith(".html"))) {
+  for (const [, name, size] of readFileSync(file, "utf8").matchAll(/h\((Orb|TalkOrb), \{[^}]*?size: (\d+)/g)) {
+    const n = Number(size);
+    if (name === "TalkOrb" ? n < 60 : !ORB_STEPS.includes(n))
+      failures.push(`${relative(DIST, file)}: ${name} at ${n}, not a step in "Which Iris, how big"`);
+  }
+}
 const browser = await playwright.chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
 

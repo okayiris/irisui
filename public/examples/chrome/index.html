@@ -92,7 +92,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect } = React;
-  const { Button, Orb, TalkOrb } = window.IrisUi;
+  const { Button, Orb } = window.IrisUi;
   const Ring = ({ size = 16 }) => h(Orb, { size });
 
   function Browser({ host, tab, children, panel, popup, onExt }) {
@@ -167,7 +167,7 @@
         h("div", { className: "you" }, "Order the party things on the list."),
         h("div", { className: "task" },
           h("button", { "aria-expanded": open, onClick: () => setOpen(!open) },
-            h(TalkOrb, { size: 22, state: stopped || step >= 3 ? "rest" : "thinking" }),
+            h(Orb, { size: 22, state: stopped || step >= 3 ? "idle" : "busy" }),
             h("span", { className: "t" }, "Filling the basket"), h("small", null, `${Math.min(step + 1, 4)} of 4`)),
           open ? h("ol", { className: "steps" },
             steps.map((s, i) => i <= step ? h("li", { key: s, className: i === step && !stopped ? "now" : "" }, s) : null),

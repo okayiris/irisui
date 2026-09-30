@@ -761,6 +761,26 @@ with her. Never put a Mark and an Orb on one screen.
 ## Size
 
 \`size\` is the ring. The glow reaches past it on every side, as light does: leave about a ring's width of room.
+
+## Which Iris, how big
+
+Three drawings of her, and each has its own sizes. What counts is the ring you see, not the box.
+
+| Where | Take | size |
+|---|---|---|
+| In a line of text, a chip, a tab | \`Orb\` | 16 |
+| A status, a corner, a header, a task row | \`Orb\` | 22 |
+| A field you type to her (the ring stands in for the mic) | \`Orb\` | 28 |
+| A list row, a card head | \`Orb\` | 34 |
+| The Mac pill | \`TalkOrb\` | 60 |
+| A logo: sign-in, lock screen, PIN pad | \`Mark\` | 48 to 96 |
+| The talk screen, the hero | \`TalkOrb\` | 120 or more |
+
+- The \`Orb\` is only ring: it fills its size. Its ring is as tall as the text next to it, never smaller.
+- The \`TalkOrb\` draws its ring at about a third of its size. The rest is room for the glow and the waves.
+  So it is never smaller than 60: at 28 its ring is 9px, a dot next to 22px text.
+- Only these steps. A size between them is a bug, not a choice.
+- Small and live is an \`Orb\`. Big and live is a \`TalkOrb\`. Still is a \`Mark\`.
 `,
   Carousel: `# Carousel
 
