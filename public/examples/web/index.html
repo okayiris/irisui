@@ -166,7 +166,8 @@
 (() => {
   const h = React.createElement;
   const { useState } = React;
-  const { PreviewI18nProvider, Button, Segmented, Field, CheckList, Topic, Progress, Chip } = window.IrisUi;
+  const { PreviewI18nProvider, Button, Segmented, Field, CheckList, Topic, Progress, Chip, SplitButton, Stat, Pattern,
+          Tabs, SearchField, Menu, Toolbar, Tooltip, Badge, BorderPattern, Icon } = window.IrisUi;
 
   // Lucide paths (the web kit's icon set). The house Icon has 14 names and none of these; see the rules drawer.
   const LUCIDE = {
@@ -264,10 +265,15 @@
     const [items, setItems] = useState(["Candles", "Balloons", "Lemonade", "Cake", "Bread", "Milk"]);
     const [done, setDone] = useState([0, 4]);
     const [draft, setDraft] = useState("");
+    const [shop, setShop] = useState("Albert Heijn");
     return h("div", { className: "col" },
       h(Topic, { name: "groceries" },
-        h("h2", { className: "t" }, "Groceries"),
-        h("p", { className: "intro" }, `${items.length - done.length} still to get. Iris orders them at Albert Heijn when you say so.`),
+        h(Pattern, { kind: "band", topic: "groceries", height: 56 }),
+        h("h2", { className: "t", style: { marginTop: 16 } }, "Groceries"),
+        h("p", { className: "intro" }, `Iris orders them at ${shop} when you say so.`),
+        h("div", { style: { display: "flex", gap: 28, margin: "0 0 16px" } },
+          h(Stat, { topic: "groceries", value: String(items.length - done.length), label: "to get" }),
+          h(Stat, { topic: "groceries", value: "€42", label: "estimate" })),
         h("div", { className: "card" },
           h("div", { className: "row" },
             h(Progress, { ring: true, size: 64, value: done.length / items.length, centre: `${done.length}/${items.length}`, topic: "groceries" }),
@@ -276,24 +282,42 @@
           h(CheckList, { topic: "groceries", items, done, onToggle: (i) => setDone((d) => d.includes(i) ? d.filter((x) => x !== i) : [...d, i]) }),
           h("form", { style: { marginTop: 12 }, onSubmit: (e) => { e.preventDefault(); if (draft.trim()) { setItems([...items, draft.trim()]); setDraft(""); } } },
             h(Field, { topic: "groceries", placeholder: "Add something", "aria-label": "Add something", value: draft, onChange: (e) => setDraft(e.target.value) }))),
-        h("div", { className: "row" }, h(Button, { variant: "primary", topic: "groceries" }, "Order at Albert Heijn"), h(Button, { variant: "glass" }, "Share the list"))));
+        h("div", { className: "row" },
+          h(SplitButton, { variant: "primary", items: ["Albert Heijn", "Jumbo", "Picnic"].filter((x) => x !== shop).map((x) => ({ label: `Order at ${x}`, onSelect: () => setShop(x) })) }, `Order at ${shop}`),
+          h(Button, { variant: "glass" }, "Share the list"))));
   }
 
   /* ------------------------------------------------------- what Iris did */
 
   const DID = [
-    { time: "14:10", t: "Moved the dentist to Wednesday 09:30", s: "Called, 2 minutes" },
-    { time: "13:52", t: "Looked up houses on Funda", s: "Read 12 pages, clicked 6 times, typed twice" },
-    { time: "13:50", t: "Could not type into the search field", s: "The page changed while she typed. She tried again and it worked.", bad: true },
-    { time: "13:41", t: "Booked a table at Da Mario", s: "Saturday 20:00, six people" },
+    { time: "14:10", t: "Moved the dentist to Wednesday 09:30", s: "Called, 2 minutes", kind: "call" },
+    { time: "13:52", t: "Looked up houses on Funda", s: "Read 12 pages, clicked 6 times, typed twice", kind: "web" },
+    { time: "13:50", t: "Could not type into the search field", s: "The page changed while she typed. She tried again and it worked.", bad: true, kind: "web" },
+    { time: "13:41", t: "Booked a table at Da Mario", s: "Saturday 20:00, six people", kind: "call" },
   ];
-  const Activity = () => h("div", { className: "col" },
+  function Activity() {
+    const [tab, setTab] = useState(0);
+    const [q, setQ] = useState("");
+    const [bad, setBad] = useState(false);
+    const [old, setOld] = useState(false);
+    const KIND = [null, "call", "web"];
+    const shown = DID.filter((d) => (!KIND[tab] || d.kind === KIND[tab]) && (!bad || d.bad) && (d.t + d.s).toLowerCase().includes(q.toLowerCase()));
+    return h("div", { className: "col" },
     h("h2", { className: "t" }, "What Iris did"),
     h("p", { className: "intro" }, "One line per task, not per click. Open a line for the steps."),
-    h("ol", { className: "log" }, DID.map((d) => h("li", { key: d.time + d.t },
+    h(Tabs, { items: ["All", "Calls", "On the web"], active: tab, onSelect: setTab }),
+    h("div", { style: { margin: "14px 0" } }, h(SearchField, { value: q, onChange: setQ, placeholder: "Search what she did" })),
+    h(Toolbar, { title: `${shown.length} tasks`, items: [{ label: "Only what failed", active: bad, onSelect: () => setBad(!bad) }],
+      trailing: h("div", { className: "row" },
+        h(Menu, { label: "Sort", align: "end", items: [
+          { label: "Newest first", checked: !old, onSelect: () => setOld(false) },
+          { label: "Oldest first", checked: old, onSelect: () => setOld(true) }] }),
+        h(Tooltip, { label: "Tasks you have not seen" }, h(Badge, { count: 2 }, h(Button, { variant: "icon", label: "Unseen", icon: h(Icon, { name: "sparkles", size: 18 }) })))) }),
+    h("ol", { className: "log" }, (old ? [...shown].reverse() : shown).map((d) => h("li", { key: d.time + d.t },
       h("span", { className: "time" }, d.time),
       h("div", { style: { fontWeight: 600, color: d.bad ? "var(--error)" : "var(--fg)" } }, d.t),
       h("div", { className: "line" }, d.s)))));
+  }
 
   /* ----------------------------------------------------------------- rules */
 
@@ -305,11 +329,11 @@
       ok: ["One card per question: plan, code, awake", "The plan you are on is the first thing you read", "The code field opens only when you have one", "Result next to the button, not in a toast", "Awake says what each choice costs"],
       ask: ["Show the price of every plan, or only yours?", "Switching waits until the renewal date: say so, or switch at once?"] },
     cart: { name: "Groceries", icon: "cart", el: Groceries,
-      ok: ["One topic on the page, the rest stays ice", "One primary, under what it acts on"],
+      ok: ["One topic on the page, the rest stays ice", "One primary, under what it acts on", "The caret holds the other shops, the button keeps the one you use", "Two numbers: what is left, what it costs"],
       ask: ["The house Button primary is white on the app, accent on the web. Here it takes the topic colour. Which one wins?"] },
     pulse: { name: "What Iris did", icon: "pulse", el: Activity,
-      ok: ["One line per task, not 30 lines of 'reads the page'", "A failure says what happened and what she did next"],
-      ask: [] },
+      ok: ["One line per task, not 30 lines of 'reads the page'", "A failure says what happened and what she did next", "Tabs, search and sort all filter the same list"],
+      ask: ["Tabs, a search field, a toolbar filter and a sort menu: four ways to narrow four lines. Which two stay?"] },
   };
   const ALL = ["The house Icon has 14 names; the web kit uses 161 Lucide icons. One set for both?",
                "Web cards are .9rem, the house Card 18px. Two radii on purpose?",
@@ -343,7 +367,10 @@
         h("aside", { className: "rail", "aria-label": "Jobs" },
           h("h2", null, "Running"),
           h("div", { className: "job" }, h("span", null, "Parcel from Coolblue"), h("small", null, "Arrives 17:00 to 18:00"), h(Progress, { value: .6 })),
-          h("div", { className: "job" }, h("span", null, "Calling Coolblue again"), h("small", null, "At 16:00"), h(Progress, { value: .1 })))),
+          h("div", { className: "job" }, h("span", null, "Calling Coolblue again"), h("small", null, "At 16:00"), h(Progress, { value: .1 })),
+          // A question is waiting on Alex right now: this one card carries the pattern for that moment.
+          h(BorderPattern, { pattern: "stream", label: "Waits on you" },
+            h("div", { className: "job", style: { padding: "10px 12px" } }, h("span", null, "Which cake?"), h("small", null, "Chocolate or lemon, for Sam"))))),
 
       h("div", { className: "bar" },
         h("form", { onSubmit: (e) => { e.preventDefault(); setText(""); } },

@@ -100,7 +100,7 @@
   .win-body h2 { font: 700 28px var(--font-display); letter-spacing: -.01em; margin: 0 0 14px; }
   .win-foot { padding: 10px 22px; border-top: 1px solid var(--line); font: var(--text-sub); color: var(--label); }
 
-  .prefs { display: grid; grid-template-columns: 170px 1fr; height: 330px; }
+  .prefs { display: grid; grid-template-columns: auto 1fr; height: 330px; }
   .prefs nav { display: grid; align-content: start; gap: 2px; padding: 8px; border-right: 1px solid var(--line); }
   .prefs nav button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; font: var(--text-body); color: var(--dim); }
   .prefs nav button:hover { color: var(--fg); }
@@ -147,7 +147,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect } = React;
-  const { PreviewI18nProvider, TalkOrb, Orb, Card, Row, Toggle, Icon, Segmented } = window.IrisUi;
+  const { PreviewI18nProvider, TalkOrb, Orb, Card, Row, Toggle, Icon, Segmented, NavRail } = window.IrisUi;
 
   // The pill's own icons, as the MacPill preview draws them; phone is Lucide, for Calls.
   const svg = (d, fill) => h("svg", { width: 16, height: 16, viewBox: "0 0 24 24", "aria-hidden": "true" },
@@ -227,7 +227,7 @@
     const [title, say, rows] = PANES[tab];
     return h(Win, { title: "Iris Settings", width: 600, onClose },
       h("div", { className: "prefs" },
-        h("nav", { "aria-label": "Settings" }, TABS.map(([k, t, i]) => h("button", { key: k, "aria-current": tab === k ? "true" : "false", onClick: () => setTab(k) }, h(Icon, { name: i }), t))),
+        h(NavRail, { label: "Settings", items: TABS.map(([k, t, i]) => ({ label: t, icon: h(Icon, { name: i, size: 16 }), active: tab === k, onSelect: () => setTab(k) })) }),
         h("div", { className: "pane" }, h("h3", null, title), h("p", { className: "say" }, say), h(Card, { padding: 4 }, rows))));
   }
 
@@ -262,7 +262,7 @@
       ok: ["Calls took the place of Loops in the bar"],
       ask: ["The bar had Loops and Chats on the left. Calls there now, or does Chats go first?"] },
     { id: "settings", name: "Settings", orb: "rest", panel: "settings",
-      ok: ["A real window with a sidebar, as Mac users expect", "Screens: may Iris open windows, and on which screen", "Light or dark follows the Mac"],
+      ok: ["A real window with a sidebar, as Mac users expect", "The sidebar is the house NavRail: it folds to icons", "Screens: may Iris open windows, and on which screen", "Light or dark follows the Mac"],
       ask: ["Toggles are violet (on), the bar hover is neon teal. Two 'on' colours on one screen?", "The house Icon has no screen and no gear: globe and sparkles stand in."] },
     { id: "screen", name: "A window from Iris", orb: "talking", words: "Here is Saturday", window: true,
       ok: ["Iris opens a window herself: the answer, big", "Says where it came from and how to close it", "Only when Screens allows it in Settings"],

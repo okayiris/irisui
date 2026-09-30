@@ -80,7 +80,7 @@
 (() => {
   const h = React.createElement;
   const { useState } = React;
-  const { Orb, Icon } = window.IrisUi;
+  const { Orb, Icon, Orb3D, Photo, PageDots, EdgeText } = window.IrisUi;
 
   // The small ring, as the web's status: it stays a ring at any TV size, the TalkOrb's glow does not scale.
   const ORB = { rest: "idle", talking: "talking", listening: "listening" };
@@ -131,7 +131,36 @@
         : h(Rest));
   }
 
-  const STAGES = { rest: Rest, plan: Plan, meet: Meet, pick: Pick };
+  // Voice only, nothing to show: her orb in 3D is the whole picture, and what she says under it.
+  const Answer = () => h(Tv, null,
+    h("div", { className: "clock" }, "21:04"),
+    h("div", { className: "rest" },
+      h("div", { style: { display: "grid", justifyItems: "center" } }, h(Orb3D, { size: 260, state: "talking" })),
+      h("div", { className: "next" }, "Tomorrow at half past nine you have the dentist.")));
+
+  // At rest the TV may show the house's photos: one at a time, the dots say which.
+  function Photos() {
+    const [at, setAt] = useState(1);
+    const PICS = [["SAM", "Sam at the lake"], ["HOME", "The garden in May"], ["PARTY", "Last year's party"]];
+    return h(Tv, null,
+      h(Corner, null),
+      h("div", { style: { position: "absolute", inset: 0 } }, h(Photo, { key: at, kind: "back", word: PICS[at][0], alt: PICS[at][1], ratio: 16 / 9, topic: "party" })),
+      h("div", { style: { position: "absolute", left: 0, right: 0, bottom: "3cqw", display: "grid", justifyItems: "center" } },
+        h(PageDots, { count: PICS.length, active: at, topic: "party", labels: PICS.map(([, a]) => a), onSelect: setAt })));
+  }
+
+  // The moving display name of "A window on it", drawn as one lit word instead: no font host needed.
+  const Word = () => h(Tv, null,
+    h(Corner, { state: "talking", word: "talking" }),
+    h("div", { className: "clock" }, "21:04"),
+    h("div", { style: { position: "absolute", left: 0, right: 0, top: "6cqw", display: "grid", justifyItems: "center" } },
+      h(EdgeText, { text: "Saturday", pattern: "party", size: 72 })),
+    h("section", { className: "win", "aria-label": "Saturday" },
+      h("ol", { className: "line" },
+        h("li", null, h("span", { className: "t" }, "14:00"), h("span", null, "Pick up the candles")),
+        h("li", { className: "fixed" }, h("span", { className: "t" }, "20:00"), h("span", null, "Da Mario, table for six")))));
+
+  const STAGES = { rest: Rest, plan: Plan, word: Word, meet: Meet, pick: Pick, answer: Answer, photos: Photos };
   window.exampleScenes({
     title: "TV and screens",
     stage: ({ scene }) => h("main", null, h(STAGES[scene.id])),
@@ -142,6 +171,15 @@
       { id: "plan", name: "A window on it",
         ok: ["The big name above, the window under it", "The same timeline as the web, only larger", "Says where it came from and how to clear it"],
         ask: ["The big name moves: stop after one pass, so it is still at rest?", "The web chapter loads a display face from a font host for this name. Keep the system face instead?"] },
+      { id: "word", name: "One lit word",
+        ok: ["The big name as an EdgeText: one word, lit, no font from a host", "Still one word per screen"],
+        ask: ["This, or the moving display name of 'A window on it'?"] },
+      { id: "answer", name: "She answers",
+        ok: ["Voice only, nothing to show: her orb in 3D is the picture", "What she says, under her"],
+        ask: ["Orb3D needs WebGL: what does a TV without it show, the flat Orb?"] },
+      { id: "photos", name: "Photos",
+        ok: ["One photo at a time, the word behind the person", "Dots say which one, the remote moves them"],
+        ask: ["Photos at rest, or only the clock?"] },
       { id: "meet", name: "A meeting",
         ok: ["A running meeting keeps the screen awake", "Who talks gets the ring"], ask: ["Live captions: always, or only on request?"] },
       { id: "pick", name: "Pick the screen",

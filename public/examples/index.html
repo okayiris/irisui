@@ -126,7 +126,8 @@
   const I = window.IrisUi;
   const { PreviewI18nProvider, Icon, Card, Row, Toggle, Button, ButtonGroup, Orb, StatusPill, TalkOrb, TabBar,
           Skeleton, Topic, Widget, Word, Pen, Anchor, Chip, Progress, CheckList, Segmented, Field,
-          Dialog, Snackbar, EmptyState, Mark } = I;
+          Dialog, Snackbar, EmptyState, Mark, AppBar, Sheet, Slider, Select, Divider, Steps, TextArea, DatePicker,
+          TimePicker, Carousel, Stat, ThemeWord, PhaseRing, LoopBubble, LoopScreen, CircleStack, ChatStack, Edge } = I;
 
   const params = new URLSearchParams(location.search);
 
@@ -140,11 +141,88 @@
       h("button", { className: "tap", onClick: () => go("groceries"), "aria-label": "Open groceries" },
         h(Widget, { topic: "groceries", look: "ring", size: "small", label: "Groceries", value: "3", unit: "/8",
                     progress: 3 / 8 })),
-      h(Widget, { topic: "weather", look: "glass", size: "small", label: "Weather", value: "14°" })),
+      h("button", { className: "tap", onClick: () => go("weather"), "aria-label": "Open the weather" },
+        h(Widget, { topic: "weather", look: "glass", size: "small", label: "Weather", value: "14°" }))),
     h("div", { style: { height: 12 } }),
     h("div", { style: { display: "grid", justifyItems: "center" } },
       h(Widget, { topic: "agenda", look: "list", size: "wide", label: "Tomorrow",
-                  items: [["09:30", "Dentist"], ["12:00", "Lunch with Sam"], ["17:30", "Groceries"]], note: "bring the old card" })));
+                  items: [["09:30", "Dentist"], ["12:00", "Lunch with Sam"], ["17:30", "Groceries"]], note: "bring the old card" })),
+    h("div", { style: { marginTop: 20 } }, h(Button, { variant: "text", onClick: () => go("remind") }, "Remind me of something")),
+    // Where the loops live on the iPhone now that there is no Loops tab: a stack of circles behind the strip.
+    h("div", { style: { marginTop: 8 } }, h(CircleStack, { items: CIRCLES, onSelect: (id) => go(id === "party" ? "party" : "loops") })));
+
+  const CIRCLES = [
+    { id: "groceries", title: "Groceries", line: "5 still to get for Saturday", unread: 1, loops: [{ title: "Order", step: 2 }, { title: "Candles", step: 1 }] },
+    { id: "party", title: "Sam's party", line: "The guests do not know yet", loops: [{ title: "Table", step: 5 }, { title: "Guests", step: 3 }] },
+    { id: "dentist", title: "Dentist", line: "Wednesday 09:30, bring the old card", loops: [{ title: "Card", step: 1 }] },
+  ];
+
+  const DAYS = [["Wednesday", "9°", "Dry, frost in the morning"], ["Thursday", "11°", "Rain after lunch"], ["Friday", "13°", "Sun"], ["Saturday", "12°", "Dry for the party"]];
+  const Weather = ({ go }) => h(Topic, { name: "weather" },
+    h("button", { className: "back", onClick: () => go("today") }, "‹ Today"),
+    h("div", { style: { margin: "14px 0 6px" } }, h(ThemeWord, { text: "Frost", theme: "frozen", height: 110 })),
+    h("h2", { className: "title" }, "Frost tonight"),
+    h("p", { className: "say" }, h("b", null, "Alex"), ", cover the bike seat: it drops to -2 at six."),
+    h("div", { style: { display: "flex", gap: 28, margin: "0 0 18px" } },
+      h(Stat, { topic: "weather", value: "-2°", label: "tonight" }), h(Stat, { topic: "weather", value: "9°", label: "tomorrow" })),
+    h(Carousel, { label: "The next days" }, DAYS.map(([d, t, l]) => h(Card, { key: d, style: { padding: 16 } },
+      h("div", { style: { font: "var(--text-row-title)" } }, d + "  " + t), h("div", { style: { font: "var(--text-sub)", color: "var(--dim)", marginTop: 3 } }, l)))));
+
+  // The house Icon has one chevron and it points forward: mirrored, it is the way back.
+  const Back = (go, to) => h(Button, { variant: "icon", label: "Back", onClick: () => go(to),
+    icon: h("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, h(Icon, { name: "chevron", size: 18 })) });
+  const LOOPS = [
+    { t: "Order groceries", s: "Waits for Albert Heijn", step: 2 },
+    { t: "Candles for Sam", s: "Planned: after the dentist", step: 1 },
+    { t: "Tell the guests", s: "Waits on you", step: 3 },
+  ];
+  const Loops = ({ go }) => h("div", null,
+    h(AppBar, { title: "Loops", sub: "3 running", leading: Back(go, "today") }),
+    h("div", { style: { display: "grid", justifyItems: "center", margin: "6px 0 14px" } },
+      h(PhaseRing, { phase: "busy", progress: 0.45, title: "Order groceries", sub: "waits for Albert Heijn", size: 220 })),
+    h("p", { className: "say" }, "What Iris is doing for you, and where each one is."),
+    h(Card, { padding: 4 }, LOOPS.map((l) => h(Row, { key: l.t, title: l.t, subtitle: l.s, chevron: true, onClick: () => go("loop"),
+      icon: h(LoopBubble, { title: l.t, step: l.step, size: 28 }) }))));
+
+  const Loop = ({ go }) => h(LoopScreen, { title: "Candles for Sam", when: "Before Saturday", sub: "at the Hema, next to the dentist",
+    phase: "planned", progress: 0.35, now: "Pick them up after the dentist on Wednesday", onDone: () => go("loops"), onLoops: () => go("loops") });
+
+  const CHATS = [
+    { id: "party", topic: "party", eyebrow: "Party", title: "Sam turns 30", line: "The guests do not know yet",
+      loops: [{ title: "Table", step: 5 }, { title: "Guests", step: 3, line: "Waits on you" }], message: "Shall I text the five guests for you?",
+      actions: [{ label: "Text them", primary: true }, { label: "Later" }] },
+    { id: "groceries", topic: "groceries", eyebrow: "Groceries", title: "For Saturday", line: "5 still to get",
+      loops: [{ title: "Order", step: 2 }], message: "Albert Heijn can deliver tomorrow between 16:00 and 18:00." },
+    { id: "dentist", topic: "agenda", eyebrow: "Agenda", title: "Dentist", line: "Wednesday 09:30", loops: [{ title: "Card", step: 1 }] },
+  ];
+  const Chats = () => h("div", null,
+    h("p", { className: "eyebrow" }, "Today"),
+    h("h2", { className: "title" }, "Chats"),
+    h("p", { className: "say" }, "Each chat with its loops. Tap the stack to fan it out."),
+    h("div", { style: { display: "grid", alignContent: "end", minHeight: 380 } }, h(ChatStack, { items: CHATS })));
+
+  const fmtDay = (d) => new Date(d + "T12:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  function Remind({ go }) {
+    const [step, setStep] = useState(0);
+    const [what, setWhat] = useState("Bring the old card to the dentist");
+    const [day, setDay] = useState("2026-10-01");
+    const [time, setTime] = useState("08:30");
+    return h("div", null,
+      h(AppBar, { title: "Remind me", leading: Back(go, "today") }),
+      h("div", { style: { margin: "6px 0 20px" } }, h(Steps, { items: ["What", "When", "Done"], active: step })),
+      step === 0 ? h("div", { className: "stack" },
+          h(TextArea, { label: "What should she remember?", value: what, onChange: setWhat, rows: 3, maxLength: 280 }),
+          h(Button, { variant: "primary", size: "lg", disabled: !what.trim(), onClick: () => setStep(1) }, "Next"))
+        : step === 1 ? h("div", { className: "stack" },
+          h(DatePicker, { value: day, onChange: setDay, label: "Which day?", min: "2026-09-30" }),
+          h(TimePicker, { value: time, onChange: setTime, label: "At what time?" }),
+          h(ButtonGroup, { stack: true },
+            h(Button, { variant: "primary", size: "lg", onClick: () => setStep(2) }, "Set it"),
+            h(Button, { variant: "glass", onClick: () => setStep(0) }, "Back")))
+        : h("div", null,
+          h("p", { className: "say" }, "She reminds you on ", h("b", null, fmtDay(day)), " at ", h("b", null, time), ": ", what, "."),
+          h(Button, { variant: "primary", size: "lg", onClick: () => go("today") }, "Done")));
+  }
 
   const ITEMS = ["Bread", "Milk", "Eggs", "Tomatoes", "Pasta", "Candles", "Balloons", "Lemonade"];
   function Groceries({ go }) {
@@ -220,6 +298,11 @@
     const [push, setPush] = useState(false);
     const [ask, setAsk] = useState(false);
     const [gone, setGone] = useState(false);
+    const [sheet, setSheet] = useState(false);
+    const [voice, setVoice] = useState("Wiep");
+    const [speed, setSpeed] = useState(100);
+    const [lang, setLang] = useState("en");
+    const LANGS = [{ value: "en", label: "English" }, { value: "nl", label: "Nederlands" }, { value: "de", label: "Deutsch" }];
     return h("div", null,
       h("p", { className: "eyebrow" }, "alex@example.com"),
       h("h2", { className: "title" }, "You"),
@@ -227,15 +310,22 @@
       h("div", { className: "stack" },
         h(Card, { padding: 4 },
           h(Row, { icon: h(Icon, { name: "phone" }), title: "This device", subtitle: "Listens here, even when locked", trailing: h(Toggle, { on: near, onChange: setNear }) }),
-          h(Row, { icon: h(Icon, { name: "speaker" }), title: "Voice", subtitle: "How Iris sounds", trailing: h("span", { style: { color: "var(--dim)" } }, "Wiep"), chevron: true }),
+          h(Row, { icon: h(Icon, { name: "speaker" }), title: "Voice", subtitle: "How Iris sounds", trailing: h("span", { style: { color: "var(--dim)" } }, voice), chevron: true, onClick: () => setSheet(true) }),
           h(Row, { icon: h(Icon, { name: "sparkles" }), title: "Notifications", subtitle: "Only when Iris needs you", trailing: h(Toggle, { on: push, onChange: setPush }) })),
         h(Card, { padding: 4 },
           h(Row, { icon: h(Icon, { name: "shield" }), title: "Privacy", subtitle: "What Iris keeps, and for how long", external: true }),
-          h(Row, { icon: h(Icon, { name: "globe" }), title: "Language", trailing: h("span", { style: { color: "var(--dim)" } }, "English"), chevron: true })),
+          h(Row, { icon: h(Icon, { name: "globe" }), title: "Language", trailing: h("span", { style: { color: "var(--dim)" } }, LANGS.find((l) => l.value === lang).label), chevron: true, onClick: () => setSheet(true) })),
         h(Card, { padding: 4 },
           h(Row, { icon: h(Icon, { name: "trash" }), title: "Delete everything", subtitle: "Lists, calls, voice and history", danger: true, onClick: () => setAsk(true) }))),
       h(Dialog, { open: ask, onClose: () => setAsk(false), title: "Delete everything?", body: "Your lists, calls and voice go, on every device. This cannot be undone.",
                   actions: [{ label: "Delete", danger: true, onClick: () => setGone(true) }, { label: "Keep it" }] }),
+      h(Sheet, { open: sheet, onClose: () => setSheet(false), title: "Voice", sub: "How she sounds on this phone" },
+        ["Wiep", "Joris"].map((v) => h(Row, { key: v, title: v, subtitle: v === "Wiep" ? "Warm and clear" : "Low and calm",
+          trailing: h(Toggle, { on: voice === v, onChange: () => setVoice(v) }) })),
+        h(Divider, { label: "How she talks" }),
+        h("div", { className: "stack", style: { padding: "4px 12px 12px" } },
+          h(Slider, { value: speed, onChange: setSpeed, min: 80, max: 130, step: 5, label: "Speed", unit: "%" }),
+          h(Select, { label: "She talks to you in", value: lang, onChange: setLang, options: LANGS }))),
       gone ? h("div", { style: { marginTop: 16 } }, h(Snackbar, { text: "Everything is deleted", tone: "ok", action: "Undo", onAction: () => setGone(false) })) : null);
   }
 
@@ -245,7 +335,10 @@
     h("div", { style: { marginBottom: 20 } }, h(Skeleton, { height: 18, width: "80%" })),
     h("div", { className: "grid2" }, h(Skeleton, { height: 170, width: 170 }), h(Skeleton, { height: 170, width: 170 })),
     h("div", { style: { height: 12 } }),
-    h(Skeleton, { height: 170 }));
+    // She is fetching exactly this block: the Edge runs along it until it is there, then goes.
+    h("div", { style: { position: "relative" } },
+      h(Skeleton, { height: 170 }),
+      h("div", { style: { position: "absolute", top: 0, left: 0 } }, h(Edge, { pattern: "comet", shape: "rect", width: 358, height: 170, radius: 18 }))));
 
   const Empty = ({ go }) => h("div", null,
     h("p", { className: "eyebrow" }, "Today"),
@@ -305,8 +398,28 @@
       ask: ["StatusPill and Segmented both say the state: one too many?", "What does the busy budget say about her orb?"] },
     { id: "you", name: "You", tab: 3, el: You,
       busy: [],
-      ok: ["Rows, values, danger at the bottom", "Delete asks first, then Undo"],
+      ok: ["Rows, values, danger at the bottom", "Delete asks first, then Undo", "Voice and language open one Sheet: voices, speed, language"],
       ask: ["Undo after 'cannot be undone': which one is true?", "Dialog ships inside a dashed demo box, so in a real screen it lands under the list. Take Stage out of Dialog and Sheet?"] },
+    { id: "weather", name: "Weather", tab: 0, el: Weather,
+      busy: [["ThemeWord, frozen", 3], ["Stat", 0], ["Carousel of glass cards", 0]],
+      ok: ["The Word is the answer: frost", "Two numbers, each with one word", "The next days swipe sideways, dots say where you are"],
+      ask: ["Stat is in the topic colour, the Word too: is the weather blue one accent or two?"] },
+    { id: "loops", name: "Loops", tab: 0, el: Loops,
+      busy: [["PhaseRing", 2]],
+      ok: ["Opened from the circles on Today", "The ring shows the loop that moves now", "Each row carries its own small loop"],
+      ask: ["AppBar here, a plain back link on Groceries: one way back for the whole app?", "The house Icon has no back chevron: the forward one is mirrored. Add a back icon?"] },
+    { id: "loop", name: "One loop", tab: 0, el: Loop,
+      busy: [["LoopScreen ring", 2]],
+      ok: ["Phase ring, title, one NOW card, Done"],
+      ask: [] },
+    { id: "chats", name: "Chats", tab: 0, el: Chats,
+      busy: [],
+      ok: ["Each chat a card in its topic colour", "Tap fans out, a tap on one opens it with its loops and actions"],
+      ask: ["Chats and the circles on Today show the same thing: keep both?"] },
+    { id: "remind", name: "Remind me", tab: 0, el: Remind,
+      busy: [["Buttons", 0]],
+      ok: ["Three steps, each one question", "Steps says where you are", "Done says back what she will do"],
+      ask: ["Date and time pickers under each other run past the fold: a Sheet instead?"] },
     { id: "camera", name: "Permission", tab: 2, el: Camera,
       busy: [["Orb", 0]],
       ok: ["Asks once, says what for", "One primary, one way out"],
@@ -314,7 +427,7 @@
     { sep: "States" },
     { id: "loading", name: "Loading", tab: 0, el: Loading,
       busy: [],
-      ok: ["Skeleton in the shape of what is coming", "The header is already there"],
+      ok: ["Skeleton in the shape of what is coming", "The header is already there", "The Edge runs along the one block she is fetching"],
       ask: ["Show her sentence as a skeleton, or leave it out until it is ready?"] },
     { id: "empty", name: "Empty", tab: 1, el: Empty,
       busy: [],
