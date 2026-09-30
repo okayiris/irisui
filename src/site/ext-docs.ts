@@ -820,7 +820,8 @@ stops, and with reduced motion it is one still frame. \`EdgeText\` is a CSS anim
 
 ## Size
 
-\`width\` is the line. The glow reaches 14px past it on every side.
+\`width\` is the line. The glow reaches up to 36px past it on every side; the canvas holds that room itself, but a parent with
+overflow: hidden cuts it off. Leave the room free.
 `,
   EdgeText: `# EdgeText
 

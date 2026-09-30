@@ -1869,7 +1869,8 @@ function drawEdge(ctx: CanvasRenderingContext2D, P: number[][], name: string, co
  */
 export function Edge({ pattern = "comet", colors, shape = "ring", path, width = 140, height, radius = 28, stroke = 2.5, speed = 1, round = 1.3 }: Any) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const ht = height ?? width, pad = 14;
+  // Room for the widest glow (party, storm: blur 36px): the canvas never cuts its own light off.
+  const ht = height ?? width, pad = 36;
   const key = [pattern, (colors ?? []).join(), shape, path, width, ht, radius, stroke, speed, round].join("|");
   useEffect(() => {
     const c = ref.current; if (!c) return;
