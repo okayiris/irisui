@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Iris UI examples</title>
+<title>Iris UI examples: phone</title>
 <meta name="description" content="The Iris app built from the design system, screen by screen, with the rules each screen keeps.">
 <link rel="stylesheet" href="../ds/tokens.css">
 <link rel="stylesheet" href="../ds/bundle.css">
@@ -18,12 +18,8 @@
 
   /* The page around the phone. */
   .ex { display: grid; grid-template-columns: 220px 390px minmax(0, 320px); gap: 40px; justify-content: center;
-        align-items: start; padding: 28px 16px 60px; }
-  .ex-top { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--line); }
-  .ex-top a { color: var(--dim); text-decoration: none; font: var(--text-body); }
-  .ex-top a:hover { color: var(--fg); }
-  .ex-top h1 { font: var(--text-row-title); font-weight: 600; margin: 0; }
-  .ex-top .sp { flex: 1; }
+        align-items: start; padding: 20px 16px 60px; }
+  .ex-top { display: flex; justify-content: center; gap: 8px; padding: 16px 20px 0; }
   .lab { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 10px; }
   .list { display: grid; gap: 4px; position: sticky; top: 20px; }
   .list button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 10px; color: var(--dim);
@@ -35,12 +31,20 @@
   .list .sep { margin: 14px 0 6px; }
 
   /* The phone. */
-  .phone { width: 390px; height: min(844px, calc(100vh - 120px)); min-height: 640px; border-radius: 54px; position: relative; overflow: hidden;
+  .phone { width: 390px; height: min(844px, calc(100vh - 190px)); min-height: 640px; border-radius: 54px; position: relative; overflow: hidden;
            box-shadow: 0 0 0 1px var(--edge), 0 0 0 10px #0d1015, 0 0 0 11px var(--edge); background: var(--bg); }
   .island { position: absolute; top: 11px; left: 50%; translate: -50% 0; width: 124px; height: 36px;
             border-radius: 20px; background: #000; z-index: 50; pointer-events: none; }
   .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; justify-content: space-between;
             align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; z-index: 40; pointer-events: none; }
+  /* Android: a punch-hole camera, the time on the left, a gesture handle under the tab bar. */
+  .phone.android { border-radius: 38px; }
+  .phone.android .status { padding: 0 26px; font: 500 14px var(--font-text); height: 40px; }
+  .phone.android .island { top: 14px; width: 14px; height: 14px; border-radius: 50%; }
+  .phone.android .app { padding-top: 50px; }
+  .phone.android .bar { bottom: 16px; }
+  .handle { position: absolute; bottom: 6px; left: 50%; translate: -50% 0; width: 108px; height: 4px; border-radius: 2px;
+            background: var(--fg); opacity: .6; z-index: 45; pointer-events: none; }
   .app { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 62px 16px 130px; scrollbar-width: none; }
   .app::-webkit-scrollbar { display: none; }
   .bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 30; }
@@ -108,6 +112,8 @@
 </style>
 </head>
 <body>
+<script>document.body.dataset.platform = new URLSearchParams(location.search).get("p") === "android" ? "android" : "ios";</script>
+<script src="nav.js"></script>
 <div id="root"></div>
 <script src="../ds/vendor/react.js"></script>
 <script src="../ds/vendor/react-dom.js"></script>
@@ -324,17 +330,28 @@
 
   /* ------------------------------------------------------------------- phone */
 
+  const android = document.body.dataset.platform === "android";
+
   function Phone({ id, go }) {
     const s = find(id);
     const tabs = ["Iris", "Calls", "Camera", "You"], icons = ["sparkles", "phone", "camera", "person"];
     const toTab = (i) => go(["today", "calls", "camera", "you"][i]);
-    return h("div", { className: "phone" },
+    return h("div", { className: "phone" + (android ? " android" : "") },
       h("div", { className: "island", "aria-hidden": "true" }),
-      h("div", { className: "status", "aria-hidden": "true" }, h("span", null, "21:04"), h("span", null, "●●●")),
+      h("div", { className: "status", "aria-hidden": "true" }, h("span", null, "21:04"), h("span", null, android ? "▾ ▴ ▮" : "●●●")),
+      android ? h("div", { className: "handle", "aria-hidden": "true" }) : null,
       h("main", { className: "app", key: id, "aria-label": s.name }, h(s.el, { go })),
       h("div", { className: "bar" },
         h(TabBar, { tabs, icons, active: s.tab < 0 ? 0 : s.tab, talk: id === "talk" ? "listening" : "rest", onSelect: toTab, onTalk: () => go("talk") })));
   }
+
+  // The system has no Android chapter: the app is the same as on iOS. These are the places that choice is tested.
+  const ANDROID = [
+    "There is no Android chapter. Same as iOS everywhere, or say where it differs?",
+    "The system back gesture: does it close the screen, or also a sheet and a dialog?",
+    "The tab bar sits 22pt into the safe area on iOS. On Android it sits on the gesture handle: how much room?",
+    "Inter ships with the system, so the type is the same. The status bar icons are Android's own.",
+  ];
 
   function Rules({ s }) {
     const total = s.busy.reduce((a, [, c]) => a + c, 0);
@@ -348,6 +365,9 @@
         h("ul", { className: "checks" },
           s.ok.map((t) => h("li", { key: t }, t)),
           s.ask.map((t) => h("li", { key: t, className: "q" }, t)))),
+      android ? h("div", null,
+        h("p", { className: "lab" }, "Android"),
+        h("ul", { className: "checks" }, ANDROID.map((t) => h("li", { key: t, className: "q" }, t)))) : null,
       h("div", { className: "legend" }, h("span", null, "keeps"), h("span", { className: "q" }, "to decide")));
   }
 
@@ -365,13 +385,9 @@
       history.replaceState(null, "", u);
     }, [all]);
 
-    const top = h("header", { className: "ex-top" },
-      h("a", { href: "../" }, "‹ Iris UI"),
-      h("h1", null, "Examples"),
-      h("span", { className: "sp" }),
+    const top = h("div", { className: "ex-top" },
       h(Button, { variant: all ? "glass" : "primary", size: "sm", onClick: () => setAll(false) }, "As an app"),
-      h(Button, { variant: all ? "primary" : "glass", size: "sm", onClick: () => setAll(true) }, "All screens"),
-      h("a", { href: "web.html", style: { color: "var(--accent)" } }, "Web app ›"));
+      h(Button, { variant: all ? "primary" : "glass", size: "sm", onClick: () => setAll(true) }, "All screens"));
 
     if (all) return h("div", null, top,
       h("div", { className: "wall" }, real.map((s) =>

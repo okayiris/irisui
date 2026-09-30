@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="dark">
 <title>Iris UI web app</title>
 <meta name="description" content="The Iris web app built from the design system: the talk page, the subscription page, a list and what Iris did.">
-<link rel="stylesheet" href="../ds/tokens.css">
-<link rel="stylesheet" href="../ds/bundle.css">
-<link rel="stylesheet" href="../ds/ext.css">
-<link rel="stylesheet" href="../ds/extra.css">
-<link rel="icon" href="../favicon.svg">
+<link rel="stylesheet" href="../../ds/tokens.css">
+<link rel="stylesheet" href="../../ds/bundle.css">
+<link rel="stylesheet" href="../../ds/ext.css">
+<link rel="stylesheet" href="../../ds/extra.css">
+<link rel="icon" href="../../favicon.svg">
 <style>
   /* The web values web-app.md lists next to the app tokens. */
   :root {
@@ -66,7 +66,7 @@
   .page { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px;
           max-width: var(--column); margin: 0 auto; padding: 8px 24px 160px calc(var(--lane-w) + 56px); }
   .col { width: 100%; max-width: 44rem; margin: 0 auto; }
-  h1.t { font-size: 2rem; font-weight: 500; margin: 20px 0 6px; letter-spacing: -.01em; }
+  h2.t { font-size: 2rem; font-weight: 500; margin: 20px 0 6px; letter-spacing: -.01em; }
   .intro { color: var(--dim); margin: 0 0 22px; line-height: 1.55; font-size: 15px; }
   .card { background: var(--glass); border: 1px solid var(--edge); border-radius: .9rem; padding: .9rem 1rem; margin-bottom: 1.1rem;
           backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
@@ -132,7 +132,7 @@
   .act svg .strike { display: none; }
 
   /* The rules drawer. */
-  .rules { position: fixed; right: 16px; top: 60px; z-index: 40; width: 22rem; max-height: calc(100dvh - 90px); overflow: auto;
+  .rules { position: fixed; right: 16px; top: 116px; z-index: 40; width: 22rem; max-height: calc(100dvh - 90px); overflow: auto;
            background: rgba(12, 17, 23, .92); border: 1px solid var(--edge); border-radius: .9rem; padding: 16px;
            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
   .rules h2 { font: 500 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--label); margin: 0 0 10px; }
@@ -154,13 +154,14 @@
   @media (prefers-reduced-motion: reduce) { .ring.live, .act.on::after { animation: none; } }
 </style>
 </head>
-<body>
+<body data-platform="web">
+<script src="../nav.js"></script>
 <div class="beam" aria-hidden="true"></div>
 <div id="root"></div>
-<script src="../ds/vendor/react.js"></script>
-<script src="../ds/vendor/react-dom.js"></script>
-<script src="../ds/bundle.js"></script>
-<script src="../ds/ext.js"></script>
+<script src="../../ds/vendor/react.js"></script>
+<script src="../../ds/vendor/react-dom.js"></script>
+<script src="../../ds/bundle.js"></script>
+<script src="../../ds/ext.js"></script>
 <script>
 (() => {
   const h = React.createElement;
@@ -220,7 +221,7 @@
         : { ok: false, t: `"${code.trim() || "empty"}" is not a code we know. Nothing changed.` });
     };
     return h("div", { className: "col" },
-      h("h1", { className: "t" }, "Subscription"),
+      h("h2", { className: "t" }, "Subscription"),
       h("p", { className: "intro" }, "Your plan, a code if you have one, and when Iris may sleep."),
 
       h("div", { className: "card" },
@@ -265,7 +266,7 @@
     const [draft, setDraft] = useState("");
     return h("div", { className: "col" },
       h(Topic, { name: "groceries" },
-        h("h1", { className: "t" }, "Groceries"),
+        h("h2", { className: "t" }, "Groceries"),
         h("p", { className: "intro" }, `${items.length - done.length} still to get. Iris orders them at Albert Heijn when you say so.`),
         h("div", { className: "card" },
           h("div", { className: "row" },
@@ -287,7 +288,7 @@
     { time: "13:41", t: "Booked a table at Da Mario", s: "Saturday 20:00, six people" },
   ];
   const Activity = () => h("div", { className: "col" },
-    h("h1", { className: "t" }, "What Iris did"),
+    h("h2", { className: "t" }, "What Iris did"),
     h("p", { className: "intro" }, "One line per task, not per click. Open a line for the steps."),
     h("ol", { className: "log" }, DID.map((d) => h("li", { key: d.time + d.t },
       h("span", { className: "time" }, d.time),
@@ -326,7 +327,6 @@
 
     return h("div", null,
       h("header", { className: "head" },
-        h("a", { className: "back", href: "./" }, "‹ Examples"),
         h("div", { className: "headgroup" },
           h("span", { className: "plan" }, "Pro"),
           h("span", { className: "ring" + (listening ? " live" : ""), "aria-hidden": "true" }),

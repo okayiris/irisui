@@ -113,7 +113,7 @@ export function Shell({ title, description, path, headings = [], components, chi
                 Overview
               </NavLink>
               <NavLink href="/examples/" path={path}>
-                Examples: the app
+                Examples: iOS, Android, Mac, web
               </NavLink>
 
               <p className="nav-head">Foundations</p>
