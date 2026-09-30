@@ -1617,3 +1617,18 @@
 .ix-thinks { position: relative; display: inline-grid; place-items: center; flex: none; }
 .ix-thinks-edge { position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 3; pointer-events: none; line-height: 0; }
 .ix-thinks-on .iris-talkorb-arc, .ix-thinks-on .iris-orb3d-arc { display: none; }
+/* EdgeText: the tube is the letters' faint outline, each light a dash that runs round every letter. --u is the
+   size in 64px steps, so the dashes keep their look at any size. */
+.ix-edgetext { display: block; overflow: visible; }
+.ix-edgetext text { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ix-edgetext-tube { stroke: rgba(190, 230, 255, .14); stroke-width: calc(var(--u) * 1.5); }
+.ix-edgetext-light { stroke-width: calc(var(--u) * 2.5); animation: ix-edgetext-run 1.3s linear infinite; }
+.ix-edgetext-comet .ix-edgetext-light { stroke-dasharray: calc(var(--u) * 40) calc(var(--u) * 160); }
+.ix-edgetext-sparks .ix-edgetext-light { stroke-dasharray: 0 calc(var(--u) * 14); stroke-width: calc(var(--u) * 4); animation-name: ix-edgetext-run, ix-edgetext-twinkle; }
+.ix-edgetext-zip .ix-edgetext-light { animation-name: ix-edgetext-zip; animation-timing-function: cubic-bezier(.33, 1, .68, 1); animation-direction: alternate; }
+.ix-edgetext-party .ix-edgetext-light { stroke-dasharray: calc(var(--u) * 24) calc(var(--u) * 24); animation-name: ix-edgetext-run, ix-edgetext-party; }
+@keyframes ix-edgetext-run { to { stroke-dashoffset: calc(var(--u) * -200); } }
+@keyframes ix-edgetext-twinkle { 50% { opacity: .35; } }
+@keyframes ix-edgetext-zip { from { stroke-dasharray: 0 calc(var(--u) * 400); } to { stroke-dasharray: calc(var(--u) * 400) 0; } }
+@keyframes ix-edgetext-party { 50% { filter: hue-rotate(160deg); } }
+@media (prefers-reduced-motion: reduce) { .ix-edgetext-light { animation: none; } }

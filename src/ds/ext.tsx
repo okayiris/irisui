@@ -1805,7 +1805,17 @@ const mixColor = (cs: string[], t: number) => {
   return `rgb(${a.map((v, k) => Math.round(v + (b[k] - v) * f)).join(",")})`;
 };
 
-function edgePath(shape: string, w: number, ht: number, r: number, inset: number, M = 480): number[][] {
+function edgePath(shape: string, w: number, ht: number, r: number, inset: number, d?: string, M = 480): number[][] {
+  if (d) {
+    // Any SVG path, fitted into the box. Its own size comes from a hidden svg, as getBBox needs the page.
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"), p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    svg.setAttribute("style", "position:absolute;width:0;height:0;visibility:hidden"); p.setAttribute("d", d); svg.append(p); document.body.append(svg);
+    const b = p.getBBox(), L = p.getTotalLength(), k = Math.min((w - inset * 2) / (b.width || 1), (ht - inset * 2) / (b.height || 1));
+    const ox = (w - b.width * k) / 2 - b.x * k, oy = (ht - b.height * k) / 2 - b.y * k, n = Math.max(M, Math.round(L * k / 1.5));
+    const P = Array.from({ length: n + 1 }, (_, i) => { const q = p.getPointAtLength((L * i) / n); return [ox + q.x * k, oy + q.y * k]; });
+    svg.remove();
+    return P;
+  }
   if (shape === "ring") {
     const cx = w / 2, cy = ht / 2, rr = Math.min(w, ht) / 2 - inset;
     return Array.from({ length: M + 1 }, (_, k) => { const a = Math.PI / 2 + (2 * Math.PI * k) / M; return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)]; });
@@ -1827,10 +1837,14 @@ function drawEdge(ctx: CanvasRenderingContext2D, P: number[][], name: string, co
     for (let k = Math.round(a * M); k <= Math.round(b * M); k++) out.push(P[k % M]);
     return out;
   };
+  // A path made of several pieces (an icon, letters) jumps between them: lift the pen there, never draw across.
+  const gap = Math.max(12, 3 * Math.hypot(P[1][0] - P[0][0], P[1][1] - P[0][1]));
   const line = (pts: number[][], col: string, w: number, glow = 6, alpha = 1) => {
     if (pts.length < 2) return;
     ctx.save(); ctx.globalAlpha = Math.max(0, alpha); ctx.strokeStyle = ctx.shadowColor = col; ctx.lineWidth = w; ctx.lineCap = ctx.lineJoin = "round";
-    ctx.shadowBlur = glow * 2; ctx.beginPath(); pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); ctx.restore();
+    ctx.shadowBlur = glow * 2; ctx.beginPath();
+    pts.forEach(([x, y], k) => (k && Math.hypot(x - pts[k - 1][0], y - pts[k - 1][1]) < gap ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.stroke(); ctx.restore();
   };
   if (["comet", "orbit", "heartbeat"].includes(name)) line(P, color(0), stroke * 0.6, 0, 0.18);
   if (name === "breathe") { const a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(phase * 2 * Math.PI)); line(P, color(0), stroke * 0.85, 14 * a, a); }
@@ -1853,28 +1867,51 @@ function drawEdge(ctx: CanvasRenderingContext2D, P: number[][], name: string, co
  * A light pattern along an edge: round her orb while she thinks, or along a screen's rounded edge while it
  * reloads. `width` is the line's box; the glow spills out past it, as light does.
  */
-export function Edge({ pattern = "comet", colors, shape = "ring", width = 140, height, radius = 28, stroke = 2.5, speed = 1, round = 1.3 }: Any) {
+export function Edge({ pattern = "comet", colors, shape = "ring", path, width = 140, height, radius = 28, stroke = 2.5, speed = 1, round = 1.3 }: Any) {
   const ref = useRef<HTMLCanvasElement>(null);
   const ht = height ?? width, pad = 14;
-  const key = [pattern, (colors ?? []).join(), shape, width, ht, radius, stroke, speed, round].join("|");
+  const key = [pattern, (colors ?? []).join(), shape, path, width, ht, radius, stroke, speed, round].join("|");
   useEffect(() => {
     const c = ref.current; if (!c) return;
     const dpr = Math.min(3, window.devicePixelRatio || 1), W = width + pad * 2, H = ht + pad * 2;
     c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
     const ctx = c.getContext("2d"); if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, pad * dpr, pad * dpr);
-    const P = edgePath(shape, width, ht, radius, stroke), cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
+    const P = edgePath(shape, width, ht, radius, stroke, path), cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now();
-    let raf = 0;
+    // Out of sight it stops: an orb scrolled away, a card below the fold, costs nothing.
+    let raf = 0, seen = true;
     const frame = (ms: number) => {
+      raf = 0;
+      if (!seen) return;
       ctx.clearRect(-pad, -pad, W, H);
       drawEdge(ctx, P, pattern, cols, stroke, still ? 0.6 : Math.max(0, (ms - t0) / 1000) * speed, round);
       if (!still) raf = requestAnimationFrame(frame);
     };
+    const io = new IntersectionObserver(([e]) => { seen = e.isIntersecting; if (seen && !raf) raf = requestAnimationFrame(frame); });
+    io.observe(c);
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return () => { cancelAnimationFrame(raf); io.disconnect(); };
   }, [key]);
   return h("canvas", { ref, className: "ix-edge", "aria-hidden": "true", style: { width: width + pad * 2, height: ht + pad * 2, margin: -pad } });
+}
+
+/**
+ * A word as a neon sign: the light runs along the outline of every letter. SVG and CSS only (a moving dash on
+ * the letters' stroke), so it costs next to nothing. Patterns: comet, sparks, zip, party.
+ */
+export function EdgeText({ text, pattern = "comet", colors, size = 64, weight = 800, speed = 1 }: Any) {
+  const ref = useRef<SVGTextElement>(null);
+  const [box, setBox] = useState<[number, number, number, number]>([0, 0, size * text.length * 0.62, size * 1.2]);
+  useEffect(() => { const b = ref.current?.getBBox(); if (b) setBox([b.x - 8, b.y - 8, b.width + 16, b.height + 16]); }, [text, size, weight]);
+  const cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
+  const t = { x: 0, y: size, fontSize: size, fontWeight: weight, style: { fontFamily: "var(--font-display)" } };
+  const dur = `${1.3 / speed}s`;
+  return h("svg", { className: `ix-edgetext ix-edgetext-${pattern}`, viewBox: box.join(" "), width: box[2], height: box[3], role: "img", "aria-label": text,
+      style: { "--u": `${size / 64}px`, filter: `drop-shadow(0 0 ${size / 16}px ${cols[0]}aa)` } },
+    h("text", { ...t, ref, className: "ix-edgetext-tube" }, text),
+    cols.slice(0, 3).map((c: string, i: number) => h("text", { ...t, key: i, className: "ix-edgetext-light", stroke: c,
+      style: { ...t.style, animationDuration: dur, animationDelay: `${(-1.3 / speed) * (i / cols.length)}s` } }, text)));
 }
 
 /**
@@ -1925,6 +1962,7 @@ const SHIPPED = {
   Carousel,
   Mark,
   Edge,
+  EdgeText,
   THINKING,
   ...(TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {}),
   ...(Orb3DThinks ? { Orb3D: Orb3DThinks } : {}),

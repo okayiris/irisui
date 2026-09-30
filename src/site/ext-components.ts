@@ -563,6 +563,24 @@ const SPECS: Spec[] = [
     variants: [
       { label: "She thinks, each time another", code: `h("div", { style: { display: "flex", gap: 26, flexWrap: "wrap", padding: 16, font: "var(--text-sub)", color: "var(--dim)" } }, ...THINKING.map((t) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 22 } }, h(TalkOrb, { size: 90, state: "thinking", thinking: t }), t)))` },
       { label: "Round a screen, while it reloads", code: `h("div", { style: { padding: 20 } }, h(Edge, { pattern: "comet", shape: "rect", width: 180, height: 120, radius: 28 }))` },
+      { label: "Along any SVG path", code: `h("div", { style: { display: "flex", gap: 40, padding: 20 } }, h(Edge, { path: "M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2.2 0 3.6 1.3 5.4 3.3 1.8-2 3.2-3.3 5.4-3.3 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z", width: 110, pattern: "comet" }), h(Edge, { path: "M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2.2 0 3.6 1.3 5.4 3.3 1.8-2 3.2-3.3 5.4-3.3 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z", width: 110, pattern: "party" }))` },
+    ],
+  },
+  {
+    name: "EdgeText",
+    group: "Brand",
+    height: 220,
+    summary: "A word as a neon sign: the Edge light runs along the outline of every letter. SVG and CSS only.",
+    props: [
+      { name: "text", type: "string", required: true },
+      { name: "pattern", type: "'comet' | 'sparks' | 'zip' | 'party'" },
+      { name: "colors", type: "string[]" },
+      { name: "size", type: "number" },
+      { name: "weight", type: "number" },
+      { name: "speed", type: "number" },
+    ],
+    variants: [
+      { label: "Four patterns", code: `h("div", { style: { display: "flex", gap: 32, flexWrap: "wrap", padding: 12 } }, ...["comet", "sparks", "zip", "party"].map((p) => h(EdgeText, { key: p, text: "Iris", pattern: p, size: 64 })))` },
     ],
   },
   {

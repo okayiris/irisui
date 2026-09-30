@@ -805,9 +805,37 @@ both sides), zip (fills both ways and back), orbit (a round), sparks, flow and p
 - Moods (\`aurora\`, \`heartbeat\`, \`breathe\`, \`wave\`) are for moments she chooses, not for thinking.
 - Reduced motion: one still frame.
 
+## Shapes and words
+
+- \`shape: "ring"\` round her orb, \`"rect"\` along a rounded screen, or \`path\`: any SVG path, fitted into the box.
+  A path of several pieces (an icon) lifts the pen between them.
+- Words take \`EdgeText\`: the light runs round every letter, as a neon sign. It is SVG and CSS, no canvas.
+- One lit thing per screen, the same as the busy budget counts a neon Word: a lit word and a thinking orb never
+  share a screen.
+
+## Cost
+
+About 1% of one core for one Edge (measured: 5 to 14 ms of work a second, party the most). Out of sight it
+stops, and with reduced motion it is one still frame. \`EdgeText\` is a CSS animation and costs less still.
+
 ## Size
 
 \`width\` is the line. The glow reaches 14px past it on every side.
+`,
+  EdgeText: `# EdgeText
+
+A word as a neon sign: the light of an \`Edge\` runs along the outline of every letter. A moving dash on the
+letters' stroke, in SVG and CSS, so it costs next to nothing.
+
+## When
+
+- A big moment in one word: "Party", "Done", her name on a first start.
+- Never a sentence, never body text, never below 40px: the dash needs room to read as light.
+
+## Patterns
+
+comet (two colours running round), sparks (dots that twinkle), zip (draws itself and back), party (colours
+that turn). One lit thing per screen.
 `,
   Carousel: `# Carousel
 
