@@ -546,6 +546,26 @@ const SPECS: Spec[] = [
     ],
   },
   {
+    name: "Edge",
+    group: "Brand",
+    height: 300,
+    summary: "The apps' light patterns along an edge: round her orb while she thinks, along a screen while it reloads. The TalkOrb and the Orb3D think with it.",
+    props: [
+      { name: "pattern", type: "'comet' | 'zip' | 'orbit' | 'sparks' | 'flow' | 'party' | 'wave' | 'breathe' | 'heartbeat' | 'aurora'" },
+      { name: "colors", type: "string[]" },
+      { name: "shape", type: "'ring' | 'rect'" },
+      { name: "width", type: "number" },
+      { name: "height", type: "number" },
+      { name: "radius", type: "number" },
+      { name: "stroke", type: "number" },
+      { name: "speed", type: "number" },
+    ],
+    variants: [
+      { label: "She thinks, each time another", code: `h("div", { style: { display: "flex", gap: 26, flexWrap: "wrap", padding: 16, font: "var(--text-sub)", color: "var(--dim)" } }, ...THINKING.map((t) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 22 } }, h(TalkOrb, { size: 90, state: "thinking", thinking: t }), t)))` },
+      { label: "Round a screen, while it reloads", code: `h("div", { style: { padding: 20 } }, h(Edge, { pattern: "comet", shape: "rect", width: 180, height: 120, radius: 28 }))` },
+    ],
+  },
+  {
     name: "Divider",
     group: "Surfaces",
     height: 180,

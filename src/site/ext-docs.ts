@@ -775,7 +775,7 @@ Four drawings of her, and each has its own sizes. What counts is the ring you se
 | The Mac pill | \`TalkOrb\` | 60 |
 | The phone's tab bar | \`TalkOrb\` | 66 |
 | A logo: sign-in, lock screen, PIN pad | \`Mark\` | 48 to 96 |
-| The talk screen: she talks (the neon lines round her) or thinks (two neon comets up both sides) | \`TalkOrb\` | 120 or more |
+| The talk screen: she talks (the neon lines round her) or thinks (an \`Edge\` pattern, another each time) | \`TalkOrb\` | 120 or more |
 | The big moment: the first start, a hero on the web, a video | \`Orb3D\` | 100 or more |
 
 - The \`Orb\` is only ring: it fills its size. Its ring is as tall as the text next to it, never smaller.
@@ -783,10 +783,31 @@ Four drawings of her, and each has its own sizes. What counts is the ring you se
   So it is never smaller than 60: at 28 its ring is 9px, a dot next to 22px text.
 - Only these steps. A size between them is a bug, not a choice.
 - Small and live is an \`Orb\`. Big and live is a \`TalkOrb\`. Still is a \`Mark\`.
-- The neon lines (talking) and the neon comets (thinking) are the \`TalkOrb\`'s. They need room, so they never come
+- The neon lines (talking) and the thinking patterns are the \`TalkOrb\`'s. They need room, so they never come
   on an \`Orb\`: small, she talks with the ring's turn alone.
 - The \`Orb3D\` is glass and light, drawn with WebGL: one per screen, never in a bar or a row, and where WebGL is
   missing it falls back to the flat \`Orb\`.
+`,
+  Edge: `# Edge
+
+The apps' light patterns along an edge (\`Rand.swift\`), drawn the same way on the web: round her orb while she
+thinks, along the phone's rounded screen while her screens reload.
+
+## Thinking is never one look
+
+She thinks with a different pattern each time, picked from the cheerful set \`THINKING\`: comet (two colours up
+both sides), zip (fills both ways and back), orbit (a round), sparks, flow and party. The \`TalkOrb\` and the
+\`Orb3D\` do this themselves; \`thinking: "zip"\` holds one.
+
+- Cheerful: bright neon on the dark, never grey, never a spinner.
+- It hugs her ring (70/60 of the TalkOrb, 72% of the Orb3D). It never crosses the screen.
+- One edge at a time. While she thinks, the screen's own edge stays still.
+- Moods (\`aurora\`, \`heartbeat\`, \`breathe\`, \`wave\`) are for moments she chooses, not for thinking.
+- Reduced motion: one still frame.
+
+## Size
+
+\`width\` is the line. The glow reaches 14px past it on every side.
 `,
   Carousel: `# Carousel
 

@@ -1610,30 +1610,10 @@
 }
 .iris-orb-away .glow { filter: grayscale(1); }
 
-/* --------------------------------------------------------- Thinking comet */
-/* The app's thinking look (Rand.swift, "comet", the default): per colour a pair of comets runs from the bottom
-   up both sides at once and meets at the top, violet and then cyan half a round later. The release drew one
-   cyan arc racing round, which the apps never show. The glow sits on the arc and the mask on the comets, so
-   the mask no longer cuts the glow off. Goes upstream into the release. */
-@property --iris-comet { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-@keyframes iris-comet { from { --iris-comet: 0deg; } to { --iris-comet: 180deg; } }
-.iris-talkorb-arc, .iris-orb3d-arc {
-  background: none; -webkit-mask: none; mask: none; animation: none;
-  filter: drop-shadow(0 0 3px rgba(139, 92, 246, .7)) drop-shadow(0 0 4px rgba(34, 211, 238, .45));
-}
-.iris-talkorb-arc::before, .iris-talkorb-arc::after, .iris-orb3d-arc::before, .iris-orb3d-arc::after {
-  --c: #8b5cf6;
-  --tail: max(0deg, calc(var(--iris-comet) - 32deg));
-  content: ""; position: absolute; inset: 0; border-radius: 50%;
-  background:
-    conic-gradient(from 180deg, transparent var(--tail), var(--c) var(--iris-comet), transparent calc(var(--iris-comet) + .5deg)),
-    conic-gradient(from calc(180deg - var(--iris-comet)), var(--c) 0deg, transparent calc(var(--iris-comet) - var(--tail)));
-  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
-          mask: radial-gradient(closest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
-  animation: iris-comet 1.3s cubic-bezier(.33, 1, .68, 1) infinite;
-}
-.iris-talkorb-arc::after, .iris-orb3d-arc::after { --c: #22d3ee; animation-delay: -.65s; }
-@media (prefers-reduced-motion: reduce) {
-  .iris-talkorb-arc::before, .iris-talkorb-arc::after, .iris-orb3d-arc::before, .iris-orb3d-arc::after { animation: none; --iris-comet: 120deg; }
-  .iris-talkorb-arc::after, .iris-orb3d-arc::after { --iris-comet: 60deg; }
-}
+/* ------------------------------------------------------------------- Edge */
+/* Edge draws the apps' light patterns on a canvas; TalkOrb and Orb3D think with it (see ext.tsx). The release's
+   single cyan arc is hidden while an Edge draws. */
+.ix-edge { display: block; pointer-events: none; }
+.ix-thinks { position: relative; display: inline-grid; place-items: center; flex: none; }
+.ix-thinks-edge { position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 3; pointer-events: none; line-height: 0; }
+.ix-thinks-on .iris-talkorb-arc, .ix-thinks-on .iris-orb3d-arc { display: none; }

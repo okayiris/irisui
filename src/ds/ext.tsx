@@ -1784,6 +1784,120 @@ export function ChatStack({
   );
 }
 
+/* ------------------------------------------------------------------- Edge */
+
+/**
+ * The apps' edge drawing (Rand.swift), ported: a light pattern along a ring or a rounded rectangle. 0 is the
+ * bottom middle, 0.5 the top middle, so the both-ways patterns start at the bottom and meet at the top.
+ */
+const EDGE_COLORS: Record<string, string[]> = {
+  comet: ["#8B5CF6", "#22D3EE"], zip: ["#22D3EE", "#8B5CF6"], orbit: ["#7dd3fc", "#ffffff"], sparks: ["#8B5CF6", "#22D3EE", "#C026D3"],
+  flow: ["#8B5CF6", "#3B82F6", "#C026D3"], party: ["#F43F5E", "#FACC15", "#22D3EE"], wave: ["#8B5CF6", "#22D3EE"], breathe: ["#8B5CF6"],
+  heartbeat: ["#F43F5E", "#FDA4AF"], aurora: ["#22D3EE", "#34D399", "#A78BFA"],
+};
+/** What she thinks with: a different one each turn, and all of them cheerful. */
+export const THINKING = ["comet", "zip", "orbit", "sparks", "flow", "party"];
+
+const hexRgb = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixColor = (cs: string[], t: number) => {
+  if (cs.length < 2) return cs[0];
+  const x = Math.min(1, Math.max(0, t)) * (cs.length - 1), i = Math.min(cs.length - 2, Math.floor(x)), f = x - i, a = hexRgb(cs[i]), b = hexRgb(cs[i + 1]);
+  return `rgb(${a.map((v, k) => Math.round(v + (b[k] - v) * f)).join(",")})`;
+};
+
+function edgePath(shape: string, w: number, ht: number, r: number, inset: number, M = 480): number[][] {
+  if (shape === "ring") {
+    const cx = w / 2, cy = ht / 2, rr = Math.min(w, ht) / 2 - inset;
+    return Array.from({ length: M + 1 }, (_, k) => { const a = Math.PI / 2 + (2 * Math.PI * k) / M; return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)]; });
+  }
+  const i = inset, p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  p.setAttribute("d", `M${w / 2},${ht - i} L${r},${ht - i} A${r - i},${r - i} 0 0 1 ${i},${ht - r} L${i},${r} A${r - i},${r - i} 0 0 1 ${r},${i} L${w - r},${i} A${r - i},${r - i} 0 0 1 ${w - i},${r} L${w - i},${ht - r} A${r - i},${r - i} 0 0 1 ${w - r},${ht - i} Z`);
+  const L = p.getTotalLength();
+  return Array.from({ length: M + 1 }, (_, k) => { const q = p.getPointAtLength((L * k) / M); return [q.x, q.y]; });
+}
+
+/** One frame of a pattern at time t (seconds). */
+function drawEdge(ctx: CanvasRenderingContext2D, P: number[][], name: string, cols: string[], stroke: number, t: number, round: number) {
+  const M = P.length - 1, color = (i: number) => cols[i % cols.length], phase = t / round;
+  const seg = (a: number, b: number) => {
+    if (a > b) [a, b] = [b, a];
+    if (b - a >= 1) { a = 0; b = 1; }
+    const v = Math.floor(a); a -= v; b -= v;
+    const out: number[][] = [];
+    for (let k = Math.round(a * M); k <= Math.round(b * M); k++) out.push(P[k % M]);
+    return out;
+  };
+  const line = (pts: number[][], col: string, w: number, glow = 6, alpha = 1) => {
+    if (pts.length < 2) return;
+    ctx.save(); ctx.globalAlpha = Math.max(0, alpha); ctx.strokeStyle = ctx.shadowColor = col; ctx.lineWidth = w; ctx.lineCap = ctx.lineJoin = "round";
+    ctx.shadowBlur = glow * 2; ctx.beginPath(); pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); ctx.restore();
+  };
+  if (["comet", "orbit", "heartbeat"].includes(name)) line(P, color(0), stroke * 0.6, 0, 0.18);
+  if (name === "breathe") { const a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(phase * 2 * Math.PI)); line(P, color(0), stroke * 0.85, 14 * a, a); }
+  else if (name === "orbit") { const k = 0.5 + (phase % 1); for (let i = 0; i < 14; i++) line(seg(k - i * 0.012, k - (i + 1) * 0.012), i < 3 ? color(1) : color(0), stroke, 6, 1 - i / 14); }
+  else if (name === "sparks") for (let i = 0; i < 28; i++) {
+    const u = (i / 28 + phase * 0.15) % 1, f = 0.5 + 0.5 * Math.sin(t * 5 + i * 1.7), [x, y] = P[Math.round(u * M)];
+    ctx.save(); ctx.globalAlpha = 0.35 + 0.65 * f; ctx.fillStyle = ctx.shadowColor = color(i); ctx.shadowBlur = 12; ctx.beginPath(); ctx.arc(x, y, stroke * (0.5 + 0.6 * f), 0, 7); ctx.fill(); ctx.restore();
+  }
+  else if (name === "wave") for (let i = 0; i < 120; i++) { const u = i / 120, g = 0.5 + 0.5 * Math.sin(u * Math.PI * 8 - phase * 2 * Math.PI); line(seg(u, u + 1 / 120 + 0.002), g > 0.6 ? color(1) : color(0), stroke * (0.3 + 1.1 * g), 6 * g); }
+  else if (name === "flow") for (let i = 0; i < 90; i++) { const u = i / 90, hh = (u + phase * 0.25) % 1; line(seg(u, u + 1 / 90 + 0.003), color(Math.floor(hh * cols.length)), stroke * 0.8, 8); }
+  else if (name === "heartbeat") { const f = phase % 1; [0, 0.18].forEach((st, j) => { const g = (f - st) / 0.5; if (g <= 0 || g >= 1) return; const k = 0.5 * easeOut(g), s0 = Math.max(0, k - 0.12);
+    line(seg(0.5 - k, 0.5 - s0), color(j), stroke, 6, 1 - g * 0.6); line(seg(0.5 + s0, 0.5 + k), color(j), stroke, 6, 1 - g * 0.6); }); }
+  else if (name === "zip") { const f = phase % 1, fill = f < 0.5 ? easeOut(f * 2) : 1 - easeOut((f - 0.5) * 2); line(seg(0.5 - fill * 0.5, 0.5), color(0), stroke * 0.85, 8); line(seg(0.5, 0.5 + fill * 0.5), color(1), stroke * 0.85, 8); }
+  else if (name === "aurora") for (let i = 0; i < 96; i++) { const u = i / 96, g = 0.5 + 0.5 * Math.sin(u * Math.PI * 6 + phase * 1.3) * Math.cos(u * Math.PI * 2.3 - phase * 0.7); line(seg(u, u + 1 / 96 + 0.003), mixColor(cols, g), stroke * (0.5 + 1.2 * g), 10 * g, 0.45 + 0.55 * g); }
+  else if (name === "party") { const burst = 0.6 + 0.4 * Math.pow(Math.max(0, Math.sin(t * 2 * Math.PI * 2)), 4); for (let i = 0; i < 96; i++) { const u = i / 96, hh = (u * 3 + phase * 1.5) % 1; line(seg(u, u + 1 / 96 + 0.003), mixColor(cols, hh), stroke * (0.8 + 0.6 * burst), 12 * burst, burst); } }
+  else { const n = cols.length; for (let i = 0; i < n; i++) { const k = 0.5 * easeOut((phase + i / n) % 1), s0 = Math.max(0, k - 0.09); line(seg(0.5 - k, 0.5 - s0), color(i), stroke); line(seg(0.5 + s0, 0.5 + k), color(i), stroke); } }
+}
+
+/**
+ * A light pattern along an edge: round her orb while she thinks, or along a screen's rounded edge while it
+ * reloads. `width` is the line's box; the glow spills out past it, as light does.
+ */
+export function Edge({ pattern = "comet", colors, shape = "ring", width = 140, height, radius = 28, stroke = 2.5, speed = 1, round = 1.3 }: Any) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const ht = height ?? width, pad = 14;
+  const key = [pattern, (colors ?? []).join(), shape, width, ht, radius, stroke, speed, round].join("|");
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const dpr = Math.min(3, window.devicePixelRatio || 1), W = width + pad * 2, H = ht + pad * 2;
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, pad * dpr, pad * dpr);
+    const P = edgePath(shape, width, ht, radius, stroke), cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now();
+    let raf = 0;
+    const frame = (ms: number) => {
+      ctx.clearRect(-pad, -pad, W, H);
+      drawEdge(ctx, P, pattern, cols, stroke, still ? 0.6 : Math.max(0, (ms - t0) / 1000) * speed, round);
+      if (!still) raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [key]);
+  return h("canvas", { ref, className: "ix-edge", "aria-hidden": "true", style: { width: width + pad * 2, height: ht + pad * 2, margin: -pad } });
+}
+
+/**
+ * The shipped TalkOrb and Orb3D, with thinking drawn by Edge: a different cheerful pattern each time she starts
+ * to think, or the one named by `thinking`. The release's single cyan arc is hidden. Goes upstream.
+ */
+function thinksWith(Base: Any, ring: number, fallback: number) {
+  if (!Base) return undefined;
+  // Base's own statics (Orb3D.rings, Orb3D.makeRenderer, ...) come along.
+  return Object.assign(function Thinks(props: Any) {
+    const { thinking, ...rest } = props;
+    const on = props.state === "thinking", size = props.size ?? fallback;
+    const [pick, setPick] = useState(() => THINKING[Math.floor(Math.random() * THINKING.length)]);
+    const was = useRef(on);
+    useEffect(() => { if (on && !was.current) setPick(THINKING[Math.floor(Math.random() * THINKING.length)]); was.current = on; }, [on]);
+    return h("span", { className: "ix-thinks" + (on ? " ix-thinks-on" : "") },
+      h(Base, rest),
+      on ? h("span", { className: "ix-thinks-edge" }, h(Edge, { pattern: thinking ?? pick, width: Math.round(size * ring), stroke: Math.max(1.5, size / 48) })) : null);
+  }, Base);
+}
+const TalkOrbThinks = thinksWith((window as Any).IrisUi?.TalkOrb, 70 / 60, 66);
+const Orb3DThinks = thinksWith((window as Any).IrisUi?.Orb3D, 0.72, 220);
+
 const SHIPPED = {
   Photo,
   BorderPattern,
@@ -1809,9 +1923,13 @@ const SHIPPED = {
   NavRail,
   SplitButton,
   Carousel,
+  Mark,
+  Edge,
+  THINKING,
+  ...(TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {}),
+  ...(Orb3DThinks ? { Orb3D: Orb3DThinks } : {}),
 };
 
 (window as Any).IrisUi = Object.assign((window as Any).IrisUi ?? {}, SHIPPED);
 
 export default SHIPPED;
-  Mark,
