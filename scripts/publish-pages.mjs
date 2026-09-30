@@ -8,7 +8,7 @@
 //
 // Publishing needs a token that may push: `gh auth token` is used, so log in with gh first.
 
-import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -45,8 +45,12 @@ const runOut = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, encoding: "ut
 
 console.log(`irisui: building the site for ${PREFIX || "/"} …`);
 run(process.execPath, [join(ROOT, "scripts/build.mjs")], {
-  env: { ...process.env, IRISUI_BASE_PATH: PREFIX, IRISUI_CANONICAL: CANONICAL },
+  env: { ...process.env, IRISUI_BASE_PATH: PREFIX, IRISUI_CANONICAL: CANONICAL, IRISUI_INTERNAL: "" },
 });
+// Ringlab is internal: refuse to publish if any of it reached the build.
+for (const p of ["lab", "examples/labs"]) {
+  if (existsSync(join(ROOT, "dist", p))) throw new Error(`dist/${p} is internal and must never be published`);
+}
 
 const token = process.env.GH_TOKEN ?? runOut("gh", ["auth", "token"]);
 // The token rides an HTTP header, never the command line: a URL with a token in it shows up in `ps` and in

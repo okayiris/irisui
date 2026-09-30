@@ -11,6 +11,7 @@ import type { Block, Doc } from "./content";
 import { FOUNDATIONS, GROUPS, PATTERNS, RESOURCES, SITE, groupOf } from "./nav";
 import { loadTokens, ROOT, type Component } from "./parse";
 import { demoFrame, previewFrame } from "./demos";
+import { LAB } from "./lab";
 import { BASE, CANONICAL, rewriteBase, rewriteBaseText, url } from "./base";
 import type { Heading } from "./markdown";
 
@@ -340,6 +341,29 @@ function collectPages(): Page[] {
     });
   }
 
+  // Ringlab modules, local only (see lab.ts): the lab itself, live, in a frame.
+  for (const m of LAB.modules) {
+    pages.push({
+      path: `/lab/${m.id}`,
+      title: m.name,
+      description: m.blurb ?? "A Ringlab module.",
+      headings: [],
+      content: (
+        <>
+          <header className="page-head">
+            <p className="eyebrow">Lab, internal</p>
+            <h1>{m.name}</h1>
+            {m.blurb ? <p className="lede">{m.blurb}</p> : null}
+          </header>
+          <iframe className="lab-frame" src={LAB.url + m.path} title={m.name} />
+          <p className="foot-dim">
+            From Ringlab, <a href={LAB.url + m.path}>{LAB.url + m.path}</a>. Never published.
+          </p>
+        </>
+      ),
+    });
+  }
+
   return pages;
 }
 
@@ -507,7 +531,10 @@ ${pages
   // The blobs' provenance note stays in the repo: it names where each asset came from and is not part of the site.
   cpSync(join(ROOT, "public"), out, {
     recursive: true,
-    filter: (src) => !src.endsWith(`${sep}blobs${sep}SOURCES.md`),
+    // The lab copies under examples/labs are internal: only a local build (IRISUI_INTERNAL=1) carries them.
+    filter: (src) =>
+      !src.endsWith(`${sep}blobs${sep}SOURCES.md`) &&
+      (process.env.IRISUI_INTERNAL === "1" || !src.includes(`${sep}examples${sep}labs`)),
   });
   write(out, ".base", BASE + "\n");
 

@@ -4,3 +4,4 @@ dist/
 .playwright/
 .DS_Store
 *.log
+public/examples/labs/

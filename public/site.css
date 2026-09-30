@@ -974,3 +974,14 @@ td code {
   border-radius: 10px;
   background: var(--bg);
 }
+
+/* A Ringlab module, live: tall enough to work in. */
+.lab-frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 220px);
+  min-height: 520px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+}

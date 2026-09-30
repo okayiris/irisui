@@ -14,6 +14,8 @@ import { fileURLToPath } from "node:url";
 import { dirname, extname, join, normalize } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// The local site shows the internal Ringlab modules too (src/site/lab.ts); a public build never does.
+process.env.IRISUI_INTERNAL = "1";
 const DIST = join(ROOT, "dist");
 const port = Number(process.argv[2] ?? 4173);
 /** --no-watch serves what is in dist/ and rebuilds nothing: for looking without the page moving. */

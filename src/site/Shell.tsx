@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Heading } from "./markdown";
 import { FOUNDATIONS, GROUPS, PATTERNS, RESOURCES, SITE, groupOf } from "./nav";
+import { LAB } from "./lab";
 import { BASE, CANONICAL } from "./base";
 import type { Component } from "./parse";
 import { chapters } from "./content";
@@ -151,6 +152,17 @@ export function Shell({ title, description, path, headings = [], components, chi
                   {r.label}
                 </NavLink>
               ))}
+
+              {LAB.modules.length ? (
+                <>
+                  <p className="nav-head">Lab, internal</p>
+                  {LAB.modules.map((m) => (
+                    <NavLink key={m.id} href={`/lab/${m.id}`} path={path}>
+                      {m.name}
+                    </NavLink>
+                  ))}
+                </>
+              ) : null}
 
               <p className="nav-head">Chapters</p>
               {chapters.map((c) => (
