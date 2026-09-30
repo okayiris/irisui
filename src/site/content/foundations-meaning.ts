@@ -224,6 +224,44 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
         ],
       },
       {
+        title: "You: what you chose, and what she thinks of you",
+        blocks: [
+          {
+            kind: "p",
+            text:
+              "Iris learns who someone is: their roles, what matters to them, how they feel. A screen about the person keeps three things apart that look alike: what they said, what she guesses, and what she advises.",
+          },
+          {
+            kind: "table",
+            head: ["Thing", "Show it as", "Never"],
+            rows: [
+              ["Something you chose", "a filled Chip or a Toggle that is on", "a tick circle: a tick means done"],
+              ["Several things you are (roles, parts of your life)", "a Row with a Toggle per item", "a CheckList: a ticked row reads as finished and is struck through"],
+              ["What she guesses about you", "her words (I think), the reason beside it, and one tap for Right and one for Different", "the same look as something you said yourself"],
+              ["How sure she is", "the evidence in words: 4 of the last 4 times; a ring only beside those words", "a percentage on its own"],
+              ["A score you gave (how it goes, how much it matters)", "your number, plain; she points at the gap between the two, in words", "green for good, red for bad"],
+              ["A feeling", "the word you picked", "a colour or a face for a mood; red only ever means destroy"],
+              ["Who does it", "her orb on what she carries, a name on what someone else carries, nothing on your own", "violet or the ring gradient as the fill of her share"],
+              ["Her advice", "the word Advice on one option, and why, in words", "that option already selected: the person taps"],
+              ["A question she asks on her own (how are you, is this still important)", "a card with the question, one-tap answers and Not now; at most three a day, never at a client or in a focus block", "a Dialog; a question with no way past it"],
+              ["A private area (sexuality, faith)", "off until the person opens it", "a question from her about it"],
+            ],
+          },
+          {
+            kind: "note",
+            tone: "rule",
+            text:
+              "She learns who you are, not who you should be. When what you say and what you do differ, she asks which is true; she never decides it for you.",
+          },
+          {
+            kind: "note",
+            tone: "llm",
+            text:
+              "Building a screen about the person: mark every guess of hers as a guess with its reason, keep feelings and scores uncoloured, and give each question a Not now. A role or a part of life is a word, not a colour: one topic per screen still holds.",
+          },
+        ],
+      },
+      {
         title: "Where each thing lives",
         blocks: [
           {
