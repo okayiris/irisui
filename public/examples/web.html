@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Iris UI web app</title>
+<meta name="description" content="The Iris web app built from the design system: the talk page, the subscription page, a list and what Iris did.">
+<link rel="stylesheet" href="../ds/tokens.css">
+<link rel="stylesheet" href="../ds/bundle.css">
+<link rel="stylesheet" href="../ds/ext.css">
+<link rel="stylesheet" href="../ds/extra.css">
+<link rel="icon" href="../favicon.svg">
+<style>
+  /* The web values web-app.md lists next to the app tokens. */
+  :root {
+    --accent-soft: rgba(125, 211, 252, .12);
+    --accent-line: rgba(125, 211, 252, .45);
+    --on-accent: #07171f;
+    --column: 76rem;
+    --lane-w: 2.7rem;
+  }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-text); }
+  * { box-sizing: border-box; }
+  body { min-height: 100dvh; }
+
+  /* The beam: a quiet band of light the input bar sits on. Never clickable. */
+  .beam { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .85;
+          background:
+            radial-gradient(60% 18% at 50% 100%, rgba(125, 211, 252, .16), transparent 70%),
+            radial-gradient(40% 10% at 50% 100%, rgba(139, 92, 246, .14), transparent 70%); }
+
+  /* Status on top: plan pill, her ring, one word. */
+  .head { position: sticky; top: 0; z-index: 20; display: flex; justify-content: center; padding: 18px 16px 14px;
+          background: linear-gradient(var(--bg) 40%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .headgroup { display: flex; align-items: center; gap: 10px; }
+  .plan { font: 500 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px;
+          background: rgba(139, 92, 246, .14); color: #d8ccfd; }
+  .ring { width: 1.05rem; height: 1.05rem; border-radius: 50%;
+          background: conic-gradient(from 200deg, var(--accent), var(--violet), var(--accent));
+          -webkit-mask: radial-gradient(circle, transparent 42%, #000 45%); mask: radial-gradient(circle, transparent 42%, #000 45%); }
+  .ring.live { animation: breathe 2.4s var(--ease-house, ease) infinite; }
+  @keyframes breathe { 50% { transform: scale(1.18); } }
+  .status { font-size: .95rem; font-weight: 500; letter-spacing: .06em; color: #cfe8f6; text-shadow: 0 0 22px rgba(125, 211, 252, .45); }
+  .back { position: absolute; left: 16px; top: 18px; color: var(--dim); text-decoration: none; font-size: 13px; }
+  .back:hover { color: var(--fg); }
+  .rulesbtn { position: absolute; right: 16px; top: 12px; }
+
+  /* The lane: one icon per screen, in the left margin. */
+  .lane { position: fixed; left: 14px; top: 50%; translate: 0 -50%; z-index: 20; display: grid; gap: 6px; padding: 6px;
+          background: rgba(12, 17, 23, .5); border: 1px solid var(--edge); border-radius: 1rem;
+          backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .lane button { all: unset; cursor: pointer; width: var(--lane-w); height: var(--lane-w); display: grid; place-items: center;
+                 border-radius: .7rem; color: var(--label); position: relative;
+                 transition: background var(--motion-fast) var(--ease-house), color var(--motion-fast) var(--ease-house); }
+  .lane button:hover { background: var(--glass); color: var(--fg); }
+  .lane button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .lane button[aria-current="page"] { background: rgba(125, 211, 252, .14); color: var(--accent); }
+  .lane button .tip { position: absolute; left: calc(100% + 10px); white-space: nowrap; padding: 4px 10px; border-radius: 8px;
+                      background: rgba(12, 17, 23, .9); border: 1px solid var(--edge); font-size: 13px; color: var(--fg);
+                      opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) var(--ease-house); }
+  .lane button:hover .tip, .lane button:focus-visible .tip { opacity: 1; }
+  .dotnew { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  /* The column and what goes in it. */
+  .page { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px;
+          max-width: var(--column); margin: 0 auto; padding: 8px 24px 160px calc(var(--lane-w) + 56px); }
+  .col { width: 100%; max-width: 44rem; margin: 0 auto; }
+  h1.t { font-size: 2rem; font-weight: 500; margin: 20px 0 6px; letter-spacing: -.01em; }
+  .intro { color: var(--dim); margin: 0 0 22px; line-height: 1.55; font-size: 15px; }
+  .card { background: var(--glass); border: 1px solid var(--edge); border-radius: .9rem; padding: .9rem 1rem; margin-bottom: 1.1rem;
+          backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .lbl { font: 500 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
+         display: flex; justify-content: space-between; align-items: center; }
+  .lbl span:last-child { color: var(--label); }
+  .big { font-size: 1.6rem; font-weight: 600; margin: 0; }
+  .line { color: var(--dim); margin: 4px 0 0; line-height: 1.55; }
+  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .row .grow { flex: 1; min-width: 12rem; }
+  .gap { height: 14px; }
+  .linkish { all: unset; cursor: pointer; color: var(--accent); font-size: 14px; border-radius: 6px; }
+  .linkish:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ok { color: var(--ok); font-size: 14px; margin: 10px 0 0; }
+  .bad { color: var(--error); font-size: 14px; margin: 10px 0 0; }
+  .price { font: 400 14px var(--font-mono); color: var(--label); }
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .planbox { all: unset; cursor: pointer; border-radius: .8rem; padding: .8rem .9rem; border: 1px solid var(--edge); display: grid; gap: 4px;
+             transition: border-color var(--motion-fast) var(--ease-house), background var(--motion-fast) var(--ease-house); }
+  .planbox:hover { background: var(--accent-soft); }
+  .planbox:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .planbox[aria-pressed="true"] { border-color: var(--accent-line); background: var(--accent-soft); }
+  .planbox b { font-weight: 600; }
+  .planbox small { color: var(--dim); font-size: 13px; line-height: 1.4; }
+  .you-are { font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+
+  /* The conversation: a timeline with a hairline. */
+  .log { list-style: none; margin: 0; padding: 0 0 0 1.2rem; border-left: 1px solid var(--line); display: grid; gap: 18px; }
+  .log li { position: relative; }
+  .log li::before { content: ""; position: absolute; left: calc(-1.2rem - 3px); top: .55rem; width: 5px; height: 5px; border-radius: 50%; background: var(--fg); }
+  .log .you { color: var(--accent); padding-left: 10px; border-left: 2px solid var(--accent); }
+  .log .you::before { background: var(--accent); left: calc(-1.2rem - 5px); }
+  .log .agi { font-size: 1.08rem; line-height: 1.55; }
+  .log .step { color: var(--dim); font-size: 14px; }
+  .log .step::before { width: 5px; height: 5px; background: var(--label); }
+  .time { display: block; font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--label); margin-bottom: 2px; }
+
+  /* Right rail: jobs, from 72rem wide. */
+  .rail { width: 17rem; position: sticky; top: 70px; align-self: start; border-left: 1px solid var(--line); padding-left: 20px; }
+  .rail h2 { font: 500 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--label); margin: 20px 0 12px; }
+  .job { padding: 12px 0; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 14px; }
+  .job small { color: var(--dim); }
+  @media (max-width: 71.99rem) { .rail { display: none; } .page { grid-template-columns: minmax(0, 1fr); } }
+
+  /* The input bar. */
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 18px 24px 22px calc(var(--lane-w) + 56px);
+         background: linear-gradient(transparent, rgba(7, 9, 12, .85) 45%); }
+  .bar form { max-width: 44rem; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
+  .bar textarea { flex: 1; resize: none; font: inherit; color: var(--fg); background: var(--glass); border: 1px solid var(--edge);
+                  border-radius: 1.45rem; padding: .85rem 1.15rem; min-height: 3rem; max-height: 33vh; outline: none;
+                  transition: border-color var(--motion-fast) var(--ease-house); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .bar textarea:focus-visible { border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .bar textarea::placeholder { color: var(--label); }
+  .act { all: unset; cursor: pointer; width: 2.9rem; height: 2.9rem; border-radius: 50%; display: grid; place-items: center; flex: none;
+         background: var(--glass); border: 1px solid var(--edge); color: var(--fg); position: relative;
+         transition: transform var(--motion-fast) var(--ease-house), background var(--motion-fast) var(--ease-house); }
+  .act:hover { background: var(--accent-soft); }
+  .act:active { transform: scale(.96); }
+  .act:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .act.on { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+  .act.on::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--accent-line); animation: breathe 2.4s ease infinite; }
+  .act.muted svg .strike { display: block; }
+  .act svg .strike { display: none; }
+
+  /* The rules drawer. */
+  .rules { position: fixed; right: 16px; top: 60px; z-index: 40; width: 22rem; max-height: calc(100dvh - 90px); overflow: auto;
+           background: rgba(12, 17, 23, .92); border: 1px solid var(--edge); border-radius: .9rem; padding: 16px;
+           backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+  .rules h2 { font: 500 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--label); margin: 0 0 10px; }
+  .rules ul { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; font-size: 14px; line-height: 1.4; }
+  .rules li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; color: var(--dim); }
+  .rules li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; background: var(--ok); }
+  .rules li.q { color: var(--fg); }
+  .rules li.q::before { background: var(--wait); }
+
+  @media (max-width: 46rem) {
+    .lane { top: auto; bottom: 86px; left: 50%; translate: -50% 0; grid-auto-flow: column; }
+    .lane button .tip { display: none; }
+    .page { padding: 8px 16px 200px; }
+    .bar { padding: 14px 16px 16px; }
+    .plans { grid-template-columns: 1fr; }
+    .back { display: none; }
+    .rules { left: 16px; width: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ring.live, .act.on::after { animation: none; } }
+</style>
+</head>
+<body>
+<div class="beam" aria-hidden="true"></div>
+<div id="root"></div>
+<script src="../ds/vendor/react.js"></script>
+<script src="../ds/vendor/react-dom.js"></script>
+<script src="../ds/bundle.js"></script>
+<script src="../ds/ext.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState } = React;
+  const { PreviewI18nProvider, Button, Segmented, Field, CheckList, Topic, Progress, Chip } = window.IrisUi;
+
+  // Lucide paths (the web kit's icon set). The house Icon has 14 names and none of these; see the rules drawer.
+  const LUCIDE = {
+    talk: "M7.9 20A9 9 0 1 0 4 16.1L2 22Z",
+    plan: "M2 7h20v12H2zM2 11h20M6 15h4",
+    cart: "M8 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM19 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6",
+    pulse: "M22 12h-4l-3 9L9 3l-3 9H2",
+    mic: "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
+    send: "M22 2 11 13M22 2l-7 20-4-9-9-4Z",
+  };
+  const Svg = ({ name, strike }) => h("svg", { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    strokeWidth: 1.75, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true" },
+    h("path", { d: LUCIDE[name] }), strike ? h("path", { className: "strike", d: "M3 3l18 18" }) : null);
+
+  /* ------------------------------------------------------------ the talk page */
+
+  function Talk({ go }) {
+    const [items, setItems] = useState(["Candles", "Balloons", "Lemonade", "Cake"]);
+    const [done, setDone] = useState([0]);
+    return h("div", { className: "col" },
+      h(Topic, { name: "groceries" },
+        h("div", { className: "card" },
+          h("p", { className: "lbl" }, h("span", null, "Groceries for Saturday"), h("span", null, `${done.length} of ${items.length}`)),
+          h(CheckList, { topic: "groceries", items, done, onToggle: (i) => setDone((d) => d.includes(i) ? d.filter((x) => x !== i) : [...d, i]) }))),
+      h("ol", { className: "log", "aria-label": "Conversation" },
+        h("li", { className: "you" }, h("span", { className: "time" }, "14:02"), "Can you move the dentist to Wednesday?"),
+        h("li", { className: "step" }, "Called the dentist, 2 minutes"),
+        h("li", { className: "agi" }, h("span", { className: "time" }, "14:05"),
+          "Done, Alex. Wednesday at 09:30. That leaves Saturday free for Sam's party, and the candles are still on your list."),
+        h("li", { className: "you" }, h("span", { className: "time" }, "14:06"), "Is my plan still running?"),
+        h("li", { className: "agi" }, h("span", { className: "time" }, "14:06"),
+          "Yes, Pro until 18 October. ", h("button", { className: "linkish", onClick: () => go("plan") }, "Open your subscription"))));
+  }
+
+  /* ----------------------------------------------------- the subscription page */
+
+  const PLANS = [
+    { id: "free", name: "Free", price: "€0", line: "Talk and lists, one device." },
+    { id: "plus", name: "Plus", price: "€6", line: "Calls for you, three devices." },
+    { id: "pro", name: "Pro", price: "€12", line: "Five times the room, and faster." },
+  ];
+
+  function Plan() {
+    const [pick, setPick] = useState("pro");
+    const [code, setCode] = useState(null);      // null: closed, "": open
+    const [codeMsg, setCodeMsg] = useState(null);
+    const [awake, setAwake] = useState(1);
+    const chosen = PLANS.find((p) => p.id === pick);
+    const tryCode = (e) => {
+      e.preventDefault();
+      setCodeMsg(code.trim().toUpperCase() === "IRIS10" ? { ok: true, t: "IRIS10 is on: your next month is €6." }
+        : { ok: false, t: `"${code.trim() || "empty"}" is not a code we know. Nothing changed.` });
+    };
+    return h("div", { className: "col" },
+      h("h1", { className: "t" }, "Subscription"),
+      h("p", { className: "intro" }, "Your plan, a code if you have one, and when Iris may sleep."),
+
+      h("div", { className: "card" },
+        h("p", { className: "lbl" }, h("span", null, "Your plan")),
+        h("p", { className: "big" }, "Pro"),
+        h("p", { className: "line" }, "€12 a month, renews on 18 October."),
+        h("div", { className: "plans", role: "group", "aria-label": "Plans" },
+          PLANS.map((p) => h("button", { key: p.id, className: "planbox", "aria-pressed": pick === p.id, onClick: () => setPick(p.id) },
+            p.id === "pro" ? h("span", { className: "you-are" }, "You are here") : h("span", { className: "you-are", style: { color: "var(--label)" } }, p.price + " a month"),
+            h("b", null, p.name), h("small", null, p.line)))),
+        h("div", { className: "gap" }),
+        pick === "pro"
+          ? h("p", { className: "line" }, "This is your plan. Pick another one to switch.")
+          : h("div", { className: "row" },
+              h("p", { className: "line grow" }, `${chosen.name} starts on 18 October. Until then you keep Pro.`),
+              h(Button, { variant: "accent" }, `Switch to ${chosen.name}`))),
+
+      h("div", { className: "card" },
+        h("p", { className: "lbl" }, h("span", null, "Code")),
+        code === null
+          ? h("button", { className: "linkish", onClick: () => setCode("") }, "I have a code")
+          : h("form", { onSubmit: tryCode },
+              h("div", { className: "row" },
+                h("div", { className: "grow" }, h(Field, { autoFocus: true, placeholder: "For example IRIS10", "aria-label": "Code", value: code,
+                  onChange: (e) => { setCode(e.target.value); setCodeMsg(null); } })),
+                h(Button, { variant: "glass" }, "Apply")),
+              codeMsg ? h("p", { className: codeMsg.ok ? "ok" : "bad", role: "status" }, codeMsg.t) : null)),
+
+      h("div", { className: "card" },
+        h("p", { className: "lbl" }, h("span", null, "Awake")),
+        h(Segmented, { items: ["Stays awake", "Sleeps when idle"], active: awake, onSelect: setAwake }),
+        h("p", { className: "line", style: { marginTop: 10 } }, awake === 0
+          ? "Iris answers at once, always. Uses more of your plan."
+          : "Iris sleeps after half an hour without use, and only when no work is waiting. The first answer takes a few seconds.")));
+  }
+
+  /* --------------------------------------------------------------- the list */
+
+  function Groceries() {
+    const [items, setItems] = useState(["Candles", "Balloons", "Lemonade", "Cake", "Bread", "Milk"]);
+    const [done, setDone] = useState([0, 4]);
+    const [draft, setDraft] = useState("");
+    return h("div", { className: "col" },
+      h(Topic, { name: "groceries" },
+        h("h1", { className: "t" }, "Groceries"),
+        h("p", { className: "intro" }, `${items.length - done.length} still to get. Iris orders them at Albert Heijn when you say so.`),
+        h("div", { className: "card" },
+          h("div", { className: "row" },
+            h(Progress, { ring: true, size: 64, value: done.length / items.length, centre: `${done.length}/${items.length}`, topic: "groceries" }),
+            h("div", { className: "grow" }, h("div", { className: "row" }, ["All", "Party", "Daily"].map((c, i) => h(Chip, { key: c, on: i === 0, topic: "groceries" }, c))))),
+          h("div", { className: "gap" }),
+          h(CheckList, { topic: "groceries", items, done, onToggle: (i) => setDone((d) => d.includes(i) ? d.filter((x) => x !== i) : [...d, i]) }),
+          h("form", { style: { marginTop: 12 }, onSubmit: (e) => { e.preventDefault(); if (draft.trim()) { setItems([...items, draft.trim()]); setDraft(""); } } },
+            h(Field, { topic: "groceries", placeholder: "Add something", "aria-label": "Add something", value: draft, onChange: (e) => setDraft(e.target.value) }))),
+        h("div", { className: "row" }, h(Button, { variant: "primary", topic: "groceries" }, "Order at Albert Heijn"), h(Button, { variant: "glass" }, "Share the list"))));
+  }
+
+  /* ------------------------------------------------------- what Iris did */
+
+  const DID = [
+    { time: "14:10", t: "Moved the dentist to Wednesday 09:30", s: "Called, 2 minutes" },
+    { time: "13:52", t: "Looked up houses on Funda", s: "Read 12 pages, clicked 6 times, typed twice" },
+    { time: "13:50", t: "Could not type into the search field", s: "The page changed while she typed. She tried again and it worked.", bad: true },
+    { time: "13:41", t: "Booked a table at Da Mario", s: "Saturday 20:00, six people" },
+  ];
+  const Activity = () => h("div", { className: "col" },
+    h("h1", { className: "t" }, "What Iris did"),
+    h("p", { className: "intro" }, "One line per task, not per click. Open a line for the steps."),
+    h("ol", { className: "log" }, DID.map((d) => h("li", { key: d.time + d.t },
+      h("span", { className: "time" }, d.time),
+      h("div", { style: { fontWeight: 600, color: d.bad ? "var(--error)" : "var(--fg)" } }, d.t),
+      h("div", { className: "line" }, d.s)))));
+
+  /* ----------------------------------------------------------------- rules */
+
+  const SCREENS = {
+    talk: { name: "Talk", icon: "talk", el: Talk,
+      ok: ["Status on top: plan pill, ring, one word", "Conversation as a timeline, you in ice blue", "A block above the talk stays in view", "Her sentence names Alex and ties the dentist to the party"],
+      ask: ["Steps ('Called the dentist') in the log, or only in What Iris did?"] },
+    plan: { name: "Subscription", icon: "plan", el: Plan,
+      ok: ["One card per question: plan, code, awake", "The plan you are on is the first thing you read", "The code field opens only when you have one", "Result next to the button, not in a toast", "Awake says what each choice costs"],
+      ask: ["Show the price of every plan, or only yours?", "Switching waits until the renewal date: say so, or switch at once?"] },
+    cart: { name: "Groceries", icon: "cart", el: Groceries,
+      ok: ["One topic on the page, the rest stays ice", "One primary, under what it acts on"],
+      ask: ["The house Button primary is white on the app, accent on the web. Here it takes the topic colour. Which one wins?"] },
+    pulse: { name: "What Iris did", icon: "pulse", el: Activity,
+      ok: ["One line per task, not 30 lines of 'reads the page'", "A failure says what happened and what she did next"],
+      ask: [] },
+  };
+  const ALL = ["The house Icon has 14 names; the web kit uses 161 Lucide icons. One set for both?",
+               "Web cards are .9rem, the house Card 18px. Two radii on purpose?",
+               "Plan names, prices and lines here are placeholders, not the real price list.",
+               "Removed: the 'Tap once for sound' toast and the breadcrumb at the bottom. The lane already says where you are."];
+
+  function App() {
+    const [id, setId] = useState(new URLSearchParams(location.search).get("s") || "plan");
+    const [listening, setListening] = useState(false);
+    const [text, setText] = useState("");
+    const [rules, setRules] = useState(false);
+    const go = (next) => { setId(next); const u = new URL(location.href); u.searchParams.set("s", next); history.replaceState(null, "", u); window.scrollTo(0, 0); };
+    const s = SCREENS[id] ?? SCREENS.plan;
+    const status = text ? "typing" : listening ? "listening" : "resting";
+
+    return h("div", null,
+      h("header", { className: "head" },
+        h("a", { className: "back", href: "./" }, "‹ Examples"),
+        h("div", { className: "headgroup" },
+          h("span", { className: "plan" }, "Pro"),
+          h("span", { className: "ring" + (listening ? " live" : ""), "aria-hidden": "true" }),
+          h("span", { className: "status", role: "status" }, status)),
+        h("div", { className: "rulesbtn" }, h(Button, { variant: rules ? "primary" : "glass", size: "sm", onClick: () => setRules(!rules) }, "Rules"))),
+
+      h("nav", { className: "lane", "aria-label": "Screens" }, Object.entries(SCREENS).map(([k, v]) =>
+        h("button", { key: k, "aria-label": v.name, "aria-current": k === id ? "page" : undefined, onClick: () => go(k) },
+          h(Svg, { name: v.icon }), h("span", { className: "tip", "aria-hidden": "true" }, v.name),
+          k === "pulse" ? h("span", { className: "dotnew", "aria-hidden": "true" }) : null))),
+
+      h("div", { className: "page" },
+        h("main", null, h(s.el, { go })),
+        h("aside", { className: "rail", "aria-label": "Jobs" },
+          h("h2", null, "Running"),
+          h("div", { className: "job" }, h("span", null, "Parcel from Coolblue"), h("small", null, "Arrives 17:00 to 18:00"), h(Progress, { value: .6 })),
+          h("div", { className: "job" }, h("span", null, "Calling Coolblue again"), h("small", null, "At 16:00"), h(Progress, { value: .1 })))),
+
+      h("div", { className: "bar" },
+        h("form", { onSubmit: (e) => { e.preventDefault(); setText(""); } },
+          h("textarea", { rows: 1, placeholder: "Talk normally, or / for commands", "aria-label": "Message to Iris", value: text, onChange: (e) => setText(e.target.value) }),
+          text
+            ? h("button", { className: "act on", "aria-label": "Send" }, h(Svg, { name: "send" }))
+            : h("button", { type: "button", className: "act" + (listening ? " on" : " muted"), "aria-label": listening ? "Stop listening" : "Start listening",
+                            "aria-pressed": listening, onClick: () => setListening(!listening) }, h(Svg, { name: "mic", strike: true })))),
+
+      rules ? h("aside", { className: "rules", "aria-label": "Rules" },
+        h("h2", null, s.name),
+        h("ul", null, s.ok.map((t) => h("li", { key: t }, t)), s.ask.map((t) => h("li", { key: t, className: "q" }, t))),
+        h("h2", null, "Whole web app"),
+        h("ul", null, ALL.map((t) => h("li", { key: t, className: "q" }, t)))) : null);
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(h(PreviewI18nProvider, null, h(App)));
+})();
+</script>
+</body>
+</html>
