@@ -75,6 +75,32 @@
   .item small { color: var(--dim); font: var(--text-sub); grid-column: 1; }
   .item .dots { font: var(--text-value); color: var(--label); grid-row: 1 / 3; grid-column: 2; align-self: center; }
 
+  /* The PIN: Face ID or Touch ID comes first, this is the way in when they cannot. */
+  .lock-stage { border-radius: 14px; padding: 40px 20px; display: grid; place-items: center; box-shadow: 0 0 0 1px var(--edge);
+                background: radial-gradient(420px 260px at 20% 20%, rgba(56, 189, 248, .16), transparent 70%), linear-gradient(to bottom left, #1d1840, #0a0d1f); }
+  .lock { width: 100%; max-width: 420px; padding: 32px 24px 26px; border-radius: 22px; text-align: center; display: grid; justify-items: center; gap: 12px;
+          background: rgba(10, 13, 18, .94); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 20px 50px rgba(0, 0, 0, .4); }
+  .lock h2 { margin: 4px 0 0; font: 600 20px var(--font-display); }
+  .lock .ask { margin: 0; font: var(--text-body); color: var(--dim); max-width: 320px; }
+  .lock .ask b { color: var(--fg); font-weight: 500; }
+  .pins { position: relative; display: flex; gap: 8px; margin: 8px 0 2px; cursor: text; }
+  .pins.shake { animation: shake .3s var(--ease-house); }
+  @keyframes shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
+  .pin { width: 44px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge);
+         font: 600 22px var(--font-mono); transition: box-shadow var(--motion-fast) var(--ease-house); }
+  .pin.at { box-shadow: inset 0 0 0 2px var(--accent); }
+  .pin.bad { box-shadow: inset 0 0 0 2px var(--error); }
+  .pin.ok { box-shadow: inset 0 0 0 2px var(--ok); }
+  .pins input { position: absolute; inset: 0; opacity: 0; font-size: 16px; }
+  .pins:focus-within .pin.at { box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 4px var(--accent-soft, rgba(125, 211, 252, .12)); }
+  .lock .msg { min-height: 20px; margin: 0; font: var(--text-body); }
+  .lock .msg.bad { color: var(--error); }
+  .lock .msg.ok { color: var(--ok); }
+  .lock .under { display: flex; gap: 14px; align-items: center; font: var(--text-body); color: var(--dim); }
+  .lock .under button { all: unset; cursor: pointer; border-radius: 6px; }
+  .lock .under button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .lock .under .link { color: var(--accent); }
+  .lock .demo { font: var(--text-sub); color: var(--label); margin: 0; }
   @media (max-width: 760px) { .three { grid-template-columns: 1fr; } .vault { grid-template-columns: 1fr; } .vault nav { border-right: 0; } }
 </style>
 </head>
@@ -168,7 +194,53 @@
           h("div", { key: t + s, className: "item" }, h("b", null, t), h("span", { className: "dots", "aria-label": "hidden" }, "••••••"), h("small", null, [u, s].filter(Boolean).join(" · ")))))));
   }
 
-  const Stage = ({ scene }) => scene.id === "vault" ? h("main", null, h(Vault))
+  /* ------------------------------------------------------------------- PIN */
+
+  // One pad for both jobs: unlock (enter) and choose (twice). Six digits submit themselves, no OK button.
+  function Pin({ mode }) {
+    const [step, setStep] = useState(mode === "choose" ? "choose" : "enter");
+    const [first, setFirst] = useState("");
+    const [value, setValue] = useState("");
+    const [show, setShow] = useState(false);
+    const [state, setState] = useState(null);      // null | "bad" | "ok"
+    const [shake, setShake] = useState(false);
+    const done = (v) => {
+      if (step === "choose") { setFirst(v); setStep("repeat"); setValue(""); return; }
+      const good = step === "repeat" ? v === first : v === "123456";
+      if (good) { setState("ok"); return; }
+      setState("bad"); setShake(true);
+      setTimeout(() => { setShake(false); setValue(""); }, 450);
+      if (step === "repeat") setTimeout(() => { setStep("choose"); setFirst(""); }, 450);
+    };
+    const type = (e) => {
+      const v = e.target.value.replace(/\D/g, "").slice(0, 6);
+      setValue(v); if (state === "bad") setState(null);
+      if (v.length === 6) done(v);
+    };
+    const title = { enter: "Enter your PIN", choose: "Choose a PIN of 6 digits", repeat: "Once more, to be sure" }[step];
+    const msg = state === "ok" ? (mode === "choose" ? "Your PIN is set." : "The vault is open, on this Mac and in Chrome.")
+      : state === "bad" ? (step === "choose" && mode === "choose" ? "The two did not match. Choose again." : "Wrong PIN. Try again.") : "";
+    return h("div", { className: "lock-stage" }, h("div", { className: "lock", role: "dialog", "aria-label": title },
+      h(Orb, { size: 64 }),
+      h("h2", null, "Iris"),
+      h("p", { className: "ask" }, title),
+      h("label", { className: "pins" + (shake ? " shake" : "") },
+        Array.from({ length: 6 }, (_, i) => h("span", { key: i, "aria-hidden": "true",
+          className: "pin" + (state === "ok" ? " ok" : state === "bad" ? " bad" : i === Math.min(value.length, 5) ? " at" : "") },
+          value[i] ? (show ? value[i] : "•") : "")),
+        h("input", { autoFocus: true, inputMode: "numeric", autoComplete: mode === "choose" ? "new-password" : "current-password",
+                     "aria-label": title, value, onChange: type, disabled: state === "ok" })),
+      h("p", { className: "msg " + (state ?? ""), role: "status" }, msg),
+      mode === "enter" ? h("p", { className: "ask" }, h("b", null, "Chrome"), " wants the vault: fills in your password on shop.example.com.") : null,
+      h("div", { className: "under" },
+        h("button", { onClick: () => setShow(!show), "aria-pressed": show }, show ? "Hide" : "Show"),
+        mode === "enter" ? h(React.Fragment, null, h("span", { "aria-hidden": "true" }, "·"), h("button", { className: "link" }, "Forgot your PIN?")) : null),
+      mode === "enter" ? h("p", { className: "demo" }, "Demo: 123456 opens, anything else shakes.") : null));
+  }
+
+  const Stage = ({ scene }) => scene.id === "pin" ? h("main", null, h(Pin, { mode: "enter" }))
+    : scene.id === "choose" ? h("main", null, h(Pin, { mode: "choose" }))
+    : scene.id === "vault" ? h("main", null, h(Vault))
     : h("main", { className: "three" }, h(Phone, { a: ASKS[scene.id] }), h("div", { className: "right" }, h(Mac, { a: ASKS[scene.id] }), h(Chrome, { a: ASKS[scene.id] })));
 
   window.exampleScenes({
@@ -176,8 +248,8 @@
     stage: Stage,
     scenes: [
       { id: "use", name: "Use one login",
-        ok: ["The same five lines on every device: who, from, why, what it does, how far", "A picture of the page she is on", "Names only, never a value, in the question"],
-        ask: ["Which device asks first: the phone, the Mac, or both at once?", "'Always for this site': how long is always?"] },
+        ok: ["Phone and Mac ask at the same time. The first answer wins, the other closes.", "The same five lines on every device: who, from, why, what it does, how far", "A picture of the page she is on", "Names only, never a value, in the question"],
+        ask: ["'Always for this site': how long is always?"] },
       { id: "names", name: "Only the names",
         ok: ["Says plainly that no value leaves the vault"], ask: ["Does reading names need Face ID at all?"] },
       { id: "store", name: "Save a new one",
@@ -185,6 +257,13 @@
       { id: "blind", name: "Nobody said why",
         ok: ["What nobody said shows as 'the asker did not say', in amber"],
         ask: ["No 'why': may she still ask, or does the vault refuse on its own?"] },
+      { sep: "Unlock" },
+      { id: "pin", name: "Unlock with PIN",
+        ok: ["Face ID or Touch ID first, the PIN only when they cannot", "Six digits open by themselves: no OK button", "A wrong PIN shakes once, short, and clears", "Who wants the vault and why stands under the PIN", "Open on the Mac means open in Chrome too"],
+        ask: [] },
+      { id: "choose", name: "Choose a PIN",
+        ok: ["Twice, the title says which time", "Two that do not match start over, with one line why"],
+        ask: [] },
       { sep: "Vault" },
       { id: "vault", name: "The vault itself",
         ok: ["Each item says when Iris last used it", "Values stay dots"],
