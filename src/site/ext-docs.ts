@@ -764,7 +764,7 @@ with her. Never put a Mark and an Orb on one screen.
 
 ## Which Iris, how big
 
-Three drawings of her, and each has its own sizes. What counts is the ring you see, not the box.
+Four drawings of her, and each has its own sizes. What counts is the ring you see, not the box.
 
 | Where | Take | size |
 |---|---|---|
@@ -775,13 +775,18 @@ Three drawings of her, and each has its own sizes. What counts is the ring you s
 | The Mac pill | \`TalkOrb\` | 60 |
 | The phone's tab bar | \`TalkOrb\` | 66 |
 | A logo: sign-in, lock screen, PIN pad | \`Mark\` | 48 to 96 |
-| The talk screen, the hero | \`TalkOrb\` | 120 or more |
+| The talk screen: she talks (the neon lines round her) or thinks (the neon arc) | \`TalkOrb\` | 120 or more |
+| The big moment: the first start, a hero on the web, a video | \`Orb3D\` | 100 or more |
 
 - The \`Orb\` is only ring: it fills its size. Its ring is as tall as the text next to it, never smaller.
 - The \`TalkOrb\` draws its ring at about a third of its size. The rest is room for the glow and the waves.
   So it is never smaller than 60: at 28 its ring is 9px, a dot next to 22px text.
 - Only these steps. A size between them is a bug, not a choice.
 - Small and live is an \`Orb\`. Big and live is a \`TalkOrb\`. Still is a \`Mark\`.
+- The neon lines (talking) and the neon arc (thinking) are the \`TalkOrb\`'s. They need room, so they never come
+  on an \`Orb\`: small, she talks with the ring's turn alone.
+- The \`Orb3D\` is glass and light, drawn with WebGL: one per screen, never in a bar or a row, and where WebGL is
+  missing it falls back to the flat \`Orb\`.
 `,
   Carousel: `# Carousel
 

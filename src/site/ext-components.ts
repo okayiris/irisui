@@ -533,7 +533,7 @@ const SPECS: Spec[] = [
   {
     name: "Mark",
     group: "Brand",
-    height: 260,
+    height: 300,
     summary: "Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.",
     props: [
       { name: "size", type: "number" },
@@ -541,7 +541,8 @@ const SPECS: Spec[] = [
     ],
     variants: [
       { label: "Lock screen size", code: `h(Mark, { size: 64 })` },
-      { label: "Three sizes", code: `h("div", { style: { display: "flex", gap: 40, alignItems: "center", padding: 24 } }, h(Mark, { size: 22 }), h(Mark, { size: 48 }), h(Mark, { size: 96 }))` },
+      { label: "Three sizes", code: `h("div", { style: { display: "flex", gap: 40, alignItems: "center", padding: 24 } }, h(Mark, { size: 48 }), h(Mark, { size: 64 }), h(Mark, { size: 96 }))` },
+      { label: "Which Iris, how big", code: `h("div", { style: { display: "flex", gap: 36, alignItems: "center", flexWrap: "wrap", padding: 12, font: "var(--text-sub)", color: "var(--dim)" } }, ...[["Orb 22", h(Orb, { size: 22 })], ["Orb 34", h(Orb, { size: 34, state: "listening" })], ["Mark 64", h(Mark, { size: 64 })], ["TalkOrb talking", h(TalkOrb, { size: 120, state: "talking" })], ["TalkOrb thinking", h(TalkOrb, { size: 120, state: "thinking" })], ["Orb3D", h(Orb3D, { size: 180 })]].map(([t, el]) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 10 } }, el, t)))` },
     ],
   },
   {

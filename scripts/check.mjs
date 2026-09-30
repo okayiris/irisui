@@ -230,9 +230,9 @@ for (const hit of scanForSecrets(DIST)) failures.push(hit);
 // ponytail: reads literal sizes in the example pages only; a size from a variable is not seen.
 const ORB_STEPS = [16, 22, 28, 34];
 for (const file of walk(join(DIST, "examples")).filter((f) => f.endsWith(".html"))) {
-  for (const [, name, size] of readFileSync(file, "utf8").matchAll(/h\((Orb|TalkOrb), \{[^}]*?size: (\d+)/g)) {
+  for (const [, name, size] of readFileSync(file, "utf8").matchAll(/h\((Orb|TalkOrb|Orb3D), \{[^}]*?size: (\d+)/g)) {
     const n = Number(size);
-    if (name === "TalkOrb" ? n < 60 : !ORB_STEPS.includes(n))
+    if (name === "Orb" ? !ORB_STEPS.includes(n) : n < (name === "TalkOrb" ? 60 : 100))
       failures.push(`${relative(DIST, file)}: ${name} at ${n}, not a step in "Which Iris, how big"`);
   }
 }
