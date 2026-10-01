@@ -91,7 +91,13 @@
   .checks li.x::before, .legend span.x::before { background: var(--error); }
   .checks li.x { color: var(--fg); }
   .phone.android .ia-scroll { padding-top: 50px; }
-  .phone.android .ia-tabbar { bottom: 16px; }
+  /* Android: the tab bar stands on a solid band, the gesture handle inside it, clear of the labels and the orb. */
+  .phone.android .ia-tabbar { bottom: 0; padding-bottom: 26px; background: linear-gradient(transparent, var(--bg) 35%); }
+  .phone.android .handle { bottom: 10px; }
+  /* The system icons: words and one battery shape, not glyphs. */
+  .sys { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .batt { width: 22px; height: 11px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px var(--fg); padding: 2px; display: inline-flex; }
+  .batt i { width: 80%; border-radius: 1px; background: var(--fg); }
   .wall .mini .ia-app { pointer-events: none; }
 
   /* All screens side by side. */
@@ -340,7 +346,7 @@
   function Phone({ path, onNavigate }) {
     return h("div", { className: "phone" + (android ? " android" : "") },
       h("div", { className: "island", "aria-hidden": "true" }),
-      h("div", { className: "status", "aria-hidden": "true" }, h("span", null, "21:04"), h("span", null, android ? "▾ ▴ ▮" : "●●●")),
+      h("div", { className: "status", "aria-hidden": "true" }, h("span", null, "21:04"), h("span", { className: "sys" }, "5G", h("span", { className: "batt" }, h("i", null)), "80%")),
       android ? h("div", { className: "handle", "aria-hidden": "true" }) : null,
       h(IrisApp, { spec: IRIS, start: path, onNavigate }));
   }
