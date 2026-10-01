@@ -9,7 +9,8 @@
 //
 // A Part is { c: "Row", title: "Voice", on: "push:voice" } with the component's own props. Strings may hold
 // {key} (state, or the item inside `each`). Actions: push:id, sheet:id, dialog:id, back, close, tab:i,
-// toggle:key, set:key=value, inc:key/max, snack:text, talk. Two-way state: `bind: "key"` on Toggle, Chip, Segmented,
+// toggle:key, set:key=value, inc:key/max, later:ms:action (commas for ;), snack:text, talk.
+// each + filter: searchKey / where: "field=={key}" narrow a list; a screen's top: { label, on } sits top right. Two-way state: `bind: "key"` on Toggle, Chip, Segmented,
 // Tabs, Slider, Select, TextArea, Field, SearchField, DatePicker, TimePicker, CheckList, Steps.
 
 import React, { useEffect, useRef, useState } from "react";
@@ -32,7 +33,8 @@ export type Screen = {
   actions?: { label: string; on?: Act; danger?: boolean }[]; // dialog
   body?: string; // dialog
   tab?: number;
-  status?: { state: string; label: string }; // her StatusPill, top left: only in an app without a tab bar
+  status?: { state: string; label: string };
+  top?: { label: string; on?: Act; icon?: string }; // one action top right in the header, always above the fold // her StatusPill, top left: only in an app without a tab bar
   bare?: boolean; // the AppBar shows only the way back: a part on the screen carries the title
 };
 export type AppSpec = {
@@ -70,7 +72,7 @@ function ratio(v: Any, state: Any) {
 /** "step==1", "when!=pick" or just "near": a condition on the state. */
 function test(cond: string, state: Any, item?: Any) {
   const m = /^([\w.$]+)\s*(==|!=)\s*(.*)$/.exec(cond);
-  if (!m) return !!fill(`{${cond}}`, state, item);
+  if (!m) { const v = fill(`{${cond}}`, state, item); return Array.isArray(v) ? v.length > 0 : !!v; }
   const v = String(fill(`{${m[1]}}`, state, item));
   return m[2] === "==" ? v === m[3] : v !== m[3];
 }
@@ -94,8 +96,12 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
   const { state, set, run } = ctx;
   const I = UI();
   if (p.each) {
-    const list = get(state, p.each) ?? [];
-    const { each, ...one } = p;
+    let list: Any[] = get(state, p.each) ?? [];
+    // filter: a state key holding search text, matched against every value of the item; where: "field==value".
+    const q = p.filter ? String(get(state, p.filter) ?? "").trim().toLowerCase() : "";
+    if (q) list = list.filter((it) => JSON.stringify(it).toLowerCase().includes(q));
+    if (p.where) { const [k, v] = String(fill(p.where, state)).split("=="); if (v !== undefined && v !== "") list = list.filter((it) => String(it?.[k]) === v); }
+    const { each, filter: _f, where: _w, ...one } = p;
     return h(React.Fragment, null, list.map((it: Any, i: number) => h(Part, { key: i, p: one, ctx, item: { ...(typeof it === "object" ? it : { v: it }), i } })));
   }
   if (p.if && !test(p.if, state, item)) return null;
@@ -103,7 +109,7 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
 
   const props: Any = {};
   for (const [k, v] of Object.entries(p)) {
-    if (["c", "on", "bind", "parts", "if", "unless", "add"].includes(k) || (v && typeof v === "object" && !Array.isArray(v) && "c" in (v as Any))) continue;
+    if (["c", "on", "bind", "parts", "if", "unless", "add", "filter", "where"].includes(k) || (v && typeof v === "object" && !Array.isArray(v) && "c" in (v as Any))) continue;
     props[k] = Array.isArray(v) ? v.map((x) => (typeof x === "string" ? fill(x, state, item) : x)) : ratio(fill(v, state, item), state);
   }
   const on = p.on ? fill(p.on, state, item) : undefined;
@@ -222,10 +228,12 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
     ? h(I.Button, { variant: "icon", label: "Back", onClick: () => ctx.run("back"),
         icon: h("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, icon("chevron", 18)) })
     : null;
+  const top = s.top ? h(I.Button, { variant: "glass", size: "sm", icon: s.top.icon ? icon(s.top.icon, 14) : undefined, onClick: () => s.top!.on && ctx.run(s.top!.on) }, fill(s.top.label, ctx.state)) : null;
   const body = h(React.Fragment, null,
     depth > 0
-      ? h(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back })
-      : h("header", { className: "ia-head" },
+      ? h(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back, actions: top })
+      : h("header", { className: "ia-head" + (top ? " ia-head-top" : "") },
+          top ? h("div", { className: "ia-top" }, top) : null,
           s.status ? h("div", { className: "ia-status" }, h(I.StatusPill, s.status)) : null,
           s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
           h("h1", { className: "ia-title" }, fill(s.title, ctx.state))),
@@ -299,6 +307,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
         else { setDir("out"); setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)); }
       } else if (verb === "tab") { setLayer({}); setDir(""); setStack([(spec.tabs ?? spec.rail)![Number(arg)].to]); }
       else if (verb === "toggle") setState((s) => ({ ...s, [arg]: !s[arg] }));
+      else if (verb === "later") { const [ms, ...a] = arg.split(":"); const next = a.join(":").replace(/,/g, ";"); setTimeout(() => run(next), Number(ms) || 1000); }
       else if (verb === "inc") { const [k, max] = arg.split("/"); setState((s) => ({ ...s, [k]: Math.min(Number(max ?? Infinity), (Number(s[k]) || 0) + 1) })); }
       else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v })); }
       else if (verb === "snack") setSnack(fill(arg, state));
