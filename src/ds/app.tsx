@@ -269,7 +269,7 @@ function Lede({ text, mark }: { text: string; mark?: { kind?: string; look?: str
   const bits = String(text).split(/(\*\*.+?\*\*|==.+?==)/g).filter(Boolean);
   return h("p", { className: "ia-lede" }, bits.map((b, i) =>
     b.startsWith("**") ? h("b", { key: i }, b.slice(2, -2))
-      : b.startsWith("==") ? (mark && I.Pen ? h(I.Pen, { key: i, kind: mark.kind ?? "underline", look: mark.look ?? "clean" }, b.slice(2, -2)) : h("b", { key: i }, b.slice(2, -2)))
+      : b.startsWith("==") ? (mark && I.Pen ? h("span", { key: i, className: "ia-mark" }, h(I.Pen, { kind: mark.kind ?? "underline", look: mark.look ?? "clean" }, b.slice(2, -2))) : h("b", { key: i }, b.slice(2, -2)))
         : b));
 }
 
@@ -367,8 +367,8 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
             // The one primary first, then the rest as glass: action is the primary, actions[] the others.
             [...(sheet.action && (!sheet.action.if || test(sheet.action.if, state)) ? [{ ...sheet.action, primary: true }] : []), ...(sheet.actions ?? [])].map((a: Any, i: number) =>
               h(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", topic: spec.topic, onClick: () => run(a.on ?? "close") }, fill(a.label, state))))) : null))) : null,
-      dialog ? h(I.Dialog, { open: true, onClose: () => run("close"), title: fill(dialog.title, state), body: fill(dialog.body, state),
-          actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on!), 0) })) }) : null));
+      dialog ? h(spec.topic ? I.Topic : React.Fragment, spec.topic ? { name: spec.topic } : null, h(I.Dialog, { open: true, onClose: () => run("close"), title: fill(dialog.title, state), body: fill(dialog.body, state),
+          actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on!), 0) })) })) : null));
 }
 
 /* ------------------------------------------------------------------- checks */
