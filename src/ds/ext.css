@@ -2884,7 +2884,7 @@ textarea.ix-textarea {
 .iris-widget {
   --iris-track: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#e3e9ee, #1a2027));
   background: linear-gradient(160deg, color-mix(in srgb, var(--kd, light-dark(#eaf4fa, #08183a)) 70%, light-dark(#ffffff, #0c0f14)), light-dark(#fbfcfd, #090b0f));
-  border-color: color-mix(in srgb, var(--k, var(--accent)) light-dark(22%, 16%), light-dark(#dde4ea, #1a2027));
+  border-color: light-dark(color-mix(in srgb, var(--k, var(--accent)) 22%, #dde4ea), color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027));
 }
 .iris-look-pattern, .iris-pattern { background: var(--kd, light-dark(#eaf4fa, #08183a)); }
 .iris-pattern { border-color: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#dde4ea, #1a2027)); }
@@ -2908,6 +2908,15 @@ textarea.ix-textarea {
 .iris-nowcard { background: linear-gradient(160deg, light-dark(#ffffff, #111a24), light-dark(#eef3f6, #0a0e14)); border-color: light-dark(var(--line), #1f2b36); }
 .iris-nowcard-text { color: light-dark(var(--dim), #c3cbd6); }
 .iris-nowcard-dots i { background: light-dark(#d5dde3, #243040); }
+
+/* ProgressRing's track and the muted mic's cut-out are SVG attributes in the release: a stylesheet wins over them. */
+.iris-pring circle:first-child {
+  stroke: light-dark(color-mix(in srgb, var(--k, var(--accent)) 18%, #e3e9ee), color-mix(in srgb, var(--k, var(--accent)) 18%, #0b0f0d));
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) path.gap { stroke: #ffffff; }
+}
+:root[data-mode="light"] path.gap { stroke: #ffffff; }
 
 /* Lettering drawn on a canvas (Word, ThemeWord): the release lightens it to read on a dark ground. On a light page
    the drawing is turned over, lightness inverted and the hue put back, so the same letters read dark. */
