@@ -130,12 +130,9 @@
     const busy = !stopped && step < 3;
     return { name: "Iris", start: "task",
       state: { sent: [], draft: "", paid: "ask", ...carry, stopped, closed: false },
-      screens: { task: { title: "Iris",
-        status: busy ? { state: "busy", label: "Using this tab" } : stopped ? { state: "idle", label: "Stopped. The page is yours again." } : { state: "idle" },
+      screens: { task: { title: "Iris", top: busy ? { label: "Stop", on: "set:stopped=true" } : { label: "Close", on: "set:closed=true" },
+        status: busy ? { state: "busy", label: "On this tab" } : stopped ? { state: "idle", label: "Stopped" } : { state: "idle" },
         parts: [
-          { c: "Buttons", stack: false, parts: [
-            ...(busy ? [{ c: "Button", variant: "glass", size: "sm", label: "Stop", on: "set:stopped=true" }] : []),
-            { c: "Button", variant: "text", size: "sm", label: "Close", on: "set:closed=true" }] },
           { c: "Group", parts: [{ c: "Row", icon: "person", title: "Order the party things on the list.", subtitle: "You" }] },
           { c: "Label", text: `Filling the basket, ${Math.min(step + 1, 4)} of 4` },
           { c: "Card", parts: [{ c: "CheckList", items: STEPS.slice(0, step + 1), done: STEPS.slice(0, step + 1).map((_, i) => i).filter((i) => i < step || !busy) }] },
