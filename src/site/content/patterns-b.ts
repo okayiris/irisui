@@ -61,7 +61,7 @@ export const PATTERNS_B: Record<string, Doc> = {
             kind: "ul",
             items: [
               "One control per row. A toggle and a chevron on one row means the row is two things.",
-              "The subtitle is a sentence with the effect in it: \"Blocks, voice, notifications and how the assistant talks here.\"",
+              "The subtitle is a sentence with the effect in it: \"Blocks, voice, notifications and how she talks here.\"",
               "A menu value shows the current choice, in the person's words, never a blank and never a code.",
               "A value is the shortest true form: a name, a unit, a count. The unit lives in the value, not in the title.",
             ],

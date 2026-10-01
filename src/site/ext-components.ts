@@ -527,7 +527,7 @@ const SPECS: Spec[] = [
     h(Mark, { size: 64 }),
     h("div", { style: { fontSize: 13, color: "var(--label)" } }, "Look at your phone to open"))` },
       { label: "Three sizes", code: `h("div", { style: { display: "flex", flexWrap: "wrap", gap: 32, alignItems: "center", padding: 16 } }, h(Mark, { size: 48 }), h(Mark, { size: 64 }), h(Mark, { size: 96 }))` },
-      { label: "Which Iris, how big", code: `h("div", { style: { display: "flex", gap: 36, alignItems: "center", flexWrap: "wrap", padding: 12, font: "var(--text-sub)", color: "var(--dim)" } }, ...[["Orb 22", h(Orb, { size: 22 })], ["Orb 34", h(Orb, { size: 34, state: "listening" })], ["Mark 64", h(Mark, { size: 64 })], ["TalkOrb talking", h(TalkOrb, { size: 120, state: "talking" })], ["TalkOrb thinking", h(TalkOrb, { size: 120, state: "thinking" })], ["Orb3D", h(Orb3D, { size: 180 })]].map(([t, el]) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 10 } }, el, t)))` },
+      { label: "Which Iris, how big", code: `h("div", { style: { display: "flex", gap: 36, alignItems: "center", flexWrap: "wrap", padding: 12, font: "var(--text-sub)", color: "var(--dim)" } }, ...[["Orb 22", h(Orb, { size: 22 })], ["Orb 34", h(Orb, { size: 34, state: "listening" })], ["Mark 64", h(Mark, { size: 64 })], ["TalkOrb talking", h(TalkOrb, { size: 120, state: "talking" })], ["TalkOrb thinking", h(TalkOrb, { size: 120, state: "thinking" })], ["Orb3D", h(Orb3D, { size: 180 })]].map(([t, el]) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 22 } }, el, t)))` },
     ],
   },
   {
@@ -551,7 +551,10 @@ const SPECS: Spec[] = [
   return h("div", { style: { display: "flex", gap: 20, alignItems: "center", padding: 16 } },
     h(TalkOrb, { size: 90, state: "thinking", thinking: THINKING[n % THINKING.length] }),
     h("div", { style: { display: "grid", gap: 4 } }, h("div", { style: { fontSize: 17 } }, "Comparing three quotes"), h("div", { style: { fontSize: 13, color: "var(--label)" } }, "Each time she thinks, the light runs another way"))); }` },
-      { label: "Round a screen, while it reloads", code: `h("div", { style: { padding: 20 } }, h(Edge, { pattern: "comet", shape: "rect", width: 180, height: 120, radius: 28 }))` },
+      { label: "Round a card, while she rebuilds it", code: `h("div", { style: { position: "relative", width: 240, height: 132, margin: 8 } },
+    h(Card, { style: { height: "100%", boxSizing: "border-box", display: "grid", alignContent: "center", gap: 4 } },
+      h("div", { style: { fontSize: 17 } }, "Groceries for Saturday"), h("div", { style: { fontSize: 13, color: "var(--label)" } }, "She is adding what the recipe needs")),
+    h("div", { style: { position: "absolute", inset: 0, pointerEvents: "none" } }, h(Edge, { pattern: "comet", shape: "rect", width: 240, height: 132, radius: 18 })))` },
     ],
   },
   {

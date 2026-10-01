@@ -102,6 +102,11 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
   },
 
   statuspill: {
+    demos: [
+      { label: "Word", code: `() => h(StatusPill, { state: "busy", label: "Busy" })` },
+      { label: "Action", code: `() => h(StatusPill, { action: "Continue here", onAction: () => {} })` },
+      { label: "Away", code: `() => h(StatusPill, { state: "away", label: "Reconnecting" })` },
+    ],
     when: "Top left of every screen, while she is doing something or has exactly one action to offer.",
     parts: [
       { name: "orb", what: "the flat orb at its state, 22pt" },
@@ -158,6 +163,14 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
   },
 
   pagedots: {
+    demos: [
+      { label: "Groceries", code: `() => { const [a, set] = React.useState(1); return h(PageDots, { count: 4, active: a, onSelect: set, topic: "groceries", labels: ["List", "Shops", "History", "Spending"] }); }` },
+      { label: "On a photo", code: `() => { const [a, set] = React.useState(2);
+  return h("div", { style: { position: "relative", maxWidth: 360 } },
+    h(Photo, { kind: "duotone", topic: "weather", alt: "A figure in front of two ridges at dusk" }),
+    h("div", { style: { position: "absolute", left: 0, right: 0, bottom: 12, display: "flex", justifyContent: "center" } },
+      h(PageDots, { count: 5, active: a, onSelect: set, topic: "weather", dark: true, labels: ["Mon", "Tue", "Wed", "Thu", "Fri"] }))); }` },
+    ],
     when: "Under screens a thumb swipes through, when the count matters to the person.",
     parts: [
       { name: "dot", what: "7px, 30% of the topic colour, in 2px gaps" },

@@ -340,6 +340,10 @@ export const OVERRIDES_CORE: Record<string, Override> = {
   },
 
   segmented: {
+    demos: [
+      { label: "Tabs", code: `() => { const [a, set] = React.useState(0); return h(Segmented, { topic: "groceries", items: ["List", "Shops", "History"], active: a, onSelect: set }); }` },
+      { label: "In the agenda topic", code: `() => { const [a, set] = React.useState(1); return h(Segmented, { topic: "agenda", items: ["Day", "Week", "Month"], active: a, onSelect: set }); }` },
+    ],
     when: "Two to four views of one thing, inside a card.",
     parts: [
       { name: "items", what: "Two to four short words; the tabs." },
@@ -416,6 +420,12 @@ export const OVERRIDES_CORE: Record<string, Override> = {
   },
 
   progress: {
+    demos: [
+      { label: "Bar", code: `() => h("div", { style: { display: "grid", gap: 8, maxWidth: 360 } },
+  h("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 13 } }, h("span", null, "Groceries"), h("span", { style: { color: "var(--label)" } }, "3 of 8")),
+  h(Progress, { topic: "groceries", value: 3 / 8 }))` },
+      { label: "Ring", code: `() => h(Progress, { topic: "agenda", ring: true, size: 90, value: 0.4, centre: "3", caption: "to go" })` },
+    ],
     when: "How far something is: a thin bar by default, or a ring with a value in the middle.",
     parts: [
       { name: "value", what: "0 to 1 of the bar or the ring." },

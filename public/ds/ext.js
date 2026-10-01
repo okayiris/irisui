@@ -265,7 +265,7 @@
       h2(I.Button, { variant: "glass", onClick: () => ctx.run("back") }, "Close")
     );
   }
-  function IrisApp({ spec, start, onNavigate, frame = "phone" }) {
+  function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }) {
     const I = UI();
     const path = (Array.isArray(start) ? start : [start ?? spec.start]).filter((id2) => spec.screens[id2]);
     const pages = path.filter((id2) => !["sheet", "dialog"].includes(spec.screens[id2].kind ?? "page"));
@@ -287,6 +287,9 @@
       onNavigate?.(stack[stack.length - 1]);
       scroller.current?.scrollTo({ top: 0 });
     }, [stack]);
+    useEffect(() => {
+      onState?.(state);
+    }, [state]);
     useEffect(() => {
       if (!snack) return;
       const t = setTimeout(() => setSnack(null), 3600);
@@ -372,7 +375,12 @@
             "div",
             { className: "ia-sheet-body" },
             (sheet.parts ?? []).map((p, i) => h2(Part, { key: i, p, ctx })),
-            sheet.action ? h2("div", { className: "ia-action" }, h2(I.Button, { variant: sheet.action.danger ? "danger" : "primary", size: "lg", onClick: () => run(sheet.action.on ?? "close") }, fill(sheet.action.label, state))) : null
+            sheet.action || sheet.actions ? h2("div", { className: "ia-action" }, h2(
+              I.ButtonGroup,
+              { stack: true },
+              // The one primary first, then the rest as glass: action is the primary, actions[] the others.
+              [...sheet.action ? [{ ...sheet.action, primary: true }] : [], ...sheet.actions ?? []].map((a, i) => h2(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", onClick: () => run(a.on ?? "close") }, fill(a.label, state)))
+            )) : null
           )
         ) : null,
         dialog ? h2(I.Dialog, {
