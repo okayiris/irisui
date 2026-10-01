@@ -35,7 +35,10 @@
   }
   function test(cond, state, item) {
     const m = /^([\w.$]+)\s*(==|!=)\s*(.*)$/.exec(cond);
-    if (!m) return !!fill(`{${cond}}`, state, item);
+    if (!m) {
+      const v2 = fill(`{${cond}}`, state, item);
+      return Array.isArray(v2) ? v2.length > 0 : !!v2;
+    }
     const v = String(fill(`{${m[1]}}`, state, item));
     return m[2] === "==" ? v === m[3] : v !== m[3];
   }
@@ -60,15 +63,21 @@
     const { state, set, run } = ctx;
     const I = UI();
     if (p.each) {
-      const list = get(state, p.each) ?? [];
-      const { each, ...one } = p;
+      let list = get(state, p.each) ?? [];
+      const q = p.filter ? String(get(state, p.filter) ?? "").trim().toLowerCase() : "";
+      if (q) list = list.filter((it) => JSON.stringify(it).toLowerCase().includes(q));
+      if (p.where) {
+        const [k, v] = String(fill(p.where, state)).split("==");
+        if (v !== void 0 && v !== "") list = list.filter((it) => String(it?.[k]) === v);
+      }
+      const { each, filter: _f, where: _w, ...one } = p;
       return h2(react_shim_default.Fragment, null, list.map((it, i) => h2(Part, { key: i, p: one, ctx, item: { ...typeof it === "object" ? it : { v: it }, i } })));
     }
     if (p.if && !test(p.if, state, item)) return null;
     if (p.unless && test(p.unless, state, item)) return null;
     const props = {};
     for (const [k, v] of Object.entries(p)) {
-      if (["c", "on", "bind", "parts", "if", "unless", "add"].includes(k) || v && typeof v === "object" && !Array.isArray(v) && "c" in v) continue;
+      if (["c", "on", "bind", "parts", "if", "unless", "add", "filter", "where"].includes(k) || v && typeof v === "object" && !Array.isArray(v) && "c" in v) continue;
       props[k] = Array.isArray(v) ? v.map((x) => typeof x === "string" ? fill(x, state, item) : x) : ratio(fill(v, state, item), state);
     }
     const on = p.on ? fill(p.on, state, item) : void 0;
@@ -149,6 +158,7 @@
             if (!t) return;
             if (p.add) set(p.add, [...get(state, p.add) ?? [], t]);
             set(b, "");
+            if (p.on) run(fill(p.on, { ...state, [b]: t }));
           } },
           h2(I.Field, { ...props, "aria-label": props.placeholder, value: val ?? "", onChange: (e) => set(b, e.target.value) })
         );
@@ -221,12 +231,14 @@
       onClick: () => ctx.run("back"),
       icon: h2("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, icon("chevron", 18))
     }) : null;
+    const top = s.top ? h2(I.Button, { variant: "glass", size: "sm", icon: s.top.icon ? icon(s.top.icon, 14) : void 0, onClick: () => s.top.on && ctx.run(s.top.on) }, fill(s.top.label, ctx.state)) : null;
     const body = h2(
       react_shim_default.Fragment,
       null,
-      depth > 0 ? h2(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back }) : h2(
+      depth > 0 ? h2(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back, actions: top }) : h2(
         "header",
-        { className: "ia-head" },
+        { className: "ia-head" + (top ? " ia-head-top" : "") },
+        top ? h2("div", { className: "ia-top" }, top) : null,
         s.status ? h2("div", { className: "ia-status" }, h2(I.StatusPill, s.status)) : null,
         s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
         h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
@@ -322,12 +334,16 @@
           setDir("");
           setStack([(spec.tabs ?? spec.rail)[Number(arg)].to]);
         } else if (verb === "toggle") setState((s2) => ({ ...s2, [arg]: !s2[arg] }));
-        else if (verb === "inc") {
+        else if (verb === "later") {
+          const [ms, ...a2] = arg.split(":");
+          const next = a2.join(":").replace(/,/g, ";");
+          setTimeout(() => run(next), Number(ms) || 1e3);
+        } else if (verb === "inc") {
           const [k, max] = arg.split("/");
           setState((s2) => ({ ...s2, [k]: Math.min(Number(max ?? Infinity), (Number(s2[k]) || 0) + 1) }));
         } else if (verb === "set") {
           const [k, v] = arg.split("=");
-          setState((s2) => ({ ...s2, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v }));
+          setState((s2) => ({ ...s2, [k]: v === "true" ? true : v === "false" ? false : v === "" || isNaN(+v) ? v : +v }));
         } else if (verb === "snack") setSnack(fill(arg, state));
         else if (verb === "talk") {
           const t = Object.keys(spec.screens).find((id2) => spec.screens[id2].kind === "talk");
@@ -2222,6 +2238,166 @@
   }
   var TalkOrbThinks = thinksWith(window.IrisUi?.TalkOrb, 70 / 60, 66);
   var Orb3DThinks = thinksWith(window.IrisUi?.Orb3D, 0.72, 220);
+  function MacPill({
+    state = "rest",
+    onPress,
+    left = [],
+    right = [],
+    open,
+    badge,
+    words,
+    status,
+    back,
+    working,
+    size = 60
+  }) {
+    const UI2 = window.IrisUi ?? {};
+    const [hand, setHand] = useState(false);
+    const [out, setOut] = useState(false);
+    useEffect(() => {
+      const t = window.setTimeout(() => setOut(hand), hand ? 180 : 700);
+      return () => window.clearTimeout(t);
+    }, [hand]);
+    const shown = open ?? (out || state === "listening");
+    const slot = 46;
+    const l = left.length * slot, r = right.length * slot, gap = size + 8, width = 8 + l + gap + r;
+    const button = (a, i) => h3(
+      "span",
+      { key: a.key ?? a.label + i, className: "ix-pill-btn", "data-on": a.active ? "1" : void 0 },
+      h3(Tooltip, { label: a.label }, houseButton({ variant: "icon", label: a.label, icon: UI2.Icon ? h3(UI2.Icon, { name: a.icon, size: 16 }) : null, onClick: a.onSelect }, null))
+    );
+    const orb = UI2.TalkOrb ? h3(UI2.TalkOrb, { state, size, onPress }) : null;
+    return h3(
+      "div",
+      { className: "ix-macpill", style: { "--pill-orb": size + "px" } },
+      words ? h3("p", { className: "ix-pill-words", "aria-live": "polite" }, "\u201C" + words + "\u201D") : null,
+      h3(
+        "div",
+        {
+          className: "ix-pill-stage",
+          onMouseEnter: () => setHand(true),
+          onMouseLeave: () => setHand(false),
+          onFocus: () => setHand(true),
+          onBlur: () => setHand(false)
+        },
+        left.length || right.length ? h3(
+          "div",
+          { className: "ix-pill-bar", "data-open": shown ? "1" : "0", style: { width, left: size / 2 - width / 2 + (r - l) / 2 } },
+          h3("div", { className: "ix-pill-side", style: { width: l, justifyContent: "flex-end" } }, left.map(button)),
+          h3("div", { style: { width: gap, flex: "none" } }),
+          h3("div", { className: "ix-pill-side", style: { width: r } }, right.map(button))
+        ) : null,
+        working ? h3("span", { className: "ix-pill-work", "aria-hidden": "true" }, h3(Edge, { pattern: "comet", shape: "ring", width: size + 10, stroke: 2 })) : null,
+        h3("div", { className: "ix-pill-orb" }, badge ? h3(Badge, { count: badge }, orb) : orb)
+      ),
+      status ? h3(
+        "div",
+        { className: "ix-pill-status", role: "status" },
+        h3("span", null, status),
+        back ? houseButton({ variant: back.variant ?? "text", size: "sm", onClick: back.onClick }, back.label) : null
+      ) : null
+    );
+  }
+  var VAULT_SCOPE = {
+    names: "Only the names are read. No value leaves the vault.",
+    use: "One value is used for this, and never shown to Iris.",
+    store: "A new secret is stored in your vault."
+  };
+  function VaultAsk({
+    title,
+    who,
+    from,
+    why,
+    does,
+    scope = "use",
+    biometric = "Face ID",
+    onAllow,
+    onAlways,
+    onDeny,
+    allowLabel,
+    denyLabel = "No"
+  }) {
+    const id = useId();
+    const unsaid = "the asker did not say";
+    const yes = allowLabel ?? (scope === "store" ? "Save with " : "Allow once with ") + biometric;
+    const facts = [["Who", who], ["From", from], ["Why", why], ["Does", does]];
+    return h3(
+      "section",
+      { className: "ix-vaultask", "aria-labelledby": id },
+      h3("h2", { className: "ix-vaultask-title", id }, title),
+      h3(
+        "dl",
+        { className: "ix-vaultask-facts" },
+        facts.map(([k, v]) => h3("div", { key: k, className: "ix-vaultask-fact" }, h3("dt", null, k), h3("dd", { "data-unsaid": v ? void 0 : "1" }, v || unsaid)))
+      ),
+      h3("p", { className: "ix-vaultask-scope" }, VAULT_SCOPE[scope]),
+      why ? null : h3("p", { className: "ix-vaultask-note" }, "Nobody said why. Ask Iris first, or say no."),
+      h3(
+        "div",
+        { className: "ix-vaultask-actions" },
+        houseButton({ variant: "primary", size: "lg", onClick: onAllow }, yes),
+        onAlways && scope === "use" && why ? houseButton({ variant: "glass", onClick: onAlways }, "Always for this site") : null,
+        houseButton({ variant: "text", onClick: onDeny }, denyLabel)
+      )
+    );
+  }
+  function TableApp({
+    title,
+    rows = [],
+    filters = [],
+    search = true,
+    placeholder,
+    noun = "items",
+    actions,
+    empty,
+    topic
+  }) {
+    const UI2 = window.IrisUi ?? {};
+    const [q, setQ] = useState("");
+    const [filter, setFilter] = useState("All");
+    const [open, setOpen] = useState(null);
+    const shown = rows.map((row, i) => ({ row, i })).filter(({ row }) => filter === "All" || (row.tags ?? []).includes(filter)).filter(({ row }) => (row.title + " " + (row.subtitle ?? "")).toLowerCase().includes(q.trim().toLowerCase()));
+    const it = open === null ? null : rows[open];
+    const chips = filters.length ? ["All", ...filters] : [];
+    return h3(
+      "div",
+      { className: "ix-table" },
+      h3(AppBar, {
+        title,
+        actions: h3(
+          react_shim_default.Fragment,
+          null,
+          search ? h3("div", { className: "ix-table-search" }, h3(SearchField, { value: q, onChange: setQ, placeholder: placeholder ?? `Search ${title.charAt(0).toLowerCase()}${title.slice(1)}` })) : null,
+          actions ?? null
+        )
+      }),
+      h3(
+        "div",
+        { className: "ix-table-body" },
+        chips.length && UI2.Chip ? h3("div", { className: "ix-table-chips", role: "group", "aria-label": "Show" }, chips.map((c) => h3(UI2.Chip, { key: c, on: c === filter, topic, onClick: () => setFilter(c) }, c))) : null,
+        shown.length && UI2.Card && UI2.Row ? h3(
+          UI2.Card,
+          { padding: 0 },
+          shown.map(
+            ({ row, i }) => h3(UI2.Row, {
+              key: row.id ?? row.title + i,
+              title: row.title,
+              subtitle: row.subtitle,
+              icon: row.icon && UI2.Icon ? h3(UI2.Icon, { name: row.icon }) : void 0,
+              chevron: !!row.detail,
+              onClick: row.detail ? () => setOpen(i) : void 0
+            })
+          )
+        ) : h3("p", { className: "ix-table-empty" }, q ? `Nothing in ${title.toLowerCase()} matches \u201C${q}\u201D.` : empty ?? "Nothing here yet."),
+        h3("p", { className: "ix-table-count", "aria-live": "polite" }, `${shown.length} of ${rows.length} ${noun}`)
+      ),
+      it ? h3(
+        "div",
+        { className: "ia-layer" },
+        h3(Sheet, { open: true, side: "end", title: it.title, sub: it.subtitle, onClose: () => setOpen(null) }, it.detail)
+      ) : null
+    );
+  }
   var TOPIC_FIX = {
     mail: ["#94a3b8", "#cbd5e1", "#121821"],
     sport: ["#fb923c", "#fdba74", "#26140a"],
@@ -2312,6 +2488,9 @@
     EdgeText,
     THINKING,
     Toggle,
+    MacPill,
+    VaultAsk,
+    TableApp,
     ...BaseWord ? { Word } : {},
     ...TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {},
     ...Orb3DThinks ? { Orb3D: Orb3DThinks } : {}

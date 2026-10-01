@@ -17,7 +17,13 @@ import { OVERRIDES_APPS } from "./content/overrides-apps";
 import { RESOURCE_DOCS_EXT } from "./content/resources";
 
 /** The published system plus the parts this project added, in the sidebar's own order. */
-export const components: Component[] = [...loadComponents().map(withDemos), ...EXT_COMPONENTS].sort((a, b) => {
+export const components: Component[] = [
+  // A part this project rebuilt as a real component (MacPill, TableApp) replaces the release's recipe of that name.
+  ...loadComponents()
+    .filter((c) => !EXT_COMPONENTS.some((e) => e.id === c.id))
+    .map(withDemos),
+  ...EXT_COMPONENTS,
+].sort((a, b) => {
   const at = GROUPS.findIndex((g) => g.key === groupOf(a));
   const bt = GROUPS.findIndex((g) => g.key === groupOf(b));
   return at - bt || a.name.localeCompare(b.name);

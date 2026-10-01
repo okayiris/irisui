@@ -2096,6 +2096,255 @@ function thinksWith(Base: Any, ring: number, fallback: number) {
 const TalkOrbThinks = thinksWith((window as Any).IrisUi?.TalkOrb, 70 / 60, 66);
 const Orb3DThinks = thinksWith((window as Any).IrisUi?.Orb3D, 0.72, 220);
 
+/* ---------------------------------------------------------------- MacPill */
+
+export type PillAction = { key?: string; label: string; icon: string; active?: boolean; onSelect?: () => void };
+
+/**
+ * Iris on the Mac desktop: only her orb, and a bar of buttons that grows out from behind it when the hand rests
+ * on it. Her words stand above the orb, one state line under it with the way back beside it, a badge counts what
+ * is new. The orb is the TalkOrb: a press talks to her.
+ */
+export function MacPill({
+  state = "rest",
+  onPress,
+  left = [],
+  right = [],
+  open,
+  badge,
+  words,
+  status,
+  back,
+  working,
+  size = 60,
+}: {
+  state?: string;
+  onPress?: () => void;
+  left?: PillAction[];
+  right?: PillAction[];
+  /** Holds the bar out. Without it the bar grows on hover and focus and folds away after a moment. */
+  open?: boolean;
+  badge?: number;
+  words?: string;
+  status?: string;
+  back?: { label: string; onClick?: () => void; variant?: "text" | "glass" };
+  working?: boolean;
+  size?: number;
+}) {
+  const UI = (window as Any).IrisUi ?? {};
+  const [hand, setHand] = useState(false);
+  const [out, setOut] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setOut(hand), hand ? 180 : 700);
+    return () => window.clearTimeout(t);
+  }, [hand]);
+  const shown = open ?? (out || state === "listening");
+  const slot = 46; // a house icon button is 44px, and 2px between
+  const l = left.length * slot, r = right.length * slot, gap = size + 8, width = 8 + l + gap + r;
+  const button = (a: PillAction, i: number) =>
+    h(
+      "span",
+      { key: a.key ?? a.label + i, className: "ix-pill-btn", "data-on": a.active ? "1" : undefined },
+      h(Tooltip, { label: a.label }, houseButton({ variant: "icon", label: a.label, icon: UI.Icon ? h(UI.Icon, { name: a.icon, size: 16 }) : null, onClick: a.onSelect }, null)),
+    );
+  const orb = UI.TalkOrb ? h(UI.TalkOrb, { state, size, onPress }) : null;
+  return h(
+    "div",
+    { className: "ix-macpill", style: { "--pill-orb": size + "px" } },
+    words ? h("p", { className: "ix-pill-words", "aria-live": "polite" }, "“" + words + "”") : null,
+    h(
+      "div",
+      {
+        className: "ix-pill-stage",
+        onMouseEnter: () => setHand(true),
+        onMouseLeave: () => setHand(false),
+        onFocus: () => setHand(true),
+        onBlur: () => setHand(false),
+      },
+      left.length || right.length
+        ? h(
+            "div",
+            { className: "ix-pill-bar", "data-open": shown ? "1" : "0", style: { width, left: size / 2 - width / 2 + (r - l) / 2 } },
+            h("div", { className: "ix-pill-side", style: { width: l, justifyContent: "flex-end" } }, left.map(button)),
+            h("div", { style: { width: gap, flex: "none" } }),
+            h("div", { className: "ix-pill-side", style: { width: r } }, right.map(button)),
+          )
+        : null,
+      working ? h("span", { className: "ix-pill-work", "aria-hidden": "true" }, h(Edge, { pattern: "comet", shape: "ring", width: size + 10, stroke: 2 })) : null,
+      h("div", { className: "ix-pill-orb" }, badge ? h(Badge, { count: badge }, orb) : orb),
+    ),
+    status
+      ? h(
+          "div",
+          { className: "ix-pill-status", role: "status" },
+          h("span", null, status),
+          back ? houseButton({ variant: back.variant ?? "text", size: "sm", onClick: back.onClick }, back.label) : null,
+        )
+      : null,
+  );
+}
+
+/* ---------------------------------------------------------------- VaultAsk */
+
+const VAULT_SCOPE = {
+  names: "Only the names are read. No value leaves the vault.",
+  use: "One value is used for this, and never shown to Iris.",
+  store: "A new secret is stored in your vault.",
+};
+
+/**
+ * The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches,
+ * then allow or deny. A line nobody filled in is said out loud, never left blank.
+ */
+export function VaultAsk({
+  title,
+  who,
+  from,
+  why,
+  does,
+  scope = "use",
+  biometric = "Face ID",
+  onAllow,
+  onAlways,
+  onDeny,
+  allowLabel,
+  denyLabel = "No",
+}: {
+  title: string;
+  who: string;
+  from: string;
+  why?: string | null;
+  does?: string | null;
+  scope?: "names" | "use" | "store";
+  /** How the person confirms: "Face ID" on a phone, "Touch ID" on a Mac. */
+  biometric?: string;
+  onAllow?: () => void;
+  /** Offers "Always for this site" next to allow; only for a use with a reason. */
+  onAlways?: () => void;
+  onDeny?: () => void;
+  allowLabel?: string;
+  denyLabel?: string;
+}) {
+  const id = useId();
+  const unsaid = "the asker did not say";
+  const yes = allowLabel ?? (scope === "store" ? "Save with " : "Allow once with ") + biometric;
+  const facts: [string, string | null | undefined][] = [["Who", who], ["From", from], ["Why", why], ["Does", does]];
+  return h(
+    "section",
+    { className: "ix-vaultask", "aria-labelledby": id },
+    h("h2", { className: "ix-vaultask-title", id }, title),
+    h(
+      "dl",
+      { className: "ix-vaultask-facts" },
+      facts.map(([k, v]) => h("div", { key: k, className: "ix-vaultask-fact" }, h("dt", null, k), h("dd", { "data-unsaid": v ? undefined : "1" }, v || unsaid))),
+    ),
+    h("p", { className: "ix-vaultask-scope" }, VAULT_SCOPE[scope]),
+    why ? null : h("p", { className: "ix-vaultask-note" }, "Nobody said why. Ask Iris first, or say no."),
+    h(
+      "div",
+      { className: "ix-vaultask-actions" },
+      houseButton({ variant: "primary", size: "lg", onClick: onAllow }, yes),
+      onAlways && scope === "use" && why ? houseButton({ variant: "glass", onClick: onAlways }, "Always for this site") : null,
+      houseButton({ variant: "text", onClick: onDeny }, denyLabel),
+    ),
+  );
+}
+
+/* ---------------------------------------------------------------- TableApp */
+
+export type TableRow = {
+  id?: string;
+  title: string;
+  subtitle?: string;
+  icon?: string;
+  /** The filter chips this row belongs to, besides "All". */
+  tags?: string[];
+  /** What the sheet shows when the row opens. Without it the row does not open. */
+  detail?: Any;
+};
+
+/**
+ * A list you can search, filter and open: search in the AppBar, filter chips under it, the rows on one Card, a
+ * count line, and a row that opens its detail in a Sheet from the side.
+ */
+export function TableApp({
+  title,
+  rows = [],
+  filters = [],
+  search = true,
+  placeholder,
+  noun = "items",
+  actions,
+  empty,
+  topic,
+}: {
+  title: string;
+  rows?: TableRow[];
+  filters?: string[];
+  search?: boolean;
+  placeholder?: string;
+  /** The word the count line uses: "4 of 12 invoices". */
+  noun?: string;
+  actions?: Any;
+  empty?: string;
+  topic?: string;
+}) {
+  const UI = (window as Any).IrisUi ?? {};
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [open, setOpen] = useState<number | null>(null);
+  const shown = rows
+    .map((row, i) => ({ row, i }))
+    .filter(({ row }) => filter === "All" || (row.tags ?? []).includes(filter))
+    .filter(({ row }) => (row.title + " " + (row.subtitle ?? "")).toLowerCase().includes(q.trim().toLowerCase()));
+  const it = open === null ? null : rows[open];
+  const chips = filters.length ? ["All", ...filters] : [];
+  return h(
+    "div",
+    { className: "ix-table" },
+    h(AppBar, {
+      title,
+      actions: h(
+        React.Fragment,
+        null,
+        search ? h("div", { className: "ix-table-search" }, h(SearchField, { value: q, onChange: setQ, placeholder: placeholder ?? `Search ${title.charAt(0).toLowerCase()}${title.slice(1)}` })) : null,
+        actions ?? null,
+      ),
+    }),
+    h(
+      "div",
+      { className: "ix-table-body" },
+      chips.length && UI.Chip
+        ? h("div", { className: "ix-table-chips", role: "group", "aria-label": "Show" }, chips.map((c) => h(UI.Chip, { key: c, on: c === filter, topic, onClick: () => setFilter(c) }, c)))
+        : null,
+      shown.length && UI.Card && UI.Row
+        ? h(
+            UI.Card,
+            { padding: 0 },
+            shown.map(({ row, i }) =>
+              h(UI.Row, {
+                key: row.id ?? row.title + i,
+                title: row.title,
+                subtitle: row.subtitle,
+                icon: row.icon && UI.Icon ? h(UI.Icon, { name: row.icon }) : undefined,
+                chevron: !!row.detail,
+                onClick: row.detail ? () => setOpen(i) : undefined,
+              }),
+            ),
+          )
+        : h("p", { className: "ix-table-empty" }, q ? `Nothing in ${title.toLowerCase()} matches “${q}”.` : empty ?? "Nothing here yet."),
+      h("p", { className: "ix-table-count", "aria-live": "polite" }, `${shown.length} of ${rows.length} ${noun}`),
+    ),
+    it
+      ? h(
+          "div",
+          { className: "ia-layer" },
+          h(Sheet, { open: true, side: "end", title: it.title, sub: it.subtitle, onClose: () => setOpen(null) }, it.detail),
+        )
+      : null,
+  );
+}
+
 // Three topic colours of the release broke the colour rules: mail was violet (violet means on and the ring), sport
 // was red (red means destructive), tasks magenta (the ring's colour). The release keeps its topics in one table on
 // IrisUi.design; the colours are changed in place, so every part that asks for a topic later gets the new ones.
@@ -2199,6 +2448,9 @@ const SHIPPED = {
   EdgeText,
   THINKING,
   Toggle,
+  MacPill,
+  VaultAsk,
+  TableApp,
   ...(BaseWord ? { Word } : {}),
   ...(TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {}),
   ...(Orb3DThinks ? { Orb3D: Orb3DThinks } : {}),

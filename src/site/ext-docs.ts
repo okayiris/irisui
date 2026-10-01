@@ -3,6 +3,97 @@
 // the component when these parts move into the artifact.
 
 export const extDocs: Record<string, string> = {
+  MacPill: `# MacPill
+
+Iris on the Mac desktop. At rest it is only her orb, low in the middle of the screen. When the hand rests on it, a
+bar of buttons grows out from behind the orb; it folds away a moment after the hand leaves. Her words stand above
+the orb, one state line under it, with the way back beside that line.
+
+## When
+
+- The one place Iris lives on a Mac desktop. One per screen: the pill is her, so no second orb anywhere near it.
+- Panels (chats, calls, the vault, settings) open above the pill from the buttons in its bar.
+
+## The parts
+
+\`left\` and \`right\` are the buttons either side of the orb: \`{ label, icon, active, onSelect }\`, a house icon
+name each, the label is the tooltip and the accessible name. \`state\` is the TalkOrb's state; a press on the orb
+calls \`onPress\`. \`words\` is what she says, above the orb. \`status\` is one line under it, \`back\` the way out
+of that state ("Turn sound on", "Try now"). \`badge\` counts what is new, in the accent. \`working\` runs the Edge
+light round the orb while she works on something. \`open\` holds the bar out.
+
+## Rules
+
+- No state word while she talks: the orb already talks. Thinking, muted and away say it in words too.
+- A state that stops her (muted, away) always has its way back next to the line.
+- The badge is a count of new things, never a colour of its own.
+- Working is light round the orb and a line that says what she does, not only a count.
+
+## Values
+
+Orb 60px. Bar 44px high, glass with an edge, radius pill, 46px per button, the gap behind the orb is the orb plus
+8px. The bar grows in --motion-base with --ease-house, after 180ms of hover, and folds after 700ms.
+
+## Accessibility
+
+Every bar button has a name and a tooltip. The bar opens on focus as well as on hover; folded it is hidden from
+the keyboard. Her words are a polite live region, the state line a status.`,
+  VaultAsk: `# VaultAsk
+
+The question the vault asks before anything leaves it. The same lines on every device, in the same order: who
+asks, from where, why, what it does, and how far it reaches. Then allow, or no.
+
+## When
+
+- Every time a secret is read, used or stored. On the phone in a Sheet, on the Mac in a small window, in Chrome
+  the extension only points to it: the answer is given on the phone or with Touch ID.
+
+## The parts
+
+\`title\` is the question in one line. \`who\`, \`from\`, \`why\` and \`does\` are the four facts; \`scope\` says
+how far it reaches: \`names\` (only names are read), \`use\` (one value is used, never shown to Iris) or \`store\`
+(a new secret is saved). \`biometric\` names how the person confirms, "Face ID" or "Touch ID". \`onAllow\`,
+\`onDeny\` and, for a use with a reason, \`onAlways\` ("Always for this site").
+
+## Rules
+
+- A fact nobody gave is said, "the asker did not say", in the wait colour. Never a blank line.
+- No why: the question says so and suggests asking Iris first. Always is not offered then.
+- Allow is the one primary button and names the confirmation: "Allow once with Face ID". No is plain text.
+- Nothing red: saying no destroys nothing.
+
+## Accessibility
+
+The question is a section named by its title. The facts are a description list, so a screen reader reads each
+label with its value.`,
+  TableApp: `# TableApp
+
+A list you search, filter and open, as one part: search in the AppBar, filter chips under it, the rows on one
+Card split by hairlines, a line that counts what is shown, and a row that opens its detail in a Sheet from the
+side.
+
+## When
+
+- Things of one kind that someone looks through: what Iris did, the vault's logins, invoices, people.
+- Not for a few settings (a Card of Rows), and not for numbers side by side (a table in a document).
+
+## The parts
+
+\`rows\` is the list: \`{ title, subtitle, icon, tags, detail }\`. \`tags\` names the filter chips a row belongs to;
+\`filters\` lists those chips, "All" comes first by itself. A row with \`detail\` opens a Sheet with that content;
+a row without it does not open and has no chevron. \`noun\` is the word of the count line ("2 of 3 tasks"),
+\`actions\` sits next to the search in the AppBar, \`empty\` is what an empty list says.
+
+## Rules
+
+- The search filters what is shown, on title and subtitle, at once. Nothing found says what was searched for.
+- The count line always counts what is shown out of the whole.
+- One chip is on at a time. All is always there.
+
+## Accessibility
+
+The search field is named by its placeholder, the chips are pressed buttons in a group named Show, the count line
+is a polite live region. The Sheet closes on Escape.`,
   Menu: `# Menu
 
 A list of choices on its own surface, anchored to the thing it belongs to: a sort, a filter, a set of actions.

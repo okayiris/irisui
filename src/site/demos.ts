@@ -15,7 +15,7 @@ const CSS = (ds: string) => `<link rel="stylesheet" href="${ds}/tokens.css">
 <link rel="icon" href="/favicon.svg">
 <style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
 /* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
-#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
 /* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
 [data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>`;
 

@@ -745,6 +745,117 @@ const SPECS: Spec[] = [
       },
     ],
   },
+  {
+    name: "MacPill",
+    group: "Brand",
+    height: 300,
+    summary: "Iris on the Mac desktop: her orb, a bar of buttons that grows out from behind it, her words above and one state line under it.",
+    props: [
+      { name: "state", type: "'rest' | 'listening' | 'thinking' | 'talking' | 'muted' | 'away'" },
+      { name: "onPress", type: "() => void" },
+      { name: "left", type: "PillAction[]" },
+      { name: "right", type: "PillAction[]" },
+      { name: "open", type: "boolean" },
+      { name: "badge", type: "number" },
+      { name: "words", type: "string" },
+      { name: "status", type: "string" },
+      { name: "back", type: "{ label: string; onClick?: () => void; variant?: 'text' | 'glass' }" },
+      { name: "working", type: "boolean" },
+      { name: "size", type: "number" },
+    ],
+    variants: [
+      {
+        label: "At rest, hover the orb",
+        code: `() => { const [panel, setPanel] = React.useState(null); const [badge, setBadge] = React.useState(2);
+  const [state, setState] = React.useState("rest"); const [words, setWords] = React.useState(null);
+  const pick = (k) => () => { setPanel(panel === k ? null : k); if (k === "chats") setBadge(0); };
+  const talk = () => { setState("thinking"); setWords(null);
+    setTimeout(() => { setState("talking"); setWords("Tomorrow at half past nine you have the dentist."); }, 1400);
+    setTimeout(() => { setState("rest"); setWords(null); }, 4600); };
+  return h("div", { style: { paddingTop: 40 } }, h(MacPill, { state, onPress: talk, badge, words, status: state === "thinking" ? "Thinking" : undefined,
+    left: [ { label: "Calls", icon: "phone", active: panel === "calls", onSelect: pick("calls") }, { label: "Chats", icon: "wave", active: panel === "chats", onSelect: pick("chats") } ],
+    right: [ { label: "Vault", icon: "shield", active: panel === "vault", onSelect: pick("vault") }, { label: "Settings", icon: "person", active: panel === "settings", onSelect: pick("settings") } ] })); }`,
+      },
+      {
+        label: "Muted, with the way back",
+        code: `() => { const [muted, setMuted] = React.useState(true);
+  return h(MacPill, { open: true, state: muted ? "muted" : "rest", status: muted ? "Muted" : undefined, back: muted ? { label: "Turn sound on", onClick: () => setMuted(false) } : undefined,
+    left: [ { label: "Chats", icon: "wave" } ], right: [ { label: "Talk while held", icon: "mic" } ] }); }`,
+      },
+      {
+        label: "Working",
+        code: `() => h(MacPill, { working: true, status: "Booking the table, step 3 of 6" })`,
+      },
+    ],
+  },
+  {
+    name: "VaultAsk",
+    group: "Overlays",
+    height: 420,
+    summary: "The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches, then allow or no.",
+    props: [
+      { name: "title", type: "string", required: true },
+      { name: "who", type: "string", required: true },
+      { name: "from", type: "string", required: true },
+      { name: "why", type: "string | null" },
+      { name: "does", type: "string | null" },
+      { name: "scope", type: "'names' | 'use' | 'store'" },
+      { name: "biometric", type: "string" },
+      { name: "onAllow", type: "() => void" },
+      { name: "onAlways", type: "() => void" },
+      { name: "onDeny", type: "() => void" },
+      { name: "allowLabel", type: "string" },
+      { name: "denyLabel", type: "string" },
+    ],
+    variants: [
+      {
+        label: "Use a login",
+        code: `() => { const [said, setSaid] = React.useState(null);
+  return said ? h("p", { role: "status", style: { fontSize: 15 } }, said)
+    : h(Card, { padding: 18 }, h(VaultAsk, { title: "Iris wants your shop.example.com login", who: "Iris, your assistant", from: "Chrome on this Mac, shop.example.com",
+      why: "You asked her to order the groceries for Saturday", does: "Fills in your password on shop.example.com", scope: "use", biometric: "Touch ID",
+      onAllow: () => setSaid("Allowed once. Touch ID confirmed."), onAlways: () => setSaid("Allowed for this site."), onDeny: () => setSaid("Nothing was shared. Iris is told no.") })); }`,
+      },
+      {
+        label: "Nobody said why",
+        code: `() => h(Card, { padding: 18 }, h(VaultAsk, { title: "Iris wants a card", who: "Iris, your assistant", from: "Her own house", scope: "use", onAllow: () => {}, onDeny: () => {} }))`,
+      },
+    ],
+  },
+  {
+    name: "TableApp",
+    group: "App layouts",
+    height: 520,
+    summary: "A list you search, filter and open: search in the AppBar, filter chips, the rows on one Card, a count line, a row that opens a Sheet.",
+    props: [
+      { name: "title", type: "string", required: true },
+      { name: "rows", type: "TableRow[]" },
+      { name: "filters", type: "string[]" },
+      { name: "search", type: "boolean" },
+      { name: "placeholder", type: "string" },
+      { name: "noun", type: "string" },
+      { name: "actions", type: "ReactNode" },
+      { name: "empty", type: "string" },
+      { name: "topic", type: "TopicName" },
+    ],
+    variants: [
+      {
+        label: "What Iris did",
+        code: `() => h(TableApp, { title: "What Iris did", noun: "tasks", filters: ["Calls", "On the web"], rows: [
+    { title: "Moved the dentist", subtitle: "Called at 14:10", icon: "phone", tags: ["Calls"], detail: h(Card, { padding: 0 }, h(Row, { title: "Asked to move Tuesday", subtitle: "14:10" }), h(Row, { title: "Wednesday 09:30 is free", subtitle: "14:11" }), h(Row, { title: "Booked. Bring the old card", subtitle: "14:12" })) },
+    { title: "Looked up houses", subtitle: "On funda.nl at 13:50", icon: "globe", tags: ["On the web"], detail: h(Card, { padding: 0 }, h(Row, { title: "Opened Utrecht, 3 rooms", subtitle: "13:50" }), h(Row, { title: "Saved 4 houses to your list", subtitle: "13:52" })) },
+    { title: "Booked Da Mario", subtitle: "Called at 13:40", icon: "phone", tags: ["Calls"], detail: h(Card, { padding: 0 }, h(Row, { title: "Asked for six on Saturday", subtitle: "13:40" }), h(Row, { title: "20:00 is free, inside", subtitle: "13:41" })) },
+  ] })`,
+      },
+      {
+        label: "The vault",
+        code: `() => h(TableApp, { title: "Logins", noun: "logins", placeholder: "Search logins", actions: h(Button, { variant: "primary", size: "sm" }, "Add"), rows: [
+    { title: "shop.example.com", subtitle: "alex@example.com, used today", detail: h(Card, { padding: 0 }, h(Row, { title: "alex@example.com", subtitle: "Name" }), h(Row, { title: "Iris may use it", subtitle: "Touch ID each time", trailing: h(Toggle, { on: true, label: "Iris may use it" }) })) },
+    { title: "da-mario.example", subtitle: "alex@example.com, added Saturday", detail: h(Card, { padding: 0 }, h(Row, { title: "Iris may use it", subtitle: "Touch ID each time", trailing: h(Toggle, { label: "Iris may use it" }) })) },
+  ] })`,
+      },
+    ],
+  },
 ];
 
 export const EXT_COMPONENTS: Component[] = SPECS.map((s) => ({
