@@ -348,7 +348,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
   // One accent per app: the app's topic colour becomes its accent, so the tab bar, chips, links and focus all speak it.
   const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
   const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2] } : undefined;
-  return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, style: tint },
+  return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, "data-theme": (spec as Any).theme, style: tint },
     spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
       ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
     spec.backdrop ? h("div", { className: "ia-backdrop", "aria-hidden": "true" }, h(Part, { p: spec.backdrop, ctx })) : null,
