@@ -149,14 +149,35 @@ export const RESOURCE_DOCS_EXT: Record<string, Doc> = {
   changelog: {
     id: "changelog",
     label: "Release notes",
-    lede: "What v32 is, what changed in it, and what this project added on top of the release.",
+    lede: "What v33 adds, what v32 is, what changed in it, and what this project added on top of the release.",
     sections: [
+      {
+        title: "Release v33",
+        blocks: [
+          {
+            kind: "p",
+            text: "v33 is this project's release of 1 october 2026: the design system of v32 with everything added since. The package is version 33.0.0. The chapters in src/content are still those of v32; what v33 adds lives in the added parts and on these pages.",
+          },
+          {
+            kind: "table",
+            head: ["what", "in v33"],
+            rows: [
+              ["Light and dark", "Iris follows the system, data-mode=\"light\" or \"dark\" on <html> fixes it. Every token and every fixed colour of the release has both halves; the site has a light, dark or system switch. An app in light gets a ground: a wash of its own colour, tinted cards with a soft shadow."],
+              ["IrisApp", "a whole app from one spec, with real navigation, sheets and dialogs, state, lists that filter, swipes (Rail, Pages, Bento, Meter) and swiping sideways between tabs. As a window it takes a NavRail. checkApp checks a spec against Meaning."],
+              ["Picture", "a photo as content: a caption, or words over its foot like a cover, or beside it on a card; drawn plain, duotone (with a dark end in both modes) or parallax."],
+              ["Meaning: neighbours", "N1 to N6, what may stand next to what: one now per screen, one loud per row, a pattern only behind a panel, a number says what it counts."],
+              ["New parts", "MacPill, VaultAsk and TableApp as real components; Edge and EdgeText, the apps' light patterns; Mark, her ring as a still; Photo, BorderPattern and ChatStack."],
+              ["Fixes", "a screen never shrinks under the tab bar, an empty group draws nothing, Toggle has a name, the topics of mail, sport and tasks leave violet, red and magenta."],
+            ],
+          },
+        ],
+      },
       {
         title: "Release v32",
         blocks: [
           {
             kind: "p",
-            text: "v32 is the release the site is built against. The package is version 32.0.0, the site says v32 and its date is 30 september 2026. The artifact is the set of files under public/ds: the two scripts, the stylesheets, the type declaration, the readme and the chapters.",
+            text: "v32 is the release the site is built against. Its package was version 32.0.0, the site said v32 and its date is 30 september 2026. The artifact is the set of files under public/ds: the two scripts, the stylesheets, the type declaration, the readme and the chapters.",
           },
           {
             kind: "p",

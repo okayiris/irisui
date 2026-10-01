@@ -10,7 +10,7 @@ export const SITE = {
   description:
     "Every Iris part, foundation and layout, with live previews, exact tokens and the rules that hold them. For people and for LLMs.",
   repo: "https://github.com/okayiris/irisui",
-  version: "v32",
+  version: "v33",
   released: "30 september 2026",
 };
 

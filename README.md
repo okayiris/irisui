@@ -2,7 +2,7 @@
 
 `ui.okayiris.com`. Two things in one repo:
 
-1. **The design system** — the published Iris Design System (release v32) plus the parts and values this
+1. **The design system** — the published Iris Design System (release v32, this project's release v33) plus the parts and values this
    project added. Live in `public/ds/`, docs in `src/content/`.
 2. **The site** — every foundation, component, pattern and value as plain static HTML, with a live frame of the
    real component on every page, and a Markdown twin so an LLM can read the same page a person sees.
