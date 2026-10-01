@@ -345,6 +345,28 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
         ],
       },
       {
+        title: "Neighbours: what may stand next to what",
+        blocks: [
+          {
+            kind: "p",
+            text:
+              "A screen is read as a whole: two parts that each make sense can still fight. A part is loud when it moves or fills (a pattern, a ring, a theme widget with its ambience, a big word); calm when it is glass, a list or plain type. checkApp checks these as N1 to N6.",
+          },
+          {
+            kind: "table",
+            head: ["Rule", "So", "Never"],
+            rows: [
+              ["N1 One now per screen", "one part says what is next (a time as its answer)", "Next up 10:00 beside Today 08:30"],
+              ["N2 A word says something new", "the big word is not also the first line of its own list", "10:00 big, and 10:00 again under it"],
+              ["N3 One loud per row", "a loud part stands between calm ones", "two patterns, a ring and a pattern, side by side or straight under each other"],
+              ["N4 The theme widget has calm neighbours", "glass and lists around it", "a patterned tile beside the theme widget"],
+              ["N5 Pattern only behind a panel", "a wide or tall tile with its list on a panel", "a bare number on stripes in a small tile"],
+              ["N6 A number says what it counts", "3 documents, 08:30 dentist", "a lone 3"],
+            ],
+          },
+        ],
+      },
+      {
         title: "Quick test",
         blocks: [
           {

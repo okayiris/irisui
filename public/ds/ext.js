@@ -472,6 +472,7 @@
       const dangerAt = rows.findIndex((p) => p.danger);
       if (dangerAt >= 0 && rows.slice(dangerAt + 1).some((p) => p.c === "Row" && !p.danger)) add(id, "Danger is the last row, never above a normal one");
       if ((s.kind ?? "page") === "page" && !s.lede && id === spec.start) add(id, "The first screen has no words of hers", "warn");
+      neighbours(id, s, add);
     }
     reach.add(spec.start);
     spec.tabs?.forEach((t) => reach.add(t.to));
@@ -492,6 +493,34 @@
     walk([...s.hero ? [s.hero] : [], ...s.parts ?? []]);
     if (s.mark?.look === "neon" && /==.+==/.test(s.lede ?? "")) out.push(["Pen, neon", 2]);
     return out;
+  }
+  var tileOf = (p) => p.c === "Tap" && p.parts?.length === 1 ? p.parts[0] : p;
+  var isLoud = (p) => {
+    const t = tileOf(p);
+    return t.c === "Pattern" || t.c === "PhaseRing" || t.c === "Word" || t.c === "ThemeWord" || t.c === "Progress" && t.ring || (t.c === "Widget" || t.c === "LabWidget") && (t.look === "pattern" || t.look === "ring") || t.c === "LabWidget" && t.loud;
+  };
+  var timeLike = (v) => /^\d{1,2}:\d{2}$/.test(String(v ?? ""));
+  function neighbours(id, s, add) {
+    const parts = [...s.hero ? [s.hero] : [], ...s.parts ?? []];
+    let nows = 0;
+    const all = [];
+    const walk = (ps = []) => ps.forEach((p) => {
+      all.push(p);
+      walk(p.parts);
+    });
+    walk(parts);
+    for (const p of all) if ((p.c === "Widget" || p.c === "LabWidget" || p.c === "Stat") && (timeLike(p.value) || timeLike(p.word))) nows++;
+    if (nows > 1) add(id, `N1: ${nows} parts each say what is next; one "now" per screen`, "warn");
+    for (const p of all) {
+      if (p.c === "LabWidget" && p.word && (p.items ?? []).some((x) => (Array.isArray(x) ? x[0] : x) === p.word)) add(id, `N2: "${p.word}" stands big and again in its own list`, "warn");
+      if ((p.c === "Widget" || p.c === "LabWidget") && p.look === "pattern" && (p.size ?? "small") === "small") add(id, "N5: a small tile on a pattern puts its number on stripes", "warn");
+    }
+    for (const p of all) {
+      if (!["Bento", "Grid", "Rail"].includes(p.c)) continue;
+      const kids = p.parts ?? [];
+      for (let i = 1; i < kids.length; i++) if (isLoud(kids[i]) && isLoud(kids[i - 1])) add(id, `N3: two loud tiles side by side in a ${p.c.toLowerCase()}`, "warn");
+    }
+    for (let i = 1; i < parts.length; i++) if (isLoud(parts[i]) && isLoud(parts[i - 1])) add(id, "N3: two loud parts straight under each other", "warn");
   }
   function depthOf(spec) {
     const seen = /* @__PURE__ */ new Set();
