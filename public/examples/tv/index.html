@@ -75,7 +75,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useMemo } = React;
-  const { Orb, Orb3D, Photo, PageDots, EdgeText, StatusPill, IrisApp, checkApp } = window.IrisUi;
+  const { Orb, Orb3D, TalkOrb, Photo, PageDots, EdgeText, StatusPill, IrisApp, checkApp } = window.IrisUi;
 
   const Corner = ({ state = "idle", label }) => h("div", { className: "corner" }, h(StatusPill, { state, label }));
   const Tv = ({ children, label = "Living room TV" }) => h("div", { className: "tv-wrap" }, h("div", { className: "tv", role: "img", "aria-label": label }, children), h("div", { className: "stand", "aria-hidden": "true" }));
@@ -145,7 +145,7 @@
   const Answer = () => h(Tv, null,
     h("div", { className: "clock" }, "21:04"),
     h("div", { className: "rest" },
-      h("div", { style: { display: "grid", justifyItems: "center" } }, gl ? h(Orb3D, { size: 260, state: "talking" }) : h(Orb, { size: 160, state: "talking" })),
+      h("div", { style: { display: "grid", justifyItems: "center" } }, gl ? h(Orb3D, { size: 260, state: "talking" }) : h(TalkOrb, { size: 160, state: "talking" })),
       h("div", { className: "next" }, "Tomorrow at half past nine you have the dentist.")));
 
   // At rest the TV may show the house's photos: one at a time, the dots say which. Left and right on the remote move them.

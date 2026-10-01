@@ -451,7 +451,7 @@
       spec.rail ? h2("div", { className: "ia-rail-col" }, h2(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) => ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
       spec.backdrop ? h2("div", { className: "ia-backdrop", "aria-hidden": "true" }, h2(Part, { p: spec.backdrop, ctx })) : null,
       h2(
-        "main",
+        "section",
         {
           ref: scroller,
           className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""),

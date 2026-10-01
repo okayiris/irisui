@@ -397,7 +397,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
     spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
       ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
     spec.backdrop ? h("div", { className: "ia-backdrop", "aria-hidden": "true" }, h(Part, { p: spec.backdrop, ctx })) : null,
-    h("main", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title,
+    h("section", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title,
       onPointerDown: onDown, onPointerMove: onMove, onPointerUp: onUp, onPointerCancel: () => { swipe.current = null; setDrag(0); },
       style: drag ? { touchAction: "pan-y" } : { touchAction: "pan-y" } },
       h("div", { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : ""), style: drag ? { transform: `translateX(${-drag * 40}px)`, opacity: 1 - Math.abs(drag) * 0.25 } : undefined },
