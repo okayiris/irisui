@@ -2575,3 +2575,9 @@
 .ix-sheet .iris-check .txt {
   white-space: normal;
 }
+.ia-hero > .ix-frost {
+  width: 100%;
+}
+.ix-frost {
+  cursor: pointer;
+}

@@ -2408,7 +2408,9 @@
     // explain was violet, party magenta. Explain is a cool soft yellow, kept apart from --wait (#fde68a) so a topic
     // never reads as waiting; party is coral pink, short of red.
     explain: ["#ede98a", "#fef9c3", "#1c1b08"],
-    party: ["#fdab9f", "#fed7cf", "#2a1210"]
+    party: ["#fdab9f", "#fed7cf", "#2a1210"],
+    // home was the waiting yellow (#fde68a): warm sand, so yellow only ever means waiting.
+    home: ["#e6c79c", "#f3e3c8", "#211a10"]
   };
   {
     const topics = window.IrisUi?.design?.TOPIC;
@@ -2432,6 +2434,82 @@
       ctx.irisNoGround = true;
     });
     return h3("div", { ref: host, className: "ix-word" }, h3(BaseWord, props));
+  }
+  function fern(c, x, y, a, len, depth) {
+    if (!depth || len < 3) return;
+    const ex = x + Math.cos(a) * len, ey = y + Math.sin(a) * len, mx = (x + ex) / 2, my = (y + ey) / 2;
+    c.beginPath();
+    c.moveTo(x, y);
+    c.lineTo(ex, ey);
+    c.stroke();
+    fern(c, ex, ey, a - 0.06, len * 0.82, depth - 1);
+    fern(c, mx, my, a - 0.9, len * 0.45, depth - 1);
+    fern(c, mx, my, a + 0.9, len * 0.45, depth - 1);
+  }
+  function FrostWord({ text, height = 120 }) {
+    const cv = useRef(null);
+    const [run, setRun] = useState(0);
+    useEffect(() => {
+      const el = cv.current;
+      if (!el) return;
+      let raf = 0, t0 = 0;
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const draw = (g) => {
+        const dpr = devicePixelRatio || 1, W = el.clientWidth, H = height;
+        if (!W) return;
+        el.width = W * dpr;
+        el.height = H * dpr;
+        const c = el.getContext("2d");
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        c.clearRect(0, 0, W, H);
+        c.strokeStyle = "#bfe6ff";
+        c.globalAlpha = 0.55;
+        c.lineWidth = 1;
+        fern(c, 0, H, -0.75, H * 0.2 * g, 7);
+        fern(c, W, H, -2.4, H * 0.2 * g, 7);
+        c.globalAlpha = 1;
+        let size = H * 0.62;
+        const font = (n) => `900 ${n}px -apple-system, "SF Pro Display", system-ui, sans-serif`;
+        c.font = font(size);
+        while (c.measureText(text).width > W * 0.76 && size > 10) {
+          size *= 0.95;
+          c.font = font(size);
+        }
+        const gr = c.createLinearGradient(0, H / 2 - size * 0.4, 0, H / 2 + size * 0.4);
+        gr.addColorStop(0, "#ffffff");
+        gr.addColorStop(1, "#cfeeff");
+        c.fillStyle = gr;
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        c.fillText(text, W / 2, H / 2);
+      };
+      if (still) {
+        draw(1);
+        return;
+      }
+      const step = (ms) => {
+        t0 ||= ms;
+        const g = Math.min(1, (ms - t0) / 3e3);
+        draw(g);
+        if (g < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+      const ro = new ResizeObserver(() => draw(1));
+      ro.observe(el);
+      return () => {
+        cancelAnimationFrame(raf);
+        ro.disconnect();
+      };
+    }, [text, height, run]);
+    return h3(
+      "div",
+      { className: "ix-word ix-frost", role: "img", "aria-label": text, onClick: () => setRun((r) => r + 1) },
+      h3("canvas", { ref: cv, style: { display: "block", width: "100%", height } })
+    );
+  }
+  var BaseThemeWord = window.IrisUi?.ThemeWord;
+  function ThemeWord(props) {
+    return props.theme === "frozen" || !props.theme ? h3(FrostWord, { text: props.text, height: props.height }) : h3(Word, { text: props.text, theme: props.theme, height: props.height });
   }
   function Toggle({ on = false, onChange, label, disabled }) {
     const [own, setOwn] = useState(on);
@@ -2499,6 +2577,7 @@
     VaultAsk,
     TableApp,
     ...BaseWord ? { Word } : {},
+    ...BaseThemeWord && BaseWord ? { ThemeWord } : {},
     ...TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {},
     ...Orb3DThinks ? { Orb3D: Orb3DThinks } : {}
   };
