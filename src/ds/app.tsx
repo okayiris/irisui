@@ -150,7 +150,7 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       // A value that asks something of you (awaiting signature, overdue, missing) takes the accent; the rest stays dim.
       // Numbers, times and amounts in the mono house font; a value that asks for action in the accent.
       // pill: a status as a small tinted pill, so a list of states scans at a glance.
-      else if (props.value != null) trailing = h("span", { className: "ia-value" + (props.pill ? " ia-pill" : "") + (/await|missing|overdue|sign|waits|late/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
+      else if (props.value != null) trailing = h("span", { className: "ia-value" + (props.pill ? " ia-pill" : "") + (/await|missing|overdue|sign|waits|late|draft|pending|review/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
       const ic = p.icon && typeof p.icon === "object" ? h(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : undefined;
       return h(I.Row, { ...props, icon: ic, trailing, chevron: props.chevron ?? (!!act && !b),
         onClick: act ?? (b ? () => set(b, !val) : undefined) });
