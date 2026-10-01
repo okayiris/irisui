@@ -283,7 +283,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
               "One flat Orb, 22 or 28, in the app bar, with the true state of whoever speaks or works; each role a StatusPill. The role is told apart by its word, never by its own colour or ring gradient.",
               "One orb per screen, in the app bar, with the true state of whoever speaks or works. Working and speaking roles get a StatusPill; a resting role shows its word only.",
               "Who is not Iris never gets an orb: a human team member or an outside agent gets an initial in a phase ring.",
-              "A role's personality (its Ringlab recipe) shows only on its own role card or the governance screen, as the one Orb3D of that screen.",
+              "A role's personality (its Ringlab recipe) shows only on its own role screen or the governance screen, as the one Orb3D of that screen.",
               "Cursor colours are a neutral, low-chroma set that means nothing: never ice blue, violet, red or the ring gradient, never a fill, always with a name flag.",
             ],
           },
