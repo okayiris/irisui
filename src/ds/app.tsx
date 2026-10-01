@@ -147,7 +147,8 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
     case "Row": {
       let trailing = props.trailing;
       if (b) trailing = h(I.Toggle, { on: !!val, onChange: (x: boolean) => set(b, x) });
-      else if (props.value != null) trailing = h("span", { className: "ia-value" }, props.value);
+      // A value that asks something of you (awaiting signature, overdue, missing) takes the accent; the rest stays dim.
+      else if (props.value != null) trailing = h("span", { className: "ia-value" + (/await|missing|overdue|due|sign|wait|open|late/i.test(String(props.value)) ? " ia-act" : "") }, props.value);
       const ic = p.icon && typeof p.icon === "object" ? h(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : undefined;
       return h(I.Row, { ...props, icon: ic, trailing, chevron: props.chevron ?? (!!act && !b),
         onClick: act ?? (b ? () => set(b, !val) : undefined) });
