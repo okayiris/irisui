@@ -2719,3 +2719,10 @@ textarea.ix-textarea {
   color: var(--fg);
   font-weight: 600;
 }
+/* In a window the page is wider and the bento has three columns: a phone grid stretched wide reads as a stack. */
+.ia-win .ia-screen {
+  max-width: 1040px;
+}
+.ia-win .ia-bento {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
