@@ -262,7 +262,7 @@ function Talk({ s, ctx }: { s: Screen; ctx: Any }) {
 
 /* --------------------------------------------------------------------- app */
 
-export function IrisApp({ spec, start, onNavigate, frame = "phone" }: { spec: AppSpec; start?: string | string[]; onNavigate?: (id: string) => void; frame?: "phone" | "window" }) {
+export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: { spec: AppSpec; start?: string | string[]; onNavigate?: (id: string) => void; onState?: (state: Record<string, Any>) => void; frame?: "phone" | "window" }) {
   const I = UI();
   const path = (Array.isArray(start) ? start : [start ?? spec.start]).filter((id) => spec.screens[id]);
   const pages = path.filter((id) => !["sheet", "dialog"].includes(spec.screens[id].kind ?? "page"));
@@ -278,6 +278,7 @@ export function IrisApp({ spec, start, onNavigate, frame = "phone" }: { spec: Ap
 
   useEffect(() => { setStack(first); setLayer(layers()); setDir(""); }, [key]);
   useEffect(() => { onNavigate?.(stack[stack.length - 1]); scroller.current?.scrollTo({ top: 0 }); }, [stack]);
+  useEffect(() => { onState?.(state); }, [state]);
   useEffect(() => { if (!snack) return; const t = setTimeout(() => setSnack(null), 3600); return () => clearTimeout(t); }, [snack]);
 
   const set = (k: string, v: Any) => setState((s) => ({ ...s, [k]: v }));
@@ -322,7 +323,10 @@ export function IrisApp({ spec, start, onNavigate, frame = "phone" }: { spec: Ap
     h("div", { className: "ia-layer" },
       sheet ? h(I.Sheet, { open: true, onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
         h("div", { className: "ia-sheet-body" }, (sheet.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx })),
-          sheet.action ? h("div", { className: "ia-action" }, h(I.Button, { variant: sheet.action.danger ? "danger" : "primary", size: "lg", onClick: () => run(sheet.action!.on ?? "close") }, fill(sheet.action.label, state))) : null)) : null,
+          sheet.action || sheet.actions ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true },
+            // The one primary first, then the rest as glass: action is the primary, actions[] the others.
+            [...(sheet.action ? [{ ...sheet.action, primary: true }] : []), ...(sheet.actions ?? [])].map((a: Any, i: number) =>
+              h(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", onClick: () => run(a.on ?? "close") }, fill(a.label, state))))) : null)) : null,
       dialog ? h(I.Dialog, { open: true, onClose: () => run("close"), title: fill(dialog.title, state), body: fill(dialog.body, state),
           actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on!), 0) })) }) : null));
 }
