@@ -34,6 +34,7 @@ export type Screen = {
   body?: string; // dialog
   tab?: number;
   status?: { state: string; label: string };
+  mark?: { kind?: string; look?: string }; // her pen on the ==fact== in the lede
   top?: { label: string; on?: Act; icon?: string }; // one action top right in the header, always above the fold // her StatusPill, top left: only in an app without a tab bar
   bare?: boolean; // the AppBar shows only the way back: a part on the screen carries the title
 };
@@ -86,7 +87,7 @@ const BUSY: Record<string, (p: Part) => number> = {
   Progress: (p) => (p.ring ? 1 : 0), Orb3D: () => 2,
 };
 const ORBS = new Set(["Orb", "TalkOrb", "Orb3D", "StatusPill", "MacPill"]);
-const HEROES = new Set(["Word", "ThemeWord", "EdgeText", "Orb3D", "PhaseRing", "Progress", "Stat", "Photo", "Widget", "Pattern"]);
+const HEROES = new Set(["LabWord", "Word", "ThemeWord", "EdgeText", "Orb3D", "PhaseRing", "Progress", "Stat", "Photo", "Widget", "Pattern"]);
 
 function icon(name: Any, size = 20) {
   return typeof name === "string" ? h(UI().Icon, { name, size }) : name;
@@ -240,18 +241,27 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
           s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
           h("h1", { className: "ia-title" }, fill(s.title, ctx.state))),
     depth > 0 && s.eyebrow ? h("p", { className: "ia-eyebrow ia-sub" }, fill(s.eyebrow, ctx.state)) : null,
-    s.lede ? h("p", { className: "ia-lede", dangerouslySetInnerHTML: { __html: lede(fill(s.lede, ctx.state)) } }) : null,
+    s.lede ? h(Lede, { text: fill(s.lede, ctx.state), mark: s.mark }) : null,
     s.hero ? h("div", { className: "ia-hero" }, h(Part, { p: s.hero, ctx })) : null,
     h("div", { className: "ia-parts" }, (s.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx }))),
     s.action || s.second
-      ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true, topic: s.topic },
-          s.action ? h(I.Button, { variant: s.action.danger ? "danger" : "primary", size: "lg", topic: s.topic, onClick: () => s.action!.on && ctx.run(s.action!.on) }, fill(s.action.label, ctx.state)) : null,
+      ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true, topic: s.topic ?? ctx.topic },
+          s.action ? h(I.Button, { variant: s.action.danger ? "danger" : "primary", size: "lg", topic: s.topic ?? ctx.topic, onClick: () => s.action!.on && ctx.run(s.action!.on) }, fill(s.action.label, ctx.state)) : null,
           s.second ? h(I.Button, { variant: "glass", onClick: () => s.second!.on && ctx.run(s.second!.on) }, fill(s.second.label, ctx.state)) : null))
       : null);
-  return s.topic ? h(I.Topic, { name: s.topic }, body) : body;
+  const t = s.topic ?? ctx.topic;
+  return t ? h(I.Topic, { name: t }, body) : body;
 }
-// Her words may name the person in bold: "**Alex**, the candles are at the Hema."
-const lede = (t: string) => t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!)).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+// Her words may name the person in bold ("**Alex**, the candles ...") and mark the one fact that matters with her pen
+// ("the deadline is ==Friday 17:00=="): the mark sits in the sentence, on the fact, never on its own line.
+function Lede({ text, mark }: { text: string; mark?: { kind?: string; look?: string } }) {
+  const I = UI();
+  const bits = String(text).split(/(\*\*.+?\*\*|==.+?==)/g).filter(Boolean);
+  return h("p", { className: "ia-lede" }, bits.map((b, i) =>
+    b.startsWith("**") ? h("b", { key: i }, b.slice(2, -2))
+      : b.startsWith("==") ? (mark && I.Pen ? h(I.Pen, { key: i, kind: mark.kind ?? "underline", look: mark.look ?? "clean" }, b.slice(2, -2)) : h("b", { key: i }, b.slice(2, -2)))
+        : b));
+}
 
 const TALK = ["listening", "thinking", "talking"];
 function Talk({ s, ctx }: { s: Screen; ctx: Any }) {
@@ -316,11 +326,11 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
       else if (verb === "talk") { const t = Object.keys(spec.screens).find((id) => spec.screens[id].kind === "talk"); if (t) { setLayer({}); setStack((s) => [...s, t]); } }
     }
   };
-  const ctx = { state, set, run };
+  const ctx = { state, set, run, topic: spec.topic };
   const id = stack[stack.length - 1], s = spec.screens[id];
   const talking = s.kind === "talk";
   const tabOf = (sid: string) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
-  const activeTab = Math.max(0, ...stack.map(tabOf).filter((i) => i >= 0).slice(0, 1));
+  const activeTab = Math.max(0, [...stack].reverse().map(tabOf).find((i) => i >= 0) ?? 0);
   const railAt = spec.rail ? Math.max(0, spec.rail.findIndex((r) => stack.includes(r.to))) : -1;
   const wide = !!spec.rail || frame === "window";
   const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
@@ -337,12 +347,12 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
       : null,
     snack ? h("div", { className: "ia-snack" }, h(I.Snackbar, { text: snack, tone: "ok" })) : null,
     h("div", { className: "ia-layer" },
-      sheet ? h(I.Sheet, { open: true, side: wide ? "end" : "bottom", onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
+      sheet ? h(spec.topic ? I.Topic : React.Fragment, spec.topic ? { name: spec.topic } : null, h(I.Sheet, { open: true, side: wide ? "end" : "bottom", onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
         h("div", { className: "ia-sheet-body" }, (sheet.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx })),
           sheet.action || sheet.actions ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true },
             // The one primary first, then the rest as glass: action is the primary, actions[] the others.
             [...(sheet.action ? [{ ...sheet.action, primary: true }] : []), ...(sheet.actions ?? [])].map((a: Any, i: number) =>
-              h(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", onClick: () => run(a.on ?? "close") }, fill(a.label, state))))) : null)) : null,
+              h(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", topic: spec.topic, onClick: () => run(a.on ?? "close") }, fill(a.label, state))))) : null))) : null,
       dialog ? h(I.Dialog, { open: true, onClose: () => run("close"), title: fill(dialog.title, state), body: fill(dialog.body, state),
           actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on!), 0) })) }) : null));
 }
@@ -365,11 +375,12 @@ export function checkApp(spec: AppSpec): Finding[] {
     let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0; // the TalkOrb in the tab bar
     if (s.kind === "talk") orbs = 1;
     if (s.status) orbs++;
-    let busy = 0, words = 0, pens = 0, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
+    let busy = s.mark && /==.+==/.test(s.lede ?? "") ? BUSY.Pen({ c: "Pen", look: s.mark.look }) : 0, markPen = s.mark && /==.+==/.test(s.lede ?? "") ? 1 : 0, words = 0, pens = markPen, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
     walk(parts, (p) => {
       if (ORBS.has(p.c) || (p.c === "Widget" && p.look === "orb")) orbs++;
-      busy += BUSY[p.c]?.(p) ?? 0;
-      if (p.c === "Word" || p.c === "ThemeWord" || p.c === "EdgeText") words++;
+      // A part the system does not know (a lab part) says its own cost and whether it is a big word.
+      busy += BUSY[p.c]?.(p) ?? (Number(p.busy) || 0);
+      if (p.c === "Word" || p.c === "ThemeWord" || p.c === "EdgeText" || p.big) words++;
       if (p.c === "Pen") pens++;
       if (p.c === "Anchor") anchors++;
       if (p.c === "Button" && p.variant === "primary") primaries++;
@@ -404,8 +415,9 @@ export function checkApp(spec: AppSpec): Finding[] {
 /** What each loud part on a screen costs, for the busy budget of 5. */
 export function costOf(s: Screen): [string, number][] {
   const out: [string, number][] = [];
-  const walk = (ps: Part[] = []) => ps.forEach((p) => { const c = BUSY[p.c]?.(p) ?? 0; if (c) out.push([p.c + (p.look ? ", " + p.look : p.effect ? ", " + p.effect : ""), c]); walk(p.parts); });
+  const walk = (ps: Part[] = []) => ps.forEach((p) => { const c = BUSY[p.c]?.(p) ?? (Number(p.busy) || 0); if (c) out.push([p.c + (p.look ? ", " + p.look : p.effect ? ", " + p.effect : ""), c]); walk(p.parts); });
   walk([...(s.hero ? [s.hero] : []), ...(s.parts ?? [])]);
+  if (s.mark?.look === "neon" && /==.+==/.test(s.lede ?? "")) out.push(["Pen, neon", 2]);
   return out;
 }
 
