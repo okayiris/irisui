@@ -24,7 +24,7 @@
     .plat nav a { padding: 6px 14px; border-radius: 999px; }
     .plat nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
     .plat .story { margin-left: auto; color: var(--label); font: var(--text-sub); }
-    @media (max-width: 1100px) { .plat .story { display: none; } }
+    @media (max-width: 1300px) { .plat .story { display: none; } }
     @media (max-width: 640px) { .plat { flex-wrap: wrap; gap: 10px; padding: 10px 16px; } .plat .story { display: none; } }
   `;
   document.head.appendChild(style);
@@ -36,4 +36,10 @@
       `<a href="${base}${href}"${id === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav>` +
     `<span class="story">One day of Alex, on every device: the dentist moved, Sam's party on Saturday.</span>`;
   document.body.prepend(bar);
+  // A lab may pad or centre its body: the bar still runs edge to edge, and the lab keeps its own top room under it.
+  const b = getComputedStyle(document.body);
+  const px = (v) => parseFloat(v) || 0;
+  const top = px(b.marginTop) + px(b.paddingTop), left = px(b.marginLeft) + px(b.paddingLeft), right = px(b.marginRight) + px(b.paddingRight);
+  if (top || left || right) Object.assign(bar.style, { margin: `-${top}px -${right}px ${top}px -${left}px` });
+  if (b.display === "grid" || b.display === "flex") bar.style.alignSelf = "stretch", bar.style.justifySelf = "stretch", bar.style.width = `calc(100% + ${left + right}px)`;
 })();
