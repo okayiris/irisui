@@ -1,0 +1,313 @@
+:root {
+  --bg: #07090c;            /* bg */
+  --fg: #e8f2f7;            /* fg: titles, primary text */
+  --dim: #8fa3b0;           /* dim: the grey line under a title */
+  --faint: #5a6b78;         /* faint: chevrons, section labels, version line */
+  --line: #1b2430;          /* line: dividers */
+  --accent: #7dd3fc;        /* accent: ice blue, the active tab, links in the app */
+  --accent-ink: #07171f;    /* accent-ink: text on accent */
+  --error: #f87171;         /* error: "Delete account", failures */
+  --ok: #4ade80;            /* checked */
+  --wait: #fde68a;          /* wait */
+  --violet: #8b5cf6;        /* Iris violet: toggles on, AirPlay on, highlights */
+  --violet-light: #a78bfa;
+  --glass: rgba(180, 225, 255, .07);   /* glass: every card */
+  --edge: rgba(190, 230, 255, .14);    /* edge: every card's 1px stroke */
+  --radius-card: 18px;      /* all cards and rows */
+  --radius-pill: 999px;
+  --pad-card: 14px;
+  --gap: 12px;              /* between cards on a page */
+  --gutter: 16px;           /* page side margin */
+  --orb-gradient: conic-gradient(from 200deg, #6d5cf6, #38bdf8, #c026d3, #8b5cf6, #6d5cf6);
+  --font: "SF Pro Text", -apple-system, system-ui, sans-serif;
+  --font-display: "SF Pro Display", -apple-system, system-ui, sans-serif;   /* 20px and up */
+  --mono: "SF Mono", ui-monospace, Menlo, monospace;
+  /* Type scale (points): title 17, body 15 (body text), row title 17, sub 12, label 10.5 mono caps */
+}
+
+.iris-root { background: var(--bg); color: var(--fg); font: 15px/1.35 var(--font); padding: var(--gutter);
+  display: flex; flex-direction: column; gap: var(--gap); -webkit-font-smoothing: antialiased; }
+
+.iris-card { background: var(--glass); border: 1px solid var(--edge); border-radius: var(--radius-card);
+  color: var(--fg); box-sizing: border-box; }
+
+.iris-section { font: 500 10.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint);
+  margin: 10px 2px -2px; }
+
+/* Row */
+.iris-row-inner { display: flex; align-items: center; gap: 10px; }
+.iris-press { cursor: pointer; }
+.iris-row-icon { color: rgba(232, 242, 247, .8); display: grid; place-items: center; width: 24px; flex: none; }
+.iris-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.iris-row-title { font-size: 17px; color: var(--fg); }
+.iris-row-sub { font-size: 12px; color: var(--dim); }
+.iris-row-trailing { flex: none; display: flex; align-items: center; color: var(--fg); }
+.iris-row-arrow { color: var(--faint); display: grid; }
+.iris-danger { color: var(--error) !important; }
+
+/* Toggle: 51x31 like iOS */
+.iris-toggle { all: unset; width: 51px; height: 31px; border-radius: var(--radius-pill); background: rgba(120, 130, 145, .45);
+  position: relative; cursor: pointer; transition: background .2s; }
+.iris-toggle i { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .3); transition: transform .2s; }
+.iris-toggle.on { background: var(--violet); }
+.iris-toggle.on i { transform: translateX(20px); }
+
+/* Buttons */
+.iris-btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; font: 600 15px var(--font); border-radius: var(--radius-pill); transition: opacity .15s; }
+.iris-btn:disabled { opacity: .35; cursor: default; }
+.iris-btn-md { height: 44px; padding: 0 20px; }
+.iris-btn-lg { height: 56px; padding: 0 24px; font-size: 17px; border-radius: 20px; width: 100%; }
+.iris-btn-sm { height: 28px; padding: 0 12px; font-size: 13px; }
+.iris-btn-primary { background: #e9f1f5; color: #0b0f13; }
+.iris-btn-glass { background: var(--glass); border: 1px solid var(--edge); color: var(--fg); }
+.iris-btn-accent { background: rgba(125, 211, 252, .28); border: 1px solid rgba(125, 211, 252, .55); color: var(--fg);
+  box-shadow: 0 0 14px rgba(125, 211, 252, .25); }
+.iris-btn-ghost { color: var(--dim); }
+.iris-btn-danger { color: var(--error); }
+.iris-btn-icon { display: grid; }
+
+/* Orb: a gradient ring with a glow; --k scales the 22pt design */
+.iris-orb { position: relative; display: inline-block; flex: none; }
+.iris-orb i { position: absolute; inset: 0; border-radius: 50%; background: var(--orb-gradient);
+  -webkit-mask: radial-gradient(circle closest-side, transparent calc(100% - 5px * var(--k)), #000 calc(100% - 5px * var(--k) + .5px));
+          mask: radial-gradient(circle closest-side, transparent calc(100% - 5px * var(--k)), #000 calc(100% - 5px * var(--k) + .5px));
+  animation: iris-spin 6s linear infinite; }
+.iris-orb .glow { filter: blur(calc(5px * var(--k))); opacity: .5; transform: scale(1.3); }
+.iris-orb .echo { background: none; border: 1px solid rgba(125, 211, 252, .55); -webkit-mask: none; mask: none;
+  animation: iris-echo 1.6s ease-out infinite; }
+.iris-orb-busy i { animation-duration: 2s; }
+.iris-orb-talking i { animation-duration: 3s; }
+.iris-orb-away i { filter: grayscale(1); animation: none; opacity: .5; }
+@keyframes iris-spin { to { transform: rotate(360deg); } }
+@keyframes iris-echo { from { transform: scale(1); opacity: .6; } to { transform: scale(2.8); opacity: 0; } }
+
+/* Status at the top */
+.iris-status { display: flex; align-items: center; gap: 14px; }
+.iris-status-label { font-size: 17px; color: var(--fg); }
+
+/* Tab bar: the glass and the tabs fold into the orb when collapsed */
+.iris-tabbar { display: flex; align-items: center; justify-content: space-between; height: 62px; padding: 0 5px;
+  position: relative; isolation: isolate; }
+.iris-tabbar-glass { position: absolute; inset: 0; border-radius: var(--radius-pill); background: rgba(20, 26, 34, .72);
+  border: 1px solid var(--edge); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: -2;
+  clip-path: inset(0 0 0 0 round 31px); transition: clip-path .42s cubic-bezier(.3,1.3,.5,1), opacity .3s; }
+.iris-tabbar-pill { position: absolute; inset: 0; z-index: -1; filter: url(#iris-goo); opacity: .16; transition: opacity .3s; }
+.iris-tabbar-pill i { position: absolute; top: 50%; transform: translate(-50%, -50%); border-radius: var(--radius-pill);
+  background: var(--accent); transition: left .45s cubic-bezier(.3,1.4,.5,1); }
+.iris-tab { all: unset; cursor: pointer; flex: 1; height: 54px; border-radius: var(--radius-pill); display: flex;
+  flex-direction: column; align-items: center; justify-content: center; gap: 3px; font: 400 13px var(--font); color: var(--dim);
+  transition: transform .42s cubic-bezier(.3,1.3,.5,1), opacity .3s; }
+.iris-tab-icon { display: grid; }
+.iris-tab.on { color: var(--accent); }
+.iris-tab.on .iris-tab-icon { filter: drop-shadow(0 0 9px rgba(125, 211, 252, .75)); }
+.iris-tab.left { transform-origin: 100% 50%; }
+.iris-tab.right { transform-origin: 0 50%; }
+.iris-tabbar-talk { width: 74px; flex: none; display: grid; place-items: center; margin-top: -28px; position: relative; z-index: 2; }
+.iris-tabbar.collapsed .iris-tabbar-glass { clip-path: inset(-14px calc(50% - 33px) 14px round 33px); opacity: 0; }
+.iris-tabbar.collapsed .iris-tab { transform: scale(.4); opacity: 0; pointer-events: none; }
+.iris-tabbar.collapsed .iris-tabbar-pill { opacity: 0; }
+
+/* TalkOrb: dark disc, Iris ring at 22/60 of it, state effects hugging the disc */
+.iris-talkorb { all: unset; cursor: pointer; position: relative; display: grid; place-items: center; flex: none; z-index: 2; }
+.iris-talkorb:active .iris-talkorb-core, .iris-talkorb:active .iris-talkorb-disc { transform: scale(.93); }
+.iris-talkorb-disc { position: absolute; inset: 0; border-radius: 50%; transition: transform .2s;
+  background: radial-gradient(circle, rgba(139, 92, 246, .16) 0%, rgba(17, 21, 27, .96) 62%);
+  box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .12), 0 0 calc(var(--s) * .3) rgba(139, 92, 246, .2); }
+.iris-talkorb-core { position: relative; display: grid; transition: transform .2s; }
+.iris-talkorb-spectrum { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(139, 92, 246, .5)); }
+.iris-talkorb-echo { position: absolute; inset: 0; border-radius: 50%; border: .8px solid rgba(125, 211, 252, .7);
+  box-shadow: 0 0 4px rgba(125, 211, 252, .4); animation: iris-talkorb-echo 1.35s ease-out infinite; opacity: 0; }
+.iris-talkorb-arc { position: absolute; inset: calc(var(--s) * -.083); border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg 200deg, rgba(56, 189, 248, .6) 300deg, #2ee6d6 358deg, transparent 360deg);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+          mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+  filter: drop-shadow(0 0 3px rgba(46, 230, 214, .7)); animation: iris-spin .69s linear infinite; }
+.iris-talkorb-thinking .iris-orb i { animation-duration: 1.5s; }
+.iris-talkorb-thinking .iris-talkorb-core { animation: iris-talkorb-pulse .7s ease-in-out infinite alternate; }
+.iris-talkorb-talking .iris-orb i, .iris-talkorb-expression .iris-orb i { animation-duration: 5s; }
+.iris-talkorb-muted .iris-talkorb-core { opacity: .2; transform: scale(.65); transition: opacity .3s, transform .3s; }
+.iris-talkorb-muted-mic { position: absolute; color: rgba(232, 242, 247, .9); }
+.iris-talkorb-muted-mic .gap, .iris-talkorb-muted-mic .line { stroke-dasharray: 24.2; stroke-dashoffset: 24.2; animation: iris-line .3s .2s ease-out forwards; }
+@keyframes iris-line { to { stroke-dashoffset: 0; } }
+.iris-talkorb-away .iris-talkorb-disc { box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .12); }
+@keyframes iris-talkorb-echo { from { transform: scale(1); opacity: .45; } to { transform: scale(1.35); opacity: 0; } }
+@keyframes iris-talkorb-pulse { from { transform: scale(.96); } to { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .iris-talkorb-arc, .iris-talkorb-echo, .iris-talkorb-core { animation: none; } }
+
+/* Orb3D: the canvas is the whole orb; the state effects hug the ring, like TalkOrb's */
+.iris-orb3d { all: unset; position: relative; display: grid; place-items: center; flex: none; z-index: 2; }
+button.iris-orb3d { cursor: pointer; }
+button.iris-orb3d:active .iris-orb3d-canvas { transform: scale(.96); }
+.iris-orb3d-canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform .2s; }
+.iris-orb3d-echo { position: absolute; inset: 18%; border-radius: 50%; border: .8px solid rgba(125, 211, 252, .7);
+  box-shadow: 0 0 4px rgba(125, 211, 252, .4); animation: iris-talkorb-echo 1.35s ease-out infinite; opacity: 0; pointer-events: none; }
+.iris-orb3d-arc { position: absolute; inset: 14%; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(from 0deg, transparent 0deg 200deg, rgba(56, 189, 248, .6) 300deg, #2ee6d6 358deg, transparent 360deg);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+          mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+  filter: drop-shadow(0 0 3px rgba(46, 230, 214, .7)); animation: iris-spin .69s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .iris-orb3d-arc, .iris-orb3d-echo { animation: none; } }
+
+/* Skeleton: the glass loading blocks, in the shape of the real content */
+.iris-skeleton { border-radius: var(--radius-card); background:
+  linear-gradient(100deg, rgba(255,255,255,.05) 30%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.05) 70%) 0 0 / 300% 100%;
+  animation: iris-shine 1.4s ease-in-out infinite; }
+.iris-skeleton-screen { display: flex; flex-direction: column; gap: 12px; }
+@keyframes iris-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .iris-skeleton, .iris-orb i { animation: none; } }
+
+/* ---------- Screen design system ---------- */
+.iris-topic { display: contents; }
+.iris-fill { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* Buttons in a topic: primary flat accent at oklch .82/.12 with dark ink, secondary glass tinted 8% */
+.iris-btn-primary { background: var(--k-button, #e9f1f5); color: #07090c; }
+.iris-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+/* in a topic or a ButtonGroup only; a plain glass button keeps --glass and --edge */
+:is(.iris-topic, .iris-btngroup) .iris-btn-glass { background: color-mix(in srgb, var(--k, var(--accent)) 8%, #12161d); border: 0; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+:is(.iris-topic, .iris-btngroup) .iris-btn-glass:hover:not(:disabled) { background: color-mix(in srgb, var(--k, var(--accent)) 16%, #12161d); }
+.iris-btn-text { color: var(--k, var(--accent)); padding: 0 4px !important; }
+.iris-btn-text:hover { text-decoration: underline; text-underline-offset: 4px; }
+.iris-btn-icon-only { width: 44px; padding: 0 !important; background: #1a2029; color: var(--fg); }
+.iris-btn-sm.iris-btn-icon-only { width: 28px; }
+.iris-btn:focus-visible { outline: 2px solid var(--k, var(--accent)); outline-offset: 2px; }
+.iris-btn[aria-busy="true"] { cursor: progress; opacity: 1; }
+.iris-btn-primary[aria-busy="true"] { background: color-mix(in srgb, var(--k-button, #e9f1f5) 70%, #0e1218); }
+:is(.iris-topic, .iris-btngroup) .iris-btn-off:disabled { background: #151a21; color: #56606d; opacity: 1; border: 0; box-shadow: none; }
+.iris-spin { width: 1em; height: 1em; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: iris-spin .8s linear infinite; box-sizing: border-box; }
+.iris-btngroup { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.iris-btngroup.stack { flex-direction: column; align-items: stretch; }
+
+/* Widget */
+.iris-widget { position: relative; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; flex: none;
+  padding: 16px; border-radius: 26px; color: var(--fg); font-family: var(--font);
+  --iris-track: color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--kd, #08183a) 70%, #0c0f14), #090b0f);
+  border: 1px solid color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027); }
+.iris-card.iris-card-topic { background: linear-gradient(160deg, color-mix(in srgb, var(--kd, #08183a) 70%, #0c0f14), #090b0f);
+  border-color: color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027); }
+.iris-card-topic > .ia-label:first-child, .iris-card-topic > .iris-section:first-child { color: var(--k, var(--accent)); }
+.iris-w-small { width: 170px; height: 170px; } .iris-w-wide { width: 360px; height: 170px; }
+.iris-w-tall { width: 170px; height: 376px; } .iris-w-large { width: 360px; height: 376px; }
+.iris-widget > * { position: relative; }
+.iris-widget > .iris-fill { position: absolute; }
+.iris-look-pattern { background: var(--kd, #08183a); }
+.iris-whead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; min-width: 0; }
+.iris-whead > span:first-child { font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--k, var(--accent));
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iris-push { flex: 1; }
+.iris-wvalue { font: 700 46px/1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--k, var(--accent)) 45%, white), var(--k, var(--accent))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.iris-w-wide .iris-wvalue, .iris-w-large .iris-wvalue { font-size: 52px; }
+.iris-wunit { font-size: 14px; color: var(--dim); }
+.iris-wpanel { margin-top: 8px; background: color-mix(in srgb, var(--kd, #08183a) 72%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 14px; padding: 4px 10px; }
+.iris-wbig { font: 700 26px/1.1 var(--font-display); letter-spacing: -.01em; }
+.iris-wbig span { font: 500 14px var(--font); color: var(--dim); }
+.iris-ring { position: relative; display: grid; place-items: center; margin: 2px auto; flex: none; }
+.iris-ring svg { position: absolute; inset: 0; }
+.iris-mid { display: grid; justify-items: center; text-align: center; gap: 2px; }
+.iris-ring .iris-wvalue { font-size: 30px; }
+.iris-ring .iris-mid span { font-size: 11px; color: var(--dim); max-width: 6rem; }
+.iris-rows { list-style: none; margin: 0; padding: 0; }
+.iris-rows li { display: flex; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid #1a212b; font-size: 14px; line-height: 1.3; min-width: 0; }
+.iris-rows li:first-child { border-top: 0; }
+.iris-rows li b { font: 600 11px var(--mono); color: var(--k, var(--accent)); min-width: 3rem; flex: none; }
+.iris-rows li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.iris-rows li.folded { color: var(--dim); font-size: 13px; }
+.iris-rows.tick li::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #4a5361; flex: none; box-sizing: border-box; }
+.iris-rows.tick li.folded::before { border: 0; background: var(--k, var(--accent)); }
+.iris-bleed { margin-left: -16px; margin-right: -16px; border-radius: 0 0 28px 28px; border-left: 0; border-right: 0; }
+
+/* Anchor: the one handwritten note */
+.iris-anchor { font: 700 20.8px/1 Caveat, "Bradley Hand", "Segoe Print", cursive; color: var(--k, var(--accent)); opacity: .9;
+  display: inline-block; transform: rotate(-3deg); max-width: 100%; margin-left: 6px; }
+.iris-anchor-plain { color: var(--dim); font-size: 13px; margin-left: 6px; }
+
+/* PhaseRing */
+.iris-phase { position: relative; display: grid; place-items: center; margin: 0 auto; max-width: 100%; aspect-ratio: 1; color: var(--fg); font-family: var(--font); }
+.iris-phase-word { font: 600 11px var(--mono); letter-spacing: .14em; color: var(--phase); text-transform: uppercase; }
+.iris-phase .iris-mid { width: 100%; position: relative; }
+.iris-phase b { font: 700 18px/1.2 var(--font-display); max-width: 62%; overflow-wrap: break-word; }
+.iris-phase-sub { font-size: 13px; color: var(--dim); max-width: 58%; }
+
+/* Pen */
+.iris-pen { position: relative; display: inline-block; }
+.iris-pen-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.iris-pen-spot::before { content: ""; position: absolute; inset: -4px -10px; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(7, 9, 12, .72); pointer-events: none; }
+
+/* Word */
+.iris-word { position: relative; border-radius: var(--radius-card, 18px); overflow: hidden; }
+
+/* PageDots: dots in the topic colour, the active one a duotone streak (k to k2) */
+.iris-dots { display: flex; justify-content: center; align-items: center; gap: 2px; }
+.iris-dots.dark { background: rgba(7, 9, 12, .72); border-radius: 999px; padding: 0 6px; width: max-content; margin: 0 auto; }
+.iris-dot { all: unset; cursor: pointer; padding: 8px 4px; }
+.iris-dot i { display: block; width: 7px; height: 7px; border-radius: 999px; background: color-mix(in srgb, var(--k, #5a6b78) 30%, #2a313b); transition: width .25s; }
+.iris-dot.on i { width: 22px; background: linear-gradient(90deg, var(--k, var(--fg)), var(--k2, var(--fg))); }
+.iris-dot:focus-visible { outline: 2px solid var(--k, var(--accent)); outline-offset: 2px; border-radius: 8px; }
+@media (prefers-reduced-motion: reduce) { .iris-spin { animation: none; } }
+
+/* Web UI parts in the topic palette (Chip, Progress, Stat, CheckList, Segmented, Field): --k from a Topic, else the ice accent */
+.iris-topic .iris-btn-accent { background: color-mix(in srgb, var(--k) 28%, transparent); border-color: color-mix(in srgb, var(--k) 55%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--k) 25%, transparent); }
+.iris-chip { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
+  border-radius: var(--radius-pill); font: 500 13px var(--font); color: var(--k, var(--accent)); cursor: pointer; transition: background .15s;
+  background: color-mix(in srgb, var(--k, var(--accent)) 14%, transparent); border: 1px solid color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }
+.iris-chip.on { background: var(--k, var(--accent)); color: var(--kd, #07171f); border-color: var(--k, var(--accent)); }
+.iris-chip:focus-visible, .iris-seg button:focus-visible, .iris-check button:focus-visible { outline: 2px solid var(--k, var(--accent)); outline-offset: 2px; border-radius: 999px; }
+.iris-bar { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--k, var(--accent)) 18%, #0b0f0d); overflow: hidden; }
+.iris-bar i { display: block; height: 100%; border-radius: 4px; background: var(--k, var(--accent)); transition: width .4s cubic-bezier(.2,.9,.25,1); }
+.iris-pring { position: relative; display: grid; place-items: center; flex: none; }
+.iris-pring svg { position: absolute; inset: 0; }
+.iris-pring .mid { display: grid; justify-items: center; text-align: center; }
+.iris-pring b { font: 700 40px/1 var(--mono); letter-spacing: -.02em; color: var(--fg); }
+.iris-pring span { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.iris-stat { background: var(--glass); border: 1px solid var(--edge); border-radius: 14px; padding: 12px 14px; min-width: 0; }
+.iris-stat b { display: block; font: 700 28px/1.05 var(--mono); letter-spacing: -.02em; color: var(--k, var(--accent)); white-space: nowrap; }
+.iris-stat span { font-size: 12px; color: var(--dim); }
+.iris-check { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font: 14px var(--font); color: var(--fg); min-width: 0; }
+.iris-check li { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.iris-check button { all: unset; display: flex; gap: 8px; align-items: center; min-width: 0; cursor: pointer; }
+.iris-check .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iris-check .box { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #4a5361; flex: none; box-sizing: border-box; }
+.iris-check .done .txt { color: var(--dim); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--dim) 60%, transparent); }
+.iris-check .done .box { border: 0; background: var(--k, var(--accent)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%2307090c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.iris-check .time { font: 600 12px var(--mono); color: var(--k, var(--accent)); min-width: 42px; flex: none; }
+.iris-check.timed .box { display: none; }
+.iris-seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--radius-pill); background: var(--glass); border: 1px solid var(--edge); }
+.iris-seg button { all: unset; padding: 6px 14px; border-radius: var(--radius-pill); font: 500 13px var(--font); color: var(--dim); cursor: pointer; }
+.iris-seg button.on { background: color-mix(in srgb, var(--k, var(--accent)) 14%, transparent); color: var(--k, var(--accent)); }
+.iris-field { box-sizing: border-box; width: 100%; height: 44px; padding: 0 16px; border-radius: var(--radius-pill); background: var(--glass);
+  border: 1px solid var(--edge); color: var(--fg); font: 15px var(--font); caret-color: var(--k, var(--accent)); outline: none; }
+.iris-field::placeholder { color: var(--faint); }
+.iris-field:focus-visible { border-color: color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--k, var(--accent)) 14%, transparent); }
+
+/* PhaseRing with labels, LoopScreen */
+.iris-phase-label { position: absolute; transform: translate(-50%, -50%); font-size: 11px; color: var(--dim); white-space: nowrap; transition: color .3s; }
+.iris-phase-label.now { color: #fff; font-weight: 700; }
+.iris-phase.labelled .iris-mid { padding: 0 25%; box-sizing: border-box; }
+.iris-phase.labelled b { max-width: 100%; font-size: 19px; line-height: 1.1; overflow-wrap: normal; }
+.iris-phase.labelled .iris-phase-sub { max-width: 100%; font-size: 11px; color: var(--phase); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iris-phase.labelled .iris-phase-word { font-size: 9px; letter-spacing: .2em; color: var(--dim); }
+.iris-gradient { background: linear-gradient(180deg, #e8f2f7, var(--phase, var(--accent))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.iris-loop { position: relative; width: 300px; box-sizing: border-box; padding: 16px 22px 16px 16px; display: flex; flex-direction: column; gap: 14px; background: var(--bg); color: var(--fg); font-family: var(--font); overflow: hidden; border-radius: 40px; border: 1px solid #1f2630; }
+.iris-loop .iris-phase { margin-top: -6px; }
+.iris-nowcard { border-radius: 20px; padding: 14px 16px; display: grid; gap: 4px; background: linear-gradient(160deg, #111a24, #0a0e14); border: 1px solid #1f2b36; }
+.iris-nowcard-head { font: 600 9px var(--mono); letter-spacing: .2em; color: var(--k, var(--accent)); text-transform: uppercase; }
+.iris-nowcard b { font: 800 22px var(--font-display); letter-spacing: -.01em; }
+.iris-nowcard-text { font-size: 13px; color: #c3cbd6; }
+.iris-nowcard-dots { display: flex; gap: 5px; margin-top: 6px; }
+.iris-nowcard-dots i { width: 8px; height: 8px; border-radius: 50%; background: #243040; }
+.iris-nowcard-dots i.done { background: var(--accent); }
+.iris-loop-dots { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); }
+.iris-dots.vertical { flex-direction: column; }
+.iris-dots.vertical .iris-dot { padding: 3px 4px; }
+.iris-dots.vertical .iris-dot i { width: 5px; height: 5px; }
+.iris-dots.vertical .iris-dot.on i { width: 5px; height: 16px; background: linear-gradient(180deg, var(--k, var(--fg)), var(--k2, var(--fg))); }
+
+/* Pattern: a moving fill in the topic's tints on its dark ground; content sits on a frosted panel */
+.iris-pattern { position: relative; overflow: hidden; border-radius: 26px; background: var(--kd, #08183a); border: 1px solid color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027); display: flex; align-items: flex-end; padding: 16px; box-sizing: border-box; color: var(--fg); font-family: var(--font); }
+.iris-pattern-panel { position: relative; background: color-mix(in srgb, var(--kd, #08183a) 72%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 14px; padding: 8px 12px; }

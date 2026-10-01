@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<!-- @dsCard group="App layouts" height=620 page subtitle="One subject, a few angles on it: tabs under the title" -->
+<div id="root" class="pv"></div>
+<script>
+(() => {
+  const ICONS = {"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"route":[["circle",{"cx":"6","cy":"19","r":"3"}],["path",{"d":"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"}],["circle",{"cx":"18","cy":"5","r":"3"}]],"list":[["path",{"d":"M3 5h.01"}],["path",{"d":"M3 12h.01"}],["path",{"d":"M3 19h.01"}],["path",{"d":"M8 5h13"}],["path",{"d":"M8 12h13"}],["path",{"d":"M8 19h13"}]],"train":[["path",{"d":"M8 3.1V7a4 4 0 0 0 8 0V3.1"}],["path",{"d":"m9 15-1-1"}],["path",{"d":"m15 15 1-1"}],["path",{"d":"M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"}],["path",{"d":"m8 19-2 3"}],["path",{"d":"m16 19 2 3"}]],"check":[["path",{"d":"M20 6 9 17l-5-5"}]],"calendar":[["path",{"d":"M8 2v3"}],["path",{"d":"M16 2v3"}],["rect",{"height":"18","rx":"2","width":"18","x":"3","y":"3"}],["path",{"d":"M3 9h18"}]],"coffee":[["path",{"d":"M10 2v2"}],["path",{"d":"M14 2v2"}],["path",{"d":"M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"}],["path",{"d":"M6 2v2"}]]};
+  const ic = (n, s = 18) => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + (ICONS[n] || []).map(([t, a]) => '<' + t + ' ' + Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('') + '</svg>';
+  const st = document.createElement("style"); st.textContent = "\n.pv{font:15px/1.5 var(--font);color:var(--fg);background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:12px;-webkit-font-smoothing:antialiased}\n.pv *{box-sizing:border-box}\n.pv-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}\n.pv-top .label{flex:1}\n.label{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}\n.seg{display:inline-flex;padding:.2rem;border-radius:999px;background:var(--glass);border:1px solid var(--edge)}\n.seg button,.tab,.nav,.btn,.item,.chip,.tb{all:unset;cursor:pointer;transition:background .2s cubic-bezier(.2,.9,.25,1),color .2s,border-color .2s,opacity .2s,scale .15s}\n.seg button{padding:.3rem .8rem;border-radius:999px;font:500 .8rem var(--font);color:var(--dim)}\n.seg button:hover{color:var(--fg)}\n.seg button[aria-pressed=true]{background:rgba(125,211,252,.14);color:var(--accent)}\n:is(.seg button,.tab,.nav,.btn,.item,.chip,.tb):focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n:is(.tab,.nav,.btn,.item,.chip,.tb):active{scale:.96}\n.stage{display:flex;justify-content:center;align-items:flex-start;padding:.5rem 0}\n.app{position:relative;width:60rem;max-width:100%;height:31rem;container-type:inline-size;border:1px solid var(--edge);border-radius:1rem;\n  background:rgba(12,17,23,.9);overflow:hidden;display:flex;transition:width .35s cubic-bezier(.2,.9,.25,1),height .35s cubic-bezier(.2,.9,.25,1)}\n.app.phone{width:23.5rem;height:36rem;border-radius:1.6rem}\n.col{display:flex;flex-direction:column;min-width:0;flex:1}\n.side{width:13rem;flex:none;padding:.9rem .6rem;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:.15rem;background:rgba(7,9,12,.5)}\n.side .brand{display:flex;align-items:center;gap:.5rem;padding:.2rem .6rem .9rem;font-weight:600}\n.side .grp{margin:.9rem .6rem .35rem}\n.nav{display:flex;gap:.6rem;align-items:center;padding:.45rem .6rem;border-radius:.7rem;color:var(--dim);font-size:.88rem}\n.nav:hover{background:var(--glass);color:var(--fg)}\n.nav[aria-current=page]{background:rgba(125,211,252,.14);color:var(--fg)}\n.nav[aria-current=page] svg{color:var(--accent)}\n.nav .n{margin-left:auto;font:500 11px var(--mono);color:var(--faint)}\n.head{display:flex;align-items:center;gap:.6rem;padding:.8rem 1.1rem;border-bottom:1px solid var(--line);min-height:3.4rem}\n.head h2{font:600 1.05rem/1.3 var(--font);margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.head .sub{color:var(--dim);font-size:.88rem;font-weight:400}\n.body{flex:1;overflow:auto;padding:1.1rem;display:flex;flex-direction:column;gap:1.3rem;min-height:0}\n.card{background:var(--glass);border:1px solid var(--edge);border-radius:.9rem;padding:.9rem 1rem}\n.card .label{color:var(--accent);display:block;margin-bottom:.35rem}\n.row{display:flex;gap:.6rem;align-items:center;padding:.6rem 0;border-top:1px solid var(--edge);font-size:.9rem}\n.row:first-of-type{border-top:0}\n.row .r{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums}\n.dim{color:var(--dim)} .small{font-size:.88rem}\n.pill{display:inline-flex;align-items:center;gap:.3rem;font:500 .75rem/1.6 var(--font);padding:0 .55rem;border-radius:999px;background:rgba(125,211,252,.12);color:var(--accent);white-space:nowrap}\n.pill.ok{background:rgba(74,222,128,.12);color:var(--ok)} .pill.wait{background:rgba(253,230,138,.12);color:var(--wait)} .pill.bad{background:rgba(248,113,113,.12);color:var(--error)}\n.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.5rem .9rem;border-radius:.6rem;font:600 .88rem var(--font);background:rgba(255,255,255,.08);color:var(--fg)}\n.btn:hover{background:rgba(255,255,255,.14)}\n.btn.primary{background:var(--accent);color:#07171f} .btn.primary:hover{background:#a5e2ff}\n.btn.rand{background:none;border:1px solid rgba(125,211,252,.45);color:var(--accent);border-radius:999px;font-weight:500}\n.btn.rand:hover{background:rgba(125,211,252,.12)}\n.btn.ghost{background:none;width:2.2rem;height:2.2rem;padding:0;border-radius:50%;color:var(--dim)}\n.btn.ghost:hover{background:var(--glass);color:var(--fg)}\n.btn.primary.icon{width:2.2rem;height:2.2rem;padding:0;border-radius:50%}\n.search{display:flex;align-items:center;gap:.5rem;padding:.4rem .8rem;border-radius:999px;background:var(--glass);border:1px solid var(--edge);color:var(--faint);font-size:.88rem;min-width:0}\n.tabbar{display:none;position:absolute;left:.6rem;right:.6rem;bottom:.6rem;height:3.6rem;padding:.3rem;border-radius:999px;background:rgba(20,26,34,.82);\n  border:1px solid var(--edge);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:6}\n.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;border-radius:999px;color:var(--dim);font-size:.72rem}\n.tab[aria-current=page]{color:var(--accent);background:rgba(125,211,252,.14)}\n.back{display:none}\n@container (max-width: 40rem){\n  .side{display:none} .tabbar{display:flex} .body{padding-bottom:5rem}\n  .head{padding:.8rem 1rem}\n}\n@media (prefers-reduced-motion: reduce){.app,.seg button,.tab,.nav,.btn,.item,.chip,.tb{transition:none}}\n"; document.head.appendChild(st);
+  const root = document.getElementById("root");
+  root.innerHTML = '<div class="pv-top"><span class="label">Tabs app</span><div class="seg" role="group" aria-label="Size">'
+    + '<button aria-pressed="true" data-size="wide">Window</button><button aria-pressed="false" data-size="phone">Phone</button></div></div>'
+    + '<div class="stage"><div class="app" id="app"></div></div>';
+  const app = root.querySelector("#app");
+  root.querySelector(".seg").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    root.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    app.classList.toggle("phone", b.dataset.size === "phone");
+  });
+  const S = {};
+  const draw = () => { app.innerHTML = ((S, ic) => {
+    const tabs = [["over","info","Overview"],["route","route","Route"],["pack","list","Packing"]];
+    const cur = S.t || "over";
+    const pack = S.pack || { "Passport": true, "Charger": true, "Rain jacket": false, "Train tickets": false };
+    const views = {
+      over: '<div class="stats"><div class="card"><div class="big">3</div><div class="dim small">nights</div></div><div class="card"><div class="big">14°</div><div class="dim small">Ghent</div></div><div class="card"><div class="big">2h 41</div><div class="dim small">by train</div></div></div>'
+        + '<div class="card"><span class="label">Friday</span><div class="row">' + ic("train", 16) + 'Central Station<span class="r">09:12</span></div><div class="row">' + ic("coffee", 16) + 'Lunch at a food market<span class="r">12:30</span></div></div>',
+      route: '<div class="card"><span class="label">Out</span><div class="row">Central Station to North Station<span class="r">09:12 to 10:31</span></div><div class="row">North Station to South Station<span class="r">10:48 to 11:53</span></div></div>',
+      pack: '<div class="card" style="padding:.2rem 1rem">' + Object.entries(pack).map(([k, v]) => '<button class="item row" data-p="' + k + '" style="width:100%">'
+        + '<span class="chk' + (v ? ' on' : '') + '">' + (v ? ic("check", 14) : '') + '</span>' + k + '</button>').join("") + '</div>',
+    };
+    S.pack = pack;
+    return '<div class="col"><div class="head" style="border:0;padding-bottom:.2rem"><h2>Weekend in Ghent <span class="sub">10 to 13 Oct</span></h2></div>'
+      + '<div class="tabs">' + tabs.map(([k, i, n]) => '<button class="tb" data-t="' + k + '"' + (k === cur ? ' aria-current="page"' : '') + '>' + n + '</button>').join("") + '</div>'
+      + '<div class="body">' + views[cur] + '</div></div>'
+      + '<nav class="tabbar">' + tabs.map(([k, i, n]) => '<button class="tab" data-t="' + k + '"' + (k === cur ? ' aria-current="page"' : '') + '>' + ic(i, 20) + n + '</button>').join("") + '</nav>';
+  })(S, ic); };
+  const extra = document.createElement("style"); extra.textContent = ".tabs{display:flex;gap:1.1rem;padding:0 1.1rem;border-bottom:1px solid var(--line)}"
+    + ".tb{padding:.6rem 0;font-size:.9rem;color:var(--dim);border-bottom:2px solid transparent;margin-bottom:-1px}.tb:hover{color:var(--fg)}.tb[aria-current]{color:var(--fg);border-color:var(--accent)}"
+    + ".stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}.stats .card{padding:.7rem;border-radius:.7rem}.big{font-size:1.4rem;font-weight:500;font-variant-numeric:tabular-nums}"
+    + ".chk{width:1.1rem;height:1.1rem;border-radius:.35rem;border:1px solid var(--edge);display:grid;place-items:center;flex:none}.chk.on{background:var(--accent);border-color:var(--accent);color:#07171f}"
+    + "@container (max-width:40rem){.tabs{display:none}}";
+  document.head.appendChild(extra);
+  app.addEventListener("click", (e) => { const b = e.target.closest("[data-t]"); if (b) { S.t = b.dataset.t; draw(); return; }
+    const p = e.target.closest("[data-p]"); if (p) { S.pack[p.dataset.p] = !S.pack[p.dataset.p]; draw(); } });
+  draw();
+})();
+</script>
+
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

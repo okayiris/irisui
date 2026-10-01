@@ -1,0 +1,1490 @@
+[
+  {
+    "path": "/",
+    "title": "Overview",
+    "description": "Every Iris part, foundation and layout, with live previews, exact tokens and the rules that hold them. For people and for LLMs.",
+    "headings": [
+      "What is here",
+      "The five rules",
+      "Use it"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/meaning",
+    "title": "Meaning: what may go where",
+    "description": "Every drawing in Iris says something. An orb is Iris, light means she is working, her hand means something personal, a colour means a kind of thing. Nothing is a picture to fill a corner.",
+    "headings": [
+      "One rule over all of it",
+      "Orbs: the five rules",
+      "Each drawing, what it means",
+      "Each state, when it is true",
+      "Colour: what each one says",
+      "Light: she is working on it",
+      "Her hand: something personal",
+      "Big words: a moment",
+      "Status: what is going on",
+      "Interrupting: how loud",
+      "Decoration: the only things allowed to just look nice",
+      "You: what you chose, and what she thinks of you",
+      "Many of her: roles in a team room",
+      "Where each thing lives",
+      "Neighbours: what may stand next to what",
+      "Quick test"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/colour",
+    "title": "Colour",
+    "description": "Iris is a calm ground, near-black or soft near-white as the system is, frosted glass and one ice-blue accent. Colour carries meaning here, it is never decoration.",
+    "headings": [
+      "The palette",
+      "Fifteen topics, one accent per screen",
+      "The loop phases",
+      "What may never be a colour",
+      "Contrast floors",
+      "What Iris does instead"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/type",
+    "title": "Type",
+    "description": "Quiet type. The system font, eight named sizes, mono for labels and values. Nothing shouts, and nothing is invented.",
+    "headings": [
+      "The eight sizes",
+      "Three stacks and where the faces come from",
+      "When mono is used",
+      "Sentence case, and quiet",
+      "Two sizes the tokens carry outside --text-*"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/shape",
+    "title": "Shape",
+    "description": "One shape holds the whole product: a frosted glass card, radius 18, with a 1px light on its edge. Pills for everything you press.",
+    "headings": [
+      "Radius tokens",
+      "The glass card recipe",
+      "Pills",
+      "The ring",
+      "Sheets, dialogs and menus"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/elevation",
+    "title": "Elevation",
+    "description": "Iris has no shadows on cards. Light on the edge does the work, and a shadow appears only over the page.",
+    "headings": [
+      "No shadows on cards",
+      "What replaces a shadow",
+      "The two elevation tokens",
+      "Overlays only",
+      "Nothing above the two steps"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/motion",
+    "title": "Motion",
+    "description": "Two durations the parts already used, three the system now names, one house curve, and her ring.",
+    "headings": [
+      "What moves",
+      "What never moves",
+      "Durations and the house curve",
+      "The ring's own animation",
+      "Reduced motion is a hard rule",
+      "Loading beats",
+      "Why there are no springs"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/interaction",
+    "title": "Interaction",
+    "description": "Every touch gets an answer you can see, and on a phone one you can feel. Nothing arrives or leaves in one frame, and nothing moves that nobody asked for.",
+    "headings": [
+      "Three rules over all of it",
+      "Press",
+      "Going deeper and coming back",
+      "Sheets",
+      "Swipe on a row",
+      "Lists that change",
+      "The done moment",
+      "Haptics",
+      "Springs, only after a finger",
+      "Motion that costs nothing"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/state",
+    "title": "State",
+    "description": "What a part does when a hand answers it, the layer values behind that answer, and the floor underneath.",
+    "headings": [
+      "The seven states",
+      "The layer values",
+      "Every control answers the hand",
+      "Focus is a ring",
+      "Disabled is 38% opacity",
+      "Busy, selected and error",
+      "The floor for targets",
+      "The layer values, state by state"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/spacing",
+    "title": "Spacing",
+    "description": "Three tokens on a page, one rhythm inside a card, and every number the parts use.",
+    "headings": [
+      "The three tokens",
+      "The rhythm inside a card",
+      "The page rhythm",
+      "Divider or space",
+      "Density and compact rows",
+      "Values on one page",
+      "The numbers behind the rhythm"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/layout",
+    "title": "Layout",
+    "description": "A phone in the hand, a window she opens, and a wide screen hold the same file. What changes is how many panes it may show and where the navigation sits.",
+    "headings": [
+      "The same file at three widths",
+      "The three breakpoints",
+      "One frame, one navigation",
+      "Which app layout for which content",
+      "Where the tab bar sits, where the sidebar takes over",
+      "The three window sizes"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/icons",
+    "title": "Icons",
+    "description": "One line set, drawn by the system. Fourteen shapes ship, at four sizes, and no screen draws its own.",
+    "headings": [
+      "One set, from the system",
+      "What the set ships",
+      "Sizes in use",
+      "Stroke",
+      "When an icon may stand alone",
+      "Never draw your own"
+    ]
+  },
+  {
+    "path": "/irisui/foundations/accessibility",
+    "title": "Accessibility: what it holds, and what it owes",
+    "description": "Contrast, target size, focus, motion and words: what the system holds today, and what it still owes.",
+    "headings": [
+      "Contrast floors",
+      "What is tested, and what is not",
+      "Targets",
+      "Focus",
+      "Motion",
+      "Text scaling",
+      "Language and reading",
+      "Alt text",
+      "Never colour alone",
+      "Keyboard"
+    ]
+  },
+  {
+    "path": "/irisui/components/edge",
+    "title": "Edge",
+    "description": "The apps' light patterns along an edge: round her orb while she thinks, along a screen while it reloads. The TalkOrb and the Orb3D think with it.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/edgetext",
+    "title": "EdgeText",
+    "description": "A word as a neon sign: the Edge light runs along the outline of every letter. SVG and CSS only.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/macpill",
+    "title": "MacPill",
+    "description": "The Mac: her orb low on the desktop, with the bar that grows out from behind it when the hand rests on it.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/mark",
+    "title": "Mark",
+    "description": "Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/orb",
+    "title": "Orb",
+    "description": "Any where you show that Iris is there: the header of a screen, a hero, the logo.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/orb3d",
+    "title": "Orb3D",
+    "description": "A hero moment, the Mac pill or the talk button, where one or two live orbs carry the screen.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/talkorb",
+    "title": "TalkOrb",
+    "description": "The talk button: the middle of the iPhone tab bar, and the Mac pill. Hold it to talk.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/button",
+    "title": "Button",
+    "description": "A single action or decision; the browser build of the app's pill button.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/buttongroup",
+    "title": "ButtonGroup",
+    "description": "The button set of one screen in its topic: primary flat, secondary glass, the quieter kinds beside them.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/chip",
+    "title": "Chip",
+    "description": "One choice among a few in a topic: a shop, a day, a filter.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/datepicker",
+    "title": "DatePicker",
+    "description": "A month you pick a day in: one accent on the chosen day, today marked with a ring.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/field",
+    "title": "Field",
+    "description": "One line of input inside a card: a search box, an add line, a short answer.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/menu",
+    "title": "Menu",
+    "description": "A list of choices on its own surface: a filter, a sort, a set of actions, anchored to the thing it belongs to.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/searchfield",
+    "title": "SearchField",
+    "description": "Finding something: a pill field that says what it is doing and clears itself.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/select",
+    "title": "Select",
+    "description": "One choice out of a few, in the shape of the fields around it.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/slider",
+    "title": "Slider",
+    "description": "One value on a line: how much, how far, how loud.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/splitbutton",
+    "title": "SplitButton",
+    "description": "One action, and the caret that opens the others that belong to it.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/textarea",
+    "title": "TextArea",
+    "description": "The multi-line field: a note, a message, anything longer than a line.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/timepicker",
+    "title": "TimePicker",
+    "description": "A time you set with two strips: the hour, then the minute. The chosen time reads big, in mono.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/toggle",
+    "title": "Toggle",
+    "description": "A setting that is on or off and takes effect at once.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/card",
+    "title": "Card",
+    "description": "Every group of content on the near-black page: one panel, one surface, no second style.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/carousel",
+    "title": "Carousel",
+    "description": "A strip of cards you swipe or scroll sideways, with dots that say where you are.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/checklist",
+    "title": "CheckList",
+    "description": "A short list of things to do, ticked in the topic colour or ordered by time.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/divider",
+    "title": "Divider",
+    "description": "A hairline that groups what is above it from what is below.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/photo",
+    "title": "Photo",
+    "description": "A photo with a depth map: a word behind the person, duotone in the topic's colours, or parallax in four depth layers. No photo ships: without a src it paints its own neutral scene with a matching depth map, and without a depth map it guesses one (lower and central is nearer).",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/row",
+    "title": "Row",
+    "description": "One line of a settings page: icon, title, the dim line under it, and a control on the right.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/stat",
+    "title": "Stat",
+    "description": "One number and one word, at the top of a card or a window.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/dialog",
+    "title": "Dialog",
+    "description": "The one place Iris interrupts: a decision that cannot wait, with the action that matters first.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/sheet",
+    "title": "Sheet",
+    "description": "Secondary content anchored to an edge: the bottom on a phone, the side on a wide window.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/vaultask",
+    "title": "VaultAsk",
+    "description": "The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches, then allow or no.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/appbar",
+    "title": "AppBar",
+    "description": "The top line of a screen or a window: what this is, and the few actions that belong to it.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/badge",
+    "title": "Badge",
+    "description": "A count or a dot on the thing it belongs to: a tab, an icon, a word.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/chatstack",
+    "title": "ChatStack",
+    "description": "Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/circlestack",
+    "title": "CircleStack",
+    "description": "Every chat with its loops as a circle, stacked behind the strip: where the loops live now that the iPhone app has no Loops tab.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/navrail",
+    "title": "NavRail",
+    "description": "The wide-window version of the tab bar: a rail of sections that collapses to icons.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/pagedots",
+    "title": "PageDots",
+    "description": "Under screens a thumb swipes through, when the count matters to the person.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/segmented",
+    "title": "Segmented",
+    "description": "Two to four views of one thing, inside a card.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/statuspill",
+    "title": "StatusPill",
+    "description": "Top left of every screen, while she is doing something or has exactly one action to offer.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/steps",
+    "title": "Steps",
+    "description": "Where you are in a short flow, and what is still coming.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/tabbar",
+    "title": "TabBar",
+    "description": "The bottom of every iPhone screen: her talk button in the middle, the tabs either side of it.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/tabs",
+    "title": "Tabs",
+    "description": "A few angles on one thing, under its title, with the ink sliding to the active one.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/toolbar",
+    "title": "Toolbar",
+    "description": "A bar of actions that belong together, docked in a screen or floating over the content.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/borderpattern",
+    "title": "BorderPattern",
+    "description": "A pattern running along a rounded edge, one per moment: refreshing, listening, thinking, working, speaking, a question waiting, news, saving.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/emptystate",
+    "title": "EmptyState",
+    "description": "Nothing here yet, said properly: what this place is for and the one thing to do about it.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/loopbubble",
+    "title": "LoopBubble",
+    "description": "One loop, small: its first letter in a disc and the six phases round it, the current one lit.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/progress",
+    "title": "Progress",
+    "description": "How far something is: a thin bar by default, or a ring with a value in the middle.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/skeleton",
+    "title": "Skeleton",
+    "description": "Anything loads from the house: blocks with a sheen in the shape of what is coming.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/snackbar",
+    "title": "Snackbar",
+    "description": "What happened next, next to the thing it happened to: one line and at most one action.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/tooltip",
+    "title": "Tooltip",
+    "description": "The name of a thing that is only an icon, on hover and on focus.",
+    "headings": [
+      "Live",
+      "Props",
+      "In the system's own words"
+    ]
+  },
+  {
+    "path": "/irisui/components/anchor",
+    "title": "Anchor",
+    "description": "The one personal note on a screen she builds for someone, beside the thing it is about.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/loopscreen",
+    "title": "LoopScreen",
+    "description": "One loop in detail, as a whole screen.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/pattern",
+    "title": "Pattern",
+    "description": "A moving fill behind a card, a header band or a screen strip, in the topic's two tints.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/pen",
+    "title": "Pen",
+    "description": "One mark on one piece of text, where a hand would have circled, underlined or ticked it.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/phasering",
+    "title": "PhaseRing",
+    "description": "A loop as six phases, when the ring itself is the progress and not decoration round it.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/themeword",
+    "title": "ThemeWord",
+    "description": "A word that carries one element or season, or the middle of a loop screen.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/topic",
+    "title": "Topic",
+    "description": "Once, high up, on every screen she builds for someone: it colours everything inside it.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/widget",
+    "title": "Widget",
+    "description": "One answer at a glance on a screen she builds for someone.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/word",
+    "title": "Word",
+    "description": "One big word for a moment: a done moment, a number, a name.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/boardapp",
+    "title": "BoardApp",
+    "description": "Work that moves through stages: jobs, a hiring pipeline, a content calendar.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/dashboardapp",
+    "title": "DashboardApp",
+    "description": "A page of tiles that answers how it is going at a glance: a house, a shop, a campaign.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/documentapp",
+    "title": "DocumentApp",
+    "description": "Long text: a plan, notes, a report she wrote.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/flowapp",
+    "title": "FlowApp",
+    "description": "Anything with an end: book, sign up, set up a plugin, file a claim.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/listdetailapp",
+    "title": "ListDetailApp",
+    "description": "A collection you open one of: mail, notes, contacts, orders.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/sidebarapp",
+    "title": "SidebarApp",
+    "description": "Sections in a sidebar on the left, one view at a time: the default shape for an app with 3 to 7 places.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/surfaces",
+    "title": "Surfaces",
+    "description": "Choosing where something she built lands, from a line in the chat to a full app.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/tableapp",
+    "title": "TableApp",
+    "description": "Things of one kind you look through: what Iris did, the vault's logins, invoices, people.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/tabsapp",
+    "title": "TabsApp",
+    "description": "One subject seen from two to five angles: a trip, a person, a project.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/widgetpagesapp",
+    "title": "WidgetPagesApp",
+    "description": "The phone home: pages of widgets, one theme per page, swiped with a dot rail.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/effects",
+    "title": "Effects",
+    "description": "Drawing attention: her LED edges, a neon line, a waiting question, the tour ring, pointing, pen marks.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/webkit",
+    "title": "WebKit",
+    "description": "The web UI parts inside a topic: Chip, Progress, Stat, CheckList, Segmented, Field.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/widgetdata",
+    "title": "WidgetData",
+    "description": "A showcase: the widget system filled with real demo content, over twelve topics.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/widgetgallery",
+    "title": "WidgetGallery",
+    "description": "A showcase: the four widget looks, each in the four sizes, with changing topics.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/widgetscreens",
+    "title": "WidgetScreens",
+    "description": "A showcase: widgets in use, as the widget lab has them, with scrolling and pictures.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "In the system's own words",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components/cover",
+    "title": "Cover",
+    "description": "The one title card of a set, chapter or share image: the word on the left, the look on the right.",
+    "headings": [
+      "Live",
+      "Anatomy",
+      "Props",
+      "Guidelines",
+      "Specs",
+      "Accessibility",
+      "Goes with"
+    ]
+  },
+  {
+    "path": "/irisui/components",
+    "title": "All components",
+    "description": "Every part of the system as a live picture. Pick one by how it looks.",
+    "headings": [
+      "Brand",
+      "Controls",
+      "Surfaces",
+      "Overlays",
+      "Navigation",
+      "Feedback",
+      "Screen parts",
+      "App layouts",
+      "Showcases",
+      "Other"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/phone",
+    "title": "A phone screen",
+    "description": "One screen she builds for one person: one answer, one accent, one mark. The rules were settled in review and live in code.",
+    "headings": [
+      "The seven hard rules",
+      "The busy budget is 5",
+      "One screen, built",
+      "What a screen never does"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/window",
+    "title": "A window she opens",
+    "description": "The overlay she lays over the talk for one view: how big it is, what holds its edges, and what never goes inside it.",
+    "headings": [
+      "A card or a window",
+      "The shape",
+      "The title bar",
+      "What never appears in a window",
+      "How a window differs from a page"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/loop",
+    "title": "A loop",
+    "description": "One thing that comes back: the six phases, the ring that shows them, and what the person can do while it runs.",
+    "headings": [
+      "The six phases",
+      "The ring",
+      "The loop screen",
+      "What the middle shows",
+      "Waiting on you is the loud one",
+      "When a loop is missed"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/apps",
+    "title": "An app she builds",
+    "description": "Several views, a way to move between them, its own data that is there tomorrow, and a shape that works in a small window, a full browser and a phone.",
+    "headings": [
+      "Pick the smallest surface that holds it",
+      "The nine layouts",
+      "What they share",
+      "Folding: the frame decides, not the screen",
+      "It uses the system's own controls"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/search",
+    "title": "Search and finding",
+    "description": "Where the field sits, what it shows while it waits, what an empty result says, and how filtering differs from asking the house.",
+    "headings": [
+      "Where the field sits",
+      "While it waits",
+      "An empty result",
+      "Filtering a list or searching a house",
+      "The keyboard",
+      "No bar of its own"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/settings",
+    "title": "Settings and the You page",
+    "description": "The You page is the reference for every settings surface: one column of glass rows, the value on the right, and danger last.",
+    "headings": [
+      "The You page is the reference",
+      "A row",
+      "What a setting may never do without saying so",
+      "Where danger sits",
+      "A value that is still loading",
+      "States and tokens you may use"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/loading",
+    "title": "Loading and empty",
+    "description": "A wait is never an empty black screen. Iris shows the shape of what is coming, then one line of what she is doing, then the thing.",
+    "headings": [
+      "The beats",
+      "A skeleton",
+      "What a skeleton may not be",
+      "Progress, for work with a real end",
+      "A busy button",
+      "When it takes long"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/errors",
+    "title": "Errors and refusal",
+    "description": "Say what happened next to the thing that failed, in one sentence, with retry first. A refusal is not an error.",
+    "headings": [
+      "Next to the thing that failed",
+      "One sentence shape",
+      "Retry is the first action",
+      "Refusal is its own case",
+      "Red is only for destructive",
+      "What is never logged or shown",
+      "The one place an error may interrupt"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/onboarding",
+    "title": "Onboarding and permission",
+    "description": "The first minutes ask once, say what for, and take one permission at a time. A refusal never disables the app.",
+    "headings": [
+      "The first minutes",
+      "Ask once, and say what for",
+      "One permission at a time",
+      "While a permission is pending",
+      "The order of the first screens",
+      "What is never asked twice",
+      "When a permission is refused"
+    ]
+  },
+  {
+    "path": "/irisui/patterns/talk",
+    "title": "Talking and voice",
+    "description": "Voice is a surface. The orb shows the state, the talk button is the mic, and every state has one word and one look.",
+    "headings": [
+      "The talk button is the mic",
+      "The states of the orb",
+      "One word of state",
+      "The talk button in the tab bar",
+      "The Mac pill",
+      "Muted and away",
+      "Interruption",
+      "While she thinks"
+    ]
+  },
+  {
+    "path": "/irisui/resources/bundle",
+    "title": "Install and bundle",
+    "description": "Two stylesheets and three scripts. Everything in the system is on one global, window.IrisUi.",
+    "headings": [
+      "Two stylesheets",
+      "Three scripts",
+      "What lands on window.IrisUi",
+      "A page that works",
+      "The fonts",
+      "Build only from these parts"
+    ]
+  },
+  {
+    "path": "/irisui/resources/changelog",
+    "title": "Release notes",
+    "description": "What v33 adds, what v32 is, what changed in it, and what this project added on top of the release.",
+    "headings": [
+      "Release v34",
+      "Release v33",
+      "Release v32",
+      "What the release records",
+      "What v32 changed",
+      "What this project added",
+      "The values the additions introduced",
+      "The site itself"
+    ]
+  },
+  {
+    "path": "/irisui/resources/contribute",
+    "title": "Contribute",
+    "description": "Add a part or a value to the system, in the real files, and hold it to the same promises as everything already there.",
+    "headings": [
+      "The rules a part keeps",
+      "What a part brings with it",
+      "How you hand it in",
+      "The gate",
+      "How to add a value"
+    ]
+  },
+  {
+    "path": "/irisui/resources/tokens",
+    "title": "Tokens",
+    "description": "Every value the system defines.",
+    "headings": [
+      "Colour",
+      "Spacing",
+      "Radius",
+      "Fonts",
+      "Type"
+    ]
+  },
+  {
+    "path": "/irisui/llms",
+    "title": "For LLMs",
+    "description": "How an agent reads this system.",
+    "headings": [
+      "Read this first",
+      "Endpoints",
+      "Four prompts that work",
+      "A prompt that works"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/readme",
+    "title": "Iris Design System (`IrisUi`)",
+    "description": "The look of the Iris app (iPhone, Mac, the windows the assistant builds): cold light on near-black, everything frosted",
+    "headings": [
+      "Where to find what",
+      "The system on one page",
+      "The feel, in five rules",
+      "Loading",
+      "Tokens (`styles.css`)",
+      "Components",
+      "A screen",
+      "Surfaces",
+      "Mail",
+      "Consuming this system (generated — do not edit)",
+      "Index (generated — do not edit)"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/apps",
+    "title": "Apps (what the assistant builds)",
+    "description": "Until now Iris built screens: one view, no navigation, gone when closed. An app is more: several views, a way",
+    "headings": [
+      "Pick the smallest surface that holds it",
+      "Anatomy of an app",
+      "The layouts",
+      "Folding: sizes come from the window, not the screen",
+      "Colour in an app",
+      "Data and state",
+      "Kit parts",
+      "An app, in JSX",
+      "The phone app: the assistant's screens in the Iris tab",
+      "Ways to make a screen",
+      "The other tabs",
+      "Do and don't"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/effects",
+    "title": "Light and marks: neon, LED edges, pointing",
+    "description": "How Iris draws attention: a light running along an edge, a neon line, a finger that points, a loop drawn round",
+    "headings": [
+      "Three lights, three meanings",
+      "The edge: her LEDs (the app's edge drawing)",
+      "Her neon lines",
+      "Ice neon: on and here",
+      "Pointing: the finger on the phone",
+      "Marks on a screen the assistant built (`Pen`)",
+      "Do and don't"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/generative",
+    "title": "AI within the framework",
+    "description": "How to ask an AI for something unique without leaving the Iris look. The split is fixed: **the framework is the base, the AI only tunes it.** The AI never writes a page, a component or CSS. It returns",
+    "headings": [
+      "The loop",
+      "Rules for prompts",
+      "Prompt templates"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/motion",
+    "title": "Motion graphics (video)",
+    "description": "How Iris moves in video: the showreel, ads and any animated explainer. Colours, type and the ring",
+    "headings": [
+      "The feel, in six rules",
+      "Timing",
+      "Layout of a scene",
+      "The ring in motion",
+      "Voices and words",
+      "Scenes that exist",
+      "Do and don't"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/screens",
+    "title": "Screens: the golden key",
+    "description": "The screens Iris builds for someone (a widget, a loop, a list, an answer with a picture) follow one recipe. It came out of an internal critic review of the screen builder, and it lives in code. Build ",
+    "headings": [
+      "The seven hard rules",
+      "The balance",
+      "Less is more: the busy budget",
+      "Still means the end state",
+      "Text behind a person",
+      "The loop screen",
+      "Colour and contrast"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/systems",
+    "title": "Generative systems",
+    "description": "Nine systems make the moving and personal parts of Iris. Each works the same way: the framework draws, a recipe (a small JSON) says what. Every value in a recipe is clamped on the way in: an unknown v",
+    "headings": [
+      "1. Patterns",
+      "2. Words",
+      "3. Widgets",
+      "4. Marks (pen)",
+      "5. Buttons",
+      "6. Photos and depth",
+      "7. Rings (shaders)",
+      "8. The loop screen",
+      "9. Screens"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/web-app",
+    "title": "Web app (talk page and windows)",
+    "description": "The browser version of Iris. Every house serves one talk page of its own; the assistant builds",
+    "headings": [
+      "Tokens: what differs from the app",
+      "The talk page, top to bottom",
+      "Where her UI lands: three surfaces",
+      "The kit",
+      "Sign-in pages",
+      "Topic colour",
+      "Do and don't"
+    ]
+  },
+  {
+    "path": "/irisui/chapters/website",
+    "title": "Website",
+    "description": "The marketing site: a calm night-blue page, big tight headlines, white pill buttons, and the Iris ring as the only",
+    "headings": [
+      "How the site differs from the app",
+      "Tokens",
+      "Type",
+      "Layout",
+      "Components",
+      "Logo",
+      "Imagery",
+      "Copy"
+    ]
+  }
+]

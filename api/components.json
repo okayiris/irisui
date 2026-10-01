@@ -1,0 +1,3049 @@
+[
+  {
+    "id": "edge",
+    "name": "Edge",
+    "group": "Brand",
+    "summary": "The apps' light patterns along an edge: round her orb while she thinks, along a screen while it reloads. The TalkOrb and the Orb3D think with it.",
+    "export": "window.IrisUi.Edge",
+    "props": [
+      {
+        "name": "pattern",
+        "type": "'comet' | 'zip' | 'orbit' | 'sparks' | 'flow' | 'party' | 'wave' | 'breathe' | 'heartbeat' | 'aurora'",
+        "required": false
+      },
+      {
+        "name": "colors",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "shape",
+        "type": "'ring' | 'rect'",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "stroke",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "She thinks, each time another",
+        "code": "() => { const [n, setN] = React.useState(0);\n  React.useEffect(() => { const t = setInterval(() => setN((x) => x + 1), 4000); return () => clearInterval(t); }, []);\n  return h(\"div\", { style: { display: \"flex\", gap: 20, alignItems: \"center\", padding: 16 } },\n    h(TalkOrb, { size: 90, state: \"thinking\", thinking: THINKING[n % THINKING.length] }),\n    h(\"div\", { style: { display: \"grid\", gap: 4 } }, h(\"div\", { style: { fontSize: 17 } }, \"Comparing three quotes\"), h(\"div\", { style: { fontSize: 13, color: \"var(--label)\" } }, \"Each time she thinks, the light runs another way\"))); }"
+      },
+      {
+        "label": "Round a card, while she rebuilds it",
+        "code": "h(\"div\", { style: { position: \"relative\", width: 240, height: 132, margin: 8 } },\n    h(Card, { style: { height: \"100%\", boxSizing: \"border-box\", display: \"grid\", alignContent: \"center\", gap: 4 } },\n      h(\"div\", { style: { fontSize: 17 } }, \"Groceries for Saturday\"), h(\"div\", { style: { fontSize: 13, color: \"var(--label)\" } }, \"She is adding what the recipe needs\")),\n    h(\"div\", { style: { position: \"absolute\", inset: 0, pointerEvents: \"none\" } }, h(Edge, { pattern: \"comet\", shape: \"rect\", width: 240, height: 132, radius: 18 })))"
+      }
+    ],
+    "docs": "/irisui/components/edge.md"
+  },
+  {
+    "id": "edgetext",
+    "name": "EdgeText",
+    "group": "Brand",
+    "summary": "A word as a neon sign: the Edge light runs along the outline of every letter. SVG and CSS only.",
+    "export": "window.IrisUi.EdgeText",
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "pattern",
+        "type": "'comet' | 'sparks' | 'zip' | 'party'",
+        "required": false
+      },
+      {
+        "name": "colors",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "weight",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "The word of a big moment",
+        "code": "h(\"div\", { style: { padding: 12 } }, h(EdgeText, { text: \"Done\", pattern: \"comet\", size: 64 }))"
+      }
+    ],
+    "docs": "/irisui/components/edgetext.md"
+  },
+  {
+    "id": "macpill",
+    "name": "MacPill",
+    "group": "Brand",
+    "summary": "Iris on the Mac desktop: her orb, a bar of buttons that grows out from behind it, her words above and one state line under it.",
+    "export": "window.IrisUi.MacPill",
+    "props": [
+      {
+        "name": "state",
+        "type": "'rest' | 'listening' | 'thinking' | 'talking' | 'muted' | 'away'",
+        "required": false
+      },
+      {
+        "name": "onPress",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "left",
+        "type": "PillAction[]",
+        "required": false
+      },
+      {
+        "name": "right",
+        "type": "PillAction[]",
+        "required": false
+      },
+      {
+        "name": "open",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "badge",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "words",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "back",
+        "type": "{ label: string; onClick?: () => void; variant?: 'text' | 'glass' }",
+        "required": false
+      },
+      {
+        "name": "working",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "At rest, hover the orb",
+        "code": "() => { const [panel, setPanel] = React.useState(null); const [badge, setBadge] = React.useState(2);\n  const [state, setState] = React.useState(\"rest\"); const [words, setWords] = React.useState(null);\n  const pick = (k) => () => { setPanel(panel === k ? null : k); if (k === \"chats\") setBadge(0); };\n  const talk = () => { setState(\"thinking\"); setWords(null);\n    setTimeout(() => { setState(\"talking\"); setWords(\"Tomorrow at half past nine you have the dentist.\"); }, 1400);\n    setTimeout(() => { setState(\"rest\"); setWords(null); }, 4600); };\n  return h(\"div\", { style: { paddingTop: 40 } }, h(MacPill, { state, onPress: talk, badge, words, status: state === \"thinking\" ? \"Thinking\" : undefined,\n    left: [ { label: \"Calls\", icon: \"phone\", active: panel === \"calls\", onSelect: pick(\"calls\") }, { label: \"Chats\", icon: \"wave\", active: panel === \"chats\", onSelect: pick(\"chats\") } ],\n    right: [ { label: \"Vault\", icon: \"shield\", active: panel === \"vault\", onSelect: pick(\"vault\") }, { label: \"Settings\", icon: \"person\", active: panel === \"settings\", onSelect: pick(\"settings\") } ] })); }"
+      },
+      {
+        "label": "Muted, with the way back",
+        "code": "() => { const [muted, setMuted] = React.useState(true);\n  return h(MacPill, { open: true, state: muted ? \"muted\" : \"rest\", status: muted ? \"Muted\" : undefined, back: muted ? { label: \"Turn sound on\", onClick: () => setMuted(false) } : undefined,\n    left: [ { label: \"Chats\", icon: \"wave\" } ], right: [ { label: \"Talk while held\", icon: \"mic\" } ] }); }"
+      },
+      {
+        "label": "Working",
+        "code": "() => h(MacPill, { working: true, status: \"Booking the table, step 3 of 6\" })"
+      }
+    ],
+    "docs": "/irisui/components/macpill.md"
+  },
+  {
+    "id": "mark",
+    "name": "Mark",
+    "group": "Brand",
+    "summary": "Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.",
+    "export": "window.IrisUi.Mark",
+    "props": [
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Lock screen size",
+        "code": "h(\"div\", { style: { display: \"grid\", justifyItems: \"center\", gap: 18, padding: \"36px 16px\", maxWidth: 300, borderRadius: 32, background: \"var(--glass)\", border: \"1px solid var(--edge)\" } },\n    h(\"div\", { style: { font: \"200 56px/1 var(--font-text)\", fontVariantNumeric: \"tabular-nums\" } }, \"9:41\"),\n    h(Mark, { size: 64 }),\n    h(\"div\", { style: { fontSize: 13, color: \"var(--label)\" } }, \"Look at your phone to open\"))"
+      },
+      {
+        "label": "Three sizes",
+        "code": "h(\"div\", { style: { display: \"flex\", flexWrap: \"wrap\", gap: 32, alignItems: \"center\", padding: 16 } }, h(Mark, { size: 48 }), h(Mark, { size: 64 }), h(Mark, { size: 96 }))"
+      },
+      {
+        "label": "Which Iris, how big",
+        "code": "h(\"div\", { style: { display: \"flex\", gap: 36, alignItems: \"center\", flexWrap: \"wrap\", padding: 12, font: \"var(--text-sub)\", color: \"var(--dim)\" } }, ...[[\"Orb 22\", h(Orb, { size: 22 })], [\"Orb 34\", h(Orb, { size: 34, state: \"listening\" })], [\"Mark 64\", h(Mark, { size: 64 })], [\"TalkOrb talking\", h(TalkOrb, { size: 120, state: \"talking\" })], [\"TalkOrb thinking\", h(TalkOrb, { size: 120, state: \"thinking\" })], [\"Orb3D\", h(Orb3D, { size: 180 })]].map(([t, el]) => h(\"div\", { key: t, style: { display: \"grid\", justifyItems: \"center\", gap: 22 } }, el, t)))"
+      }
+    ],
+    "docs": "/irisui/components/mark.md"
+  },
+  {
+    "id": "orb",
+    "name": "Orb",
+    "group": "Brand",
+    "summary": "Her orb: a ring with a slowly turning violet-blue-pink gradient and a soft glow.",
+    "export": "window.IrisUi.Orb",
+    "props": [
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "state",
+        "type": "'idle' | 'listening' | 'busy' | 'talking' | 'away'",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "States",
+        "code": "() => h(\"div\", {style:{display:\"flex\",gap:28,alignItems:\"center\"}}, [\"idle\",\"listening\",\"busy\",\"talking\",\"away\"].map(s => h(Orb, {key:s, state:s, size:34})))"
+      },
+      {
+        "label": "Hero",
+        "code": "() => h(\"div\", {style:{display:\"grid\",placeItems:\"center\",padding:24}}, h(Orb, {size:112}))"
+      }
+    ],
+    "docs": "/irisui/components/orb.md"
+  },
+  {
+    "id": "orb3d",
+    "name": "Orb3D",
+    "group": "Brand",
+    "summary": "Her orb in 3D: a glass ball with a ring of light round it.",
+    "export": "window.IrisUi.Orb3D",
+    "props": [
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "state",
+        "type": "'rest' | 'talking' | 'expression' | 'listening' | 'thinking' | 'muted' | 'away'",
+        "required": false
+      },
+      {
+        "name": "ring",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "particles",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "shape",
+        "type": "'orbit' | 'comets' | 'sparks' | 'dust' | 'swarm' | 'circle' | 'square' | 'triangle' | 'knot' | string",
+        "required": false
+      },
+      {
+        "name": "material",
+        "type": "'glass' | 'matte' | 'pearl' | 'plasma' | 'chrome' | 'hologram'",
+        "required": false
+      },
+      {
+        "name": "particleStyle",
+        "type": "{ count?: number; lines?: number; size?: number; trail?: number; react?: number; speed?: number; sprite?: 'dot' | 'star' | 'blob' | 'square' | 'ring' | 'streak'; colors?: [string, string, string]; colorMode?: 'preset' | 'along' | 'voice' | 'depth' | 'cycle'; minSize?: number; maxSize?: number; maxLight?: number }",
+        "required": false
+      },
+      {
+        "name": "tone",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "body",
+        "type": "'sphere' | 'cube' | 'triangle' | 'donut' | 'gem' | string",
+        "required": false
+      },
+      {
+        "name": "onError",
+        "type": "(message: string | null) => void",
+        "required": false
+      },
+      {
+        "name": "look",
+        "type": "Record<string",
+        "required": false
+      },
+      {
+        "name": "analyser",
+        "type": "AnalyserNode",
+        "required": false
+      },
+      {
+        "name": "onPress",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Hero",
+        "code": "() => h(Hero)"
+      },
+      {
+        "label": "In the Mac pill (hover the orb)",
+        "code": "() => h(PillPlayground)"
+      },
+      {
+        "label": "Rings + particles",
+        "code": "() => h(Multi, { size: 150, items: [\n      [\"deepsea\", \"orbit\", {}], [\"precession\", \"comets\", {}], [\"silk-wave\", \"sparks\", {}], [\"comet-orbit\", \"dust\", { lines: 4 }],\n      [\"fieldlines\", \"swarm\", {}], [\"angular-discharge\", \"orbit\", { lines: 3, sprite: \"streak\", trail: 0.6 }],\n      [\"caustic-orbit\", \"comets\", { lines: 7, trail: 0.8, sprite: \"streak\" }], [\"long-teardrop-orbit\", \"sparks\", { lines: 6, sprite: \"star\" }],\n      [\"smoke-spiral\", \"dust\", { sprite: \"square\", count: 120, size: 0.7 }], [\"mercury-strands\", \"knot\", { lines: 3, colorMode: \"cycle\", colors: [\"#2ee6d6\", \"#7dd3fc\", \"#c026d3\"] }],\n      [\"deep-stroke\", \"swarm\", { sprite: \"blob\", count: 40, lines: 3 }], [\"drop-wave\", \"orbit\", { sprite: \"ring\", count: 60, colorMode: \"voice\", colors: [\"#38bdf8\", \"#8b5cf6\", \"#ffffff\"] }],\n    ].map(([r, k, st]) => ({ ring: r, shape: k, particles: 1, particleStyle: st, label: Orb3D.ringName(r), sub: k + (st.sprite ? \" \\u00b7 \" + st.sprite : \"\") + (st.lines ? \" \\u00b7 \" + st.lines + \" lines\" : \"\") })) })"
+      },
+      {
+        "label": "Ball materials",
+        "code": "() => h(Multi, { size: 130, items: Orb3D.materials.map(m => ({ ring: \"deepsea\", material: m, shape: \"orbit\", particles: 0.6, label: m })) })"
+      },
+      {
+        "label": "Particle shapes (no ring)",
+        "code": "() => h(Multi, { size: 120, items: [\"circle\", \"square\", \"triangle\", \"knot\"].map(k =>\n      ({ ring: \"none\", shape: k, particles: 1, label: k })) })"
+      },
+      {
+        "label": "Ball shapes (with a ring)",
+        "code": "() => h(Multi, { size: 150, items: [[\"sphere\", \"deepsea\"], [\"cube\", \"silk-wave\"], [\"triangle\", \"precession\"], [\"donut\", \"comet-orbit\"], [\"gem\", \"angular-discharge\"]].map(([b, r]) =>\n      ({ body: b, ring: r, label: b, sub: r })) })"
+      },
+      {
+        "label": "States",
+        "code": "() => h(\"div\", { style: { display: \"flex\", justifyContent: \"space-between\", flexWrap: \"wrap\", gap: 4 } },\n      [\"rest\", \"talking\", \"expression\", \"listening\", \"thinking\", \"muted\", \"away\"].map(s => cell(s, { state: s })))"
+      },
+      {
+        "label": "All 28 rings (talking)",
+        "code": "() => h(Multi, { items: Orb3D.rings.map(r => ({ ring: r, label: Orb3D.ringName(r), sub: r })) })"
+      }
+    ],
+    "docs": "/irisui/components/orb3d.md"
+  },
+  {
+    "id": "talkorb",
+    "name": "TalkOrb",
+    "group": "Brand",
+    "summary": "The orb as the talk button: a dark disc with the turning Iris ring inside, the middle of the tab bar on iPhone (\"the orb is the mic\").",
+    "export": "window.IrisUi.TalkOrb",
+    "props": [
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "state",
+        "type": "'rest' | 'talking' | 'expression' | 'listening' | 'thinking' | 'muted' | 'away'",
+        "required": false
+      },
+      {
+        "name": "analyser",
+        "type": "AnalyserNode",
+        "required": false
+      },
+      {
+        "name": "onPress",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "States",
+        "code": "() => h(\"div\", { style: { display: \"flex\", justifyContent: \"space-around\", flexWrap: \"wrap\", gap: 18 } }, [\"rest\", \"talking\", \"expression\", \"listening\", \"thinking\", \"muted\", \"away\"].map(cell))"
+      },
+      {
+        "label": "Spectrogram (test sound or your voice)",
+        "code": "() => h(Spectrogram)"
+      },
+      {
+        "label": "Expression",
+        "code": "() => h(\"div\", { style: { display: \"grid\", placeItems: \"center\", padding: 70 } }, h(TalkOrb, { state: \"expression\", size: 120 }))"
+      }
+    ],
+    "docs": "/irisui/components/talkorb.md"
+  },
+  {
+    "id": "button",
+    "name": "Button",
+    "group": "Controls",
+    "summary": "Pills.",
+    "export": "window.IrisUi.Button",
+    "props": [
+      {
+        "name": "variant",
+        "type": "'primary' | 'glass' | 'accent' | 'ghost' | 'danger' | 'text' | 'icon'",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "'sm' | 'md' | 'lg'",
+        "required": false
+      },
+      {
+        "name": "icon",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "busy",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Primary",
+        "code": "() => h(Button, {variant:\"primary\", size:\"lg\"}, \"Agree and continue\")"
+      },
+      {
+        "label": "Accent",
+        "code": "() => h(Button, {variant:\"accent\", size:\"sm\", icon:h(Icon,{name:\"speaker\",size:14})}, \"Continue here\")"
+      },
+      {
+        "label": "Glass",
+        "code": "() => h(Button, {variant:\"glass\"}, \"Edit\")"
+      },
+      {
+        "label": "Ghost",
+        "code": "() => h(Button, {variant:\"ghost\"}, \"Don't agree\")"
+      },
+      {
+        "label": "Danger",
+        "code": "() => h(Button, {variant:\"danger\"}, \"Unpair\")"
+      },
+      {
+        "label": "Text",
+        "code": "() => h(Button, {variant:\"text\"}, \"Details\")"
+      },
+      {
+        "label": "Icon",
+        "code": "() => h(Button, {variant:\"icon\", label:\"Speaker\", icon:h(Icon,{name:\"speaker\",size:18})})"
+      },
+      {
+        "label": "Busy",
+        "code": "() => h(Button, {variant:\"primary\", busy:true}, \"Busy\")"
+      },
+      {
+        "label": "Primary in a topic",
+        "code": "() => h(Button, {variant:\"primary\", topic:\"parcel\"}, \"Track parcel\")"
+      }
+    ],
+    "docs": "/irisui/components/button.md"
+  },
+  {
+    "id": "buttongroup",
+    "name": "ButtonGroup",
+    "group": "Controls",
+    "summary": "The button set of one screen in its topic: primary flat, secondary glass, and the quieter kinds beside them.",
+    "export": "window.IrisUi.ButtonGroup",
+    "props": [
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "stack",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "One decision",
+        "code": "() => h(ButtonGroup, { topic: \"agenda\" },\n  h(Button, { variant: \"primary\" }, \"Schedule it\"),\n  h(Button, { variant: \"glass\" }, \"Later\"),\n  h(Button, { variant: \"text\" }, \"Details\"))"
+      },
+      {
+        "label": "In the parcel topic",
+        "code": "() => h(ButtonGroup, { topic: \"parcel\" }, h(Button, { variant: \"primary\" }, \"Track parcel\"), h(Button, { variant: \"glass\" }, \"Other address\"))"
+      }
+    ],
+    "docs": "/irisui/components/buttongroup.md"
+  },
+  {
+    "id": "chip",
+    "name": "Chip",
+    "group": "controls",
+    "summary": "A pill filter or choice in the topic colour: on fills it with --k and dark --kd ink, off it is glass with the topic edge.",
+    "export": "window.IrisUi.Chip",
+    "props": [
+      {
+        "name": "on",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Choices",
+        "code": "() => { const [on, set] = React.useState(0); return h(\"div\", { style: { display: \"flex\", gap: 6, flexWrap: \"wrap\" } }, [\"the supermarket\", \"the bookshop\", \"the market\"].map((c, i) => h(UI.Chip, { key: c, topic: \"groceries\", on: i === on, onClick: () => set(i) }, c))); }"
+      },
+      {
+        "label": "Per topic",
+        "code": "() => h(\"div\", { style: { display: \"flex\", gap: 6, flexWrap: \"wrap\" } }, [\"agenda\", \"mail\", \"parcel\", \"sport\", \"money\"].map(t => h(UI.Chip, { key: t, topic: t, on: true }, t)))"
+      },
+      {
+        "label": "Without a topic",
+        "code": "() => h(\"div\", { style: { display: \"flex\", gap: 6 } }, h(UI.Chip, { on: true }, \"Today\"), h(UI.Chip, null, \"This week\"))"
+      }
+    ],
+    "docs": "/irisui/components/chip.md"
+  },
+  {
+    "id": "datepicker",
+    "name": "DatePicker",
+    "group": "Controls",
+    "summary": "A month you pick a day in: one accent on the chosen day, today marked with a ring.",
+    "export": "window.IrisUi.DatePicker",
+    "props": [
+      {
+        "name": "value",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(day: string) => void",
+        "required": false
+      },
+      {
+        "name": "year",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "month",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "min",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "max",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "showToday",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Pick a day",
+        "code": "() => { const [day, setDay] = React.useState(\"2026-10-01\");\n  return h(DatePicker, { value: day, onChange: setDay, label: \"When should she remind you?\" }); }"
+      },
+      {
+        "label": "Within two weeks",
+        "code": "() => { const [day, setDay] = React.useState(\"2026-10-06\");\n  return h(DatePicker, { value: day, onChange: setDay, min: \"2026-10-01\", max: \"2026-10-14\", label: \"Only the next two weeks\" }); }"
+      }
+    ],
+    "docs": "/irisui/components/datepicker.md"
+  },
+  {
+    "id": "field",
+    "name": "Field",
+    "group": "controls",
+    "summary": "The pill input: glass, caret and focus edge in the topic colour.",
+    "export": "window.IrisUi.Field",
+    "props": [
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Search",
+        "code": "() => h(\"div\", { style: { width: 320 } }, h(UI.Field, { topic: \"mail\", placeholder: \"Search mail\" }))"
+      },
+      {
+        "label": "Add",
+        "code": "() => h(\"div\", { style: { width: 320 } }, h(UI.Field, { topic: \"groceries\", placeholder: \"Add something\", defaultValue: \"Oat milk\" }))"
+      }
+    ],
+    "docs": "/irisui/components/field.md"
+  },
+  {
+    "id": "menu",
+    "name": "Menu",
+    "group": "Controls",
+    "summary": "A list of choices on its own surface: a filter, a sort, a set of actions, anchored to the thing it belongs to.",
+    "export": "window.IrisUi.Menu",
+    "props": [
+      {
+        "name": "items",
+        "type": "MenuItem[]",
+        "required": true
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "trigger",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "side",
+        "type": "'start' | 'end'",
+        "required": false
+      },
+      {
+        "name": "align",
+        "type": "'start' | 'end'",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Sort and filter",
+        "code": "() => {\n  const [picked, setPicked] = React.useState(null);\n  return h(\"div\", { style: { minHeight: 250 } },\n    h(Menu, { label: \"Sort\", defaultOpen: true, items: [\n      { label: \"Newest first\", checked: picked === \"Newest first\", onSelect: () => setPicked(\"Newest first\") },\n      { label: \"By name\", checked: picked === \"By name\", onSelect: () => setPicked(\"By name\") },\n      { kind: \"label\", label: \"Show\" },\n      { label: \"Only unread\", checked: picked === \"Only unread\", onSelect: () => setPicked(\"Only unread\") },\n      { kind: \"sep\" },\n      { label: \"Delete all\", danger: true, onSelect: () => setPicked(\"Delete all\") },\n    ] }));\n}"
+      },
+      {
+        "label": "A menu on a Row",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"wave\" }), title: \"Voice\", subtitle: \"Dutch, warm and clear\", trailing: h(Menu, { label: \"Alex\", align: \"end\", items: [ { label: \"Alex\", checked: true }, { label: \"Calmer\" }, { label: \"No voice\" } ] }) })"
+      }
+    ],
+    "docs": "/irisui/components/menu.md"
+  },
+  {
+    "id": "searchfield",
+    "name": "SearchField",
+    "group": "Controls",
+    "summary": "Finding something: a pill field that says what it is doing and clears itself.",
+    "export": "window.IrisUi.SearchField",
+    "props": [
+      {
+        "name": "value",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(v: string) => void",
+        "required": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "busy",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "With results",
+        "code": "() => { const [v, setV] = React.useState(\"dentist\"); const hits = [\"Dentist, Tuesday 14:00\", \"Dentist: confirmation\", \"Call the dentist\"];\n  return h(SearchField, { value: v, onChange: setV, placeholder: \"Search your house\", busy: false },\n    v ? hits.filter((x) => x.toLowerCase().includes(v.toLowerCase())).map((x, i) => h(\"button\", { key: i, type: \"button\", className: \"ix-menu-item ix-hit\" }, h(\"span\", null, x))) : null); }"
+      },
+      {
+        "label": "While she looks",
+        "code": "() => h(SearchField, { value: \"when will the parcel arrive\", onChange: () => {}, busy: true })"
+      },
+      {
+        "label": "Nothing found",
+        "code": "() => h(SearchField, { value: \"xyz\", onChange: () => {} },\n    h(\"div\", { className: \"ix-results-empty\" }, h(\"strong\", null, \"Nothing by that name\"), h(\"span\", null, \"Try a subject, a person or a date. She searches everything you kept.\")))"
+      }
+    ],
+    "docs": "/irisui/components/searchfield.md"
+  },
+  {
+    "id": "select",
+    "name": "Select",
+    "group": "Controls",
+    "summary": "One choice out of a few, in the shape of the fields around it.",
+    "export": "window.IrisUi.Select",
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(v: string) => void",
+        "required": false
+      },
+      {
+        "name": "options",
+        "type": "(string | { value: string; label: string })[]",
+        "required": true
+      }
+    ],
+    "variants": [
+      {
+        "label": "A language",
+        "code": "() => { const [v, setV] = React.useState(\"nl\");\n  return h(Select, { label: \"She talks to you in\", value: v, onChange: setV, options: [ { value: \"nl\", label: \"Nederlands\" }, { value: \"en\", label: \"English\" }, { value: \"de\", label: \"Deutsch\" } ] }); }"
+      }
+    ],
+    "docs": "/irisui/components/select.md"
+  },
+  {
+    "id": "slider",
+    "name": "Slider",
+    "group": "Controls",
+    "summary": "One value on a line: how much, how far, how loud.",
+    "export": "window.IrisUi.Slider",
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(v: number) => void",
+        "required": false
+      },
+      {
+        "name": "min",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "step",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "unit",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "format",
+        "type": "(v: number) => string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "How far she listens",
+        "code": "() => { const [v, setV] = React.useState(60); return h(\"div\", { style: { display: \"grid\", gap: 18 } },\n    h(Slider, { value: v, onChange: setV, label: \"Listening distance\", unit: \"m\" }),\n    h(\"div\", { style: { fontSize: 13, color: \"var(--dim)\" } }, v > 75 ? \"Far: she hears the whole house\" : v < 25 ? \"Near: only right in front of the phone\" : \"About a room\")); }"
+      },
+      {
+        "label": "In a topic",
+        "code": "() => { const [v, setV] = React.useState(3); return h(Topic, { name: \"health\" }, h(Slider, { value: v, onChange: setV, min: 1, max: 7, label: \"Walks a week\", format: (n) => n + \"×\" })); }"
+      }
+    ],
+    "docs": "/irisui/components/slider.md"
+  },
+  {
+    "id": "splitbutton",
+    "name": "SplitButton",
+    "group": "Controls",
+    "summary": "One action, and the caret that opens the others that belong to it.",
+    "export": "window.IrisUi.SplitButton",
+    "props": [
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      },
+      {
+        "name": "onSelect",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "items",
+        "type": "MenuItem[]",
+        "required": true
+      },
+      {
+        "name": "variant",
+        "type": "'primary' | 'accent' | 'glass'",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "'sm' | 'md' | 'lg'",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Send, or send another way",
+        "code": "() => h(\"div\", { style: { minHeight: 180 } },\n    h(SplitButton, { items: [\n      { label: \"Send as a mail\" },\n      { label: \"Send as a text\" },\n      { kind: \"sep\" },\n      { label: \"Schedule for tomorrow\" },\n    ] }, \"Send it\"))"
+      },
+      {
+        "label": "In a topic",
+        "code": "() => h(Topic, { name: \"parcel\" }, h(SplitButton, { size: \"sm\", variant: \"accent\", items: [ { label: \"Track it\" }, { label: \"Open the carrier's site\" } ] }, \"Track parcel\"))"
+      }
+    ],
+    "docs": "/irisui/components/splitbutton.md"
+  },
+  {
+    "id": "textarea",
+    "name": "TextArea",
+    "group": "Controls",
+    "summary": "The multi-line field: a note, a message, anything longer than a line.",
+    "export": "window.IrisUi.TextArea",
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(v: string) => void",
+        "required": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "rows",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "maxLength",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "A note to her",
+        "code": "() => { const [v, setV] = React.useState(\"The bin must go out by 8 on Tuesday\"); return h(\"div\", { style: { display: \"grid\", gap: 10 } },\n    h(TextArea, { label: \"What should she remember?\", value: v, onChange: setV, rows: 3, maxLength: 280 }),\n    h(\"div\", { style: { fontSize: 12, color: \"var(--label)\", fontFamily: \"var(--mono)\" } }, v.length + \" / 280\")); }"
+      }
+    ],
+    "docs": "/irisui/components/textarea.md"
+  },
+  {
+    "id": "timepicker",
+    "name": "TimePicker",
+    "group": "Controls",
+    "summary": "A time you set with two strips: the hour, then the minute. The chosen time reads big, in mono.",
+    "export": "window.IrisUi.TimePicker",
+    "props": [
+      {
+        "name": "value",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(time: string) => void",
+        "required": false
+      },
+      {
+        "name": "step",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Pick a time",
+        "code": "() => { const [t, setT] = React.useState(\"14:30\");\n  return h(TimePicker, { value: t, onChange: setT, label: \"When should the bins go out?\" }); }"
+      },
+      {
+        "label": "Every quarter hour",
+        "code": "() => { const [t, setT] = React.useState(\"09:45\");\n  return h(TimePicker, { value: t, onChange: setT, step: 15, label: \"A reminder\" }); }"
+      }
+    ],
+    "docs": "/irisui/components/timepicker.md"
+  },
+  {
+    "id": "toggle",
+    "name": "Toggle",
+    "group": "Controls",
+    "summary": "The iOS switch, 51x31: violet (--violet) when on, grey glass when off.",
+    "export": "window.IrisUi.Toggle",
+    "props": [
+      {
+        "name": "on",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "(on: boolean) => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Off, in its row",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"car\" }), title: \"On the road\", subtitle: \"She listens and talks through this iPhone, even when locked.\", trailing: h(Toggle, { label: \"On the road\" }) })"
+      },
+      {
+        "label": "On, in its row",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"mic\" }), title: \"Listen for her name\", subtitle: \"Say Iris and she answers\", trailing: h(Toggle, { on: true, label: \"Listen for her name\" }) })"
+      }
+    ],
+    "docs": "/irisui/components/toggle.md"
+  },
+  {
+    "id": "card",
+    "name": "Card",
+    "group": "Surfaces",
+    "summary": "The one surface of the app: frosted glass (--glass), 1px --edge stroke, radius 18, padding 14.",
+    "export": "window.IrisUi.Card",
+    "props": [
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "padding",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Default",
+        "code": "() => h(Card, null, h(\"div\", {style:{fontSize:17}}, \"Live report\"), h(\"div\", {style:{fontSize:12,color:\"var(--dim)\",marginTop:3}}, \"Updated while we talk\"))"
+      },
+      {
+        "label": "Stat",
+        "code": "() => h(Card, {padding:18}, h(\"div\", {style:{fontSize:34,fontWeight:500}}, \"4/4\"), h(\"div\", {style:{fontSize:15,color:\"var(--dim)\"}}, \"points\"))"
+      },
+      {
+        "label": "Topic",
+        "code": "() => h(Card, {topic:\"groceries\"}, h(\"div\", {style:{font:\"500 11px var(--mono)\",letterSpacing:\".14em\",color:\"var(--k)\"}}, \"GROCERIES\"), h(\"div\", {style:{fontSize:15,marginTop:6}}, \"Your weekly list, ticked off as you shop.\"))"
+      }
+    ],
+    "docs": "/irisui/components/card.md"
+  },
+  {
+    "id": "carousel",
+    "name": "Carousel",
+    "group": "Surfaces",
+    "summary": "A strip of cards you swipe or scroll sideways, with dots that say where you are.",
+    "export": "window.IrisUi.Carousel",
+    "props": [
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      },
+      {
+        "name": "gap",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "snap",
+        "type": "'start' | 'center'",
+        "required": false
+      },
+      {
+        "name": "arrows",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Three cards",
+        "code": "() => h(Carousel, { label: \"What is waiting\" }, [\n    h(Card, { key: 1, style: { padding: 16 } }, h(\"div\", { style: { fontSize: 17 } }, \"Dentist\"), h(\"div\", { style: { fontSize: 12, color: \"var(--dim)\", marginTop: 3 } }, \"Tuesday 14:00, confirm it\")),\n    h(Card, { key: 2, style: { padding: 16 } }, h(\"div\", { style: { fontSize: 17 } }, \"Parcel\"), h(\"div\", { style: { fontSize: 12, color: \"var(--dim)\", marginTop: 3 } }, \"Arrives today between 13 and 15\")),\n    h(Card, { key: 3, style: { padding: 16 } }, h(\"div\", { style: { fontSize: 17 } }, \"Contractor\"), h(\"div\", { style: { fontSize: 12, color: \"var(--dim)\", marginTop: 3 } }, \"Compare the quotes\")),\n  ])"
+      },
+      {
+        "label": "With arrows",
+        "code": "() => h(Carousel, { arrows: true, label: \"This week\" }, [0, 1, 2].map((i) => h(Card, { key: i, style: { padding: 16 } }, h(\"div\", { style: { fontSize: 17 } }, [\"Monday\", \"Tuesday\", \"Wednesday\"][i]), h(\"div\", { style: { fontSize: 12, color: \"var(--dim)\", marginTop: 3 } }, \"Three things, one waiting on you\"))))"
+      }
+    ],
+    "docs": "/irisui/components/carousel.md"
+  },
+  {
+    "id": "checklist",
+    "name": "CheckList",
+    "group": "surfaces",
+    "summary": "A list with tick circles in the topic colour, or with times in front instead; onToggle makes the rows tickable.",
+    "export": "window.IrisUi.CheckList",
+    "props": [
+      {
+        "name": "items",
+        "type": "(string | [string, string])[]",
+        "required": false
+      },
+      {
+        "name": "done",
+        "type": "number | number[]",
+        "required": false
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "onToggle",
+        "type": "(i: number) => void",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Tickable",
+        "code": "() => { const [done, set] = React.useState([0, 1]); return h(\"div\", { style: { width: 320 } }, h(UI.CheckList, { topic: \"groceries\", items: [\"Milk\", \"Bread\", \"Eggs\", \"Cheese\", \"Apples\"], done, onToggle: i => set(x => x.includes(i) ? x.filter(y => y !== i) : [...x, i]) })); }"
+      },
+      {
+        "label": "Times instead of ticks",
+        "code": "() => h(\"div\", { style: { width: 320 } }, h(UI.CheckList, { topic: \"agenda\", items: [[\"09:30\", \"Stand-up\"], [\"14:00\", \"Dentist\"], [\"16:30\", \"Call a colleague\"]], done: [0] }))"
+      }
+    ],
+    "docs": "/irisui/components/checklist.md"
+  },
+  {
+    "id": "divider",
+    "name": "Divider",
+    "group": "Surfaces",
+    "summary": "A hairline that groups what is above it from what is below.",
+    "export": "window.IrisUi.Divider",
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "inset",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Plain and inset",
+        "code": "() => h(\"div\", { style: { display: \"grid\", gap: 0 } }, h(\"div\", { style: { fontSize: 15 } }, \"On this device\"), h(Divider, null), h(\"div\", { style: { fontSize: 15 } }, \"Blocks and voice\"), h(Divider, { inset: true }), h(\"div\", { style: { fontSize: 15 } }, \"What she keeps\"))"
+      },
+      {
+        "label": "With a label",
+        "code": "() => h(Divider, { label: \"Only you can open this\" })"
+      }
+    ],
+    "docs": "/irisui/components/divider.md"
+  },
+  {
+    "id": "photo",
+    "name": "Photo",
+    "group": "Surfaces",
+    "summary": "A photo with a depth map: a word behind the person, duotone in the topic's colours, or parallax in four depth layers. No photo ships: without a src it paints its own neutral scene with a matching depth map, and without a depth map it guesses one (lower and central is nearer).",
+    "export": "window.IrisUi.Photo",
+    "props": [
+      {
+        "name": "alt",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "src",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "depth",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "kind",
+        "type": "'back' | 'duotone' | 'parallax'",
+        "required": false
+      },
+      {
+        "name": "word",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "threshold",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "ratio",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "motion",
+        "type": "'pointer' | 'scroll'",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "The word behind the person",
+        "code": "() => h(\"div\", { style: { maxWidth: 380 } }, h(Photo, { kind: \"back\", word: \"CALM\", alt: \"A figure in front of two ridges at dusk\" }))"
+      },
+      {
+        "label": "Parallax and duotone",
+        "code": "() => h(\"div\", { style: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(160px, 1fr))\", gap: 12 } },\n    h(Photo, { kind: \"parallax\", alt: \"A figure in front of two ridges, moving with the pointer\" }),\n    h(Photo, { kind: \"duotone\", topic: \"money\", alt: \"The same scene in the money topic's two colours\" }),\n    h(Photo, { kind: \"duotone\", topic: \"weather\", alt: \"The same scene in the weather topic's two colours\" }))"
+      }
+    ],
+    "docs": "/irisui/components/photo.md"
+  },
+  {
+    "id": "row",
+    "name": "Row",
+    "group": "Surfaces",
+    "summary": "A settings row (the You page): 24px icon at 80% --fg, a 17pt title, a 12pt --dim line under it, and on the right a Toggle, a menu value, a chevron or an extern…",
+    "export": "window.IrisUi.Row",
+    "props": [
+      {
+        "name": "icon",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "subtitle",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "trailing",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "chevron",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "external",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "danger",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Chevron",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"phone\" }), title: \"This device\", subtitle: \"Blocks, voice, notifications and how she talks here.\", chevron: true, onClick: () => {} })"
+      },
+      {
+        "label": "Toggle",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"car\" }), title: \"On the road\", subtitle: \"She listens and talks through this iPhone, even when locked.\", trailing: h(Toggle, { label: \"On the road\" }) })"
+      },
+      {
+        "label": "Menu",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"wave\" }), title: \"Voice\", subtitle: \"Dutch, warm and clear\", trailing: h(Menu, { label: \"Alex\", align: \"end\", items: [ { label: \"Alex\", checked: true }, { label: \"Calmer\", checked: false }, { label: \"No voice\", checked: false } ] }) })"
+      },
+      {
+        "label": "Grouped in a card",
+        "code": "() => h(Card, { padding: 0 },\n  h(Row, { icon: h(Icon, { name: \"mic\" }), title: \"Listen for her name\", subtitle: \"Say Iris and she answers\", trailing: h(Toggle, { on: true, label: \"Listen for her name\" }) }),\n  h(Row, { icon: h(Icon, { name: \"speaker\" }), title: \"Read mail out loud\", subtitle: \"Only from people you know\", trailing: h(Toggle, { label: \"Read mail out loud\" }) }),\n  h(Row, { icon: h(Icon, { name: \"shield\" }), title: \"Vault\", subtitle: \"Only your iPhone opens it\", chevron: true, onClick: () => {} }))"
+      },
+      {
+        "label": "Danger",
+        "code": "() => h(Row, { icon: h(Icon, { name: \"trash\" }), title: \"Delete account\", subtitle: \"Deletes her and everything she stored.\", danger: true, onClick: () => {} })"
+      }
+    ],
+    "docs": "/irisui/components/row.md"
+  },
+  {
+    "id": "stat",
+    "name": "Stat",
+    "group": "surfaces",
+    "summary": "One number and one word: the number large in the topic colour, the word dim under it.",
+    "export": "window.IrisUi.Stat",
+    "props": [
+      {
+        "name": "value",
+        "type": "ReactNode",
+        "required": true
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Pair",
+        "code": "() => h(\"div\", { style: { display: \"grid\", gridTemplateColumns: \"repeat(2, minmax(0, 1fr))\", gap: 12 } },\n  h(Stat, { topic: \"groceries\", value: \"5\", label: \"to get\" }), h(Stat, { topic: \"groceries\", value: \"€42\", label: \"estimate\" }))"
+      },
+      {
+        "label": "Three, one topic",
+        "code": "() => h(\"div\", { style: { display: \"grid\", gridTemplateColumns: \"repeat(3, minmax(0, 1fr))\", gap: 12 } },\n  h(Stat, { topic: \"agenda\", value: \"14:00\", label: \"next\" }), h(Stat, { topic: \"agenda\", value: \"4\", label: \"today\" }), h(Stat, { topic: \"agenda\", value: \"1\", label: \"waiting\" }))"
+      }
+    ],
+    "docs": "/irisui/components/stat.md"
+  },
+  {
+    "id": "dialog",
+    "name": "Dialog",
+    "group": "Overlays",
+    "summary": "The one place Iris interrupts: a decision that cannot wait, with the action that matters first.",
+    "export": "window.IrisUi.Dialog",
+    "props": [
+      {
+        "name": "open",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "onClose",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "body",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "actions",
+        "type": "{ label: string; variant?: string; onClick?: () => void; danger?: boolean }[]",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Unpair, a destructive decision",
+        "code": "() => { const [open, setOpen] = React.useState(true);\n  return h(Dialog, { open, onClose: () => setOpen(false), title: \"Unpair this device?\",\n    body: \"She stops listening and talking here. Everything she stored stays in your vault.\",\n    actions: [ { label: \"Keep it\" }, { label: \"Unpair\", variant: \"danger\" } ] }); }"
+      },
+      {
+        "label": "A waiting question",
+        "code": "() => { const [open, setOpen] = React.useState(true);\n  return h(Dialog, { open, onClose: () => setOpen(false), title: \"Send this to Alex?\",\n    body: \"The list for Saturday, with the two things you added.\",\n    actions: [ { label: \"Send it\" }, { label: \"Not yet\", variant: \"ghost\" } ] }); }"
+      }
+    ],
+    "docs": "/irisui/components/dialog.md"
+  },
+  {
+    "id": "sheet",
+    "name": "Sheet",
+    "group": "Overlays",
+    "summary": "Secondary content anchored to an edge: the bottom on a phone, the side on a wide window.",
+    "export": "window.IrisUi.Sheet",
+    "props": [
+      {
+        "name": "open",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "onClose",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sub",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "side",
+        "type": "'bottom' | 'end'",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Bottom, choosing a voice",
+        "code": "() => { const [open, setOpen] = React.useState(true); const [voice, setVoice] = React.useState(\"Alex\");\n  const pick = (title, subtitle) => h(Row, { key: title, title, subtitle, onClick: () => setVoice(title),\n    trailing: voice === title ? h(\"span\", { \"aria-label\": \"Chosen\", style: { color: \"var(--accent)\", fontSize: 17 } }, \"✓\") : null });\n  return h(Sheet, { open, onClose: () => setOpen(false), title: \"Voice\", sub: \"How she sounds on this device\",\n    children: [ pick(\"Alex\", \"Dutch, warm and clear\"), pick(\"Calmer\", \"Dutch, softer\"), pick(\"No voice\", \"She only writes here\") ] }); }"
+      },
+      {
+        "label": "Side, on a wide window",
+        "code": "() => { const [open, setOpen] = React.useState(true);\n  return h(Sheet, { open, onClose: () => setOpen(false), side: \"end\", title: \"Details\", sub: \"The invoice she read\",\n    children: [ h(Card, { key: \"a\" }, h(\"div\", { style: { fontSize: 17 } }, \"Van Dijk Contractors\"), h(\"div\", { style: { fontSize: 12, color: \"var(--dim)\", marginTop: 3 } }, \"€ 1.240,00 · 14 days\")),\n      h(Card, { key: \"b\" }, h(\"div\", { style: { fontSize: 17 } }, \"Two prices to compare\"), h(\"div\", { style: { fontSize: 12, color: \"var(--dim)\", marginTop: 3 } }, \"She marked the difference\")) ] }); }"
+      }
+    ],
+    "docs": "/irisui/components/sheet.md"
+  },
+  {
+    "id": "vaultask",
+    "name": "VaultAsk",
+    "group": "Overlays",
+    "summary": "The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches, then allow or no.",
+    "export": "window.IrisUi.VaultAsk",
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "who",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "from",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "why",
+        "type": "string | null",
+        "required": false
+      },
+      {
+        "name": "does",
+        "type": "string | null",
+        "required": false
+      },
+      {
+        "name": "scope",
+        "type": "'names' | 'use' | 'store'",
+        "required": false
+      },
+      {
+        "name": "biometric",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onAllow",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "onAlways",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "onDeny",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "allowLabel",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "denyLabel",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Use a login",
+        "code": "() => { const [said, setSaid] = React.useState(null);\n  return said ? h(\"p\", { role: \"status\", style: { fontSize: 15 } }, said)\n    : h(Card, { padding: 18 }, h(VaultAsk, { title: \"Iris wants your shop.example.com login\", who: \"Iris, your assistant\", from: \"Chrome on this Mac, shop.example.com\",\n      why: \"You asked her to order the groceries for Saturday\", does: \"Fills in your password on shop.example.com\", scope: \"use\", biometric: \"Touch ID\",\n      onAllow: () => setSaid(\"Allowed once. Touch ID confirmed.\"), onAlways: () => setSaid(\"Allowed for this site.\"), onDeny: () => setSaid(\"Nothing was shared. Iris is told no.\") })); }"
+      },
+      {
+        "label": "Nobody said why",
+        "code": "() => h(Card, { padding: 18 }, h(VaultAsk, { title: \"Iris wants a card\", who: \"Iris, your assistant\", from: \"Her own house\", scope: \"use\", onAllow: () => {}, onDeny: () => {} }))"
+      }
+    ],
+    "docs": "/irisui/components/vaultask.md"
+  },
+  {
+    "id": "appbar",
+    "name": "AppBar",
+    "group": "Navigation",
+    "summary": "The top line of a screen or a window: what this is, and the few actions that belong to it.",
+    "export": "window.IrisUi.AppBar",
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sub",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "leading",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "actions",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "'small' | 'large'",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Small, with actions",
+        "code": "() => h(\"div\", null,\n    h(AppBar, { title: \"Bins\", sub: \"A loop, every Tuesday\", leading: h(Button, { variant: \"icon\", label: \"Back\", icon: h(\"span\", { style: { display: \"inline-flex\", transform: \"scaleX(-1)\" } }, h(Icon, { name: \"chevron\", size: 18 })) }),\n      actions: h(Button, { variant: \"icon\", label: \"Talk about this loop\", icon: h(Icon, { name: \"mic\", size: 18 }) }) }),\n    h(Card, { style: { margin: 16 } }, h(Row, { title: \"Next time\", subtitle: \"Tuesday 6 Oct, out by 8\" }), h(Row, { title: \"Who\", subtitle: \"You, she reminds you at 7\" })))"
+      },
+      {
+        "label": "Large, the title of a screen",
+        "code": "() => h(AppBar, { variant: \"large\", title: \"This week\", sub: \"Six loops, two waiting on you\",\n      actions: h(Button, { variant: \"icon\", label: \"New loop\", icon: h(Icon, { name: \"sparkles\", size: 18 }) }) })"
+      }
+    ],
+    "docs": "/irisui/components/appbar.md"
+  },
+  {
+    "id": "badge",
+    "name": "Badge",
+    "group": "Navigation",
+    "summary": "A count or a dot on the thing it belongs to: a tab, an icon, a word.",
+    "export": "window.IrisUi.Badge",
+    "props": [
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      },
+      {
+        "name": "count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "dot",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "tone",
+        "type": "'accent' | 'violet' | 'error'",
+        "required": false
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Count, dot and a capped count",
+        "code": "() => h(\"div\", { style: { display: \"flex\", gap: 30, alignItems: \"center\", paddingTop: 8 } },\n    h(Badge, { count: 3 }, h(Button, { variant: \"icon\", label: \"Loops, 3 new\", icon: h(Icon, { name: \"loop\", size: 18 }) })),\n    h(Badge, { dot: true }, h(Button, { variant: \"icon\", label: \"Camera, something new\", icon: h(Icon, { name: \"camera\", size: 18 }) })),\n    h(Badge, { count: 128, max: 99 }, h(Button, { variant: \"icon\", label: \"Calls, 128 missed\", icon: h(Icon, { name: \"phone\", size: 18 }) })))"
+      }
+    ],
+    "docs": "/irisui/components/badge.md"
+  },
+  {
+    "id": "chatstack",
+    "name": "ChatStack",
+    "group": "Navigation",
+    "summary": "Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.",
+    "export": "window.IrisUi.ChatStack",
+    "props": [
+      {
+        "name": "items",
+        "type": "ChatCircle[]",
+        "required": true
+      },
+      {
+        "name": "fanned",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "current",
+        "type": "string | null",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "(id: string | null) => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "At rest, tap to fan out",
+        "code": "() => h(\"div\", { style: { display: \"grid\", alignContent: \"end\", minHeight: 300 } },\n    h(ChatStack, { items: [\n      { id: \"debtors\", topic: \"money\", eyebrow: \"Money\", title: \"Debtors\", line: \"Van Dijk waits on you\", loops: [{ title: \"Van Dijk\", step: 3 }, { title: \"Korenaar\", step: 1 }, { title: \"Noorderlicht\", step: 1 }, { title: \"Debtors\", step: 1 }] },\n      { id: \"groceries\", topic: \"groceries\", eyebrow: \"Groceries\", title: \"Groceries\", line: \"Saturday delivery, 8 on the list\", loops: [{ title: \"Jumbo\", step: 4 }] },\n      { id: \"renovation\", topic: \"home\", eyebrow: \"Home\", title: \"Renovation\", line: \"Comparing 3 quotes\", loops: [{ title: \"Quotes\", step: 2 }, { title: \"Tiles\", step: 1 }] },\n      { id: \"dentist\", topic: \"health\", eyebrow: \"Health\", title: \"Dentist\", line: \"Pick a time\", loops: [{ title: \"Dentist\", step: 3 }] },\n    ] }))"
+      },
+      {
+        "label": "One chat open",
+        "code": "() => h(ChatStack, { current: \"debtors\", items: [\n    { id: \"debtors\", topic: \"money\", eyebrow: \"Money\", title: \"Debtors\", line: \"Van Dijk waits on you\",\n      message: \"Only Van Dijk is 34 days late, 4,840 euros. My suggestion: one last reminder with a deadline, and only then a delivery stop.\",\n      loops: [\n        { title: \"Debtors\", step: 0, line: \"the house rules\" },\n        { title: \"Van Dijk\", step: 3, line: \"34 days late, 4,840 euros\" },\n        { title: \"Korenaar\", step: 1, line: \"12 days late, 1,210 euros\" },\n      ],\n      actions: [{ label: \"Send the reminder\", primary: true }] },\n    { id: \"groceries\", topic: \"groceries\", title: \"Groceries\", line: \"Saturday delivery\" },\n    { id: \"renovation\", topic: \"home\", title: \"Renovation\", line: \"Comparing 3 quotes\" },\n  ] })"
+      }
+    ],
+    "docs": "/irisui/components/chatstack.md"
+  },
+  {
+    "id": "circlestack",
+    "name": "CircleStack",
+    "group": "Navigation",
+    "summary": "Every chat with its loops as a circle, stacked behind the strip: where the loops live now that the iPhone app has no Loops tab.",
+    "export": "window.IrisUi.CircleStack",
+    "props": [
+      {
+        "name": "items",
+        "type": "Circle[]",
+        "required": true
+      },
+      {
+        "name": "open",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "onOpenChange",
+        "type": "(open: boolean) => void",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "(id: string) => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Closed, above the strip",
+        "code": "() => h(\"div\", { style: { display: \"grid\", alignContent: \"end\", minHeight: 150, paddingTop: 30 } },\n    h(CircleStack, { items: [\n      { id: \"debtors\", title: \"Debtors\", line: \"Van Dijk is 34 days late\", unread: 1, loops: [{ title: \"Van Dijk\", step: 3 }, { title: \"Bakker\", step: 2 }] },\n      { id: \"groceries\", title: \"Groceries\", line: \"Saturday delivery, 8 on the list\", loops: [{ title: \"Groceries\", step: 1 }] },\n      { id: \"renovation\", title: \"Renovation\", line: \"Comparing 3 quotes\" },\n      { id: \"dentist\", title: \"Dentist\", line: \"Pick a time\" },\n    ] }),\n    h(Card, null, h(\"div\", { style: { fontSize: 15 } }, \"The dentist at 9:30, lunch with Tom at 13:00\")))"
+      },
+      {
+        "label": "Fanned out",
+        "code": "() => {\n  return h(CircleStack, { open: true, items: [\n      { id: \"debtors\", title: \"Debtors\", line: \"Van Dijk is 34 days late\", unread: 1, loops: [{ title: \"Van Dijk\", step: 3 }, { title: \"Bakker\", step: 2 }, { title: \"Peters\", step: 4 }, { title: \"Jansen\", step: 1 }] },\n      { id: \"groceries\", title: \"Groceries\", line: \"Saturday delivery, 8 on the list\", loops: [{ title: \"Groceries\", step: 1 }] },\n      { id: \"renovation\", title: \"Renovation\", line: \"Comparing 3 quotes\" },\n      { id: \"dentist\", title: \"Dentist\", line: \"Pick a time\" },\n    ] });\n}"
+      }
+    ],
+    "docs": "/irisui/components/circlestack.md"
+  },
+  {
+    "id": "navrail",
+    "name": "NavRail",
+    "group": "Navigation",
+    "summary": "The wide-window version of the tab bar: a rail of sections that collapses to icons.",
+    "export": "window.IrisUi.NavRail",
+    "props": [
+      {
+        "name": "items",
+        "type": "RailItem[]",
+        "required": false
+      },
+      {
+        "name": "collapsed",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "onToggle",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "trailing",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Expanded",
+        "code": "() => { const [at, setAt] = React.useState(0);\n  const items = [[\"Iris\", \"sparkles\"], [\"Loops\", \"loop\"], [\"Camera\", \"camera\"], [\"You\", \"person\"]];\n  return h(NavRail, { items: items.map(([label, name], i) => ({ label, icon: h(Icon, { name, size: 16 }), active: i === at, onSelect: () => setAt(i) })),\n    trailing: h(\"span\", { style: { fontSize: 12, color: \"var(--dim)\", padding: \"0 10px\" } }, \"On this device\") }); }"
+      },
+      {
+        "label": "Collapsed",
+        "code": "() => h(NavRail, { collapsed: true, items: [[\"Iris\", \"sparkles\"], [\"Loops\", \"loop\"], [\"Camera\", \"camera\"], [\"You\", \"person\"]].map(([label, name], i) => ({ label, icon: h(Icon, { name, size: 16 }), active: i === 1 })) })"
+      }
+    ],
+    "docs": "/irisui/components/navrail.md"
+  },
+  {
+    "id": "pagedots",
+    "name": "PageDots",
+    "group": "Navigation",
+    "summary": "Page dots under swipeable screens: each dot 7px in 30% of the topic colour, the active one a 22px duotone streak from --k to --k2.",
+    "export": "window.IrisUi.PageDots",
+    "props": [
+      {
+        "name": "count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "active",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "labels",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "dark",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "vertical",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "(i: number) => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Groceries",
+        "code": "() => { const [a, set] = React.useState(1); return h(PageDots, { count: 4, active: a, onSelect: set, topic: \"groceries\", labels: [\"List\", \"Shops\", \"History\", \"Spending\"] }); }"
+      },
+      {
+        "label": "On a photo",
+        "code": "() => { const [a, set] = React.useState(2);\n  return h(\"div\", { style: { position: \"relative\", maxWidth: 360 } },\n    h(Photo, { kind: \"duotone\", topic: \"weather\", alt: \"A figure in front of two ridges at dusk\" }),\n    h(\"div\", { style: { position: \"absolute\", left: 0, right: 0, bottom: 12, display: \"flex\", justifyContent: \"center\" } },\n      h(PageDots, { count: 5, active: a, onSelect: set, topic: \"weather\", dark: true, labels: [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"] }))); }"
+      }
+    ],
+    "docs": "/irisui/components/pagedots.md"
+  },
+  {
+    "id": "segmented",
+    "name": "Segmented",
+    "group": "navigation",
+    "summary": "Tabs inside a card: a glass track with the active tab tinted 14% of the topic colour.",
+    "export": "window.IrisUi.Segmented",
+    "props": [
+      {
+        "name": "items",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "active",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "(i: number) => void",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Tabs",
+        "code": "() => { const [a, set] = React.useState(0); return h(Segmented, { topic: \"groceries\", items: [\"List\", \"Shops\", \"History\"], active: a, onSelect: set }); }"
+      },
+      {
+        "label": "In the agenda topic",
+        "code": "() => { const [a, set] = React.useState(1); return h(Segmented, { topic: \"agenda\", items: [\"Day\", \"Week\", \"Month\"], active: a, onSelect: set }); }"
+      }
+    ],
+    "docs": "/irisui/components/segmented.md"
+  },
+  {
+    "id": "statuspill",
+    "name": "StatusPill",
+    "group": "Navigation",
+    "summary": "Top left of every screen: the orb and one word of what she is doing (\"busy\", \"listening\"), or an accent pill with an action (\"Continue here\").",
+    "export": "window.IrisUi.StatusPill",
+    "props": [
+      {
+        "name": "state",
+        "type": "'idle' | 'listening' | 'busy' | 'talking' | 'away'",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "action",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onAction",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Word",
+        "code": "() => h(StatusPill, { state: \"busy\", label: \"Busy\" })"
+      },
+      {
+        "label": "Action",
+        "code": "() => h(StatusPill, { action: \"Continue here\", onAction: () => {} })"
+      },
+      {
+        "label": "Away",
+        "code": "() => h(StatusPill, { state: \"away\", label: \"Reconnecting\" })"
+      }
+    ],
+    "docs": "/irisui/components/statuspill.md"
+  },
+  {
+    "id": "steps",
+    "name": "Steps",
+    "group": "Navigation",
+    "summary": "Where you are in a short flow, and what is still coming.",
+    "export": "window.IrisUi.Steps",
+    "props": [
+      {
+        "name": "items",
+        "type": "string[]",
+        "required": true
+      },
+      {
+        "name": "active",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Halfway",
+        "code": "() => h(Steps, { items: [\"House\", \"Voice\", \"Devices\", \"Done\"], active: 2 })"
+      },
+      {
+        "label": "At the end",
+        "code": "() => h(Steps, { items: [\"House\", \"Voice\", \"Devices\", \"Done\"], active: 3 })"
+      }
+    ],
+    "docs": "/irisui/components/steps.md"
+  },
+  {
+    "id": "tabbar",
+    "name": "TabBar",
+    "group": "Navigation",
+    "summary": "The floating tab bar at the bottom: a frosted capsule with four tabs (Iris, Loops, Camera, You) and the talk button in the middle, a ring like the orb.",
+    "export": "window.IrisUi.TabBar",
+    "props": [
+      {
+        "name": "tabs",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "active",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "icons",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "collapsed",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "progress",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "talk",
+        "type": "'rest' | 'talking' | 'expression' | 'listening' | 'thinking' | 'muted' | 'away'",
+        "required": false
+      },
+      {
+        "name": "analyser",
+        "type": "AnalyserNode",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "(i: number) => void",
+        "required": false
+      },
+      {
+        "name": "onTalk",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Open",
+        "code": "() => pad(h(TabBar, { active: 0 }))"
+      },
+      {
+        "label": "Collapsed",
+        "code": "() => pad(h(TabBar, { active: 0, collapsed: true }))"
+      },
+      {
+        "label": "Swipe halfway",
+        "code": "() => pad(h(TabBar, { active: 0, progress: 0.5 }))"
+      },
+      {
+        "label": "Swipe (live)",
+        "code": "() => h(Swipe)"
+      },
+      {
+        "label": "Talking",
+        "code": "() => pad(h(TabBar, { active: 1, talk: \"talking\" }))"
+      }
+    ],
+    "docs": "/irisui/components/tabbar.md"
+  },
+  {
+    "id": "tabs",
+    "name": "Tabs",
+    "group": "Navigation",
+    "summary": "A few angles on one thing, under its title, with the ink sliding to the active one.",
+    "export": "window.IrisUi.Tabs",
+    "props": [
+      {
+        "name": "items",
+        "type": "string[]",
+        "required": true
+      },
+      {
+        "name": "active",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "(i: number) => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Three angles",
+        "code": "() => { const [i, setI] = React.useState(0); return h(\"div\", { style: { display: \"grid\", gap: 14 } },\n    h(Tabs, { items: [\"Today\", \"Loops\", \"Kept\"], active: i, onSelect: setI }),\n    h(\"div\", { role: \"tabpanel\", style: { fontSize: 15 } }, [\"The dentist at 9:30, lunch with Tom at 13:00\", \"Six loops, two waiting on you\", \"Twelve things she kept for you\"][i])); }"
+      }
+    ],
+    "docs": "/irisui/components/tabs.md"
+  },
+  {
+    "id": "toolbar",
+    "name": "Toolbar",
+    "group": "Navigation",
+    "summary": "A bar of actions that belong together, docked in a screen or floating over the content.",
+    "export": "window.IrisUi.Toolbar",
+    "props": [
+      {
+        "name": "items",
+        "type": "ToolbarItem[]",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "'docked' | 'floating'",
+        "required": false
+      },
+      {
+        "name": "trailing",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Docked, in a screen",
+        "code": "() => { const [unread, setUnread] = React.useState(true);\n  return h(Toolbar, { title: \"This week\", items: [\n    { label: \"New\", icon: h(Icon, { name: \"sparkles\", size: 16 }) },\n    { label: \"Only unread\", active: unread, onSelect: () => setUnread(!unread) },\n  ] }); }"
+      },
+      {
+        "label": "Floating over content",
+        "code": "() => h(Toolbar, { variant: \"floating\", items: [\n    { label: \"Read out\", icon: h(Icon, { name: \"speaker\", size: 16 }), active: true },\n    { label: \"Keep\" },\n    { label: \"Delete\", danger: true },\n  ] })"
+      }
+    ],
+    "docs": "/irisui/components/toolbar.md"
+  },
+  {
+    "id": "borderpattern",
+    "name": "BorderPattern",
+    "group": "Feedback",
+    "summary": "A pattern running along a rounded edge, one per moment: refreshing, listening, thinking, working, speaking, a question waiting, news, saving.",
+    "export": "window.IrisUi.BorderPattern",
+    "props": [
+      {
+        "name": "pattern",
+        "type": "BorderPatternName",
+        "required": false
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "All eight, one at a time",
+        "code": "() => { const all = [[\"comet\", \"Refreshing\"], [\"breathe\", \"Listening\"], [\"orbit\", \"Thinking\"], [\"sparks\", \"Working on a loop\"], [\"wave\", \"She speaks\"], [\"stream\", \"Waits on you\"], [\"heartbeat\", \"A new loop\"], [\"zip\", \"Saving\"]];\n  const [p, setP] = React.useState(\"comet\"); const when = all.find((x) => x[0] === p)[1];\n  return h(\"div\", { style: { display: \"grid\", gap: 16, maxWidth: 360 } },\n    h(Select, { label: \"The moment\", value: p, onChange: setP, options: all.map(([value, label]) => ({ value, label })) }),\n    h(BorderPattern, { key: p, pattern: p, label: when },\n      h(\"div\", { style: { padding: \"var(--pad-card)\", display: \"grid\", gap: 4 } }, h(\"div\", { style: { fontSize: 17 } }, \"Groceries for Saturday\"), h(\"div\", { style: { fontSize: 12, color: \"var(--label)\" } }, when)))); }"
+      },
+      {
+        "label": "Round a card",
+        "code": "() => h(BorderPattern, { pattern: \"orbit\", label: \"Iris is thinking\" },\n    h(\"div\", { style: { padding: \"var(--pad-card)\", display: \"grid\", gap: 4 } },\n      h(\"div\", { style: { fontSize: 17 } }, \"Comparing three quotes\"),\n      h(\"div\", { style: { fontSize: 12, color: \"var(--label)\" } }, \"Iris is reading the small print\")))"
+      }
+    ],
+    "docs": "/irisui/components/borderpattern.md"
+  },
+  {
+    "id": "emptystate",
+    "name": "EmptyState",
+    "group": "Feedback",
+    "summary": "Nothing here yet, said properly: what this place is for and the one thing to do about it.",
+    "export": "window.IrisUi.EmptyState",
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "line",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "action",
+        "type": "{ label: string; onClick?: () => void }",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Nothing kept yet",
+        "code": "() => h(EmptyState, { title: \"Nothing kept yet\", line: \"When she finds something worth keeping, it lands here and stays yours.\", action: { label: \"Ask her something\" } })"
+      },
+      {
+        "label": "No loops yet",
+        "code": "() => h(Topic, { name: \"home\" }, h(EmptyState, { title: \"No loops yet\", line: \"A loop is one thing that comes back: the bins, a bill, a birthday.\" }))"
+      }
+    ],
+    "docs": "/irisui/components/emptystate.md"
+  },
+  {
+    "id": "loopbubble",
+    "name": "LoopBubble",
+    "group": "Feedback",
+    "summary": "One loop, small: its first letter in a disc and the six phases round it, the current one lit.",
+    "export": "window.IrisUi.LoopBubble",
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "step",
+        "type": "0 | 1 | 2 | 3 | 4 | 5",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Every phase",
+        "code": "() => h(\"div\", { style: { display: \"flex\", flexWrap: \"wrap\", gap: 16, paddingTop: 8 } },\n    [\"Recognised\", \"Planned\", \"Busy\", \"You\", \"Check\", \"Done\"].map((t, i) => h(\"div\", { key: t, style: { display: \"grid\", justifyItems: \"center\", gap: 6, fontSize: 12, color: \"var(--label)\" } }, h(LoopBubble, { title: t, step: i }), t)))"
+      }
+    ],
+    "docs": "/irisui/components/loopbubble.md"
+  },
+  {
+    "id": "progress",
+    "name": "Progress",
+    "group": "feedback",
+    "summary": "Progress in the topic colour: a thin bar by default, or a ring with a centre value and caption like a ring widget.",
+    "export": "window.IrisUi.Progress",
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "ring",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "centre",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "caption",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Bar",
+        "code": "() => h(\"div\", { style: { display: \"grid\", gap: 8, maxWidth: 360 } },\n  h(\"div\", { style: { display: \"flex\", justifyContent: \"space-between\", fontSize: 13 } }, h(\"span\", null, \"Groceries\"), h(\"span\", { style: { color: \"var(--label)\" } }, \"3 of 8\")),\n  h(Progress, { topic: \"groceries\", value: 3 / 8 }))"
+      },
+      {
+        "label": "Ring",
+        "code": "() => h(Progress, { topic: \"agenda\", ring: true, size: 90, value: 0.4, centre: \"3\", caption: \"to go\" })"
+      }
+    ],
+    "docs": "/irisui/components/progress.md"
+  },
+  {
+    "id": "skeleton",
+    "name": "Skeleton",
+    "group": "Feedback",
+    "summary": "What shows while anything loads from the house: glass blocks with a sheen, in the shape of the real content.",
+    "export": "window.IrisUi.Skeleton",
+    "props": [
+      {
+        "name": "height",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "number | string",
+        "required": false
+      },
+      {
+        "name": "screen",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Row",
+        "code": "() => h(Skeleton, null)"
+      },
+      {
+        "label": "Screen",
+        "code": "() => h(Skeleton, {screen:true})"
+      }
+    ],
+    "docs": "/irisui/components/skeleton.md"
+  },
+  {
+    "id": "snackbar",
+    "name": "Snackbar",
+    "group": "Feedback",
+    "summary": "What happened next, next to the thing it happened to: one line and at most one action.",
+    "export": "window.IrisUi.Snackbar",
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "tone",
+        "type": "'accent' | 'ok' | 'wait' | 'error'",
+        "required": false
+      },
+      {
+        "name": "action",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "onAction",
+        "type": "() => void",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Done",
+        "code": "() => h(Snackbar, { text: \"Added to the list for Saturday\", tone: \"ok\" })"
+      },
+      {
+        "label": "With undo",
+        "code": "() => h(Snackbar, { text: \"Three mails archived\", tone: \"accent\", action: \"Undo\", onAction: () => {} })"
+      },
+      {
+        "label": "Waiting",
+        "code": "() => h(Snackbar, { text: \"Reading the invoice\", tone: \"wait\" })"
+      },
+      {
+        "label": "Failed",
+        "code": "() => h(Snackbar, { text: \"No connection to the house\", tone: \"error\", action: \"Try again\", onAction: () => {} })"
+      }
+    ],
+    "docs": "/irisui/components/snackbar.md"
+  },
+  {
+    "id": "tooltip",
+    "name": "Tooltip",
+    "group": "Feedback",
+    "summary": "The name of a thing that is only an icon, on hover and on focus.",
+    "export": "window.IrisUi.Tooltip",
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "On an icon button",
+        "code": "() => h(\"div\", { style: { paddingTop: 60 } }, h(Tooltip, { label: \"Read it out\", open: true }, h(Button, { variant: \"icon\", label: \"Read it out\", icon: h(Icon, { name: \"speaker\", size: 18 }) })))"
+      }
+    ],
+    "docs": "/irisui/components/tooltip.md"
+  },
+  {
+    "id": "anchor",
+    "name": "Anchor",
+    "group": "Screen parts",
+    "summary": "The one personal note in handwriting on a screen: Caveat 700 at 20.8px, the topic's pen colour, -3 degrees, opacity .9, no fill under it.",
+    "export": "window.IrisUi.Anchor",
+    "props": [
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      }
+    ],
+    "variants": [
+      {
+        "label": "In a widget",
+        "code": "() => h(UI.Widget, { topic: \"groceries\", look: \"glass\", size: \"wide\", label: \"On the list\", value: \"8\", unit: \"things\", note: \"home-baked\" })"
+      }
+    ],
+    "docs": "/irisui/components/anchor.md"
+  },
+  {
+    "id": "loopscreen",
+    "name": "LoopScreen",
+    "group": "Screen parts",
+    "summary": "One loop in detail: the phase ring with its six labels, the loop's title in the middle, a glass NOW card and Done.",
+    "export": "window.IrisUi.LoopScreen",
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "when",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sub",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "phase",
+        "type": "Phase | 0 | 1 | 2 | 3 | 4 | 5",
+        "required": false
+      },
+      {
+        "name": "progress",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "center",
+        "type": "'none' | 'glass' | 'pattern' | 'word'",
+        "required": false
+      },
+      {
+        "name": "pen",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "onDone",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "onLoops",
+        "type": "() => void",
+        "required": false
+      },
+      {
+        "name": "doneLabel",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "loopsLabel",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Planned",
+        "code": "() => h(UI.LoopScreen, { title: \"Bins out\", when: \"In 16 hours\", sub: \"even weeks green, odd weeks grey\", phase: \"planned\", progress: 0.35, now: \"even weeks green, odd weeks grey\" })"
+      },
+      {
+        "label": "Done",
+        "code": "() => h(UI.LoopScreen, { title: \"Bins out\", when: \"done\", phase: \"done\", now: \"next time: Tuesday, grey\", pen: false })"
+      }
+    ],
+    "docs": "/irisui/components/loopscreen.md"
+  },
+  {
+    "id": "pattern",
+    "name": "Pattern",
+    "group": "Screen parts",
+    "summary": "A moving pattern fill in the topic's two tints on its dark ground: behind a card, a header band or a screen strip, the same motor as Widget look=\"pattern\".",
+    "export": "window.IrisUi.Pattern",
+    "props": [
+      {
+        "name": "kind",
+        "type": "'lanes' | 'grid' | 'bubbles' | 'band' | 'rain' | 'drift'",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "colors",
+        "type": "[string, string]",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "recipe",
+        "type": "{ layout: 'lanes' | 'grid' | 'lanes-round' | 'bubbles' | 'rain' | 'keys' | 'band' | 'scan' | 'drift' | 'eq' | 'spiral' | 'swarm' | 'wave'; shapes?: ('circle' | 'ring' | 'capsule' | 'triangle' | 'plus' | 'half' | 'square' | 'arc' | 'dot')[]; background?: string; palette?: string[]; density?: number; scale?: number; speed?: number; pop?: number; fill?: number; rotate?: number; depth?: number; variation?: number; confetti?: number; camera?: { from: number[]; to: number[] } }",
+        "required": false
+      }
+    ],
+    "variants": [],
+    "docs": "/irisui/components/pattern.md"
+  },
+  {
+    "id": "pen",
+    "name": "Pen",
+    "group": "Screen parts",
+    "summary": "A hand-drawn mark on one piece of text, drawn in with pen pressure: thick where the hand presses, thin at both ends.",
+    "export": "window.IrisUi.Pen",
+    "props": [
+      {
+        "name": "kind",
+        "type": "'circle' | 'check' | 'strike' | 'underline' | 'mark' | 'arrow' | 'bracket' | 'box' | 'spotlight' | 'pulse' | 'star' | 'number'",
+        "required": false
+      },
+      {
+        "name": "look",
+        "type": "'pen' | 'clean' | 'neon' | 'marker'",
+        "required": false
+      },
+      {
+        "name": "smoothness",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "open",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "tilt",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "n",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      }
+    ],
+    "variants": [
+      {
+        "label": "Circle",
+        "code": "() => h(\"p\", { style: { fontSize: 17, margin: \"12px 0\" } }, \"The dentist moved you to \", h(Pen, { kind: \"circle\" }, \"14:00\"), \" on Tuesday.\")"
+      },
+      {
+        "label": "Underline",
+        "code": "() => h(\"p\", { style: { fontSize: 17, margin: \"12px 0\" } }, \"Pay \", h(Pen, { kind: \"underline\" }, \"before Friday\"), \", or the fine doubles.\")"
+      },
+      {
+        "label": "Check",
+        "code": "() => h(\"p\", { style: { fontSize: 17, margin: \"12px 0\", paddingLeft: 24 } }, h(Pen, { kind: \"check\" }, \"Bins out\"), \" for this week.\")"
+      },
+      {
+        "label": "Strike",
+        "code": "() => h(\"p\", { style: { fontSize: 17, margin: \"12px 0\" } }, \"Milk, \", h(Pen, { kind: \"strike\" }, \"bread\"), \", apples.\")"
+      }
+    ],
+    "docs": "/irisui/components/pen.md"
+  },
+  {
+    "id": "phasering",
+    "name": "PhaseRing",
+    "group": "Screen parts",
+    "summary": "A loop as six phases around a ring, each in its own colour; the current phase runs as an hourglass.",
+    "export": "window.IrisUi.PhaseRing",
+    "props": [
+      {
+        "name": "phase",
+        "type": "Phase | 'seen' | 0 | 1 | 2 | 3 | 4 | 5",
+        "required": true
+      },
+      {
+        "name": "progress",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "eyebrow",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sub",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "labels",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "pen",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "center",
+        "type": "'none' | 'glass' | 'pattern' | 'word'",
+        "required": false
+      },
+      {
+        "name": "word",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "theme",
+        "type": "'frozen' | 'fire' | 'autumn'",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Busy",
+        "code": "() => h(UI.PhaseRing, { phase: \"busy\", progress: 0.45, title: \"Contractor quote\", sub: \"comparing 3 prices\", size: 220 })"
+      },
+      {
+        "label": "Waiting on you",
+        "code": "() => h(UI.PhaseRing, { phase: \"you\", progress: 0.7, title: \"Dentist\", sub: \"pick a time\", size: 220 })"
+      },
+      {
+        "label": "Done",
+        "code": "() => h(UI.PhaseRing, { phase: \"done\", progress: 1, title: \"Passport\", size: 220 })"
+      }
+    ],
+    "docs": "/irisui/components/phasering.md"
+  },
+  {
+    "id": "themeword",
+    "name": "ThemeWord",
+    "group": "Screen parts",
+    "summary": "A word in one of three themes: frozen (frost and icicles), fire (flames) and autumn (falling leaves), each on its own ground (word-frozen, word-fire, word-autumn).",
+    "export": "window.IrisUi.ThemeWord",
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "theme",
+        "type": "'frozen' | 'fire' | 'autumn'",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [],
+    "docs": "/irisui/components/themeword.md"
+  },
+  {
+    "id": "topic",
+    "name": "Topic",
+    "group": "Screen parts",
+    "summary": "Gives everything inside it the colours of one topic: --k (accent and pen), --k2 (second tint), --kd (dark ground) and --k-button (the primary button, oklch .82 / .12 of the accent).",
+    "export": "window.IrisUi.Topic",
+    "props": [
+      {
+        "name": "name",
+        "type": "TopicName",
+        "required": true
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Groceries",
+        "code": "() => h(UI.Topic, { name: \"groceries\" }, h(UI.ButtonGroup, null, h(UI.Button, { variant: \"primary\" }, \"Add to list\"), h(UI.Button, { variant: \"glass\" }, \"Later\")))"
+      },
+      {
+        "label": "Parcel",
+        "code": "() => h(UI.Topic, { name: \"parcel\" }, h(UI.ButtonGroup, null, h(UI.Button, { variant: \"primary\" }, \"Track\"), h(UI.Button, { variant: \"text\" }, \"Details\")))"
+      },
+      {
+        "label": "Sport",
+        "code": "() => h(UI.Topic, { name: \"sport\" }, h(UI.ButtonGroup, null, h(UI.Button, { variant: \"primary\" }, \"Start run\"), h(UI.Button, { variant: \"glass\" }, \"Skip\")))"
+      }
+    ],
+    "docs": "/irisui/components/topic.md"
+  },
+  {
+    "id": "widget",
+    "name": "Widget",
+    "group": "Screen parts",
+    "summary": "A tile that shows one answer at a glance, in four looks (glass, pattern, ring, list) and four sizes (small 170x170, wide 360x170, tall 170x376, large 360x376).",
+    "export": "window.IrisUi.Widget",
+    "props": [
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "look",
+        "type": "'glass' | 'pattern' | 'ring' | 'list'",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "'small' | 'wide' | 'tall' | 'large'",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "value",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "unit",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "items",
+        "type": "(string | [string, string])[]",
+        "required": false
+      },
+      {
+        "name": "done",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "progress",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pattern",
+        "type": "'lanes' | 'grid' | 'bubbles' | 'band' | 'rain' | 'drift'",
+        "required": false
+      },
+      {
+        "name": "note",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "bleed",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Glass, small",
+        "code": "() => h(UI.Widget, { topic: \"agenda\", look: \"glass\", size: \"small\", label: \"Today\", value: \"14:00\", unit: \"Dentist\" })"
+      },
+      {
+        "label": "Pattern, wide",
+        "code": "() => h(UI.Widget, { topic: \"groceries\", look: \"pattern\", size: \"wide\", pattern: \"lanes\", label: \"On the list\", value: \"8\", unit: \"things\", note: \"home-baked\" })"
+      },
+      {
+        "label": "Ring, tall",
+        "code": "() => h(UI.Widget, { topic: \"tasks\", look: \"ring\", size: \"tall\", label: \"To do\", value: \"3\", unit: \"to go\", progress: 0.4, items: [\"Sign quote\", \"Fix tyre\", \"the neighbour's birthday\", \"Tax\", \"Water plants\"], done: 2 })"
+      },
+      {
+        "label": "List, large",
+        "code": "() => h(UI.Widget, { topic: \"mail\", look: \"list\", size: \"large\", label: \"Mail\", value: \"3\", unit: \"important\", items: [\"Contractor: quote\", \"Tax office\", \"Alex: Saturday?\", \"Newsletter\", \"Dentist: confirmation\", \"Parents' evening\"], done: 1 })"
+      }
+    ],
+    "docs": "/irisui/components/widget.md"
+  },
+  {
+    "id": "word",
+    "name": "Word",
+    "group": "Screen parts",
+    "summary": "One big word with a moving effect, whose colours always stay readable on their ground.",
+    "export": "window.IrisUi.Word",
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "effect",
+        "type": "'gradient' | 'pop' | 'wave' | 'shine' | 'neon' | 'echo' | 'fill' | 'split' | 'lanes' | 'tiles' | 'stretch' | 'outline' | 'long-shadow' | 'stamp' | string",
+        "required": false
+      },
+      {
+        "name": "theme",
+        "type": "'frozen' | 'fire' | 'autumn'",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      },
+      {
+        "name": "level",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "Gradient, a loop done",
+        "code": "() => h(Word, { text: \"Done\", effect: \"gradient\", topic: \"loop\", level: 0.6, height: 100 })"
+      },
+      {
+        "label": "Fill, how far the list is",
+        "code": "() => h(Word, { text: \"3 / 8\", effect: \"fill\", topic: \"groceries\", level: 0.6, height: 100 })"
+      },
+      {
+        "label": "Wave, a parcel on the way",
+        "code": "() => h(Word, { text: \"On the way\", effect: \"wave\", topic: \"parcel\", level: 0.6, height: 100 })"
+      },
+      {
+        "label": "Outline, the weather",
+        "code": "() => h(Word, { text: \"Rain\", effect: \"outline\", topic: \"weather\", level: 0.6, height: 100 })"
+      },
+      {
+        "label": "Stamp, delivered",
+        "code": "() => h(Word, { text: \"Delivered\", effect: \"stamp\", topic: \"parcel\", level: 0.6, height: 100 })"
+      }
+    ],
+    "docs": "/irisui/components/word.md"
+  },
+  {
+    "id": "boardapp",
+    "name": "BoardApp",
+    "group": "App layouts",
+    "summary": "Columns of cards for things that move through stages.",
+    "export": "window.IrisUi.BoardApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/boardapp.md"
+  },
+  {
+    "id": "dashboardapp",
+    "name": "DashboardApp",
+    "group": "App layouts",
+    "summary": "Tiles in a grid of 4, 2 or 1 columns: numbers first, then a chart, then what needs attention.",
+    "export": "window.IrisUi.DashboardApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/dashboardapp.md"
+  },
+  {
+    "id": "documentapp",
+    "name": "DocumentApp",
+    "group": "App layouts",
+    "summary": "A reading column with a toolbar, and an inspector on the side for details.",
+    "export": "window.IrisUi.DocumentApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/documentapp.md"
+  },
+  {
+    "id": "flowapp",
+    "name": "FlowApp",
+    "group": "App layouts",
+    "summary": "One question per step with a progress line on top: sign-ups, bookings, a plugin wizard.",
+    "export": "window.IrisUi.FlowApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/flowapp.md"
+  },
+  {
+    "id": "listdetailapp",
+    "name": "ListDetailApp",
+    "group": "App layouts",
+    "summary": "A list on the left, the chosen item on the right.",
+    "export": "window.IrisUi.ListDetailApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/listdetailapp.md"
+  },
+  {
+    "id": "sidebarapp",
+    "name": "SidebarApp",
+    "group": "App layouts",
+    "summary": "A sidebar of sections on the left, one view on the right.",
+    "export": "window.IrisUi.SidebarApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/sidebarapp.md"
+  },
+  {
+    "id": "surfaces",
+    "name": "Surfaces",
+    "group": "App layouts",
+    "summary": "Every place Iris can put something she built, from a line in the chat to a full app, and when to pick which.",
+    "export": "window.IrisUi.Surfaces",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/surfaces.md"
+  },
+  {
+    "id": "tableapp",
+    "name": "TableApp",
+    "group": "App layouts",
+    "summary": "A list you search, filter and open: search in the AppBar, filter chips, the rows on one Card, a count line, a row that opens a Sheet.",
+    "export": "window.IrisUi.TableApp",
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "rows",
+        "type": "TableRow[]",
+        "required": false
+      },
+      {
+        "name": "filters",
+        "type": "string[]",
+        "required": false
+      },
+      {
+        "name": "search",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "noun",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "actions",
+        "type": "ReactNode",
+        "required": false
+      },
+      {
+        "name": "empty",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "topic",
+        "type": "TopicName",
+        "required": false
+      }
+    ],
+    "variants": [
+      {
+        "label": "What Iris did",
+        "code": "() => h(TableApp, { title: \"What Iris did\", noun: \"tasks\", filters: [\"Calls\", \"On the web\"], rows: [\n    { title: \"Moved the dentist\", subtitle: \"Called at 14:10\", icon: \"phone\", tags: [\"Calls\"], detail: h(Card, { padding: 0 }, h(Row, { title: \"Asked to move Tuesday\", subtitle: \"14:10\" }), h(Row, { title: \"Wednesday 09:30 is free\", subtitle: \"14:11\" }), h(Row, { title: \"Booked. Bring the old card\", subtitle: \"14:12\" })) },\n    { title: \"Looked up houses\", subtitle: \"On funda.nl at 13:50\", icon: \"globe\", tags: [\"On the web\"], detail: h(Card, { padding: 0 }, h(Row, { title: \"Opened Utrecht, 3 rooms\", subtitle: \"13:50\" }), h(Row, { title: \"Saved 4 houses to your list\", subtitle: \"13:52\" })) },\n    { title: \"Booked Da Mario\", subtitle: \"Called at 13:40\", icon: \"phone\", tags: [\"Calls\"], detail: h(Card, { padding: 0 }, h(Row, { title: \"Asked for six on Saturday\", subtitle: \"13:40\" }), h(Row, { title: \"20:00 is free, inside\", subtitle: \"13:41\" })) },\n  ] })"
+      },
+      {
+        "label": "The vault",
+        "code": "() => h(TableApp, { title: \"Logins\", noun: \"logins\", placeholder: \"Search logins\", actions: h(Button, { variant: \"primary\", size: \"sm\" }, \"Add\"), rows: [\n    { title: \"shop.example.com\", subtitle: \"alex@example.com, used today\", detail: h(Card, { padding: 0 }, h(Row, { title: \"alex@example.com\", subtitle: \"Name\" }), h(Row, { title: \"Iris may use it\", subtitle: \"Touch ID each time\", trailing: h(Toggle, { on: true, label: \"Iris may use it\" }) })) },\n    { title: \"da-mario.example\", subtitle: \"alex@example.com, added Saturday\", detail: h(Card, { padding: 0 }, h(Row, { title: \"Iris may use it\", subtitle: \"Touch ID each time\", trailing: h(Toggle, { label: \"Iris may use it\" }) })) },\n  ] })"
+      }
+    ],
+    "docs": "/irisui/components/tableapp.md"
+  },
+  {
+    "id": "tabsapp",
+    "name": "TabsApp",
+    "group": "App layouts",
+    "summary": "One subject, a few angles on it: tabs under the title.",
+    "export": "window.IrisUi.TabsApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/tabsapp.md"
+  },
+  {
+    "id": "widgetpagesapp",
+    "name": "WidgetPagesApp",
+    "group": "App layouts",
+    "summary": "Pages of widgets you swipe through, each page one theme (Today, Home, Movement).",
+    "export": "window.IrisUi.WidgetPagesApp",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/widgetpagesapp.md"
+  },
+  {
+    "id": "effects",
+    "name": "Effects",
+    "group": "Showcases",
+    "summary": "How Iris draws attention, all moving on one page: the LED edge patterns, the neon refresh line, the rotating border of a waiting question, the tour ring, ice neon for on and here (Mac bar, active tab), the finger and the hand-drawn loop on the phone, and Pen marks in the neon look.",
+    "export": "window.IrisUi.Effects",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/effects.md"
+  },
+  {
+    "id": "webkit",
+    "name": "WebKit",
+    "group": "Showcases",
+    "summary": "The web UI parts in the topic palette: Chip, Progress (bar or ring), Stat, CheckList, Segmented, Field.",
+    "export": "window.IrisUi.WebKit",
+    "props": [],
+    "variants": [
+      {
+        "label": "One topic per screen, four screens",
+        "code": "() => h(\"div\", { style: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit,minmax(460px,1fr))\", gap: 16 } },\n      Object.keys(DEMO).map(n => h(Screen, { key: n, name: n })))"
+      },
+      {
+        "label": "Without a topic: the ice accent",
+        "code": "() => h(Card, { style: { padding: 14, display: \"grid\", gap: 12, maxWidth: 460 } },\n      h(Segmented, { items: [\"All\", \"Open\"], active: 0 }), h(Progress, { value: .4 }), h(CheckList, { items: [\"Call the plumber\", \"Pay the invoice\"], done: 1 }),\n      h(\"div\", { style: { display: \"flex\", gap: 6 } }, h(Chip, { on: true }, \"Today\"), h(Chip, null, \"This week\")), h(Field, { placeholder: \"Search\" }))"
+      }
+    ],
+    "docs": "/irisui/components/webkit.md"
+  },
+  {
+    "id": "widgetdata",
+    "name": "WidgetData",
+    "group": "Showcases",
+    "summary": "The widget system filled with real demo content: 18 widgets over 12 topics (groceries, agenda, mail, parcel, weather, tasks, sport, money, travel, health, home, music), each topic with its own colour and pattern, spread over the four looks and sizes; the old app widget beside the same content in the four new looks; and the word lab's letter recipes on the same beat.",
+    "export": "window.IrisUi.WidgetData",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/widgetdata.md"
+  },
+  {
+    "id": "widgetgallery",
+    "name": "WidgetGallery",
+    "group": "Showcases",
+    "summary": "The four widget looks (glass, pattern, ring, list and type), each in the four sizes (small, wide, tall, large) with changing topics, as the widget lab draws them.",
+    "export": "window.IrisUi.WidgetGallery",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/widgetgallery.md"
+  },
+  {
+    "id": "widgetscreens",
+    "name": "WidgetScreens",
+    "group": "Showcases",
+    "summary": "Widgets in use, as the widget lab has them: horizontal scrolling with page dots in the topic colour and vertical scrolling with the app's side pointer, widgets with pictures (real photos in duotone, two colours of the topic, and flat drawings in trip style for the things themselves), the full Groceries screen in three looks where tapping an item ticks it off and the counter, dots and ring follow.",
+    "export": "window.IrisUi.WidgetScreens",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/widgetscreens.md"
+  },
+  {
+    "id": "cover",
+    "name": "Cover",
+    "group": "Other",
+    "summary": "The one title card of a set, chapter or share image: the word on the left, the look on the right.",
+    "export": "window.IrisUi.Cover",
+    "props": [],
+    "variants": [],
+    "docs": "/irisui/components/cover.md"
+  }
+]

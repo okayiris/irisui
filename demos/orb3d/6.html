@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<!-- @dsCard group="Brand" height=3150 -->
+<style>
+  /* The Mac pill around the 3D orb: the same desk, glass bar, label, steps ring and badge as MacPill. */
+  .o3-desk { position: relative; height: 240px; border-radius: 16px; overflow: hidden;
+    background: radial-gradient(420px 260px at 18% 22%, rgba(56,189,248,.28), transparent 70%),
+                radial-gradient(380px 260px at 84% 78%, rgba(192,38,211,.22), transparent 70%),
+                linear-gradient(to bottom left, #291f52, #0a0d1f); }
+  .o3-pill { position: absolute; left: 50%; top: 54%; width: 0; height: 0; }
+  .o3-bar { position: absolute; top: -22px; height: 44px; border-radius: 22px; display: flex; align-items: center; padding: 0 6px;
+    background: rgba(7,9,12,.78); box-shadow: inset 0 0 0 1px rgba(190,230,255,.14), 0 0 0 1px rgba(0,0,0,.25), 0 0 5px rgba(0,0,0,.3);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    transition: transform .42s cubic-bezier(.34,1.3,.64,1), opacity .25s, filter .3s; }
+  .o3-bar.closed { transform: scaleX(.3) scaleY(.8); opacity: 0; filter: blur(6px); pointer-events: none; }
+  .o3-side { display: flex; gap: 2px; }
+  .o3-gap { width: 80px; flex: none; }
+  .o3-btn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: rgba(232,242,247,.85); }
+  .o3-btn:hover { color: #2ee6d6; background: rgba(46,230,214,.16); }
+  .o3-btn.mic { background: rgba(139,92,246,.75); color: #fff; }
+  .o3-orb { position: absolute; left: -52px; top: -52px; }
+  .o3-work { position: absolute; left: -44px; top: -44px; width: 88px; height: 88px; pointer-events: none; animation: o3-turn 4s linear infinite; }
+  @keyframes o3-turn { to { transform: rotate(360deg); } }
+  .o3-badge { position: absolute; left: 18px; top: -38px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 10px;
+    background: #ff453a; color: #fff; font: 700 11px var(--font); display: grid; place-items: center; box-shadow: 0 0 6px rgba(255,69,58,.5); z-index: 3; }
+  .o3-label { position: absolute; left: -200px; width: 400px; top: 48px; text-align: center; font: 500 9.5px var(--mono); letter-spacing: 1.4px; color: #8fa3b0; }
+  .o3-above { position: absolute; left: -250px; width: 500px; top: -78px; display: flex; justify-content: center; align-items: center; gap: 8px;
+    font: 500 12px var(--font); color: rgba(232,242,247,.9); }
+  .o3-dot { width: 6px; height: 6px; border-radius: 50%; background: #7dd3fc; box-shadow: 0 0 3px rgba(125,211,252,.8); }
+  .o3-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+  .o3-controls button { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); background: rgba(255,255,255,.05);
+    border: 1px solid rgba(190,230,255,.14); border-radius: 999px; padding: 6px 11px; cursor: pointer; }
+  .o3-controls button.on { color: #2ee6d6; border-color: rgba(46,230,214,.7); background: rgba(46,230,214,.12); }
+  .o3-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; width: 100%; max-width: 760px; }
+  .o3-panel-col { display: flex; flex-direction: column; gap: 8px; }
+  .o3-h { font: 500 10px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-top: 4px; }
+  .o3-slider { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 8px; font: 12px var(--font); color: var(--dim); }
+  .o3-slider input { accent-color: #8b5cf6; width: 100%; }
+  .o3-slider b { font: 500 11px var(--mono); color: var(--fg); text-align: right; }
+  .o3-panel input[type=color] { width: 44px; height: 30px; border: 1px solid var(--edge); border-radius: 8px; background: none; padding: 2px; cursor: pointer; }
+  .o3-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px 4px; }
+  .o3-grid div { display: flex; flex-direction: column; align-items: center; gap: 2px; font: 400 11px var(--font); color: var(--dim); text-align: center; }
+  .o3-grid code { font: 500 9.5px var(--mono); color: var(--faint); }
+</style>
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Orb3D, Button } = window.IrisUi;
+  const label = t => h("div", { style: { font: "500 10px var(--mono)", letterSpacing: ".14em", textTransform: "uppercase", color: "var(--faint)" } }, t);
+  const cell = (s, props) => h("div", { key: s, style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 4 } }, h(Orb3D, { size: 100, ...props }), label(s));
+
+  // Hero: talking on a test sound (a tone gliding 120 Hz to 2.5 kHz and back) or your microphone.
+  function Hero() {
+    const [an, setAn] = React.useState(null), [parts, setParts] = React.useState(1);
+    // Two formulas, both editable: the particles (where each mote goes) and the body (the glass shape).
+    // Pick a preset to start from, then change the GLSL and watch it live.
+    const [tab, setTab] = React.useState("particles"), [pick, setPick] = React.useState({ particles: "orbit", body: "sphere" });
+    const [code, setCode] = React.useState({ particles: Orb3D.shapeGlsl("orbit"), body: Orb3D.bodyGlsl("sphere") });
+    const [withRing, setWithRing] = React.useState(true), [err, setErr] = React.useState(null);
+    const [style, setStyle] = React.useState(Orb3D.shapeStyle("orbit")), [finish, setFinish] = React.useState("glass"), [toneDown, setToneDown] = React.useState(0);
+    const set = (k, v) => setStyle({ ...style, [k]: v });
+    const choose = k => { setPick({ ...pick, [tab]: k }); setCode({ ...code, [tab]: tab === "body" ? Orb3D.bodyGlsl(k) : Orb3D.shapeGlsl(k) });
+      if (tab === "particles") setStyle({ ...Orb3D.shapeStyle(k), colors: style.colors, colorMode: style.colorMode }); };
+    const chips = (list, on, pickIt) => h("div", { className: "o3-controls" }, list.map(k => h("button", { key: k, className: k === on ? "on" : "", onClick: () => pickIt(k) }, k)));
+    const slider = (k, label, min, max, step) => h("label", { key: k, className: "o3-slider" }, h("span", null, label),
+      h("input", { type: "range", min, max, step, value: style[k], onChange: e => set(k, Number(e.target.value)) }), h("b", null, style[k]));
+    const sound = React.useRef(null);
+    const analyser = ctx => { const a = ctx.createAnalyser(); a.fftSize = 2048; a.smoothingTimeConstant = 0.5; return a; };
+    const tone = () => {
+      const ctx = new AudioContext(), a = analyser(ctx), gain = ctx.createGain(), o = ctx.createOscillator();
+      gain.gain.value = 0.12; o.type = "triangle";
+      const glide = () => { const t = ctx.currentTime; o.frequency.cancelScheduledValues(t); o.frequency.setValueAtTime(120, t);
+        o.frequency.exponentialRampToValueAtTime(2500, t + 3); o.frequency.exponentialRampToValueAtTime(120, t + 6); };
+      o.connect(gain).connect(a).connect(ctx.destination); o.start(); glide();
+      sound.current = { ctx, loop: setInterval(glide, 6000) }; setAn(a);
+    };
+    const mic = async () => {
+      try { const stream = await navigator.mediaDevices.getUserMedia({ audio: true }), ctx = new AudioContext(), a = analyser(ctx);
+        ctx.createMediaStreamSource(stream).connect(a); sound.current = { ctx, stream }; setAn(a); } catch (e) {}
+    };
+    const stop = () => { const s = sound.current; if (s) { clearInterval(s.loop); s.stream?.getTracks().forEach(t => t.stop()); s.ctx.close(); } sound.current = null; setAn(null); };
+    React.useEffect(() => stop, []);
+    return h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 12 } },
+      h(Orb3D, { size: 300, state: "talking", analyser: an, particles: parts, shape: code.particles, body: code.body, particleStyle: style, material: finish, tone: toneDown,
+        ring: withRing ? "deepsea" : "none", onError: setErr }),
+      h("div", { className: "o3-controls" },
+        ["particles", "body"].map(k => h("button", { key: k, className: k === tab ? "on" : "", onClick: () => setTab(k) }, k === "body" ? "Edit: ball" : "Edit: particles")),
+        h("button", { className: withRing ? "on" : "", onClick: () => setWithRing(!withRing) }, "+ ring")),
+      h("div", { className: "o3-controls" },
+        (tab === "body" ? Orb3D.bodies : Orb3D.shapes).map(k => h("button", { key: k, className: k === pick[tab] ? "on" : "", onClick: () => choose(k) }, k))),
+      h("textarea", { value: code[tab], spellCheck: false, onChange: e => { setPick({ ...pick, [tab]: null }); setCode({ ...code, [tab]: e.target.value }); },
+        "aria-label": tab === "body" ? "Ball formula" : "Particle formula",
+        style: { width: "100%", maxWidth: 640, height: 190, boxSizing: "border-box", background: "rgba(180,225,255,.05)", color: "var(--fg)",
+          border: "1px solid " + (err ? "var(--error)" : "var(--edge)"), borderRadius: 12, padding: 12, font: "12px/1.5 var(--mono)", resize: "vertical" } }),
+      err ? h("div", { style: { font: "11px var(--mono)", color: "var(--error)", maxWidth: 640, whiteSpace: "pre-wrap" } }, err.split("\n").filter(Boolean).slice(0, 3).join("\n"))
+        : h("div", { style: { fontSize: 12, color: "var(--dim)", maxWidth: 640, textAlign: "center" } },
+          tab === "body" ? "body(p) is the distance from p to the edge of the glass: negative inside. The glass bends over DEPTH units in from the edge. t is time, rot(a) turns."
+            : "particle(i, h, color, size) returns where mote i is in 3D. t is time, level loudness, pulse an onset, band(x) a pitch band, iris(u) the Iris colours, spin(q, speed) turns a shape."),
+      h("div", { className: "o3-panel" },
+        h("div", { className: "o3-panel-col" }, h("div", { className: "o3-h" }, "Particles"),
+          slider("count", "Count", 8, 512, 1), slider("lines", "Lines", 1, 12, 1), slider("size", "Size", 0.2, 3, 0.05),
+          slider("trail", "Trail", 0, 1, 0.05), slider("react", "React to voice", 0, 3, 0.05), slider("speed", "Speed", 0, 3, 0.05),
+          h("div", { className: "o3-h" }, "Limits"), slider("minSize", "Min size", 0, 4, 0.1), slider("maxSize", "Max size", 0.5, 12, 0.1),
+          slider("maxLight", "Max light", 0.2, 3, 0.05),
+          h("div", { className: "o3-h" }, "Sprite"), chips(Orb3D.sprites, style.sprite, k => set("sprite", k))),
+        h("div", { className: "o3-panel-col" }, h("div", { className: "o3-h" }, "Colour: start, mid, end"),
+          h("div", { style: { display: "flex", gap: 8 } }, [0, 1, 2].map(i => h("input", { key: i, type: "color", value: style.colors[i], "aria-label": ["Start", "Mid", "End"][i] + " colour",
+            onChange: e => { const c = [...style.colors]; c[i] = e.target.value; setStyle({ ...style, colors: c, colorMode: style.colorMode === "preset" ? "along" : style.colorMode }); } }))),
+          h("div", { className: "o3-h" }, "Colour effect"), chips(Orb3D.colorModes, style.colorMode, k => set("colorMode", k)),
+          h("div", { className: "o3-h" }, "Ball material"), chips(Orb3D.materials, finish, setFinish),
+          h("div", { className: "o3-h" }, "Whole orb"),
+          h("label", { className: "o3-slider" }, h("span", null, "Tone down"),
+            h("input", { type: "range", min: 0, max: 1, step: 0.05, value: toneDown, onChange: e => setToneDown(Number(e.target.value)) }), h("b", null, toneDown)))),
+      h("div", { style: { display: "flex", gap: 10 } },
+        h(Button, { variant: "glass", size: "sm", onClick: () => setParts(parts ? 0 : 1) }, parts ? "Particles off" : "Particles on"), an
+        ? h(Button, { variant: "glass", size: "sm", onClick: stop }, "Stop")
+        : [h(Button, { key: "t", variant: "accent", size: "sm", onClick: tone }, "Play test sound"),
+           h(Button, { key: "m", variant: "glass", size: "sm", onClick: mic }, "Use my microphone")]));
+  }
+
+  // The 3D orb in the Mac pill: glass bar behind it, a word under it, the steps ring and badge on top.
+  const svg = d => h("svg", { width: 16, height: 16, viewBox: "0 0 24 24" }, d.map((p, i) => h("path", { key: i, d: p, fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" })));
+  const ICON = { loop: ["M19.5 9A8 8 0 0 0 5 7.5M4.5 15A8 8 0 0 0 19 16.5", "M4 3.5v5h5M20 20.5v-5h-5"], chats: ["M4 5h11v8H8l-4 3z", "M18 8h2v8l-3-2h-6v-1"],
+    vault: ["M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6z"], gear: ["M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"],
+    mic: ["M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z", "M19 11a7 7 0 0 1-14 0M12 18v3"] };
+  const Btn = (i, cls) => h("div", { key: i, className: "o3-btn" + (cls ? " " + cls : "") }, svg(ICON[i]));
+  function Pill({ state = "rest", label, bar, working, steps, words, badge, ring, particles }) {
+    const [mouse, setMouse] = React.useState(false), [open, setOpen] = React.useState(false);
+    React.useEffect(() => { const t = setTimeout(() => setOpen(mouse), mouse ? 180 : 700); return () => clearTimeout(t); }, [mouse]);
+    const hover = { onMouseEnter: () => setMouse(true), onMouseLeave: () => setMouse(false) };
+    return h("div", { className: "o3-desk" }, h("div", { className: "o3-pill" },
+      words ? h("div", { className: "o3-above" }, "\u201c" + words + "\u201d")
+        : steps ? h("div", { className: "o3-above" }, h("span", { className: "o3-dot" }), steps + " steps") : null,
+      h("div", { className: "o3-bar" + (bar || open ? "" : " closed"), style: { left: -120 }, ...hover },
+        h("div", { className: "o3-side" }, Btn("loop"), Btn("chats")), h("div", { className: "o3-gap" }),
+        h("div", { className: "o3-side" }, Btn("vault"), Btn("gear"), Btn("mic", "mic"))),
+      h("div", { className: "o3-orb", ...hover }, h(Orb3D, { size: 104, state, ring, particles })),
+      working ? h("svg", { className: "o3-work", viewBox: "-44 -44 88 88" },
+        h("circle", { r: 43, fill: "none", stroke: "#7dd3fc", strokeWidth: 1.4, strokeLinecap: "round", strokeDasharray: "0.1 5.4", style: { filter: "drop-shadow(0 0 2px rgba(125,211,252,.8))" } })) : null,
+      badge ? h("div", { className: "o3-badge" }, badge) : null,
+      label ? h("div", { className: "o3-label" }, label) : null));
+  }
+  const PILL = [
+    ["Rest", { state: "rest", badge: 3 }],
+    ["Talking", { state: "talking", words: "Dim the kitchen lights", bar: true }],
+    ["Listening", { state: "listening", label: "LISTENING" }],
+    ["Thinking", { state: "thinking", label: "THINKING" }],
+    ["Working", { state: "rest", label: "WORKING", working: true, steps: 6 }],
+    ["Muted", { state: "muted", label: "MUTED" }],
+    ["Away", { state: "away", label: "CONNECTION LOST" }],
+  ];
+  function PillPlayground() {
+    const [k, setK] = React.useState(1), [ring, setRing] = React.useState("deepsea"), [parts, setParts] = React.useState(1);
+    return h("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
+      h("div", { className: "o3-controls" }, PILL.map(([n], i) => h("button", { key: n, className: i === k ? "on" : "", onClick: () => setK(i) }, n))),
+      h("div", { className: "o3-controls" }, ["deepsea", "precession", "fieldlines", "comet-orbit", "silk-wave", "angular-discharge"].map(r =>
+        h("button", { key: r, className: r === ring ? "on" : "", onClick: () => setRing(r) }, Orb3D.ringName(r))),
+        h("button", { className: parts ? "on" : "", onClick: () => setParts(parts ? 0 : 1) }, "Particles")),
+      h(Pill, { key: k + ring, ring, particles: parts, ...PILL[k][1] }),
+      h("div", { style: { fontSize: 12, color: "var(--dim)" } }, "Rest the mouse on the orb: the bar grows out from behind it."));
+  }
+
+  // Many orbs at once: one WebGL context draws them all, each with its own made-up voice, copied into small canvases.
+  // (A page keeps about 16 contexts; one Orb3D each would run out.)
+  // Many orbs at once: one WebGL context draws them all, each with its own made-up voice, copied into small canvases.
+  // (A page keeps about 16 contexts; one Orb3D each would run out.) Only orbs in view are compiled and drawn, and
+  // at most BUDGET per frame, taking turns, so the page stays quick while it loads and scrolls.
+  const BUDGET = 4;
+  function Multi({ items, size = 110 }) {
+    const ref = React.useRef(null);
+    React.useEffect(() => {
+      const px = size * 2, gl = Object.assign(document.createElement("canvas"), { width: px, height: px });
+      let R = null, raf, turn = 0;
+      const live = [...ref.current.querySelectorAll("canvas")].map((c, i) => ({ c, ctx: c.getContext("2d"), ...Orb3D.source(items[i]),
+        particles: items[i].particles || 0, voice: Orb3D.makeVoice(() => "fake"), on: false, broken: false }));
+      const io = new IntersectionObserver(es => es.forEach(e => { const it = live.find(i => i.c === e.target); if (it) it.on = e.isIntersecting; }));
+      live.forEach(it => io.observe(it.c));
+      const frame = ms => { raf = requestAnimationFrame(frame); const t = ms / 1000;
+        const seen = live.filter(it => it.on && !it.broken); if (!seen.length) return;
+        if (!R) R = Orb3D.makeRenderer(gl);
+        for (let n = 0; n < Math.min(BUDGET, seen.length); n++) {
+          const it = seen[(turn + n) % seen.length]; it.voice.update(t);
+          try { if (!R.draw(it.src, it.voice, t, { ...it.look, particles: it.particles, pstyle: it.pstyle, ptime: t * it.pstyle.speed })) continue; }
+          catch (e) { console.warn(e.message); it.broken = true; continue; }
+          it.ctx.clearRect(0, 0, px, px); it.ctx.drawImage(gl, 0, 0);
+        }
+        turn = (turn + BUDGET) % seen.length;
+      };
+      raf = requestAnimationFrame(frame);
+      return () => { cancelAnimationFrame(raf); io.disconnect(); R && R.lose(); };
+    }, []);
+    return h("div", { ref, className: "o3-grid", style: { gridTemplateColumns: `repeat(auto-fill, minmax(${size + 8}px, 1fr))` } }, items.map((it, i) => h("div", { key: i },
+      h("canvas", { width: size * 2, height: size * 2, style: { width: size, height: size } }), it.label, it.sub ? h("code", null, it.sub) : null)));
+  }
+
+  window.__dsPreview = {
+    Hero: () => h(Hero),
+    "In the Mac pill (hover the orb)": () => h(PillPlayground),
+    "Rings + particles": () => h(Multi, { size: 150, items: [
+      ["deepsea", "orbit", {}], ["precession", "comets", {}], ["silk-wave", "sparks", {}], ["comet-orbit", "dust", { lines: 4 }],
+      ["fieldlines", "swarm", {}], ["angular-discharge", "orbit", { lines: 3, sprite: "streak", trail: 0.6 }],
+      ["caustic-orbit", "comets", { lines: 7, trail: 0.8, sprite: "streak" }], ["long-teardrop-orbit", "sparks", { lines: 6, sprite: "star" }],
+      ["smoke-spiral", "dust", { sprite: "square", count: 120, size: 0.7 }], ["mercury-strands", "knot", { lines: 3, colorMode: "cycle", colors: ["#2ee6d6", "#7dd3fc", "#c026d3"] }],
+      ["deep-stroke", "swarm", { sprite: "blob", count: 40, lines: 3 }], ["drop-wave", "orbit", { sprite: "ring", count: 60, colorMode: "voice", colors: ["#38bdf8", "#8b5cf6", "#ffffff"] }],
+    ].map(([r, k, st]) => ({ ring: r, shape: k, particles: 1, particleStyle: st, label: Orb3D.ringName(r), sub: k + (st.sprite ? " \u00b7 " + st.sprite : "") + (st.lines ? " \u00b7 " + st.lines + " lines" : "") })) }),
+    "Ball materials": () => h(Multi, { size: 130, items: Orb3D.materials.map(m => ({ ring: "deepsea", material: m, shape: "orbit", particles: 0.6, label: m })) }),
+    "Particle shapes (no ring)": () => h(Multi, { size: 120, items: ["circle", "square", "triangle", "knot"].map(k =>
+      ({ ring: "none", shape: k, particles: 1, label: k })) }),
+    "Ball shapes (with a ring)": () => h(Multi, { size: 150, items: [["sphere", "deepsea"], ["cube", "silk-wave"], ["triangle", "precession"], ["donut", "comet-orbit"], ["gem", "angular-discharge"]].map(([b, r]) =>
+      ({ body: b, ring: r, label: b, sub: r })) }),
+    States: () => h("div", { style: { display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 } },
+      ["rest", "talking", "expression", "listening", "thinking", "muted", "away"].map(s => cell(s, { state: s }))),
+    "All 28 rings (talking)": () => h(Multi, { items: Orb3D.rings.map(r => ({ ring: r, label: Orb3D.ringName(r), sub: r })) }),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>
+
+<script>
+(() => {
+  const root = document.getElementById("root") ?? document.body.firstElementChild;
+  if (!root) return;
+  const cells = Array.from(root.children);
+  if (!cells.length) return;
+  const label = "States";
+  const text = (el) => (el.textContent || "").replace(/\s+/g, " ").trim();
+  const keep = cells.find((el) => text(el).startsWith(label)) ?? cells[6] ?? cells[0];
+  for (const el of cells) if (el !== keep) el.remove();
+  // The page already names the variant above the frame; the preview's own small caps caption goes.
+  const cap = keep.firstElementChild;
+  if (cap && /uppercase/.test(cap.getAttribute("style") || "") && text(cap) === label) cap.remove();
+  document.documentElement.setAttribute("data-demo", "orb3d:6");
+})();
+</script>
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

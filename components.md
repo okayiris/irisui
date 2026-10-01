@@ -1,0 +1,76 @@
+# All components
+
+- [Edge](/irisui/components/edge.md): The apps' light patterns along an edge: round her orb while she thinks, along a screen while it reloads. The TalkOrb and the Orb3D think with it.
+- [EdgeText](/irisui/components/edgetext.md): A word as a neon sign: the Edge light runs along the outline of every letter. SVG and CSS only.
+- [MacPill](/irisui/components/macpill.md): Iris on the Mac desktop: her orb, a bar of buttons that grows out from behind it, her words above and one state line under it.
+- [Mark](/irisui/components/mark.md): Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.
+- [Orb](/irisui/components/orb.md): Her orb: a ring with a slowly turning violet-blue-pink gradient and a soft glow.
+- [Orb3D](/irisui/components/orb3d.md): Her orb in 3D: a glass ball with a ring of light round it.
+- [TalkOrb](/irisui/components/talkorb.md): The orb as the talk button: a dark disc with the turning Iris ring inside, the middle of the tab bar on iPhone ("the orb is the mic").
+- [Button](/irisui/components/button.md): Pills.
+- [ButtonGroup](/irisui/components/buttongroup.md): The button set of one screen in its topic: primary flat, secondary glass, and the quieter kinds beside them.
+- [Chip](/irisui/components/chip.md): A pill filter or choice in the topic colour: on fills it with --k and dark --kd ink, off it is glass with the topic edge.
+- [DatePicker](/irisui/components/datepicker.md): A month you pick a day in: one accent on the chosen day, today marked with a ring.
+- [Field](/irisui/components/field.md): The pill input: glass, caret and focus edge in the topic colour.
+- [Menu](/irisui/components/menu.md): A list of choices on its own surface: a filter, a sort, a set of actions, anchored to the thing it belongs to.
+- [SearchField](/irisui/components/searchfield.md): Finding something: a pill field that says what it is doing and clears itself.
+- [Select](/irisui/components/select.md): One choice out of a few, in the shape of the fields around it.
+- [Slider](/irisui/components/slider.md): One value on a line: how much, how far, how loud.
+- [SplitButton](/irisui/components/splitbutton.md): One action, and the caret that opens the others that belong to it.
+- [TextArea](/irisui/components/textarea.md): The multi-line field: a note, a message, anything longer than a line.
+- [TimePicker](/irisui/components/timepicker.md): A time you set with two strips: the hour, then the minute. The chosen time reads big, in mono.
+- [Toggle](/irisui/components/toggle.md): The iOS switch, 51x31: violet (--violet) when on, grey glass when off.
+- [Card](/irisui/components/card.md): The one surface of the app: frosted glass (--glass), 1px --edge stroke, radius 18, padding 14.
+- [Carousel](/irisui/components/carousel.md): A strip of cards you swipe or scroll sideways, with dots that say where you are.
+- [CheckList](/irisui/components/checklist.md): A list with tick circles in the topic colour, or with times in front instead; onToggle makes the rows tickable.
+- [Divider](/irisui/components/divider.md): A hairline that groups what is above it from what is below.
+- [Photo](/irisui/components/photo.md): A photo with a depth map: a word behind the person, duotone in the topic's colours, or parallax in four depth layers. No photo ships: without a src it paints its own neutral scene with a matching depth map, and without a depth map it guesses one (lower and central is nearer).
+- [Row](/irisui/components/row.md): A settings row (the You page): 24px icon at 80% --fg, a 17pt title, a 12pt --dim line under it, and on the right a Toggle, a menu value, a chevron or an extern…
+- [Stat](/irisui/components/stat.md): One number and one word: the number large in the topic colour, the word dim under it.
+- [Dialog](/irisui/components/dialog.md): The one place Iris interrupts: a decision that cannot wait, with the action that matters first.
+- [Sheet](/irisui/components/sheet.md): Secondary content anchored to an edge: the bottom on a phone, the side on a wide window.
+- [VaultAsk](/irisui/components/vaultask.md): The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches, then allow or no.
+- [AppBar](/irisui/components/appbar.md): The top line of a screen or a window: what this is, and the few actions that belong to it.
+- [Badge](/irisui/components/badge.md): A count or a dot on the thing it belongs to: a tab, an icon, a word.
+- [ChatStack](/irisui/components/chatstack.md): Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.
+- [CircleStack](/irisui/components/circlestack.md): Every chat with its loops as a circle, stacked behind the strip: where the loops live now that the iPhone app has no Loops tab.
+- [NavRail](/irisui/components/navrail.md): The wide-window version of the tab bar: a rail of sections that collapses to icons.
+- [PageDots](/irisui/components/pagedots.md): Page dots under swipeable screens: each dot 7px in 30% of the topic colour, the active one a 22px duotone streak from --k to --k2.
+- [Segmented](/irisui/components/segmented.md): Tabs inside a card: a glass track with the active tab tinted 14% of the topic colour.
+- [StatusPill](/irisui/components/statuspill.md): Top left of every screen: the orb and one word of what she is doing ("busy", "listening"), or an accent pill with an action ("Continue here").
+- [Steps](/irisui/components/steps.md): Where you are in a short flow, and what is still coming.
+- [TabBar](/irisui/components/tabbar.md): The floating tab bar at the bottom: a frosted capsule with four tabs (Iris, Loops, Camera, You) and the talk button in the middle, a ring like the orb.
+- [Tabs](/irisui/components/tabs.md): A few angles on one thing, under its title, with the ink sliding to the active one.
+- [Toolbar](/irisui/components/toolbar.md): A bar of actions that belong together, docked in a screen or floating over the content.
+- [BorderPattern](/irisui/components/borderpattern.md): A pattern running along a rounded edge, one per moment: refreshing, listening, thinking, working, speaking, a question waiting, news, saving.
+- [EmptyState](/irisui/components/emptystate.md): Nothing here yet, said properly: what this place is for and the one thing to do about it.
+- [LoopBubble](/irisui/components/loopbubble.md): One loop, small: its first letter in a disc and the six phases round it, the current one lit.
+- [Progress](/irisui/components/progress.md): Progress in the topic colour: a thin bar by default, or a ring with a centre value and caption like a ring widget.
+- [Skeleton](/irisui/components/skeleton.md): What shows while anything loads from the house: glass blocks with a sheen, in the shape of the real content.
+- [Snackbar](/irisui/components/snackbar.md): What happened next, next to the thing it happened to: one line and at most one action.
+- [Tooltip](/irisui/components/tooltip.md): The name of a thing that is only an icon, on hover and on focus.
+- [Anchor](/irisui/components/anchor.md): The one personal note in handwriting on a screen: Caveat 700 at 20.8px, the topic's pen colour, -3 degrees, opacity .9, no fill under it.
+- [LoopScreen](/irisui/components/loopscreen.md): One loop in detail: the phase ring with its six labels, the loop's title in the middle, a glass NOW card and Done.
+- [Pattern](/irisui/components/pattern.md): A moving pattern fill in the topic's two tints on its dark ground: behind a card, a header band or a screen strip, the same motor as Widget look="pattern".
+- [Pen](/irisui/components/pen.md): A hand-drawn mark on one piece of text, drawn in with pen pressure: thick where the hand presses, thin at both ends.
+- [PhaseRing](/irisui/components/phasering.md): A loop as six phases around a ring, each in its own colour; the current phase runs as an hourglass.
+- [ThemeWord](/irisui/components/themeword.md): A word in one of three themes: frozen (frost and icicles), fire (flames) and autumn (falling leaves), each on its own ground (word-frozen, word-fire, word-autumn).
+- [Topic](/irisui/components/topic.md): Gives everything inside it the colours of one topic: --k (accent and pen), --k2 (second tint), --kd (dark ground) and --k-button (the primary button, oklch .82 / .12 of the accent).
+- [Widget](/irisui/components/widget.md): A tile that shows one answer at a glance, in four looks (glass, pattern, ring, list) and four sizes (small 170x170, wide 360x170, tall 170x376, large 360x376).
+- [Word](/irisui/components/word.md): One big word with a moving effect, whose colours always stay readable on their ground.
+- [BoardApp](/irisui/components/boardapp.md): Columns of cards for things that move through stages.
+- [DashboardApp](/irisui/components/dashboardapp.md): Tiles in a grid of 4, 2 or 1 columns: numbers first, then a chart, then what needs attention.
+- [DocumentApp](/irisui/components/documentapp.md): A reading column with a toolbar, and an inspector on the side for details.
+- [FlowApp](/irisui/components/flowapp.md): One question per step with a progress line on top: sign-ups, bookings, a plugin wizard.
+- [ListDetailApp](/irisui/components/listdetailapp.md): A list on the left, the chosen item on the right.
+- [SidebarApp](/irisui/components/sidebarapp.md): A sidebar of sections on the left, one view on the right.
+- [Surfaces](/irisui/components/surfaces.md): Every place Iris can put something she built, from a line in the chat to a full app, and when to pick which.
+- [TableApp](/irisui/components/tableapp.md): A list you search, filter and open: search in the AppBar, filter chips, the rows on one Card, a count line, a row that opens a Sheet.
+- [TabsApp](/irisui/components/tabsapp.md): One subject, a few angles on it: tabs under the title.
+- [WidgetPagesApp](/irisui/components/widgetpagesapp.md): Pages of widgets you swipe through, each page one theme (Today, Home, Movement).
+- [Effects](/irisui/components/effects.md): How Iris draws attention, all moving on one page: the LED edge patterns, the neon refresh line, the rotating border of a waiting question, the tour ring, ice neon for on and here (Mac bar, active tab), the finger and the hand-drawn loop on the phone, and Pen marks in the neon look.
+- [WebKit](/irisui/components/webkit.md): The web UI parts in the topic palette: Chip, Progress (bar or ring), Stat, CheckList, Segmented, Field.
+- [WidgetData](/irisui/components/widgetdata.md): The widget system filled with real demo content: 18 widgets over 12 topics (groceries, agenda, mail, parcel, weather, tasks, sport, money, travel, health, home, music), each topic with its own colour and pattern, spread over the four looks and sizes; the old app widget beside the same content in the four new looks; and the word lab's letter recipes on the same beat.
+- [WidgetGallery](/irisui/components/widgetgallery.md): The four widget looks (glass, pattern, ring, list and type), each in the four sizes (small, wide, tall, large) with changing topics, as the widget lab draws them.
+- [WidgetScreens](/irisui/components/widgetscreens.md): Widgets in use, as the widget lab has them: horizontal scrolling with page dots in the topic colour and vertical scrolling with the app's side pointer, widgets with pictures (real photos in duotone, two colours of the topic, and flat drawings in trip style for the things themselves), the full Groceries screen in three looks where tapping an item ticks it off and the counter, dots and ring follow.
+- [Cover](/irisui/components/cover.md): 

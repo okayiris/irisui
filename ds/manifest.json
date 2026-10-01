@@ -1,0 +1,76 @@
+{
+  "manifestVersion": 3,
+  "name": "Iris",
+  "namespace": "IrisUi",
+  "files": [
+    "components/Button/README.md",
+    "components/Card/README.md",
+    "components/Orb/README.md",
+    "components/Row/README.md",
+    "components/Skeleton/README.md",
+    "components/StatusPill/README.md",
+    "components/TabBar/README.md",
+    "components/Toggle/README.md",
+    "components/bundle.css",
+    "components/bundle.js",
+    "components/index.d.ts",
+    "tokens.css",
+    "web-app.md",
+    "website.md"
+  ],
+  "libraries": [
+    {
+      "name": "react",
+      "version": "18",
+      "global": "React"
+    },
+    {
+      "name": "react-dom",
+      "version": "18",
+      "global": "ReactDOM"
+    }
+  ],
+  "components": [
+    {
+      "name": "Orb",
+      "group": "brand",
+      "summary": "Her orb: a ring with a slowly turning violet-blue-pink gradient and a soft glow."
+    },
+    {
+      "name": "Button",
+      "group": "controls",
+      "summary": "Pills. primary = the light full-width button of a decision (\"Agree and continue\", size lg); glass = frosted; accent = ice-blue glow (\"Continue here\", size sm);…"
+    },
+    {
+      "name": "Toggle",
+      "group": "controls",
+      "summary": "The iOS switch, 51x31: violet (--violet) when on, grey glass when off."
+    },
+    {
+      "name": "Skeleton",
+      "group": "feedback",
+      "summary": "What shows while anything loads from the house: glass blocks with a sheen, in the shape of the real content."
+    },
+    {
+      "name": "StatusPill",
+      "group": "navigation",
+      "summary": "Top left of every screen: the orb and one word of what she is doing (\"busy\", \"listening\"), or an accent pill with an action (\"Continue here\")."
+    },
+    {
+      "name": "TabBar",
+      "group": "navigation",
+      "summary": "The floating tab bar at the bottom: a frosted capsule with four tabs (Iris, Loops, Camera, You) and the talk button in the middle, a ring like the orb."
+    },
+    {
+      "name": "Card",
+      "group": "surfaces",
+      "summary": "The one surface of the app: frosted glass (--glass), 1px --edge stroke, radius 18, padding 14."
+    },
+    {
+      "name": "Row",
+      "group": "surfaces",
+      "summary": "A settings row (the You page): 24px icon at 80% --fg, a 17pt title, a 12pt --dim line under it, and on the right a Toggle, a menu value, a chevron or an extern…"
+    }
+  ],
+  "assetGroups": []
+}

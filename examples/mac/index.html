@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Iris UI examples: Mac</title>
+<meta name="description" content="Iris on the Mac: the pill on the desktop, the panels that open above it, the same day as on the phone and the web.">
+<link rel="stylesheet" href="../../ds/tokens.css">
+<link rel="stylesheet" href="../../ds/bundle.css">
+<link rel="stylesheet" href="../../ds/ext.css">
+<link rel="stylesheet" href="../../ds/extra.css">
+<link rel="stylesheet" href="../shared.css">
+<link rel="icon" href="../../favicon.svg">
+<style>
+  .ex { grid-template-columns: 200px minmax(0, 880px) 300px; }
+  .list .lab { grid-column: 1 / -1; }
+  @media (max-width: 1240px) { .ex { grid-template-columns: minmax(0, 880px); } }
+
+  /* The desk: a wallpaper in the house colours, the menu bar, the pill low in the middle. */
+  .desk { position: relative; height: min(620px, calc(100dvh - 120px)); min-height: 540px; border-radius: var(--radius-card); overflow: hidden;
+          box-shadow: 0 0 0 1px var(--edge);
+          background: radial-gradient(60% 50% at 18% 22%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+                      radial-gradient(55% 50% at 84% 78%, color-mix(in srgb, var(--violet) 22%, transparent), transparent 70%), var(--bg); }
+  .menubar { height: 28px; display: flex; align-items: center; gap: 18px; padding: 0 16px; font: var(--text-sub); color: var(--fg);
+             background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); white-space: nowrap; overflow: hidden; }
+  .menubar .sp { flex: 1; }
+
+  /* The house MacPill, low in the middle of the desk. */
+  .mp { position: absolute; left: 0; right: 0; bottom: 40px; display: flex; justify-content: center; }
+
+  /* A panel opens above the pill. */
+  .panel { position: absolute; left: 50%; bottom: 196px; translate: -50% 0; width: 380px; height: 380px; border-radius: var(--radius-card); overflow: hidden;
+           background: var(--bg); box-shadow: 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
+  .panel .ia-app { position: absolute; inset: 0; }
+  .chats { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: 16px; gap: 10px; }
+  .chats h2 { font: var(--text-page-title); margin: 0; }
+  .say { color: var(--dim); font: var(--text-body); margin: 0; }
+  .log { list-style: none; margin: 0; padding: 0 0 0 16px; border-left: 1px solid var(--line); display: grid; gap: 12px; align-content: start; overflow: auto; font: var(--text-body); }
+  .log li { position: relative; line-height: 1.45; }
+  .log li::before { content: ""; position: absolute; left: -19px; top: 7px; width: 5px; height: 5px; border-radius: 50%; background: var(--fg); }
+  .log .you { color: var(--accent); }
+  .log .you::before { background: var(--accent); }
+  .log .wait { color: var(--label); }
+  .log .wait::before { background: var(--label); }
+  .time { display: block; font: var(--text-label); color: var(--label); }
+  .chatbar { display: flex; gap: 8px; align-items: center; }
+  .chatbar > :first-child { flex: 1; }
+
+  /* Type to her, like Spotlight. */
+  .spot { position: absolute; left: 50%; top: 22%; translate: -50% 0; width: min(540px, calc(100% - 32px)); display: flex; align-items: center; gap: 12px;
+          padding: 12px 16px; border-radius: var(--radius-card); background: var(--bg); box-shadow: 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
+  .spot > :first-child { flex: 1; }
+  .spot .hint { font: var(--text-sub); color: var(--label); }
+
+  /* A Mac window: Iris' own, or her settings. The first light closes it. */
+  .win { position: absolute; left: 50%; top: 48px; translate: -50% 0; max-width: calc(100% - 24px); border-radius: var(--radius-card); overflow: hidden;
+         background: var(--bg); box-shadow: 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
+  .win-top { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; font: var(--text-sub); color: var(--dim); border-bottom: 1px solid var(--line); }
+  .win-top .t { flex: 1; text-align: center; margin-right: 52px; }
+  .lights { display: flex; gap: 8px; }
+  .lights button { all: unset; width: 12px; height: 12px; border-radius: 50%; background: var(--edge); cursor: pointer; }
+  .lights button:hover { background: var(--dim); }
+  .lights button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+  .win-body { padding: 14px 22px 20px; }
+  .win-body h2 { font: var(--text-page-title); margin: 0 0 14px; }
+  .win-foot { padding: 10px 22px; border-top: 1px solid var(--line); font: var(--text-sub); color: var(--label); }
+
+  .prefs { position: relative; height: 400px; transform: translateZ(0); }
+  .sheet-body { display: grid; gap: 14px; }
+
+  @media (max-width: 620px) { .panel { width: calc(100% - 24px); } }
+</style>
+</head>
+<body data-platform="macos">
+<script src="../nav.js"></script>
+<div id="root"></div>
+<script src="../../ds/vendor/react.js"></script>
+<script src="../../ds/vendor/react-dom.js"></script>
+<script src="../../ds/bundle.js"></script>
+<script src="../../ds/ext.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState, useEffect, useRef } = React;
+  const { PreviewI18nProvider, MacPill, Icon, Button, Field, IrisApp, checkApp } = window.IrisUi;
+  const I = (name, size = 16) => h(Icon, { name, size });
+  const hhmm = () => new Date().toTimeString().slice(0, 5);
+
+  /* ------------------------------------------------- calls and vault: one small app in the panel */
+
+  const PANEL = {
+    name: "Iris on the Mac", start: "calls",
+    state: { retry: "16:00", ah: true, cb: true },
+    screens: {
+      calls: { title: "Calls", lede: "Who Iris called for you, and how it went.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "phone", title: "Dentist", subtitle: "Moved to Wednesday 09:30", on: "push:dentist" },
+          { c: "Row", icon: "phone", title: "Pizzeria Da Mario", subtitle: "Table for six on Saturday, 20:00", on: "push:mario" },
+          { c: "Row", icon: "phone", title: "Coolblue", subtitle: "No answer. She tries again at {retry}.", on: "sheet:retry" }] }] },
+      dentist: { title: "Dentist", eyebrow: "Iris called at 14:10", lede: "Moved to **Wednesday 09:30**. Bring the old card.",
+        parts: [{ c: "Card", parts: [{ c: "CheckList", items: [["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]] }] }] },
+      mario: { title: "Da Mario", eyebrow: "Iris called at 13:40", lede: "A table for six on **Saturday at 20:00**. Sam does not know.",
+        parts: [{ c: "Card", parts: [{ c: "CheckList", items: [["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]] }] }] },
+      retry: { kind: "sheet", title: "Call Coolblue again", lede: "About the washing machine that did not come.",
+        parts: [{ c: "Chips", bind: "retry", items: ["16:00", "18:00", "Tomorrow 09:00"] }],
+        action: { label: "Call at {retry}", on: "close;snack:She calls Coolblue at {retry}." } },
+      vault: { title: "Vault", lede: "What Iris may use, locked with Touch ID.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "shield", title: "Albert Heijn", subtitle: "Used for the grocery order, 30 September", on: "push:ah" },
+          { c: "Row", icon: "shield", title: "Coolblue", subtitle: "Not used yet", on: "push:cb" }] }] },
+      ah: { title: "Albert Heijn", eyebrow: "Login", lede: "Iris used it for the grocery order. She never saw the password.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "person", title: "alex@example.com" },
+          { c: "Row", icon: "shield", title: "Iris may use it", subtitle: "Touch ID each time", bind: "ah" },
+          { c: "Row", icon: "trash", title: "Remove from the vault", danger: true, on: "dialog:remove" }] }] },
+      cb: { title: "Coolblue", eyebrow: "Login", lede: "Not used yet. Iris asks you first, every time.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "person", title: "alex@example.com" },
+          { c: "Row", icon: "shield", title: "Iris may use it", subtitle: "Touch ID each time", bind: "cb" }] }] },
+      remove: { kind: "dialog", title: "Remove this login?", body: "Iris can no longer sign in there until you add it again. This cannot be undone.",
+        actions: [{ label: "Remove", danger: true, on: "snack:Removed from the vault." }, { label: "Keep it" }] },
+    },
+  };
+  const FINDINGS = [...checkApp(PANEL), ...checkApp({ ...PANEL, start: "vault" })].filter((f, i, all) => f.rule !== "No way to reach this screen" || all.filter((g) => g.screen === f.screen && g.rule === f.rule).length > 1)
+    .filter((f, i, all) => all.findIndex((g) => g.screen === f.screen && g.rule === f.rule) === i);
+
+  /* ---------------------------------------------------------------- chats */
+
+  function Chats({ first, talk }) {
+    const [log, setLog] = useState(first ? [{ who: "you", ...first }] : []);
+    const [text, setText] = useState("");
+    useEffect(() => { if (first) answer(); }, []);
+    const answer = () => {
+      setLog((l) => [...l, { who: "wait", text: "Thinking" }]);
+      setTimeout(() => setLog((l) => [...l.filter((m) => m.who !== "wait"), { who: "her", at: hhmm(), text: "On it, Alex. I tell you here when it is done." }]), 1500);
+    };
+    const send = (e) => { e.preventDefault(); const t = text.trim(); if (!t) return; setLog((l) => [...l, { who: "you", at: hhmm(), text: t }]); setText(""); answer(); };
+    return h("div", { className: "chats" },
+      h("div", null, h("h2", null, "Chats"), h("p", { className: "say" }, "The same talk as on your phone.")),
+      h("ol", { className: "log", "aria-live": "polite" },
+        h("li", { className: "you" }, h("span", { className: "time" }, "14:02"), "Can you move the dentist to Wednesday?"),
+        h("li", null, h("span", { className: "time" }, "14:05"), "Done, Alex. Wednesday at 09:30. That leaves Saturday free for Sam's party."),
+        log.map((m, i) => h("li", { key: i, className: m.who }, m.at ? h("span", { className: "time" }, m.at) : null, m.text))),
+      h("form", { className: "chatbar", onSubmit: send },
+        h(Field, { autoFocus: !!first || undefined, value: text, onChange: (e) => setText(e.target.value), placeholder: "Message Iris", "aria-label": "Message Iris" }),
+        h(Button, { variant: "primary", size: "sm", disabled: !text.trim() }, "Send")));
+  }
+
+  /* ----------------------------------------------------------- windows */
+
+  const Win = ({ title, width, onClose, children, foot }) => h("section", { className: "win", style: { width }, "aria-label": title },
+    h("div", { className: "win-top" },
+      h("div", { className: "lights" }, h("button", { "aria-label": "Close", onClick: onClose }), h("i", { "aria-hidden": "true" }), h("i", { "aria-hidden": "true" })),
+      h("span", { className: "t" }, title)),
+    children,
+    foot ? h("div", { className: "win-foot" }, foot) : null);
+
+  // Settings is a real window: a Mac user looks for it there. Inside it, one IrisApp with spec.rail.
+  const SETTINGS = {
+    name: "Settings", start: "listen",
+    rail: [{ label: "Listening", icon: "mic", to: "listen" }, { label: "Voice", icon: "speaker", to: "voice" },
+           { label: "Screens", icon: "external", to: "screens" }, { label: "Vault", icon: "shield", to: "vault" }],
+    state: { listen: true, login: true, loud: true, windows: true, where: 0, touch: true, voice: "Wiep", speed: 100 },
+    screens: {
+      listen: { title: "Listening", lede: "Which device hears you, and when she starts.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", title: "Listens on this Mac", subtitle: "The phone stays quiet while this one hears you", bind: "listen" },
+          { c: "Row", title: "Starts with the Mac", subtitle: "The pill is there when you log in", bind: "login" }] }] },
+      voice: { title: "Voice", lede: "How Iris sounds.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", title: "Voice", value: "{voice}", on: "sheet:pick" },
+          { c: "Row", title: "Speaks out loud", subtitle: "Off: she only writes", bind: "loud" }] }] },
+      pick: { kind: "sheet", title: "Voice", lede: "How she sounds on this Mac.",
+        parts: [{ c: "Chips", bind: "voice", items: ["Wiep", "Joris"] }, { c: "Slider", bind: "speed", min: 80, max: 130, step: 5, label: "Speed", unit: "%" }],
+        action: { label: "Done", on: "close" } },
+      screens: { title: "Screens", lede: "Where Iris may put a window.",
+        parts: [{ c: "Group", parts: [{ c: "Row", title: "Iris may open windows", subtitle: "A plan, a list, a call. Never over full screen apps.", bind: "windows" }] },
+                { c: "Segmented", if: "windows", bind: "where", items: ["This screen", "Second screen"] }] },
+      vault: { title: "Vault", lede: "What Iris may use, and how it opens.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", title: "Open with Touch ID", subtitle: "Otherwise your PIN", bind: "touch" },
+          { c: "Row", title: "Logins", value: "2", on: "push:logins" }] }] },
+      logins: { title: "Logins", lede: "The vault opens above the pill." },
+    },
+  };
+  const Settings = ({ onClose, openVault }) => h(Win, { title: "Iris Settings", width: 680, onClose },
+    h("div", { className: "prefs" }, h(IrisApp, { spec: SETTINGS, onNavigate: (id) => id === "logins" && openVault() })));
+
+  const Shown = ({ onClose }) => h(Win, { title: "Iris", width: 440, onClose, foot: "Iris opened this for you. Say close, or press the first light." },
+    h("div", { className: "win-body" },
+      h("h2", null, "Saturday"),
+      h("ol", { className: "log" },
+        h("li", null, h("span", { className: "time" }, "14:00"), "Pick up the candles"),
+        h("li", null, h("span", { className: "time" }, "20:00"), "Da Mario, table for six. Iris booked it by phone."),
+        h("li", null, h("span", { className: "time" }, "22:30"), "Cake, when Sam turns 30"))));
+
+  /* ------------------------------------------------------------------ scenes */
+
+  const SCENES = [
+    { id: "rest", name: "At rest", orb: "rest", badge: 2,
+      ok: ["Only the orb: the bar grows out when the mouse rests on it", "The badge counts what is new, in the accent", "Click the orb and she listens; the mic in the bar does the same, again to send"] },
+    { id: "chats", name: "Chats", orb: "rest", panel: "chats",
+      ok: ["The panel opens above the pill", "The same talk as the phone and the web", "Send shows your line, that she thinks, then her answer", "One way to talk by voice: the pill. The chat bar only types."] },
+    { id: "calls", name: "Calls", orb: "rest", panel: "calls",
+      ok: ["A small IrisApp in the panel: every row opens", "A call opens its steps, Coolblue a sheet to call again", "Back in the app bar, one level down"] },
+    { id: "vault", name: "Vault", orb: "rest", panel: "vault",
+      ok: ["Each login opens: who, the toggle, remove last", "Remove asks first and says it cannot be undone"] },
+    { id: "settings", name: "Settings", orb: "rest", panel: "settings",
+      ok: ["A real window with one IrisApp inside: spec.rail draws the sidebar", "One group of rows per pane, no box in a box", "Voice opens a sheet from the right, Logins the vault"] },
+    { id: "screen", name: "A window from Iris", orb: "talking", words: "Here is Saturday", window: true,
+      ok: ["Iris opens a window herself: the answer, big", "Says where it came from and how to close it"] },
+    { id: "type", name: "Type to Iris", orb: "rest", type: true,
+      ok: ["Option Space opens one field, like Spotlight", "Enter sends it to Chats, Escape closes it", "No second orb in the field: the pill is her"] },
+    { sep: "States" },
+    { id: "talking", name: "Talking", orb: "talking", words: "Tomorrow at half past nine you have the dentist.",
+      ok: ["Her words above the orb", "No state word: the orb already talks"] },
+    { id: "thinking", name: "Thinking", orb: "thinking", label: "Thinking",
+      ok: ["A light pattern round the orb, a new one each time", "The state also in words, under her"] },
+    { id: "working", name: "Working", orb: "rest", label: "Booking the table, step 3 of 6", working: true,
+      ok: ["Light runs round the orb while she works: the house Edge", "What she does, in words, not only a count"] },
+    { id: "muted", name: "Muted", orb: "muted", label: "Muted",
+      ok: ["One word under the orb, and the way back next to it"] },
+    { id: "away", name: "Connection lost", orb: "away", label: "Cannot reach your house. Trying again in 10 seconds.",
+      ok: ["Says why, and what brings her back", "Try now does it at once"] },
+  ];
+  const real = SCENES.filter((s) => s.id);
+  const ALL = ["The pill is the house MacPill: this page only runs her states and the panels.",
+               "The house Icon has no chat bubble, no gear and no screen: Chats uses wave, Settings person, Screens external.",
+               "The NavRail always shows Collapse, also in a settings window."];
+
+  /* -------------------------------------------------------------------- pill */
+
+  // The pill is the house MacPill; this page only runs her states and the panels.
+  function Pill({ scene, panel, setPanel }) {
+    const [orb, setOrb] = useState(scene.orb);
+    const [label, setLabel] = useState(scene.label);
+    const [words, setWords] = useState(scene.words);
+    const [badge, setBadge] = useState(scene.badge ?? 0);
+    const timers = useRef([]);
+    useEffect(() => () => timers.current.forEach(clearTimeout), []);
+    const later = (ms, f) => timers.current.push(setTimeout(f, ms));
+    const stop = () => { timers.current.forEach(clearTimeout); timers.current = []; setOrb("rest"); setLabel(undefined); setWords(undefined); };
+    // Talking: listening while the mic is open, then thinking, then her answer, then rest.
+    const answer = () => {
+      setOrb("thinking"); setLabel("Thinking"); setWords(undefined);
+      later(1400, () => { setOrb("talking"); setLabel(undefined); setWords("Tomorrow at half past nine you have the dentist."); });
+      later(4600, stop);
+    };
+    const listen = () => { stop(); setOrb("listening"); setLabel("Listening"); };
+    const press = () => { if (orb === "listening") answer(); else if (orb === "rest") { listen(); later(1800, answer); } else stop(); };
+    const act = (key, label, icon) => ({ key, label, icon, active: panel === key, onSelect: () => { setPanel(panel === key ? null : key); if (key === "chats") setBadge(0); } });
+    const working = scene.working && orb === "rest";
+    return h("div", { className: "mp" }, h(MacPill, {
+      state: orb, onPress: press, open: !!panel || undefined, badge, words, working,
+      status: label ?? (working ? scene.label : undefined),
+      left: [act("calls", "Calls", "phone"), act("chats", "Chats", "wave")],
+      right: [act("vault", "Vault", "shield"), act("settings", "Settings", "person"),
+              { key: "mic", label: orb === "listening" ? "Done talking" : "Talk", icon: "mic", active: orb === "listening", onSelect: () => (orb === "listening" ? answer() : listen()) }],
+      back: orb === "muted" ? { label: "Turn sound on", onClick: stop, variant: "text" }
+          : orb === "away" ? { label: "Try now", variant: "glass", onClick: () => { setLabel("Connecting"); later(900, stop); } } : undefined }));
+  }
+
+  function Spot({ onClose, onSend }) {
+    const [q, setQ] = useState("");
+    useEffect(() => { const k = (e) => e.key === "Escape" && onClose(); document.addEventListener("keydown", k); return () => document.removeEventListener("keydown", k); }, [onClose]);
+    return h("form", { className: "spot", onSubmit: (e) => { e.preventDefault(); q.trim() ? onSend(q.trim()) : onClose(); } },
+      h(Field, { autoFocus: true, value: q, onChange: (e) => setQ(e.target.value), placeholder: "Ask Iris anything", "aria-label": "Ask Iris" }),
+      h("span", { className: "hint" }, "esc"));
+  }
+
+  function App() {
+    const [id, setId] = useState(new URLSearchParams(location.search).get("s") || "rest");
+    const scene = real.find((s) => s.id === id) ?? real[0];
+    const [panel, setPanel] = useState(scene.panel ?? null);
+    const [type, setType] = useState(!!scene.type);
+    const [shown, setShown] = useState(!!scene.window);
+    const [first, setFirst] = useState(null);
+    const go = (next) => {
+      const s = real.find((x) => x.id === next);
+      setId(next); setPanel(s.panel ?? null); setType(!!s.type); setShown(!!s.window); setFirst(null);
+      const u = new URL(location.href); u.searchParams.set("s", next); history.replaceState(null, "", u);
+    };
+    useEffect(() => { const k = (e) => { if (e.altKey && e.code === "Space") { e.preventDefault(); setType(true); } };
+      document.addEventListener("keydown", k); return () => document.removeEventListener("keydown", k); }, []);
+    const appPanel = panel === "calls" || panel === "vault";
+    const found = appPanel ? FINDINGS : [];
+
+    return h("div", { className: "ex" },
+      h("nav", { className: "list", "aria-label": "Scenes" },
+        h("p", { className: "lab" }, "On the Mac"),
+        SCENES.map((s) => s.sep ? h("p", { key: s.sep, className: "lab sep" }, s.sep)
+          : h("button", { key: s.id, "aria-current": s.id === scene.id ? "true" : "false", onClick: () => go(s.id) }, s.name))),
+      h("main", { className: "desk", "aria-label": "Mac desktop" },
+        h("div", { className: "menubar", "aria-hidden": "true" }, h("b", null, "Finder"), h("span", null, "File"), h("span", null, "Edit"), h("span", null, "View"),
+          h("span", { className: "sp" }), h("span", null, "Tue 30 Sep 21:04")),
+        shown ? h(Shown, { onClose: () => setShown(false) }) : null,
+        panel === "settings" ? h(Settings, { onClose: () => setPanel(null), openVault: () => setPanel("vault") }) : null,
+        appPanel ? h("section", { className: "panel", "aria-label": panel }, h(IrisApp, { key: panel, spec: PANEL, start: panel, frame: "window" })) : null,
+        panel === "chats" ? h("section", { className: "panel", "aria-label": "Chats" }, h(Chats, { key: first?.text, first })) : null,
+        type ? h(Spot, { onClose: () => setType(false), onSend: (text) => { setFirst({ at: hhmm(), text }); setType(false); setPanel("chats"); } }) : null,
+        h(Pill, { key: scene.id, scene, panel, setPanel })),
+      h("aside", { className: "rules", "aria-label": "Rules" },
+        h("p", { className: "lab" }, scene.name),
+        h("ul", { className: "checks" }, scene.ok.map((t) => h("li", { key: t }, t)), found.map((f, i) => h("li", { key: "f" + i, className: "q" }, `${f.screen}: ${f.rule}`))),
+        appPanel ? h("p", { className: "note" }, found.length ? `checkApp: ${found.length} to look at` : "checkApp: the panel app keeps every rule") : null,
+        h("p", { className: "lab" }, "Whole Mac app"),
+        h("ul", { className: "checks" }, ALL.map((t) => h("li", { key: t, className: "q" }, t)))));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(h(PreviewI18nProvider, null, h(App)));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+/* Fixes to the release's own previews, for the component pages only. The previews draw an app with their own
+   class names (.app, .col, .insp), so these rules never go into ext.css, where they would reach real screens. */
+
+/* DocumentApp: on a narrow window the details panel lay over the text. It now stands under the document. */
+@container (max-width: 52rem) {
+  .doc-wrap {
+    flex-direction: column;
+    overflow: auto;
+  }
+  .doc-wrap .doc {
+    flex: none;
+    overflow: visible;
+    padding-bottom: 1rem;
+  }
+  .doc-wrap .insp {
+    position: static;
+    width: auto;
+    margin: 0 1rem 1rem;
+    border: 1px solid var(--edge);
+    border-radius: 1rem;
+    background: var(--glass);
+    backdrop-filter: none;
+  }
+}
+
+/* TableApp: on a phone the list shrank inside its box and hid the last invoice. */
+.tw {
+  flex-shrink: 0;
+}
+/* Late is a warning, not a destruction: red stays for destructive actions. */
+.pill.bad {
+  background: rgba(253, 230, 138, 0.12);
+  color: var(--wait);
+}
+
+/* WidgetPagesApp: the day header was red. Red is destructive only: the header is a label, so it goes dim. */
+.w .label[style*="--error"] {
+  color: var(--dim) !important;
+}
+/* A done tick takes the topic colour (the ice accent without a topic), not violet: violet means on and the ring. */
+body .wchk.on .chk {
+  background: var(--k, var(--accent));
+  border-color: var(--k, var(--accent));
+  color: var(--accent-ink);
+}
+
+/* Light. The release's app previews (BoardApp, FlowApp, SidebarApp, ListDetailApp, TabsApp, TableApp, DashboardApp,
+   DocumentApp, WidgetPagesApp, Surfaces) paint their window and buttons in fixed dark values, in a style the preview
+   adds after this file: hence :root in front, to win. The dark half of each light-dark() is the release's value. */
+:root .app { background: light-dark(rgba(255, 255, 255, 0.9), rgba(12, 17, 23, 0.9)); }
+:root .app .side { background: light-dark(rgba(238, 243, 246, 0.8), rgba(7, 9, 12, 0.5)); }
+:root .insp { background: light-dark(rgba(255, 255, 255, 0.94), rgba(12, 17, 23, 0.94)); }
+:root .app .btn:not(.ghost, .rand, .primary) { background: light-dark(rgba(16, 48, 72, 0.07), rgba(255, 255, 255, 0.08)); }
+:root .app .btn:not(.ghost, .rand, .primary):hover { background: light-dark(rgba(16, 48, 72, 0.12), rgba(255, 255, 255, 0.14)); }
+:root .app .btn.primary,
+:root .app .chip.on,
+:root .app .chk.on { color: light-dark(#ffffff, #07171f); }
+:root .app .btn.primary:hover { background: light-dark(#075985, #a5e2ff); }
+:root .app .tabbar { background: light-dark(rgba(255, 255, 255, 0.82), rgba(20, 26, 34, 0.82)); }
+:root .bcard:hover { background: light-dark(rgba(16, 48, 72, 0.06), rgba(180, 225, 255, 0.12)); }
+:root .scene:not(.on) { background: light-dark(rgba(16, 48, 72, 0.05), rgba(255, 255, 255, 0.05)); }
+:root .scene:not(.on):hover { background: light-dark(rgba(16, 48, 72, 0.1), rgba(255, 255, 255, 0.1)); }
+:root .mini { background: light-dark(rgba(238, 243, 246, 0.9), rgba(7, 9, 12, 0.7)); }
+:root .mini i { background: light-dark(rgba(16, 48, 72, 0.08), rgba(255, 255, 255, 0.07)); }
+:root .m-card.half { background: light-dark(rgba(16, 48, 72, 0.06), rgba(255, 255, 255, 0.07)) !important; }
+:root .m-h { background: light-dark(rgba(13, 26, 34, 0.22), rgba(232, 242, 247, 0.3)) !important; }
+:root .m-over { background: light-dark(rgba(255, 255, 255, 0.96), rgba(18, 26, 34, 0.96)) !important; }

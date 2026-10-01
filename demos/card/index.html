@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<!-- @dsCard group="Surfaces" height=160 -->
+<div id="root" style="background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, Card, Row, Toggle, Button, Orb, StatusPill, TabBar, Skeleton } = window.IrisUi;
+  window.__dsPreview = {
+  Default: () => h(Card, null, h("div", {style:{fontSize:17}}, "Live report"), h("div", {style:{fontSize:12,color:"var(--dim)",marginTop:3}}, "Updated while we talk")),
+  Stat: () => h(Card, {padding:18}, h("div", {style:{fontSize:34,fontWeight:500}}, "4/4"), h("div", {style:{fontSize:15,color:"var(--dim)"}}, "points")),
+  Topic: () => h(Card, {topic:"groceries"}, h("div", {style:{font:"500 11px var(--mono)",letterSpacing:".14em",color:"var(--k)"}}, "GROCERIES"), h("div", {style:{fontSize:15,marginTop:6}}, "Your weekly list, ticked off as you shop.")),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cell = document.createElement("div");
+    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 2px">' + k + '</div><div></div>';
+    root.appendChild(cell);
+    ReactDOM.createRoot(cell.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>
+
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

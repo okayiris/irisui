@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Iris UI examples: phone</title>
+<meta name="description" content="The Iris app built from the design system, screen by screen, with the rules each screen keeps.">
+<link rel="stylesheet" href="../ds/tokens.css">
+<link rel="stylesheet" href="../ds/bundle.css">
+<link rel="stylesheet" href="../ds/ext.css">
+<link rel="stylesheet" href="../ds/extra.css">
+<link rel="stylesheet" href="../ds/placeholder.css">
+<link rel="icon" href="../favicon.svg">
+<style>
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-text); }
+  * { box-sizing: border-box; }
+
+  /* The page around the phone. */
+  .ex { display: grid; grid-template-columns: 220px 390px minmax(0, 320px); gap: 40px; justify-content: center;
+        align-items: start; padding: 20px 16px 60px; }
+  .ex-top { display: flex; justify-content: center; gap: 8px; padding: 16px 20px 0; }
+  .lab { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 10px; }
+  .list { display: grid; gap: 4px; position: sticky; top: 20px; }
+  .list button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 10px; color: var(--dim);
+                 font: var(--text-body); display: flex; justify-content: space-between; gap: 8px; }
+  .list button:hover { background: var(--glass); color: var(--fg); }
+  .list button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .list button[aria-current="true"] { background: var(--glass); color: var(--fg); box-shadow: inset 0 0 0 1px var(--edge); }
+  .list .n { font-family: var(--font-mono); font-size: 11px; color: var(--label); }
+  .list .sep { margin: 14px 0 6px; }
+
+  /* The phone. */
+  .phone { width: 390px; height: min(844px, calc(100vh - 190px)); min-height: 640px; border-radius: 54px; position: relative; overflow: hidden;
+           box-shadow: 0 0 0 1px var(--edge), 0 0 0 10px #0d1015, 0 0 0 11px var(--edge); background: var(--bg); }
+  .island { position: absolute; top: 11px; left: 50%; translate: -50% 0; width: 124px; height: 36px;
+            border-radius: 20px; background: #000; z-index: 50; pointer-events: none; }
+  .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; justify-content: space-between;
+            align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; z-index: 40; pointer-events: none; }
+  /* Android: a punch-hole camera, the time on the left, a gesture handle under the tab bar. */
+  .phone.android { border-radius: 38px; }
+  .phone.android .status { padding: 0 26px; font: 500 14px var(--font-text); height: 40px; }
+  .phone.android .island { top: 14px; width: 14px; height: 14px; border-radius: 50%; }
+  .phone.android .app { padding-top: 50px; }
+  .phone.android .bar { bottom: 16px; }
+  .handle { position: absolute; bottom: 6px; left: 50%; translate: -50% 0; width: 108px; height: 4px; border-radius: 2px;
+            background: var(--fg); opacity: .6; z-index: 45; pointer-events: none; }
+  .app { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 62px 16px 130px; scrollbar-width: none; }
+  .app::-webkit-scrollbar { display: none; }
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 30; }
+  /* ponytail: Dialog ships inside a demo Stage (dashed box). Undo it here, so the scrim covers the phone:
+     the transform makes the phone the box a fixed scrim fills. Fix belongs in ext.tsx. */
+  .phone { transform: translateZ(0); }
+  .app .ix-stage { position: static; min-height: 0; border: 0; background: none; overflow: visible; border-radius: 0; }
+  .app .ix-scrim { position: fixed; }
+
+  /* What goes inside a screen. */
+  .eyebrow { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 8px 0 6px; }
+  .title { font: var(--text-page-title); margin: 0 0 8px; letter-spacing: -.01em; }
+  .say { font: var(--text-body); color: var(--dim); line-height: 1.45; margin: 0 0 20px; }
+  .say b { color: var(--fg); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; justify-items: center; }
+  .stack { display: grid; gap: 12px; }
+  .tap { all: unset; cursor: pointer; display: block; border-radius: 26px; }
+  .tap:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .back { all: unset; cursor: pointer; color: var(--accent); font: var(--text-body); padding: 6px 0; display: inline-flex; gap: 4px; }
+  .back:focus-visible { outline: 2px solid var(--accent); border-radius: 6px; }
+  .hero { display: flex; align-items: center; gap: 18px; margin: 4px 0 18px; }
+  .chips { display: flex; gap: 8px; margin: 0 0 14px; flex-wrap: wrap; }
+  .centre { display: grid; justify-items: center; text-align: center; gap: 14px; padding-top: 70px; }
+  .centre .say { max-width: 300px; }
+  .errline { color: var(--error); font: var(--text-body); margin: 10px 0 0; }
+
+  /* The rules panel. */
+  .rules { position: sticky; top: 20px; display: grid; gap: 14px; }
+  .score { display: flex; gap: 4px; }
+  .score i { flex: 1; height: 8px; border-radius: 4px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
+  .score i.on { background: var(--accent); box-shadow: none; }
+  .score.over i.on { background: var(--error); }
+  .cost { display: grid; gap: 4px; font: var(--text-body); color: var(--dim); }
+  .cost div { display: flex; justify-content: space-between; }
+  .cost span:last-child { font-family: var(--font-mono); color: var(--label); }
+  .checks { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font: var(--text-body); }
+  .checks li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; color: var(--dim); }
+  .checks li::before { content: ""; width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--ok); }
+  .checks li.q::before { background: var(--wait); }
+  .checks li.q { color: var(--fg); }
+  .legend { font-size: 12px; color: var(--label); display: flex; gap: 14px; }
+  .legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--ok); }
+  .legend span.q::before { background: var(--wait); }
+  .checks li.x::before, .legend span.x::before { background: var(--error); }
+  .checks li.x { color: var(--fg); }
+  .phone.android .ia-scroll { padding-top: 50px; }
+  /* Android: the tab bar stands on a solid band, the gesture handle inside it, clear of the labels and the orb. */
+  .phone.android .ia-tabbar { bottom: 0; padding-bottom: 26px; background: linear-gradient(transparent, var(--bg) 35%); }
+  .phone.android .handle { bottom: 10px; }
+  /* The system icons: words and one battery shape, not glyphs. */
+  .sys { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .batt { width: 22px; height: 11px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px var(--fg); padding: 2px; display: inline-flex; }
+  .batt i { width: 80%; border-radius: 1px; background: var(--fg); }
+  .wall .mini .ia-app { pointer-events: none; }
+
+  /* All screens side by side. */
+  .wall { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; padding: 28px 16px 60px; }
+  .wall figure { margin: 0; display: grid; gap: 10px; justify-items: center; }
+  .wall .mini { zoom: .7; }
+  .wall .phone { height: 844px; }
+  .wall figcaption { font: var(--text-body); color: var(--dim); }
+  .wall figcaption button { all: unset; cursor: pointer; color: var(--accent); }
+
+
+  @media (max-width: 1040px) {
+    .ex { grid-template-columns: 390px; }
+    .list { position: static; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .rules { position: static; }
+  }
+  @media (max-width: 430px) {
+    .ex { padding: 0 0 40px; grid-template-columns: 100%; }
+    .phone { width: 100%; height: 100svh; border-radius: 0; box-shadow: none; }
+    .island, .status { display: none; }
+    .list, .rules { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+<script>document.body.dataset.platform = new URLSearchParams(location.search).get("p") === "android" ? "android" : "ios";</script>
+<script src="nav.js"></script>
+<main id="root"></main>
+<script src="../ds/vendor/react.js"></script>
+<script src="../ds/vendor/react-dom.js"></script>
+<script src="../ds/bundle.js"></script>
+<script src="../ds/ext.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState, useEffect } = React;
+  const { PreviewI18nProvider, Button, IrisApp, checkApp, costOf, depthOf } = window.IrisUi;
+  const params = new URLSearchParams(location.search);
+
+  /* ------------------------------------------------------------------ the app, as one spec */
+  // Every screen below is data. IrisApp draws it with the system's parts, so every tap works:
+  // rows open the next screen, buttons open a sheet or a dialog, toggles, ticks and fields keep their state.
+
+  const IRIS = {
+    name: "Iris", start: "today",
+    tabs: [
+      { label: "Iris", icon: "sparkles", to: "today" }, { label: "Calls", icon: "phone", to: "calls" },
+      { label: "Camera", icon: "camera", to: "camera" }, { label: "You", icon: "person", to: "you" },
+    ],
+    state: {
+      items: ["Bread", "Milk", "Eggs", "Tomatoes", "Pasta", "Candles", "Balloons", "Lemonade"], done: [0, 1, 2], draft: "",
+      party: [0], near: true, push: false, voice: "Wiep", speed: 100, lang: "English", keep: 30,
+      what: "Bring the old card to the dentist", when: "Tomorrow 08:30", day: "2026-10-01", retry: "16:00",
+      days: [{ d: "Wednesday", t: "9°", l: "Dry, frost in the morning" }, { d: "Thursday", t: "11°", l: "Rain after lunch" },
+             { d: "Friday", t: "13°", l: "Sun" }, { d: "Saturday", t: "12°", l: "Dry for the party" }],
+      loops: [{ t: "Order groceries", s: "Waits for Albert Heijn", step: 2 }, { t: "Candles for Sam", s: "Planned: after the dentist", step: 1 },
+              { t: "Tell the guests", s: "Waits on you", step: 3 }],
+      circles: [
+        { id: "groceries", title: "Groceries", line: "5 still to get for Saturday", unread: 1, loops: [{ title: "Order", step: 2 }, { title: "Candles", step: 1 }] },
+        { id: "party", title: "Sam's party", line: "The guests do not know yet", loops: [{ title: "Table", step: 5 }, { title: "Guests", step: 3 }] },
+        { id: "dentist", title: "Dentist", line: "Wednesday 09:30, bring the old card", loops: [{ title: "Card", step: 1 }] },
+      ],
+      chats: [
+        { id: "party", topic: "party", eyebrow: "Party", title: "Sam turns 30", line: "The guests do not know yet",
+          loops: [{ title: "Table", step: 5 }, { title: "Guests", step: 3, line: "Waits on you" }], message: "Shall I text the five guests for you?",
+          actions: [{ label: "Text them", primary: true }, { label: "Later" }] },
+        { id: "groceries", topic: "groceries", eyebrow: "Groceries", title: "For Saturday", line: "5 still to get",
+          loops: [{ title: "Order", step: 2 }], message: "Albert Heijn can deliver tomorrow between 16:00 and 18:00." },
+        { id: "dentist", topic: "agenda", eyebrow: "Agenda", title: "Dentist", line: "Wednesday 09:30", loops: [{ title: "Card", step: 1 }] },
+      ],
+    },
+    screens: {
+      today: { eyebrow: "Tuesday 30 September", title: "Good evening, Alex",
+        lede: "**Alex**, after the dentist you still have time for the groceries.",
+        parts: [
+          { c: "Grid", parts: [
+            { c: "Tap", label: "Open groceries", on: "push:groceries", parts: [
+              { c: "Widget", topic: "groceries", look: "ring", size: "small", label: "Groceries", value: "{done.length}", unit: "/{items.length}", progress: "=done/items" }] },
+            { c: "Tap", label: "Open the weather", on: "push:weather", parts: [
+              { c: "Widget", topic: "weather", look: "glass", size: "small", label: "Weather", value: "14°" }] }] },
+          { c: "Widget", topic: "agenda", look: "list", size: "wide", label: "Tomorrow",
+            items: [["09:30", "Dentist"], ["12:00", "Lunch with Sam"], ["17:30", "Groceries"]], note: "bring the old card" },
+          { c: "Label", text: "What she is on" },
+          { c: "CircleStack", items: "{circles}", open: true, on: "push:{$.id}" },
+          { c: "Group", parts: [
+            { c: "Row", icon: "loop", title: "Loops", subtitle: "3 running", on: "push:loops" },
+            { c: "Row", icon: "sparkles", title: "All chats", subtitle: "Each with its loops", on: "push:chats" },
+            { c: "Row", icon: "sparkles", title: "Remind me of something", subtitle: "One line, she picks the moment", on: "sheet:remind" }] }] },
+
+      groceries: { topic: "groceries", title: "Groceries", eyebrow: "For Saturday",
+        lede: "**Alex**, the candles are at the Hema, next to the dentist.",
+        hero: { c: "Progress", ring: true, size: 120, value: "=done/items", centre: "{done}/{items}", topic: "groceries" },
+        parts: [
+          { c: "Card", parts: [{ c: "CheckList", topic: "groceries", items: "{items}", bind: "done" }] },
+          { c: "Field", topic: "groceries", placeholder: "Add something", bind: "draft", add: "items" }],
+        action: { label: "Order at Albert Heijn", on: "sheet:order" }, second: { label: "Share the list", on: "snack:Link copied. Sam can add to it too." } },
+
+      order: { kind: "sheet", title: "Order at Albert Heijn", lede: "What is not ticked yet, delivered to your door.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "car", title: "Delivery", value: "Tomorrow, 16:00" },
+          { c: "Row", icon: "shield", title: "Pay with", value: "iDEAL" }] }],
+        action: { label: "Order for €23.40", on: "close;push:failed" } },
+
+      failed: { topic: "groceries", title: "Order", lede: "Albert Heijn did not answer. **Nothing was ordered or paid.**",
+        parts: [{ c: "Group", parts: [{ c: "Row", icon: "car", title: "Albert Heijn", subtitle: "Tomorrow, 16:00 to 18:00" }] },
+                { c: "Text", tone: "error", text: "No answer at 21:04. Iris tried twice." }],
+        action: { label: "Try again", on: "snack:Ordered. Tomorrow between 16:00 and 18:00.;back" }, second: { label: "Back to the list", on: "back" } },
+
+      weather: { topic: "weather", title: "Frost tonight", eyebrow: "Weather",
+        lede: "**Alex**, cover the bike seat: it drops to -2 at six.",
+        hero: { c: "ThemeWord", text: "Frost", theme: "frozen", height: 110 },
+        parts: [
+          { c: "Grid", parts: [{ c: "Stat", topic: "weather", value: "-2°", label: "tonight" }, { c: "Stat", topic: "weather", value: "9°", label: "tomorrow" }] },
+          { c: "Label", text: "The next days" },
+          { c: "Group", parts: [{ c: "Row", each: "days", title: "{$.d}", subtitle: "{$.l}", value: "{$.t}" }] }] },
+
+      loops: { title: "Loops", eyebrow: "3 running", lede: "What Iris is doing for you, and where each one is.",
+        hero: { c: "PhaseRing", phase: "busy", progress: 0.45, title: "Order groceries", sub: "waits for Albert Heijn", size: 220 },
+        parts: [{ c: "Group", parts: [{ c: "Row", each: "loops", title: "{$.t}", subtitle: "{$.s}", on: "push:loop",
+          icon: { c: "LoopBubble", title: "{$.t}", step: "{$.step}", size: 28 } }] }] },
+
+      loop: { title: "Candles for Sam", bare: true,
+        parts: [{ c: "LoopScreen", title: "Candles for Sam", when: "Before Saturday", sub: "at the Hema", phase: "planned", progress: 0.35,
+                  now: "Pick them up after the dentist on Wednesday", on: "snack:Done. Iris ticks it off the list.;back" }] },
+
+      chats: { title: "Chats", lede: "Each chat with its loops. Tap the stack to fan it out.",
+        parts: [{ c: "ChatStack", items: "{chats}" }] },
+
+      remind: { kind: "sheet", title: "Remind me", lede: "One line is enough. She picks the moment with you.",
+        parts: [
+          { c: "TextArea", label: "What should she remember?", bind: "what", rows: 2, maxLength: 280 },
+          { c: "Chips", bind: "when", items: ["Tomorrow 08:30", "Tonight 20:00", "At the dentist", "Pick a day"] },
+          { c: "DatePicker", if: "when==Pick a day", bind: "day", label: "Which day?", min: "2026-09-30" }],
+        action: { label: "Remind me", on: "close;snack:She reminds you: {when}." } },
+
+      calls: { title: "Calls", eyebrow: "Today", lede: "Who Iris called for you, and how it went.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "phone", title: "Dentist", subtitle: "Moved to Wednesday 09:30", on: "push:dentist" },
+          { c: "Row", icon: "phone", title: "Pizzeria Da Mario", subtitle: "Table for six on Saturday, 20:00", on: "push:party" },
+          { c: "Row", icon: "phone", title: "Coolblue", subtitle: "No answer. She tries again at {retry}.", on: "sheet:retry" }] }] },
+
+      dentist: { title: "Dentist", eyebrow: "Iris called at 14:10",
+        lede: "Moved to **Wednesday 09:30**. They asked you to bring the old card.",
+        parts: [{ c: "Label", text: "How the call went" },
+                { c: "Card", parts: [{ c: "CheckList", items: [["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]] }] }],
+        action: { label: "Remind me about the card", on: "sheet:remind" } },
+
+      retry: { kind: "sheet", title: "Call Coolblue again", lede: "About the washing machine that did not come.",
+        parts: [{ c: "TimePicker", bind: "retry", label: "At what time?" }],
+        action: { label: "Call at {retry}", on: "close;snack:She calls Coolblue at {retry}." } },
+
+      party: { topic: "party", title: "Sam turns 30", eyebrow: "Saturday 20:00",
+        lede: "**Alex**, the candles from your grocery list are for this.",
+        hero: { c: "Word", text: "Party", effect: "neon", topic: "party", height: 110 },
+        parts: [{ c: "Group", parts: [{ c: "Row", icon: "car", title: "Da Mario", subtitle: "Table for six, booked by Iris" }] },
+                { c: "Card", parts: [{ c: "CheckList", topic: "party", items: ["Table booked", "Tell the guests", "Cake"], bind: "party" }] }],
+        action: { label: "Tell the guests", on: "dialog:tell" }, second: { label: "Later", on: "back" } },
+
+      tell: { kind: "dialog", title: "Text the five guests?", body: "From your number: Saturday 20:00 at Da Mario, and Sam does not know.",
+        actions: [{ label: "Send", on: "snack:Sent to five guests." }, { label: "Not yet" }] },
+
+      talk: { kind: "talk", title: "Talk", lede: "Tap her orb and ask anything.",
+        parts: [{ c: "Text", text: "Go ahead, I am listening." }, { c: "Text", text: "Looking at your agenda." },
+                { c: "Text", text: "Tomorrow you have the dentist at half past nine." }] },
+
+      camera: { title: "Show Iris what you see",
+        lede: "Only while you hold the button. Nothing is kept after Iris answers.",
+        hero: { c: "Icon", name: "camera", size: 44 },
+        action: { label: "Allow the camera", on: "snack:Camera on. Hold the button to show her.;tab:0" }, second: { label: "Not now", on: "tab:0" } },
+
+      you: { title: "You", eyebrow: "alex@example.com", lede: "How Iris works on this phone.",
+        parts: [
+          { c: "Group", parts: [
+            { c: "Row", icon: "phone", title: "This device", subtitle: "Listens here, even when locked", bind: "near" },
+            { c: "Row", icon: "speaker", title: "Voice", subtitle: "How Iris sounds", value: "{voice}", on: "sheet:voice" },
+            { c: "Row", icon: "sparkles", title: "Notifications", subtitle: "Only when Iris needs you", bind: "push" }] },
+          { c: "Group", parts: [
+            { c: "Row", icon: "shield", title: "Privacy", subtitle: "What Iris keeps, and for how long", on: "push:privacy" },
+            { c: "Row", icon: "globe", title: "Language", value: "{lang}", on: "sheet:language" }] },
+          { c: "Group", parts: [
+            { c: "Row", icon: "trash", title: "Delete everything", subtitle: "Lists, calls, voice and history", danger: true, on: "dialog:delete" }] }] },
+
+      voice: { kind: "sheet", title: "Voice", lede: "How she sounds on this phone.",
+        parts: [{ c: "Chips", bind: "voice", items: ["Wiep", "Joris"] },
+                { c: "Slider", bind: "speed", min: 80, max: 130, step: 5, label: "Speed", unit: "%" }],
+        action: { label: "Done", on: "close" } },
+
+      language: { kind: "sheet", title: "Language", lede: "She talks to you in this language.",
+        parts: [{ c: "Chips", bind: "lang", items: ["English", "Nederlands", "Deutsch"] }],
+        action: { label: "Done", on: "close" } },
+
+      privacy: { title: "Privacy", lede: "What she keeps, and when it goes. Nothing leaves your house without you.",
+        parts: [{ c: "Group", parts: [
+                  { c: "Row", icon: "mic", title: "Your voice", value: "Not kept" },
+                  { c: "Row", icon: "phone", title: "Calls", value: "{keep} days" },
+                  { c: "Row", icon: "sparkles", title: "Lists and loops", value: "Until you delete" }] },
+                { c: "Slider", bind: "keep", min: 7, max: 90, step: 1, label: "Keep calls for", unit: " days" }] },
+
+      delete: { kind: "dialog", title: "Delete everything?", body: "Your lists, calls and voice go, on every device. This cannot be undone.",
+        actions: [{ label: "Delete", danger: true, on: "snack:Everything is deleted." }, { label: "Keep it" }] },
+
+      loading: { eyebrow: "Tuesday 30 September", title: "Good evening, Alex",
+        parts: [{ c: "Skeleton", height: 18, width: "80%" },
+                { c: "BorderPattern", pattern: "comet", label: "Iris is fetching your day", parts: [{ c: "Skeleton", height: 170 }] },
+                { c: "Grid", parts: [{ c: "Skeleton", height: 120 }, { c: "Skeleton", height: 120 }] }] },
+
+      empty: { title: "Calls", eyebrow: "Today",
+        parts: [{ c: "EmptyState", icon: "phone", title: "No calls yet", line: "Ask Iris to call someone. She tells you how it went.", action: "Talk to Iris", on: "talk" }] },
+    },
+  };
+
+  /* ---------------------------------------------- the list: each entry opens the app at a path */
+
+  // ok: what this screen shows on purpose. ask: what is not decided yet. The rule check under it is live (checkApp).
+  const LIST = [
+    { name: "Today", path: ["today"], ok: ["Every widget opens what it shows", "The circles open the thing she is on", "Remind me opens a sheet, not a page"] },
+    { name: "Groceries", path: ["today", "groceries"], ok: ["The ring is the count and moves when you tick", "Add with Enter", "Order opens a sheet, Share says what happened"] },
+    { name: "Order", path: ["today", "groceries", "order"], ok: ["A sheet: one question, one action", "The price is on the button"] },
+    { name: "Weather", path: ["today", "weather"], ok: ["The word is the answer: frost", "The next days as rows, not a strip you have to swipe"],
+      ask: ["The frozen ThemeWord still draws in its own navy box: keep the box, or let the word stand on the page?"] },
+    { name: "Loops", path: ["today", "loops"], ok: ["Back in the app bar, like every screen one level down", "Each row carries its own small loop"] },
+    { name: "One loop", path: ["today", "loops", "loop"], ok: ["The loop fills the screen: no second phone frame inside", "Done goes back and says it"] },
+    { name: "Chats", path: ["today", "chats"], ok: ["Each chat a card in its topic colour"], ask: ["Chats and the circles on Today show the same thing: keep both?"] },
+    { name: "Remind me", path: ["today", "remind"], ok: ["One line and a moment: four choices, a day only if you ask for it"] },
+    { name: "Calls", path: ["calls"], ok: ["One group, each row says how it went", "Each row opens: the call, the party, a sheet to call again"] },
+    { name: "A call", path: ["calls", "dentist"], ok: ["What was said, with times", "The one action follows from the call"] },
+    { name: "Neon", path: ["calls", "party"], ok: ["One neon word, no pen next to it", "Telling the guests asks first: it goes out from your number"] },
+    { name: "Talking", path: ["talk"], ok: ["One orb: the tab bar steps aside", "Tap: listening, thinking, talking, by itself", "The state also in words"] },
+    { name: "Permission", path: ["camera"], ok: ["Asks once, says what for", "No Mark: the brand does not ask for the camera"] },
+    { name: "You", path: ["you"], ok: ["Rows in one surface per group, hairlines between", "Voice and Language each open their own sheet", "Delete asks, and does not offer an undo it cannot keep"] },
+    { name: "Privacy", path: ["you", "privacy"], ok: ["What she keeps, with the time it stays", "The slider changes the row above it"] },
+    { sep: "States" },
+    { name: "Loading", path: ["loading"], ok: ["Skeleton in the shape of what is coming", "The light runs round the one block she fetches"] },
+    { name: "Empty", path: ["empty"], ok: ["Never an empty black screen", "An icon of what goes here, not a circle that looks like her"] },
+    { name: "Error", path: ["today", "groceries", "failed"], ok: ["Says what did not happen: nothing paid", "Try again, or back to the list"] },
+    { name: "Dialog", path: ["you", "delete"], ok: ["The only way she interrupts", "Red only on Delete"] },
+  ];
+  const real = LIST.filter((l) => l.path);
+  const byName = (n) => real.find((l) => l.name === n || l.path.join(">") === n) ?? real[0];
+  const FINDINGS = checkApp(IRIS);
+
+  /* ------------------------------------------------------------------------------ phone */
+
+  const android = document.body.dataset.platform === "android";
+
+  function Phone({ path, onNavigate }) {
+    return h("div", { className: "phone" + (android ? " android" : "") },
+      h("div", { className: "island", "aria-hidden": "true" }),
+      h("div", { className: "status", "aria-hidden": "true" }, h("span", null, "21:04"), h("span", { className: "sys" }, "5G", h("span", { className: "batt" }, h("i", null)), "80%")),
+      android ? h("div", { className: "handle", "aria-hidden": "true" }) : null,
+      h(IrisApp, { spec: IRIS, start: path, onNavigate }));
+  }
+
+  const ANDROID = [
+    "There is no Android chapter. Same as iOS everywhere, or say where it differs?",
+    "The system back gesture: does it close the screen, or also a sheet and a dialog?",
+    "The tab bar sits 22pt into the safe area on iOS. On Android it sits on the gesture handle: how much room?",
+  ];
+
+  function Rules({ entry, at }) {
+    const s = IRIS.screens[at] ?? IRIS.screens[entry.path[entry.path.length - 1]];
+    const id = IRIS.screens[at] ? at : entry.path[entry.path.length - 1];
+    const cost = costOf(s), total = cost.reduce((a, [, c]) => a + c, 0);
+    const found = FINDINGS.filter((f) => f.screen === id);
+    return h("aside", { className: "rules", "aria-label": "Rules on this screen" },
+      h("div", null,
+        h("p", { className: "lab" }, `Busy ${total} of 5`),
+        h("div", { className: "score" + (total > 5 ? " over" : "") }, [0, 1, 2, 3, 4].map((i) => h("i", { key: i, className: i < total ? "on" : "" })))),
+      cost.length ? h("div", { className: "cost" }, cost.map(([p, c], i) => h("div", { key: i }, h("span", null, p), h("span", null, c)))) : null,
+      h("div", null,
+        h("p", { className: "lab" }, `Rule check: ${found.length ? found.length + " to fix" : "keeps every rule"}`),
+        found.length ? h("ul", { className: "checks" }, found.map((f, i) => h("li", { key: i, className: f.level === "break" ? "x" : "q" }, f.rule))) : null),
+      at === entry.path[entry.path.length - 1] ? h("div", null,
+        h("p", { className: "lab" }, "On purpose"),
+        h("ul", { className: "checks" },
+          entry.ok.map((t) => h("li", { key: t }, t)),
+          (entry.ask ?? []).map((t) => h("li", { key: t, className: "q" }, t)))) : null,
+      android ? h("div", null,
+        h("p", { className: "lab" }, "Android"),
+        h("ul", { className: "checks" }, ANDROID.map((t) => h("li", { key: t, className: "q" }, t)))) : null,
+      h("div", { className: "legend" }, h("span", null, "keeps"), h("span", { className: "q" }, "to decide"), h("span", { className: "x" }, "breaks a rule")),
+      h("p", { className: "lab" }, `${Object.keys(IRIS.screens).length} screens, ${depthOf(IRIS)} levels deep`));
+  }
+
+  function App() {
+    const [entry, setEntry] = useState(() => byName(params.get("s") || "Today"));
+    const [at, setAt] = useState(entry.path[entry.path.length - 1]);
+    const [all, setAll] = useState(params.has("all"));
+    const open = (e) => {
+      setEntry(e); setAt(e.path[e.path.length - 1]);
+      const u = new URL(location.href); u.searchParams.set("s", e.name); u.searchParams.delete("all");
+      history.replaceState(null, "", u);
+    };
+    useEffect(() => {
+      const u = new URL(location.href);
+      all ? u.searchParams.set("all", "") : u.searchParams.delete("all");
+      history.replaceState(null, "", u);
+    }, [all]);
+
+    const top = h("div", { className: "ex-top" },
+      h(Button, { variant: all ? "glass" : "primary", size: "sm", onClick: () => setAll(false) }, "As an app"),
+      h(Button, { variant: all ? "primary" : "glass", size: "sm", onClick: () => setAll(true) }, "All screens"));
+
+    if (all) return h("div", null, top,
+      h("div", { className: "wall" }, real.map((e) =>
+        h("figure", { key: e.name },
+          h("div", { className: "mini" }, h(Phone, { path: e.path })),
+          h("figcaption", null, h("button", { onClick: () => { setAll(false); open(e); } }, e.name))))));
+
+    return h("div", null, top,
+      h("div", { className: "ex" },
+        h("nav", { className: "list", "aria-label": "Screens" },
+          h("p", { className: "lab" }, "Screens"),
+          LIST.map((e) => e.sep
+            ? h("p", { key: e.sep, className: "lab sep" }, e.sep)
+            : h("button", { key: e.name, "aria-current": e === entry ? "true" : "false", onClick: () => open(e) },
+                h("span", null, e.name),
+                (() => { const n = FINDINGS.filter((f) => e.path.includes(f.screen) && f.screen === e.path[e.path.length - 1]).length + (e.ask?.length ?? 0);
+                         return n ? h("span", { className: "n" }, n) : null; })()))),
+        h(Phone, { path: entry.path, onNavigate: setAt }),
+        h(Rules, { entry, at })));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(h(PreviewI18nProvider, null, h(App)));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Iris UI web app</title>
+<meta name="description" content="The Iris web app built from the design system: talk, groceries, what Iris did and the subscription, every control working.">
+<link rel="stylesheet" href="../../ds/tokens.css">
+<link rel="stylesheet" href="../../ds/bundle.css">
+<link rel="stylesheet" href="../../ds/ext.css">
+<link rel="stylesheet" href="../../ds/extra.css">
+<link rel="stylesheet" href="../shared.css">
+<link rel="icon" href="../../favicon.svg">
+<style>
+  /* The page around the app: the app window, and the rules beside it (never inside it). */
+  .ex { grid-template-columns: minmax(0, 1080px) 300px; }
+  @media (max-width: 1240px) { .ex { grid-template-columns: minmax(0, 1080px); } }
+  .app { position: relative; height: min(780px, calc(100dvh - 110px)); min-height: 600px; border-radius: var(--radius-card); overflow: hidden;
+         box-shadow: 0 0 0 1px var(--edge); transform: translateZ(0); }
+  @media (max-width: 640px) { .ex { padding: 0 0 40px; } .app { border-radius: 0; height: calc(100dvh - 90px); } }
+</style>
+</head>
+<body data-platform="web">
+<script src="../nav.js"></script>
+<main id="root"></main>
+<script src="../../ds/vendor/react.js"></script>
+<script src="../../ds/vendor/react-dom.js"></script>
+<script src="../../ds/bundle.js"></script>
+<script src="../../ds/ext.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState } = React;
+  const { PreviewI18nProvider, IrisApp, checkApp } = window.IrisUi;
+
+  // The whole web app is one spec: IrisApp draws the NavRail, the pages, the sheets from the right and the dialogs.
+  // What Iris did: the house TableApp. Each row opens its steps in a sheet from the side.
+  const { CheckList, Card } = window.IrisUi;
+  const steps = (items) => h(Card, null, h(CheckList, { items }));
+  const TASKS = [
+    { id: "dentist", icon: "phone", tags: ["Calls"], title: "Moved the dentist to Wednesday 09:30", subtitle: "14:10, called, 2 minutes",
+      detail: steps([["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]]) },
+    { id: "funda", icon: "globe", tags: ["On the web"], title: "Looked up houses on Funda", subtitle: "13:52, read 12 pages, one step tried twice",
+      detail: steps([["13:50", "Opened Utrecht, 3 rooms"], ["13:51", "The page moved while she typed. Tried again, it worked."], ["13:52", "Saved 4 houses to your list"]]) },
+    { id: "mario", icon: "phone", tags: ["Calls"], title: "Booked a table at Da Mario", subtitle: "13:41, Saturday 20:00, six people",
+      detail: steps([["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]]) },
+  ];
+
+  const WEB = {
+    name: "Iris", start: "talk",
+    rail: [{ label: "Talk", icon: "wave", to: "talk" }, { label: "Groceries", icon: "car", to: "groceries" },
+           { label: "What Iris did", icon: "loop", to: "did" }, { label: "Subscription", icon: "person", to: "plan" }],
+    state: { sent: [], draft: "", cake: "ask", items: ["Candles", "Balloons", "Lemonade", "Bread", "Milk", "Eggs"], done: [0, 4], add: "",
+             shop: "Albert Heijn", awake: 1, next: "" },
+    screens: {
+      talk: { title: "Talk", status: { state: "idle" },
+        lede: "**Alex**, the dentist moved to Wednesday 09:30. Saturday stays free for Sam's party.",
+        parts: [
+          { c: "Group", parts: [
+            { c: "Row", icon: "person", title: "Can you move the dentist to Wednesday?", subtitle: "You, 14:02" },
+            { c: "Row", icon: "phone", title: "Called the dentist, 2 minutes", subtitle: "Iris, 14:03" },
+            { c: "Row", title: "Done, Alex. Wednesday at 09:30. The candles are still on your list.", subtitle: "Iris, 14:05" },
+            { c: "Row", each: "sent", icon: "person", title: "{$.v}", subtitle: "You, just now" }] },
+          { c: "Text", if: "thinking==yes", text: "Iris is thinking." },
+          { c: "Text", if: "answered==yes", text: "Iris: on it, Alex. Follow \u201c{last}\u201d under What Iris did." },
+          { c: "Field", placeholder: "Type to Iris, Enter sends", bind: "draft", add: "sent",
+            on: "set:last={draft};set:answered=;set:thinking=yes;later:1500:set:thinking=,set:answered=yes" },
+          { c: "BorderPattern", pattern: "stream", label: "Waits on you", if: "cake==ask", parts: [{ c: "Card", parts: [
+            { c: "Text", text: "Which cake for Sam? I put it on the grocery list." },
+            { c: "Buttons", stack: false, parts: [
+              { c: "Button", variant: "glass", label: "Chocolate", on: "set:cake=Chocolate;snack:Chocolate cake is on the grocery list." },
+              { c: "Button", variant: "glass", label: "Lemon", on: "set:cake=Lemon;snack:Lemon cake is on the grocery list." },
+              { c: "Button", variant: "text", label: "Not now", on: "set:cake=later;snack:She asks again tomorrow." }] }] }] }],
+        action: { label: "Talk to Iris", on: "talk" } },
+      voice: { kind: "talk", title: "Talk", lede: "Tap her orb and ask anything.",
+        parts: [{ c: "Text", text: "Go ahead, I am listening." }, { c: "Text", text: "Looking at your agenda." },
+                { c: "Text", text: "Tomorrow you have the dentist at half past nine." }] },
+
+      groceries: { title: "Groceries", topic: "groceries", status: { state: "idle" },
+        lede: "**Alex**, the candles are at the Hema, next to the dentist. I order the rest at {shop} when you say so.",
+        hero: { c: "Progress", ring: true, size: 110, value: "=done/items", centre: "{done}/{items}", topic: "groceries" },
+        parts: [
+          { c: "Card", parts: [{ c: "CheckList", topic: "groceries", items: "{items}", bind: "done" }] },
+          { c: "Field", topic: "groceries", placeholder: "Add something", bind: "add", add: "items" }],
+        action: { label: "Order at {shop}", on: "sheet:order" }, second: { label: "Share the list", on: "snack:Link copied. Sam can add to it too." } },
+      order: { kind: "sheet", title: "Order at {shop}", lede: "What is not ticked yet, delivered to your door.",
+        parts: [
+          { c: "Chips", bind: "shop", items: ["Albert Heijn", "Jumbo", "Picnic"] },
+          { c: "Group", parts: [{ c: "Row", icon: "car", title: "Delivery", value: "Tomorrow, 16:00" }, { c: "Row", icon: "shield", title: "Pay with", value: "iDEAL" }] }],
+        action: { label: "Order at {shop}", on: "close;snack:Ordered at {shop}. Tomorrow between 16:00 and 18:00." },
+        actions: [{ label: "Not now", on: "close" }] },
+
+      did: { title: "What Iris did", status: { state: "idle" }, lede: "One line per task, not per click. Open a line for the steps.",
+        parts: [
+          { c: "TableApp", title: "Today", noun: "tasks", placeholder: "Search what she did", filters: ["Calls", "On the web"], rows: TASKS }] },
+
+      plan: { title: "Subscription", status: { state: "idle" }, lede: "You are on Pro, €12 a month, until 18 October. {next}",
+        parts: [
+          { c: "Label", text: "Plans" },
+          { c: "Group", parts: [
+            { c: "Row", title: "Free", subtitle: "Talk and lists, one device", value: "€0 a month", on: "dialog:to-free" },
+            { c: "Row", title: "Plus", subtitle: "Calls for you, three devices", value: "€6 a month", on: "dialog:to-plus" },
+            { c: "Row", title: "Pro", subtitle: "Five times the room, and faster", value: "Your plan" }] },
+          { c: "Label", text: "Awake" },
+          { c: "Segmented", bind: "awake", items: ["Stays awake", "Sleeps when idle"] },
+          { c: "Text", if: "awake==0", text: "Iris answers at once, always. Uses more of your plan." },
+          { c: "Text", if: "awake==1", text: "Iris sleeps after half an hour without use, and only when no work is waiting. The first answer takes a few seconds." }] },
+      "to-plus": { kind: "dialog", title: "Switch to Plus?", body: "Plus starts on 18 October at €6 a month. Until then you keep Pro.",
+        actions: [{ label: "Switch to Plus", on: "set:next=Then Plus, at €6 a month.;snack:Plus starts on 18 October." }, { label: "Keep Pro" }] },
+      "to-free": { kind: "dialog", title: "Switch to Free?", body: "Free starts on 18 October. Calls stop then, your lists stay.",
+        actions: [{ label: "Switch to Free", on: "set:next=Then Free.;snack:Free starts on 18 October." }, { label: "Keep Pro" }] },
+    },
+  };
+  const FOUND = checkApp(WEB);
+
+  const RULES = {
+    talk: ["Her presence top left: the StatusPill", "Her words as the lede, the talk under it", "Enter sends your line, she thinks, then answers; Talk to Iris opens her orb", "The question she asks has answers and Not now"],
+    groceries: ["The ring is the count and moves when you tick", "Order opens a sheet from the right: pick the shop there", "Share says what happened"],
+    did: ["The house TableApp: search, chips and a count filter the same rows", "Every row opens its steps in a sheet from the side", "A task that failed once and then worked is not red"],
+    plan: ["The plan you are on, once, in her words", "Every plan shows its price the same way", "Switching asks first: it is about money"],
+  };
+  const TOP = { voice: "talk" };
+  const ALL = ["One spec, drawn by IrisApp with spec.rail: NavRail, pages, sheets from the right, dialogs.",
+               "The house Icon has 14 names: Groceries uses car, Subscription person."];
+
+  function App() {
+    const q = new URLSearchParams(location.search).get("s");
+    const [at, setAt] = useState(WEB.screens[q] ? q : "talk");
+    const top = TOP[at] ?? (RULES[at] ? at : "talk");
+    const go = (id) => { setAt(id); const u = new URL(location.href); u.searchParams.set("s", TOP[id] ?? id); history.replaceState(null, "", u); };
+    return h("div", { className: "ex" },
+      h("div", { className: "app" }, h(IrisApp, { spec: WEB, start: WEB.screens[q] ? q : "talk", onNavigate: go })),
+      h("aside", { className: "rules", "aria-label": "Rules" },
+        h("p", { className: "lab" }, WEB.screens[top].title),
+        h("ul", { className: "checks" }, RULES[top].map((t) => h("li", { key: t }, t)),
+          FOUND.map((f, i) => h("li", { key: i, className: "q" }, `${f.screen}: ${f.rule}`))),
+        h("p", { className: "lab" }, FOUND.length ? `checkApp: ${FOUND.length} to look at` : "checkApp: keeps every rule"),
+        h("p", { className: "lab" }, "Whole web app"),
+        h("ul", { className: "checks" }, ALL.map((t) => h("li", { key: t, className: "q" }, t)))));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(h(PreviewI18nProvider, null, h(App)));
+})();
+</script>
+</body>
+</html>

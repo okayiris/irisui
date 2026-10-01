@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<!-- @dsCard height=300 -->
+<div style="position:relative;width:960px;height:300px;background:var(--bg);overflow:hidden;font-family:var(--font-display)">
+<svg width="960" height="300" viewBox="0 0 960 300" style="position:absolute;inset:0">
+<!-- blocks: bg ground, glass (radius-card) x3, accent pill, violet pill; arrangement: a staggered stack right of 480
+     pattern: the ring (a literal motif: her orb), built from radius-pill discs; README: "her violet ring"
+     steps: gap 12, gutter 16; radii: radius-card 18, radius-pill (half the short side) -->
+<style>.g{fill:var(--glass);stroke:var(--edge)}.a{fill:var(--accent)}.v{fill:var(--violet)}.f{fill:var(--bg)}</style>
+<rect class="g" x="520" y="36" width="200" height="132" rx="18"/>
+<rect class="g" x="732" y="36" width="192" height="64" rx="18"/>
+<rect class="g" x="732" y="112" width="192" height="152" rx="18"/>
+<rect class="a" x="520" y="180" width="200" height="40" rx="20"/>
+<rect class="v" x="520" y="232" width="96" height="32" rx="16"/>
+<circle class="v" cx="828" cy="188" r="52"/><circle class="a" cx="846" cy="176" r="30" opacity=".9"/><circle class="f" cx="828" cy="188" r="28"/>
+</svg>
+<div style="position:absolute;left:40px;bottom:40px;width:440px">
+<div style="font-size:120px;line-height:.92;font-weight:700;color:var(--fg)">Iris</div>
+<div style="margin-top:12px;font:400 14px var(--font);color:var(--dim)">Cold light on near-black, frosted glass, one ice-blue accent and her ring.</div>
+</div>
+</div>
+
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

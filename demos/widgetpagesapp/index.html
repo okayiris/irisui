@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<!-- @dsCard group="App layouts" height=620 page subtitle="Pages of widgets you swipe through, each page one theme (Today, Home, Movement)" -->
+<div id="root" class="pv"></div>
+<script>
+(() => {
+  const ICONS = {"cloud":[["path",{"d":"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"}]],"calendar":[["path",{"d":"M8 2v3"}],["path",{"d":"M16 2v3"}],["rect",{"height":"18","rx":"2","width":"18","x":"3","y":"3"}],["path",{"d":"M3 9h18"}]],"check":[["path",{"d":"M20 6 9 17l-5-5"}]],"music":[["path",{"d":"M9 18V5l12-2v13"}],["circle",{"cx":"6","cy":"18","r":"3"}],["circle",{"cx":"18","cy":"16","r":"3"}]],"play":[["path",{"d":"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"}]],"lamp":[["path",{"d":"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"}],["path",{"d":"M9 18h6"}],["path",{"d":"M10 22h4"}]],"thermometer":[["path",{"d":"M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"}]],"bolt":[["path",{"d":"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"}]],"home":[["path",{"d":"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"}],["path",{"d":"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"}]],"film":[["path",{"d":"m12.296 3.464 3.02 3.956"}],["path",{"d":"M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"}],["path",{"d":"M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"}],["path",{"d":"m6.18 5.276 3.1 3.899"}]],"bed":[["path",{"d":"M2 4v16"}],["path",{"d":"M2 8h18a2 2 0 0 1 2 2v10"}],["path",{"d":"M2 17h20"}],["path",{"d":"M6 8v9"}]],"door":[["path",{"d":"M10 21H2"}],["path",{"d":"M10 3H7a2 2 0 00-2 2v16"}],["path",{"d":"M14 12h.01"}],["path",{"d":"M19 21V5a2 2 0 00-1.675-1.974l-6.163-1.013A1 1 0 0010 3v18a1 1 0 001.124.992z"}],["path",{"d":"M22 21h-3"}]],"pulse":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"battery":[["path",{"d":"M 22 14 L 22 10"}],["rect",{"height":"12","rx":"2","width":"16","x":"2","y":"6"}]],"route":[["circle",{"cx":"6","cy":"19","r":"3"}],["path",{"d":"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"}],["circle",{"cx":"18","cy":"5","r":"3"}]],"min":[["path",{"d":"M5 12h14"}]],"plus":[["path",{"d":"M5 12h14"}],["path",{"d":"M12 5v14"}]]};
+  const ic = (n, s = 18) => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + (ICONS[n] || []).map(([t, a]) => '<' + t + ' ' + Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('') + '</svg>';
+  const st = document.createElement("style"); st.textContent = "\n.pv{font:15px/1.5 var(--font);color:var(--fg);background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:12px;-webkit-font-smoothing:antialiased}\n.pv *{box-sizing:border-box}\n.pv-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}\n.pv-top .label{flex:1}\n.label{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}\n.seg{display:inline-flex;padding:.2rem;border-radius:999px;background:var(--glass);border:1px solid var(--edge)}\n.seg button,.tab,.nav,.btn,.item,.chip,.tb{all:unset;cursor:pointer;transition:background .2s cubic-bezier(.2,.9,.25,1),color .2s,border-color .2s,opacity .2s,scale .15s}\n.seg button{padding:.3rem .8rem;border-radius:999px;font:500 .8rem var(--font);color:var(--dim)}\n.seg button:hover{color:var(--fg)}\n.seg button[aria-pressed=true]{background:rgba(125,211,252,.14);color:var(--accent)}\n:is(.seg button,.tab,.nav,.btn,.item,.chip,.tb):focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n:is(.tab,.nav,.btn,.item,.chip,.tb):active{scale:.96}\n.stage{display:flex;justify-content:center;align-items:flex-start;padding:.5rem 0}\n.app{position:relative;width:60rem;max-width:100%;height:31rem;container-type:inline-size;border:1px solid var(--edge);border-radius:1rem;\n  background:rgba(12,17,23,.9);overflow:hidden;display:flex;transition:width .35s cubic-bezier(.2,.9,.25,1),height .35s cubic-bezier(.2,.9,.25,1)}\n.app.phone{width:23.5rem;height:36rem;border-radius:1.6rem}\n.col{display:flex;flex-direction:column;min-width:0;flex:1}\n.side{width:13rem;flex:none;padding:.9rem .6rem;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:.15rem;background:rgba(7,9,12,.5)}\n.side .brand{display:flex;align-items:center;gap:.5rem;padding:.2rem .6rem .9rem;font-weight:600}\n.side .grp{margin:.9rem .6rem .35rem}\n.nav{display:flex;gap:.6rem;align-items:center;padding:.45rem .6rem;border-radius:.7rem;color:var(--dim);font-size:.88rem}\n.nav:hover{background:var(--glass);color:var(--fg)}\n.nav[aria-current=page]{background:rgba(125,211,252,.14);color:var(--fg)}\n.nav[aria-current=page] svg{color:var(--accent)}\n.nav .n{margin-left:auto;font:500 11px var(--mono);color:var(--faint)}\n.head{display:flex;align-items:center;gap:.6rem;padding:.8rem 1.1rem;border-bottom:1px solid var(--line);min-height:3.4rem}\n.head h2{font:600 1.05rem/1.3 var(--font);margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.head .sub{color:var(--dim);font-size:.88rem;font-weight:400}\n.body{flex:1;overflow:auto;padding:1.1rem;display:flex;flex-direction:column;gap:1.3rem;min-height:0}\n.card{background:var(--glass);border:1px solid var(--edge);border-radius:.9rem;padding:.9rem 1rem}\n.card .label{color:var(--accent);display:block;margin-bottom:.35rem}\n.row{display:flex;gap:.6rem;align-items:center;padding:.6rem 0;border-top:1px solid var(--edge);font-size:.9rem}\n.row:first-of-type{border-top:0}\n.row .r{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums}\n.dim{color:var(--dim)} .small{font-size:.88rem}\n.pill{display:inline-flex;align-items:center;gap:.3rem;font:500 .75rem/1.6 var(--font);padding:0 .55rem;border-radius:999px;background:rgba(125,211,252,.12);color:var(--accent);white-space:nowrap}\n.pill.ok{background:rgba(74,222,128,.12);color:var(--ok)} .pill.wait{background:rgba(253,230,138,.12);color:var(--wait)} .pill.bad{background:rgba(248,113,113,.12);color:var(--error)}\n.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.5rem .9rem;border-radius:.6rem;font:600 .88rem var(--font);background:rgba(255,255,255,.08);color:var(--fg)}\n.btn:hover{background:rgba(255,255,255,.14)}\n.btn.primary{background:var(--accent);color:#07171f} .btn.primary:hover{background:#a5e2ff}\n.btn.rand{background:none;border:1px solid rgba(125,211,252,.45);color:var(--accent);border-radius:999px;font-weight:500}\n.btn.rand:hover{background:rgba(125,211,252,.12)}\n.btn.ghost{background:none;width:2.2rem;height:2.2rem;padding:0;border-radius:50%;color:var(--dim)}\n.btn.ghost:hover{background:var(--glass);color:var(--fg)}\n.btn.primary.icon{width:2.2rem;height:2.2rem;padding:0;border-radius:50%}\n.search{display:flex;align-items:center;gap:.5rem;padding:.4rem .8rem;border-radius:999px;background:var(--glass);border:1px solid var(--edge);color:var(--faint);font-size:.88rem;min-width:0}\n.tabbar{display:none;position:absolute;left:.6rem;right:.6rem;bottom:.6rem;height:3.6rem;padding:.3rem;border-radius:999px;background:rgba(20,26,34,.82);\n  border:1px solid var(--edge);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:6}\n.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;border-radius:999px;color:var(--dim);font-size:.72rem}\n.tab[aria-current=page]{color:var(--accent);background:rgba(125,211,252,.14)}\n.back{display:none}\n@container (max-width: 40rem){\n  .side{display:none} .tabbar{display:flex} .body{padding-bottom:5rem}\n  .head{padding:.8rem 1rem}\n}\n@media (prefers-reduced-motion: reduce){.app,.seg button,.tab,.nav,.btn,.item,.chip,.tb{transition:none}}\n"; document.head.appendChild(st);
+  const root = document.getElementById("root");
+  root.innerHTML = '<div class="pv-top"><span class="label">Widget Pages app</span><div class="seg" role="group" aria-label="Size">'
+    + '<button aria-pressed="false" data-size="wide">Window</button><button aria-pressed="true" data-size="phone">Phone</button></div></div>'
+    + '<div class="stage"><div class="app phone" id="app"></div></div>';
+  const app = root.querySelector("#app");
+  root.querySelector(".seg").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    root.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    app.classList.toggle("phone", b.dataset.size === "phone");
+  });
+  const S = {};
+  const draw = () => { app.innerHTML = ((S, ic) => {
+    const light = S.light ?? true, temp = S.temp ?? 20.5, done = S.done || [false, false, true];
+    S.done = done;
+    const bars = (xs, cls) => '<div class="wbars ' + cls + '">' + xs.map((b, k) => '<i style="height:' + b + '%"' + (k === xs.length - 1 ? ' class="now"' : '') + '></i>').join("") + '</div>';
+    const ring = (p, c) => '<svg viewBox="0 0 36 36" class="ring"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--line)" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="' + c + '" stroke-width="3" stroke-linecap="round" stroke-dasharray="' + (p * .942) + ' 100" transform="rotate(-90 18 18)"/><text x="18" y="21" text-anchor="middle" font-size="8" fill="var(--fg)">' + p + '%</text></svg>';
+    const pages = [
+      ["Today", "Mon 28 Sep",
+        '<div class="w">' + ic("cloud", 16) + '<div class="wbig">14°</div><div class="small dim">Partly cloudy</div></div>'
+        + '<div class="w"><span class="label" style="color:var(--error)">Monday</span><div class="wbig">28</div><div class="wrow small"><i class="d"></i><em>Stand-up</em><span>10:00</span></div><div class="wrow small"><i class="d"></i><em>Lunch</em><span>12:30</span></div></div>'
+        + '<div class="w span"><span class="label">Reminders <b class="cnt">' + done.filter((x) => !x).length + '</b></span>' + ["Pick up parcel","Bins out tonight","Send quote"].map((t, k) => '<button class="item wchk' + (done[k] ? ' on' : '') + '" data-done="' + k + '"><span class="chk">' + (done[k] ? ic("check", 12) : '') + '</span>' + t + '</button>').join("") + '</div>'
+        + '<div class="w span wplay"><span class="art">' + ic("music", 26) + '</span><div style="flex:1;min-width:0"><span class="label">Paused</span><div>Deep Focus</div><div class="small dim">Playlist</div></div><button class="btn primary icon" aria-label="Play">' + ic("play", 16) + '</button></div>'],
+      ["Home", "3 lights on",
+        '<button class="item w wlamp' + (light ? ' on' : '') + '" data-light>' + ic("lamp", 18) + '<div style="margin-top:auto"><b>Living room</b><div class="small">' + (light ? '3 lights on' : 'Off') + '</div></div></button>'
+        + '<div class="w"><span class="label">Thermostat</span><div class="wbig">' + temp.toFixed(1) + '°</div><div style="display:flex;gap:.4rem"><button class="btn ghost" data-temp="-0.5" aria-label="Cooler">' + ic("min", 16) + '</button><button class="btn ghost" data-temp="0.5" aria-label="Warmer">' + ic("plus", 16) + '</button></div></div>'
+        + '<div class="w span"><span class="label">Energy today</span><div class="wbig" style="font-size:1.4rem">8.4 <span class="small dim">kWh made</span></div>' + bars([8,12,20,35,52,70,84,90,76,60,40,22], "green") + '</div>'
+        + '<div class="w span"><span class="label">Scenes</span><div class="scenes">' + [["home","Welcome",1],["film","Film"],["bed","Sleep"],["door","Away"]].map(([i, n, on]) => '<button class="item scene' + (on ? ' on' : '') + '">' + ic(i, 18) + '<span>' + n + '</span></button>').join("") + '</div></div>'],
+      ["Movement", "today",
+        '<div class="w"><span class="label">Steps</span><div class="wbig">7,412</div>' + bars([30,50,20,70,45,90,60], "warm") + '</div>'
+        + '<div class="w"><span class="label">Heart</span><div class="wbig">' + ic("pulse", 18) + ' 64</div><div class="small dim">resting</div></div>'
+        + '<div class="w span"><span class="label">Batteries</span><div class="rings">' + ring(82, "var(--ok)") + ring(64, "var(--ok)") + ring(19, "var(--wait)") + '</div><div class="rings small dim"><span>iPhone</span><span>AirPods</span><span>Watch</span></div></div>'
+        + '<div class="w span wroute"><div><span class="label">To home</span><div class="wbig">24 min</div><div class="small dim">Leave at 17:40</div></div>' + ic("route", 44) + '</div>'],
+    ];
+    const p = S.p ?? 0;
+    return '<div class="col"><div class="wpages" data-pages>' + pages.map(([t, sub, w], k) => '<section class="wpage"><div class="whead"><h2>' + t + '</h2><span class="small dim">' + sub + '</span></div><div class="wgrid">' + w + '</div></section>').join("") + '</div>'
+      + '<div class="wdots">' + pages.map((x, k) => '<button class="item wdot' + (k === p ? ' on' : '') + '" data-page="' + k + '" aria-label="' + x[0] + '"></button>').join("") + '</div></div>';
+  })(S, ic); };
+  const extra = document.createElement("style"); extra.textContent = ".wpages{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;padding:1.1rem;overflow:auto;min-height:0}"
+    + ".whead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.6rem}.whead h2{margin:0;font:600 1.05rem var(--font)}"
+    + ".wgrid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}.w{background:var(--glass);border:1px solid var(--edge);border-radius:.9rem;padding:.7rem;display:flex;flex-direction:column;gap:.2rem;min-height:7rem;min-width:0;text-align:left;container-type:inline-size}"
+    + ".w.span{grid-column:span 2;min-height:0}.wbig{font-size:min(1.9rem,30cqi);white-space:nowrap;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:.3rem}"
+    + ".wrow{display:flex;gap:.4rem;align-items:center}.wrow em{font-style:normal;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wrow span{margin-left:auto;flex:none;color:var(--dim);font-variant-numeric:tabular-nums}.d{width:.35rem;height:.35rem;border-radius:50%;background:var(--accent);flex:none}"
+    + ".cnt{color:var(--wait);float:right;font-size:.9rem}.wchk{display:flex;gap:.5rem;align-items:center;padding:.3rem 0;font-size:.9rem}.wchk.on{color:var(--faint);text-decoration:line-through}"
+    + ".chk{width:1rem;height:1rem;border-radius:50%;border:1px solid var(--edge);display:grid;place-items:center;flex:none}.wchk.on .chk{background:var(--violet);border-color:var(--violet);color:var(--fg)}"
+    + ".wplay{flex-direction:row;align-items:center;gap:.7rem}.art{width:3.4rem;height:3.4rem;border-radius:.6rem;display:grid;place-items:center;background:rgba(139,92,246,.22);color:var(--violet-light);flex:none}"
+    + ".wlamp{cursor:pointer}.wlamp.on{background:#fbbf24;border-color:#fbbf24;color:#1f1603}.wlamp.on .small{color:#4a3a0e}"
+    + ".wbars{display:flex;align-items:flex-end;gap:2px;height:3.2rem;margin-top:auto}.wbars i{flex:1;border-radius:3px 3px 0 0;background:rgba(74,222,128,.35)}.wbars i.now{background:var(--ok)}"
+    + ".wbars.warm i{background:rgba(251,191,36,.3)}.wbars.warm i.now{background:#fbbf24}"
+    + ".scenes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4rem}.scene{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.6rem .2rem;border-radius:.7rem;background:rgba(255,255,255,.05);font-size:.72rem;min-width:0}.scene span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.scene:hover{background:rgba(255,255,255,.1)}.scene.on{background:#fbbf24;color:#1f1603}"
+    + ".rings{display:grid;grid-template-columns:repeat(3,1fr);justify-items:center;text-align:center}.ring{width:3.4rem;height:3.4rem}"
+    + ".wroute{flex-direction:row;justify-content:space-between;align-items:center;color:var(--accent)}.wroute>div{color:var(--fg)}"
+    + ".wdots{display:none}"
+    + "@container (max-width:8.5rem){.wrow{flex-wrap:wrap;row-gap:0;line-height:1.3;margin-top:.2rem}.wrow em{flex:1}.wrow span{flex-basis:100%;margin-left:0;padding-left:.75rem}}"
+    + "@container (max-width:17rem){.scenes{grid-template-columns:1fr 1fr}.scene{flex-direction:row;justify-content:center;padding:.5rem .35rem;gap:.3rem}}"
+    + ".w .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em}"
+    + "@container (max-width:40rem){.wpages{display:block;scroll-snap-type:y mandatory;padding:0 1rem}.wpage{scroll-snap-align:start;min-height:100%;padding:1rem 0 1.5rem}"
+    + ".wdots{display:flex;flex-direction:column;gap:.35rem;position:absolute;right:.35rem;top:50%;translate:0 -50%}.wdot{width:.35rem;height:.35rem;border-radius:999px;background:var(--faint)}.wdot.on{height:1rem;background:var(--accent)}}";
+  document.head.appendChild(extra);
+  app.addEventListener("click", (e) => { const t = e.target.closest("button"); if (!t) return;
+    if (t.dataset.done) { S.done[+t.dataset.done] = !S.done[+t.dataset.done]; draw(); }
+    else if ("light" in t.dataset) { S.light = !(S.light ?? true); draw(); }
+    else if (t.dataset.temp) { S.temp = (S.temp ?? 20.5) + +t.dataset.temp; draw(); }
+    else if (t.dataset.page) { const pg = app.querySelectorAll(".wpage")[+t.dataset.page]; S.p = +t.dataset.page; pg.scrollIntoView({ behavior: "smooth", block: "start" }); draw(); } });
+  app.addEventListener("scroll", (e) => { const w = e.target; if (!w.matches?.("[data-pages]")) return; const k = Math.round(w.scrollTop / w.clientHeight);
+    app.querySelectorAll(".wdot").forEach((d, i) => d.classList.toggle("on", i === k)); S.p = k; }, true);
+  draw();
+})();
+</script>
+
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

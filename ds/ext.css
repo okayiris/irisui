@@ -1,0 +1,2965 @@
+/* Additions to the design system: the parts and values Iris was missing beyond the core.
+ *
+ * Same house as the rest: a calm ground (near-black in dark, soft near-white in light), glass, one accent, quiet
+ * type, everything answers the hand. Every value here is a token; where a token did not exist yet, it is defined in
+ * the "values the system did not have" block below and is meant to move into tokens.css when this ships into the
+ * artifact.
+ *
+ * This file adds to bundle.css. The one place it restates release rules is the light block at the end: parts the
+ * release painted with fixed dark values get a light half there. */
+
+/* ---------- values the system did not have ---------- */
+
+:root {
+  /* Label text: 7.6:1 on --bg. The release's --faint is 3.6:1 and stays for hairlines and decoration, never
+     for words that must be read (small text asks 4.5:1). */
+  --label: #8fa3b0;
+
+  /* State: a layer of the accent or the ink over a surface, never a colour change. */
+  --state-hover: rgba(180, 225, 255, 0.07);
+  --state-press: rgba(180, 225, 255, 0.12);
+  --state-selected: rgba(125, 211, 252, 0.12);
+  --state-disabled: 0.38;
+
+  /* The two durations the app already used, now named; and the house curve. */
+  --motion-fast: 0.14s;
+  --motion-base: 0.2s;
+  --motion-slow: 0.32s;
+  --ease-house: cubic-bezier(0.2, 0.9, 0.25, 1);
+
+  /* Focus is one ring, on the accent, with a gap: it must stay visible on glass. */
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+
+  /* Elevation is light on the edge, never a shadow: two steps above the page. */
+  --elev-1: inset 0 0 0 1px var(--edge), 0 1px 0 rgba(190, 230, 255, 0.06);
+  --elev-2: inset 0 0 0 1px var(--edge), 0 10px 34px rgba(0, 0, 0, 0.55);
+
+  /* Surfaces of a sheet or a dialog: the glass, denser, over the page. */
+  --sheet-bg: rgba(10, 13, 18, 0.92);
+  --scrim: rgba(4, 6, 9, 0.62);
+
+  /* The disc inside a loop bubble: the app's LoopBubble fill, the tab bar's glass without its alpha. */
+  --bubble-disc: #141a22;
+  /* The "you" phase as a colour a stylesheet can reach: the release keeps it only in PHASE_COLOURS[3]. */
+  --phase-you: #f0abfc;
+
+  /* Radii the system had not named yet. */
+  --radius-menu: 14px;
+  --radius-sheet: 22px;
+  --radius-field: 12px;
+
+  /* Where the layout changes: the app is one column until a window is wide enough for two. */
+  --bp-medium: 600px;
+  --bp-expanded: 840px;
+  --bp-large: 1200px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0.001s;
+    --motion-base: 0.001s;
+    --motion-slow: 0.001s;
+  }
+}
+
+/* ---------- light ----------
+ * Iris has a light and a dark mode. She follows the system (prefers-color-scheme); data-mode="light" or "dark" on
+ * <html> overrides it. Dark is the release's own values; light is the same house on a soft near-white: glass is
+ * white, the edge is ink, one accent (ice blue darkened to 5.5:1), violet only for on and her ring, red only
+ * destructive. The two selectors below are the only place the switch is made: the token block is repeated once
+ * for each, and `color-scheme` follows, so the parts' own light-dark() values (at the end of this file) and the
+ * browser's scrollbars and form controls go with it. */
+
+:root {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) {
+    color-scheme: light;
+    --bg: #f4f7f9;
+    --fg: #0d1a22;
+    --dim: #4a5c68;
+    --faint: #8696a1;
+    --label: #4a5c68;
+    --line: #dde4ea;
+    --accent: #0369a1;
+    --accent-ink: #ffffff;
+    --violet: #6d28d9;
+    --violet-light: #7c3aed;
+    --error: #b91c1c;
+    --ok: #15803d;
+    --wait: #a16207;
+    --glass: rgba(255, 255, 255, 0.78);
+    --edge: rgba(16, 48, 72, 0.13);
+    --state-hover: rgba(3, 105, 161, 0.06);
+    --state-press: rgba(3, 105, 161, 0.11);
+    --state-selected: rgba(3, 105, 161, 0.1);
+    --elev-1: inset 0 0 0 1px var(--edge), 0 1px 2px rgba(16, 40, 60, 0.06);
+    --elev-2: inset 0 0 0 1px var(--edge), 0 12px 32px rgba(16, 40, 60, 0.16);
+    --sheet-bg: rgba(250, 252, 253, 0.95);
+    --scrim: rgba(20, 32, 44, 0.32);
+    --bubble-disc: #e6edf2;
+    --phase-you: #a21caf;
+  }
+}
+
+:root[data-mode="light"] {
+  color-scheme: light;
+  --bg: #f4f7f9;
+  --fg: #0d1a22;
+  --dim: #4a5c68;
+  --faint: #8696a1;
+  --label: #4a5c68;
+  --line: #dde4ea;
+  --accent: #0369a1;
+  --accent-ink: #ffffff;
+  --violet: #6d28d9;
+  --violet-light: #7c3aed;
+  --error: #b91c1c;
+  --ok: #15803d;
+  --wait: #a16207;
+  --glass: rgba(255, 255, 255, 0.78);
+  --edge: rgba(16, 48, 72, 0.13);
+  --state-hover: rgba(3, 105, 161, 0.06);
+  --state-press: rgba(3, 105, 161, 0.11);
+  --state-selected: rgba(3, 105, 161, 0.1);
+  --elev-1: inset 0 0 0 1px var(--edge), 0 1px 2px rgba(16, 40, 60, 0.06);
+  --elev-2: inset 0 0 0 1px var(--edge), 0 12px 32px rgba(16, 40, 60, 0.16);
+  --sheet-bg: rgba(250, 252, 253, 0.95);
+  --scrim: rgba(20, 32, 44, 0.32);
+  --bubble-disc: #e6edf2;
+  --phase-you: #a21caf;
+}
+
+/* ---------- a shared press/hover answer ---------- */
+
+.ix-hit {
+  transition: background var(--motion-fast) var(--ease-house), border-color var(--motion-fast) var(--ease-house),
+    transform var(--motion-fast) var(--ease-house), color var(--motion-fast) var(--ease-house),
+    opacity var(--motion-fast) var(--ease-house);
+}
+
+.ix-hit:hover {
+  background: var(--state-hover);
+}
+
+.ix-hit:active {
+  transform: scale(0.985);
+}
+
+.ix-hit:focus-visible,
+.ix-focus:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-hit:active {
+    transform: none;
+  }
+}
+
+/* ---------- Tooltip ---------- */
+
+.ix-tip {
+  position: relative;
+  display: inline-flex;
+}
+
+.ix-tip-body {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  z-index: 40;
+  width: max-content;
+  max-width: 22ch;
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: var(--sheet-bg);
+  border: 1px solid var(--edge);
+  box-shadow: var(--elev-2);
+  font: 400 12.5px/1.4 var(--font-text);
+  color: var(--fg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-fast) var(--ease-house), transform var(--motion-fast) var(--ease-house);
+}
+
+.ix-tip[data-open="1"] .ix-tip-body {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.ix-tip-body::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  margin-top: -4px;
+  transform: rotate(45deg);
+  background: var(--sheet-bg);
+  border-right: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+}
+
+/* ---------- Menu ---------- */
+
+.ix-menu-host {
+  position: relative;
+  display: inline-flex;
+}
+
+.ix-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  padding: 6px;
+  z-index: 50;
+  background: var(--sheet-bg);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-menu);
+  box-shadow: var(--elev-2);
+  animation: ix-in var(--motion-fast) var(--ease-house);
+}
+
+.ix-menu[data-side="end"] {
+  left: auto;
+  right: 0;
+}
+
+@keyframes ix-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.ix-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--fg);
+  font: 400 14px/1.3 var(--font-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ix-menu-item[aria-checked="true"]::before {
+  content: "✓";
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.ix-menu-item[data-danger="1"] {
+  color: var(--error);
+}
+
+.ix-menu-item[disabled] {
+  opacity: var(--state-disabled);
+  cursor: default;
+}
+
+.ix-menu-label {
+  padding: 8px 10px 4px;
+  font: 500 10px var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.ix-menu-sep {
+  height: 1px;
+  margin: 5px 6px;
+  background: var(--line);
+}
+
+.ix-menu-key {
+  margin-left: auto;
+  font: 400 11px var(--font-mono);
+  color: var(--label);
+}
+
+.ix-menu-item[aria-checked="true"] .ix-menu-key {
+  color: var(--dim);
+}
+
+/* ---------- Dialog and Sheet ---------- */
+
+.ix-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+  animation: ix-fade var(--motion-base) var(--ease-house);
+}
+
+@keyframes ix-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.ix-dialog {
+  width: min(400px, calc(100% - 32px));
+  padding: 20px;
+  background: var(--sheet-bg);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elev-2);
+  animation: ix-up var(--motion-base) var(--ease-house);
+}
+
+@keyframes ix-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.ix-dialog h2 {
+  margin: 0 0 6px;
+  font: 600 17px/1.3 var(--font-text);
+}
+
+.ix-dialog p {
+  margin: 0 0 18px;
+  font: 400 14px/1.5 var(--font-text);
+  color: var(--dim);
+}
+
+.ix-dialog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ix-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  max-height: 82%;
+  overflow: auto;
+  padding: 10px 16px 20px;
+  background: var(--sheet-bg);
+  border-top: 1px solid var(--edge);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  box-shadow: var(--elev-2);
+  animation: ix-sheet-up var(--motion-slow) var(--ease-house);
+}
+
+.ix-sheet[data-side="end"] {
+  left: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 92%);
+  border-top: 0;
+  border-left: 1px solid var(--edge);
+  border-radius: var(--radius-sheet) 0 0 var(--radius-sheet);
+  animation: ix-sheet-in var(--motion-slow) var(--ease-house);
+  overflow: auto;
+}
+
+@keyframes ix-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes ix-sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+.ix-sheet-grip {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 12px;
+  border-radius: 999px;
+  background: var(--line);
+}
+
+.ix-sheet-title {
+  margin: 0 0 4px;
+  font: 600 17px/1.3 var(--font-text);
+}
+
+.ix-sheet-sub {
+  margin: 0 0 14px;
+  font: 400 12px/1.4 var(--font-text);
+  color: var(--dim);
+}
+
+/* ---------- Snackbar ---------- */
+
+.ix-snack {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  padding: 11px 12px 11px 14px;
+  background: var(--sheet-bg);
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  box-shadow: var(--elev-2);
+  animation: ix-up var(--motion-base) var(--ease-house);
+}
+
+.ix-snack-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--accent);
+}
+
+.ix-snack[data-tone="ok"] .ix-snack-dot {
+  background: var(--ok);
+}
+
+.ix-snack[data-tone="wait"] .ix-snack-dot {
+  background: var(--wait);
+}
+
+.ix-snack[data-tone="error"] .ix-snack-dot {
+  /* a failure is not a destruction: red stays for destructive actions */
+  background: var(--wait);
+}
+
+.ix-snack-text {
+  font: 400 13.5px/1.4 var(--font-text);
+  color: var(--fg);
+}
+
+.ix-snack-action {
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--accent);
+  font: 500 13px var(--font-text);
+  white-space: nowrap;
+  flex: none;
+  cursor: pointer;
+}
+
+.ix-snack-action:hover {
+  background: var(--state-selected);
+}
+
+/* ---------- Badge ---------- */
+
+.ix-badge-host {
+  position: relative;
+  display: inline-flex;
+}
+
+.ix-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 600 10.5px var(--font-text);
+  border: 2px solid var(--bg);
+}
+
+.ix-badge[data-tone="violet"] {
+  background: var(--violet);
+  color: #fff;
+}
+
+.ix-badge[data-tone="error"] {
+  background: var(--error);
+  color: light-dark(#ffffff, #21090a);
+}
+
+.ix-badge[data-dot="1"] {
+  min-width: 9px;
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  top: -3px;
+  right: -4px;
+}
+
+/* ---------- Slider ---------- */
+
+.ix-slider {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.ix-slider-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ix-slider-label {
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.ix-slider-value {
+  font: 400 13px var(--font-mono);
+  color: var(--fg);
+}
+
+.ix-slider input {
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: none;
+  cursor: pointer;
+}
+
+.ix-slider input::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--k, var(--accent)) var(--ix-fill, 50%),
+    var(--line) var(--ix-fill, 50%)
+  );
+}
+
+.ix-slider input::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--k, var(--accent));
+  box-shadow: var(--elev-1);
+  transition: transform var(--motion-fast) var(--ease-house);
+}
+
+.ix-slider input:hover::-webkit-slider-thumb {
+  transform: scale(1.08);
+}
+
+.ix-slider input:active::-webkit-slider-thumb {
+  transform: scale(0.96);
+}
+
+.ix-slider input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 999px;
+}
+
+/* ---------- TextArea, Select and Search ---------- */
+
+.ix-field {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.ix-field > label,
+.ix-field-label {
+  font: 500 13px var(--font-text);
+  color: var(--label);
+}
+
+.ix-area,
+.ix-input,
+.ix-select {
+  width: 100%;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-field);
+  color: var(--fg);
+  font: 400 15px/1.5 var(--font-text);
+  padding: 11px 13px;
+  transition: border-color var(--motion-fast) var(--ease-house), background var(--motion-fast) var(--ease-house);
+}
+
+.ix-area {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.ix-input::placeholder,
+.ix-area::placeholder {
+  color: var(--label);
+}
+
+.ix-input:hover,
+.ix-area:hover,
+.ix-select:hover {
+  background: var(--state-hover);
+}
+
+.ix-input:focus,
+.ix-area:focus,
+.ix-select:focus {
+  outline: none;
+  border-color: var(--k, var(--accent));
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.14));
+}
+
+.ix-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%238fa3b0' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 34px;
+}
+
+.ix-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 460px;
+  height: 40px;
+  padding: 0 6px 0 14px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  transition: border-color var(--motion-fast) var(--ease-house), background var(--motion-fast) var(--ease-house);
+}
+
+.ix-search:hover {
+  background: var(--state-hover);
+}
+
+.ix-search[data-focus="1"] {
+  border-color: var(--k, var(--accent));
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.14));
+}
+
+.ix-search input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  color: var(--fg);
+  font: 400 14.5px var(--font-text);
+}
+
+.ix-search input:focus {
+  outline: none;
+}
+
+.ix-search-clear {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--dim);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.ix-search-clear:hover {
+  background: var(--state-hover);
+  color: var(--fg);
+}
+
+.ix-spin {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--k, var(--accent));
+  animation: ix-spin 0.7s linear infinite;
+}
+
+@keyframes ix-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ix-results {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px;
+  background: var(--sheet-bg);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-menu);
+  box-shadow: var(--elev-2);
+}
+
+/* ---------- Tabs and Steps ---------- */
+
+.ix-tabs {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  width: 100%;
+}
+
+.ix-tab {
+  position: relative;
+  padding: 10px 14px 12px;
+  border: 0;
+  background: none;
+  color: var(--dim);
+  font: 500 13.5px var(--font-text);
+  cursor: pointer;
+  transition: color var(--motion-fast) var(--ease-house);
+}
+
+.ix-tab:hover {
+  color: var(--fg);
+}
+
+.ix-tab[aria-selected="true"] {
+  color: var(--fg);
+}
+
+.ix-tab-ink {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--k, var(--accent));
+  transition: transform var(--motion-base) var(--ease-house), width var(--motion-base) var(--ease-house);
+}
+
+.ix-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.ix-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.ix-step-dot {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: var(--glass);
+  color: var(--dim);
+  font: 500 11px var(--font-mono);
+}
+
+.ix-step[data-state="done"] .ix-step-dot {
+  background: var(--k, var(--accent));
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+.ix-step[data-state="now"] .ix-step-dot {
+  border-color: var(--k, var(--accent));
+  color: var(--fg);
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.14));
+}
+
+.ix-step-label {
+  font: 400 13px var(--font-text);
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ix-step-dot { flex: none; }
+.ix-step-line { min-width: 8px; }
+
+.ix-step[data-state="now"] .ix-step-label,
+.ix-step[data-state="done"] .ix-step-label {
+  color: var(--fg);
+}
+
+.ix-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.ix-step-line[data-done="1"] {
+  background: var(--k, var(--accent));
+}
+
+/* ---------- Empty state, Divider ---------- */
+
+.ix-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 22px 18px;
+  text-align: center;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+}
+
+.ix-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  border: 1px solid var(--edge);
+  color: var(--k, var(--accent));
+}
+
+.ix-empty-title {
+  font: 500 15px var(--font-text);
+  color: var(--fg);
+}
+
+.ix-empty-line {
+  font: 400 13px/1.5 var(--font-text);
+  color: var(--dim);
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+.ix-empty-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.ix-divider {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  margin: 12px 0;
+}
+
+.ix-divider[data-inset="1"] {
+  margin-left: 44px;
+}
+
+.ix-divider[data-label]:not([data-label=""]) {
+  height: auto;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.ix-divider[data-label]:not([data-label=""])::before,
+.ix-divider[data-label]:not([data-label=""])::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------- small pieces the parts above need ---------- */
+
+.ix-stage {
+  position: relative;
+  min-height: 260px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.ix-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  color: var(--fg);
+  font: 400 13.5px var(--font-text);
+  cursor: pointer;
+}
+
+.ix-menu-trigger:hover {
+  background: var(--state-hover);
+}
+
+.ix-menu-host:focus-within > .ix-menu-trigger {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.ix-tip-anchor {
+  display: inline-flex;
+}
+
+.ix-search-field {
+  position: relative;
+  display: grid;
+  width: 100%;
+  max-width: 460px;
+}
+
+.ix-search-glass {
+  color: var(--label);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.ix-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Toolbar ---------- */
+
+.ix-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--sheet-bg);
+  border: 1px solid var(--edge);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ix-toolbar[data-variant="docked"] {
+  background: var(--glass);
+  box-shadow: none;
+}
+
+.ix-toolbar[data-variant="floating"] {
+  box-shadow: var(--elev-2);
+}
+
+.ix-toolbar-title {
+  padding: 0 10px 0 12px;
+  font: 500 13.5px var(--font-text);
+  color: var(--label);
+  white-space: nowrap;
+}
+
+.ix-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--dim);
+  font: 400 13.5px var(--font-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ix-toolbar-btn:hover {
+  background: var(--state-hover);
+  color: var(--fg);
+}
+
+.ix-toolbar-btn[data-active="1"] {
+  background: var(--state-selected);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px light-dark(rgba(3, 105, 161, 0.45), rgba(125, 211, 252, 0.45));
+}
+
+.ix-toolbar-btn[data-danger="1"] {
+  color: var(--error);
+}
+
+.ix-toolbar-btn:disabled {
+  opacity: var(--state-disabled);
+  cursor: default;
+}
+
+.ix-toolbar-trailing {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 6px;
+}
+
+/* ---------- DatePicker ---------- */
+
+.ix-datepicker {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 336px;
+  padding: 14px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+}
+
+.ix-dp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ix-dp-month {
+  font: 500 15px var(--font-text);
+  color: var(--fg);
+}
+
+.ix-dp-nav {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--edge);
+  border-radius: 50%;
+  background: none;
+  color: var(--dim);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ix-dp-nav:hover {
+  background: var(--state-hover);
+  color: var(--fg);
+}
+
+.ix-dp-week,
+.ix-dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.ix-dp-week span {
+  text-align: center;
+  font: 500 9.5px var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--label);
+  padding-bottom: 4px;
+}
+
+.ix-dp-day {
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--fg);
+  font: 400 13.5px var(--font-text);
+  cursor: pointer;
+}
+
+.ix-dp-day:hover {
+  background: var(--state-hover);
+}
+
+.ix-dp-day[data-today="1"] {
+  box-shadow: inset 0 0 0 1px var(--edge);
+}
+
+.ix-dp-day[data-selected="1"] {
+  background: var(--k, var(--accent));
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.ix-dp-day:disabled {
+  opacity: var(--state-disabled);
+  cursor: default;
+}
+
+.ix-dp-empty {
+  height: 34px;
+}
+
+.ix-dp-foot,
+.ix-tp-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.ix-dp-hint {
+  font: 400 12px var(--font-mono);
+  color: var(--label);
+}
+
+/* ---------- TimePicker ---------- */
+
+.ix-timepicker {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 336px;
+  padding: 14px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+}
+
+.ix-tp-value {
+  display: block;
+  text-align: center;
+  font: 400 34px/1.2 var(--font-mono);
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 10px;
+}
+
+.ix-tp-row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ix-tp-label {
+  font: 500 9.5px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.ix-tp-strip {
+  /* every hour in view at once: a strip that scrolls hid 07 to 23 with nothing saying so */
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.ix-tp-chip {
+  min-width: 0;
+  height: 30px;
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  background: none;
+  color: var(--dim);
+  font: 400 13px var(--font-mono);
+  cursor: pointer;
+}
+
+.ix-tp-chip:hover {
+  background: var(--state-hover);
+  color: var(--fg);
+}
+
+.ix-tp-chip[data-on="1"] {
+  background: var(--k, var(--accent));
+  border-color: transparent;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+/* ---------- AppBar ---------- */
+
+.ix-appbar {
+  background: light-dark(rgba(244, 247, 249, 0.82), rgba(7, 9, 12, 0.82));
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 12px 10px;
+}
+
+.ix-appbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+}
+
+.ix-appbar-leading,
+.ix-appbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ix-appbar-actions {
+  margin-left: auto;
+}
+
+.ix-appbar-title {
+  font: 500 15px/1.3 var(--font-text);
+  color: var(--fg);
+  margin: 0;
+}
+
+.ix-appbar-large {
+  font: 700 26px/1.15 var(--font-display, var(--font-text));
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  margin: 6px 0 0;
+}
+
+.ix-appbar-sub {
+  font: 400 12px/1.4 var(--font-text);
+  color: var(--dim);
+  margin: 4px 0 0;
+}
+
+.ix-appbar-body {
+  margin-top: 10px;
+}
+
+/* ---------- NavRail ---------- */
+
+.ix-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 208px;
+  padding: 12px 10px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  transition: width var(--motion-base) var(--ease-house);
+}
+
+.ix-rail[data-collapsed="1"] {
+  width: 72px;
+}
+
+.ix-rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.ix-rail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--dim);
+  font: 400 13.5px var(--font-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ix-rail-item:hover {
+  background: var(--state-hover);
+  color: var(--fg);
+}
+
+.ix-rail-item[aria-current="page"] {
+  background: var(--state-selected);
+  color: var(--fg);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.ix-rail-icon {
+  flex: none;
+  width: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+.ix-rail-label {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ix-rail-foot {
+  margin-top: auto;
+  display: grid;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.ix-rail-toggle {
+  color: var(--label);
+}
+
+/* ---------- SplitButton ---------- */
+
+.ix-split {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* one shape: the action on the left, the caret on the right, a hairline between */
+.ix-split > .iris-btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ix-split-caret,
+.ix-split .ix-menu-host {
+  display: flex;
+}
+
+.ix-split .ix-menu-trigger {
+  all: unset;
+  display: flex;
+  cursor: pointer;
+  border-radius: 0 999px 999px 0;
+}
+
+.ix-split .ix-menu-trigger:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.ix-split-btn {
+  padding: 0 14px 0 12px;
+  border-radius: 0 999px 999px 0;
+  box-shadow: inset 1px 0 0 var(--line);
+}
+
+/* ---------- Carousel ---------- */
+
+.ix-carousel {
+  display: grid;
+  gap: 10px;
+  max-width: 100%;
+}
+
+.ix-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.ix-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.ix-carousel-slide {
+  /* the next card peeks in at the edge: that is what says the strip swipes */
+  flex: 0 0 88%;
+  min-width: 0;
+}
+
+.ix-carousel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ix-carousel-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.ix-carousel-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--line);
+  cursor: pointer;
+  transition: width var(--motion-base) var(--ease-house), background var(--motion-fast) var(--ease-house);
+}
+
+.ix-carousel-dot[data-on="1"] {
+  width: 22px;
+  background: var(--k, var(--accent));
+}
+
+.ix-carousel-arrow {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--edge);
+  border-radius: 50%;
+  background: none;
+  color: var(--dim);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ix-carousel-arrow:hover {
+  background: var(--state-hover);
+  color: var(--fg);
+}
+
+/* ---------- LoopBubble ---------- */
+
+.ix-bubble {
+  display: inline-flex;
+  flex: none;
+}
+
+.ix-bubble-disc {
+  fill: var(--bubble-disc);
+}
+
+.ix-bubble-arc {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ix-bubble-draw var(--motion-slow) var(--ease-house) both;
+}
+
+.ix-bubble-arc[data-state="done"] {
+  stroke: var(--arc);
+  stroke-opacity: 0.7;
+}
+
+.ix-bubble-arc[data-state="now"],
+.ix-bubble-arc[data-state="you"] {
+  stroke: var(--arc);
+}
+
+.ix-bubble-arc[data-state="you"] {
+  filter: drop-shadow(0 0 2px var(--arc));
+}
+
+@keyframes ix-bubble-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ix-bubble-letter {
+  font: 600 13px var(--font-text);
+  fill: var(--fg);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ---------- CircleStack ---------- */
+
+.ix-circles-edges {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  isolation: isolate;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  cursor: pointer;
+}
+
+.ix-circles-edges i {
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  right: 16px;
+  height: 16px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  transition: transform var(--motion-fast) var(--ease-house);
+}
+
+.ix-circles-edges i[data-depth="1"] {
+  left: 26px;
+  right: 26px;
+  bottom: 8px;
+  opacity: 0.65;
+  z-index: -1;
+}
+
+.ix-circles-edges:hover i {
+  transform: translateY(-2px);
+}
+
+.ix-circles-count {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  padding: 1px 6px;
+  font: var(--text-label);
+  color: var(--accent);
+  background: var(--state-selected);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-pill);
+}
+
+.ix-circles {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 8px;
+  list-style: none;
+  animation: ix-circles-fan var(--motion-base) var(--ease-house) both;
+}
+
+@keyframes ix-circles-fan {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.ix-circle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  text-align: left;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+}
+
+.ix-circle-text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ix-circle-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* the line under a chat gets two lines on a phone instead of losing its end */
+.ix-circle-line {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.ix-circle-title {
+  font: 600 15px/20px var(--font-text);
+}
+
+.ix-circle-line {
+  font: var(--text-sub);
+  color: var(--dim);
+}
+
+.ix-circle-line[data-you] {
+  color: var(--phase-you);
+}
+
+.ix-circle-loops {
+  display: flex;
+}
+
+.ix-circle-loops > * + * {
+  margin-left: -6px;
+}
+
+.ix-circle-more {
+  font: var(--text-label);
+  color: var(--label);
+}
+
+.ix-circle-unread {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+/* ---------- Photo ---------- */
+
+.ix-photo {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-radius: var(--radius-card);
+  background: var(--glass);
+  box-shadow: var(--elev-1);
+}
+
+.ix-photo canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Parallax: every layer moves with --px/--py (-1..1) by its depth --z, at most 3% each way: 6% of the width. The
+   scale keeps the moved edge inside the frame. */
+.ix-photo[data-kind="parallax"] canvas {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(calc(var(--px, 0) * var(--z, 0) * -3%), calc(var(--py, 0) * var(--z, 0) * -3%), 0) scale(1.08);
+  transition: transform var(--motion-slow) var(--ease-house);
+}
+
+/* ---------- BorderPattern ---------- */
+
+.ix-border {
+  position: relative;
+  border-radius: var(--radius-card);
+  background: var(--glass);
+}
+
+.ix-border-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- ChatStack ---------- */
+
+.ix-chats {
+  --card: 64px;
+  --peek: 11px;
+  position: relative;
+  height: calc(var(--card) + 2 * var(--peek));
+  transition: height var(--motion-slow) var(--ease-house);
+}
+
+.ix-chats[data-fanned] {
+  height: calc(var(--n) * (var(--card) + 8px) - 8px);
+}
+
+.ix-chat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--card);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 14px;
+  text-align: left;
+  color: var(--fg);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--kd, var(--bg)) 70%, transparent), var(--glass));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transform-origin: 50% 0;
+  transform: translateY(calc(var(--i) * var(--peek) * -1)) scale(calc(1 - var(--i) * 0.06));
+  filter: blur(calc(var(--i) * 0.4px)) brightness(calc(1 - var(--i) * 0.12));
+  opacity: calc(1 - var(--i) * 0.2);
+  transition: transform var(--motion-slow) var(--ease-house), opacity var(--motion-slow) var(--ease-house),
+    filter var(--motion-slow) var(--ease-house), border-color var(--motion-fast) var(--ease-house);
+}
+
+.ix-chat:hover {
+  border-color: color-mix(in srgb, var(--k, var(--accent)) 40%, var(--edge));
+}
+
+.ix-chat[data-far] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ix-chats:not([data-fanned]) .ix-chat[tabindex="-1"] {
+  pointer-events: none;
+}
+
+.ix-chats[data-fanned] .ix-chat {
+  transform: translateY(calc(var(--i) * (var(--card) + 8px) * -1));
+  filter: none;
+  opacity: 1;
+}
+
+.ix-chats-count {
+  top: -14px;
+  z-index: 9;
+}
+
+.ix-chat-text {
+  display: grid;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ix-chat-eyebrow {
+  font: var(--text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--k, var(--label));
+}
+
+.ix-chat-title,
+.ix-chat-line,
+.ix-chat-loop-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ix-chat-title {
+  font: 600 15px/20px var(--font-text);
+}
+
+.ix-chat-line {
+  font: var(--text-sub);
+  color: var(--label);
+}
+
+.ix-chat-line[data-you] {
+  color: var(--phase-you);
+}
+
+.ix-chat-open {
+  position: relative;
+  padding-top: 12px;
+}
+
+.ix-chat-peek {
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 14px;
+  border: 1px solid color-mix(in srgb, var(--k, var(--edge)) 25%, transparent);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  background: color-mix(in srgb, var(--kd, var(--bg)) 80%, var(--bg));
+}
+
+.ix-chat-peek[data-depth="0"] {
+  top: 5px;
+  left: 16px;
+  right: 16px;
+  z-index: 1;
+}
+
+.ix-chat-sheet {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 10px;
+  padding: 18px var(--pad-card) var(--pad-card);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--kd, var(--bg)) 55%, var(--bg)), var(--bg) 45%);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sheet);
+  animation: ix-circles-fan var(--motion-base) var(--ease-house) both;
+}
+
+.ix-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ix-chat-message {
+  margin: 0;
+  padding: 10px 12px;
+  font: var(--text-body);
+  color: var(--fg);
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: 16px 16px 16px 4px;
+}
+
+.ix-chat-section {
+  font: var(--text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.ix-chat-loops {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ix-chat-loop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+}
+
+.ix-chat-loop[data-you] {
+  /* the phase colour may leave the ring when it says a loop phase: this loop waits on you */
+  border-color: color-mix(in srgb, var(--phase-you) 55%, transparent);
+  box-shadow: 0 0 16px -6px var(--phase-you);
+}
+
+.ix-chat-loop-title {
+  font: 600 13px/18px var(--font-text);
+}
+
+.ix-chat-phase {
+  font-weight: 600;
+}
+
+.ix-chat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-chats,
+  .ix-chat,
+  .ix-photo[data-kind="parallax"] canvas {
+    transition: none;
+  }
+}
+
+/* At rest the cards behind show only their edge: their words would read through the glass on top. */
+.ix-chat > * {
+  transition: opacity var(--motion-base) var(--ease-house);
+}
+
+.ix-chats:not([data-fanned]) .ix-chat[tabindex="-1"] > * {
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------- Mark */
+/* The image is the ring plus its glow; the ring is 70% of it. The span is the ring, the glow spills out. */
+.ix-mark { position: relative; display: inline-block; flex: none; }
+.ix-mark img { position: absolute; left: 50%; top: 50%; translate: -50% -50%; pointer-events: none; user-select: none; }
+
+/* -------------------------------------------------------------------- Orb */
+/* The release blurs the glow and then masks it to the ring, so the blur is cut off again: a flat grey disc
+   with a hard edge round a sharp ring, which reads as unsharp. Here the softness is in the mask itself and
+   there is no blur: the glow fades out in colour, as the Mark's does. Goes upstream into the release. */
+.iris-orb .glow {
+  filter: none; opacity: .45; transform: scale(1.45);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 40%, #000 62%, #000 70%, transparent 100%);
+          mask: radial-gradient(circle closest-side, transparent 40%, #000 62%, #000 70%, transparent 100%);
+}
+.iris-orb-away .glow { filter: grayscale(1); }
+
+/* ------------------------------------------------------------------- Edge */
+/* Edge draws the apps' light patterns on a canvas; TalkOrb and Orb3D think with it (see ext.tsx). The release's
+   single cyan arc is hidden while an Edge draws. */
+.ix-edge { display: block; pointer-events: none; }
+.ix-thinks { position: relative; display: inline-grid; place-items: center; flex: none; }
+.ix-thinks-edge { position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 3; pointer-events: none; line-height: 0; }
+.ix-thinks-on .iris-talkorb-arc, .ix-thinks-on .iris-orb3d-arc { display: none; }
+/* EdgeText: the tube is the letters' faint outline, each light a dash that runs round every letter. --u is the
+   size in 64px steps, so the dashes keep their look at any size. */
+.ix-edgetext { display: block; overflow: visible; }
+.ix-edgetext text { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ix-edgetext-tube { stroke: light-dark(rgba(16, 48, 72, .14), rgba(190, 230, 255, .14)); stroke-width: calc(var(--u) * 1.5); }
+.ix-edgetext-light { stroke-width: calc(var(--u) * 2.5); animation: ix-edgetext-run 1.3s linear infinite; }
+.ix-edgetext-comet .ix-edgetext-light { stroke-dasharray: calc(var(--u) * 40) calc(var(--u) * 160); }
+.ix-edgetext-sparks .ix-edgetext-light { stroke-dasharray: 0 calc(var(--u) * 14); stroke-width: calc(var(--u) * 4); animation-name: ix-edgetext-drift, ix-edgetext-twinkle; }
+.ix-edgetext-zip .ix-edgetext-light { animation-name: ix-edgetext-zip; animation-timing-function: cubic-bezier(.33, 1, .68, 1); animation-direction: alternate; }
+.ix-edgetext-party .ix-edgetext-light { stroke-dasharray: calc(var(--u) * 24) calc(var(--u) * 24); animation-name: ix-edgetext-run, ix-edgetext-party; }
+@keyframes ix-edgetext-run { to { stroke-dashoffset: calc(var(--u) * -200); } }
+/* Sparks drift two dots a round: running as fast as the comet, they raced. */
+@keyframes ix-edgetext-drift { to { stroke-dashoffset: calc(var(--u) * -28); } }
+@keyframes ix-edgetext-twinkle { 50% { opacity: .35; } }
+@keyframes ix-edgetext-zip { from { stroke-dasharray: 0 calc(var(--u) * 400); } to { stroke-dasharray: calc(var(--u) * 400) 0; } }
+@keyframes ix-edgetext-party { 50% { filter: hue-rotate(160deg); } }
+@media (prefers-reduced-motion: reduce) { .ix-edgetext-light { animation: none; } }
+
+/* ---------- Fixes to shipped parts, until they land in the release ---------- */
+
+/* A Row is its own card. Inside a Card (a group of settings) it drops its glass and the rows share one surface,
+   split by hairlines: one box, not a box of boxes. */
+.iris-card > .iris-row {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.iris-card > .iris-row + .iris-row {
+  box-shadow: inset 0 1px 0 var(--line);
+}
+.ix-sheet-body > .iris-row {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.ix-sheet-body > .iris-row + .iris-row {
+  box-shadow: inset 0 1px 0 var(--line);
+}
+.iris-card > .iris-row.iris-press:hover {
+  background: light-dark(rgba(3, 105, 161, 0.04), rgba(180, 225, 255, 0.04));
+}
+
+/* LoopScreen shipped as a 300px phone of its own. On a screen it is the screen: full width, no second frame. */
+.ia-app .iris-loop,
+.app .iris-loop {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0 22px 0 0;
+  overflow: visible;
+}
+
+/* AppBar: the sub line stands under the title, beside the back button. */
+.ix-appbar-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.ix-appbar-text .ix-appbar-sub {
+  margin: 0;
+}
+
+/* ---------- IrisApp: a whole app from a spec ---------- */
+
+.ia-app {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-text);
+}
+.ia-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 62px var(--gutter, 16px) 40px;
+  scrollbar-width: none;
+}
+.ia-scroll::-webkit-scrollbar {
+  display: none;
+}
+.ia-scroll.ia-has-tabs {
+  padding-bottom: 130px;
+}
+.ia-app[data-frame="window"] .ia-scroll {
+  padding-top: 24px;
+}
+.ia-screen.ia-in {
+  animation: ia-in var(--motion-base, 200ms) var(--ease-house, ease-out);
+}
+.ia-screen.ia-out {
+  animation: ia-out var(--motion-base, 200ms) var(--ease-house, ease-out);
+}
+@keyframes ia-in {
+  from { transform: translateX(28px); opacity: 0; }
+}
+@keyframes ia-out {
+  from { transform: translateX(-28px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ia-screen.ia-in,
+  .ia-screen.ia-out {
+    animation: none;
+  }
+}
+
+/* The page: header, her words, the hero, the content, the one action. One gap between them all. */
+.ia-screen > *,
+.ia-screen > .iris-topic > * {
+  margin-bottom: var(--gap, 12px);
+}
+.ia-screen .ix-appbar {
+  margin: -8px calc(-1 * var(--gutter, 16px)) 12px;
+  padding-left: 8px;
+  background: none;
+  backdrop-filter: none;
+}
+.ia-head {
+  margin-bottom: 4px;
+}
+.ia-eyebrow {
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label, var(--dim));
+  margin: 8px 0 6px;
+}
+.ia-eyebrow.ia-sub {
+  margin-top: 0;
+}
+.ia-title {
+  font: var(--text-page-title);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.ia-lede {
+  font: var(--text-body);
+  color: var(--dim);
+  line-height: 1.45;
+  margin: 6px 0 20px;
+}
+.ia-lede b {
+  color: var(--fg);
+  font-weight: 600;
+}
+.ia-hero {
+  display: grid;
+  justify-items: center;
+  margin: 4px 0 20px;
+}
+.ia-parts {
+  display: grid;
+  gap: var(--gap, 12px);
+}
+.ia-say {
+  font: var(--text-body);
+  color: var(--dim);
+  line-height: 1.45;
+  margin: 0;
+}
+.ia-say.ia-error {
+  color: var(--error);
+}
+.ia-label {
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label, var(--dim));
+  margin: 12px 0 -4px;
+}
+.ia-grid {
+  display: grid;
+  gap: var(--gap, 12px);
+}
+.ia-grid > * {
+  min-width: 0;
+}
+.ia-stack {
+  display: grid;
+  gap: 8px;
+}
+.ia-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ia-value {
+  color: var(--dim);
+  font: var(--text-body);
+}
+.ia-group {
+  overflow: hidden;
+}
+.ia-tap {
+  cursor: pointer;
+  transition: transform var(--motion-fast, 150ms) var(--ease-house, ease-out);
+}
+.ia-tap:active {
+  transform: scale(0.98);
+}
+.ia-action {
+  margin-top: 20px;
+}
+.ia-missing {
+  color: var(--error);
+  font: var(--text-sub);
+}
+.ia-tabbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+}
+.ia-snack {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 120px;
+  z-index: 40;
+}
+.ia-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+.ia-layer > * {
+  pointer-events: auto;
+}
+/* A dialog and a sheet cover the app they belong to: the Stage is the whole app here, without its demo box. */
+.ia-layer .ix-stage {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.ia-sheet-body {
+  display: grid;
+  gap: var(--gap, 12px);
+}
+
+/* Talking: her orb is the screen. No tab bar, so there is one orb. */
+.ia-talk {
+  min-height: 640px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 28px;
+  text-align: center;
+}
+.ia-talk-word {
+  font: var(--text-row-title);
+  color: var(--fg);
+  margin: 0;
+}
+.ia-talk-line {
+  max-width: 300px;
+  min-height: 3em;
+  margin: 0;
+}
+.ia-tapbtn {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  border-radius: var(--radius-card);
+  transition: transform var(--motion-fast, 150ms) var(--ease-house, ease-out);
+}
+.ia-tapbtn:active {
+  transform: scale(0.97);
+}
+.ia-tapbtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* A Word fills its line: in the centred hero it would otherwise shrink to nothing. */
+.ia-hero > .iris-word,
+.ia-hero > .ix-word {
+  width: 100%;
+}
+.ia-hero > .ia-grid {
+  width: 100%;
+}
+.ia-status {
+  margin: 0 0 14px;
+}
+/* Stat: a long value (12.4 kWh, €2,480) shrinks to its tile instead of running into the next one. */
+.iris-stat {
+  container-type: inline-size;
+}
+.iris-stat b {
+  font-size: clamp(17px, 22cqi, 28px);
+}
+
+/* ---------- IrisApp: parts you swipe ---------- */
+
+/* Rail: tiles side by side, swiped sideways, the next one peeking in at the edge of the screen. */
+.ia-rail {
+  display: flex;
+  gap: var(--gap, 12px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--gutter, 16px);
+  margin: 0 calc(-1 * var(--gutter, 16px));
+  padding: 2px var(--gutter, 16px) 6px;
+  scrollbar-width: none;
+}
+.ia-rail::-webkit-scrollbar {
+  display: none;
+}
+.ia-rail-item {
+  flex: none;
+  scroll-snap-align: start;
+  display: grid;
+}
+.ia-rail-item > * {
+  min-width: 0;
+}
+
+/* Pages: one page per swipe, dots under them (or beside them, standing up). */
+.ia-pages {
+  display: grid;
+  gap: 10px;
+}
+.ia-pages-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.ia-pages-track::-webkit-scrollbar {
+  display: none;
+}
+.ia-page {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: grid;
+  align-content: start;
+  gap: var(--gap, 12px);
+}
+.ia-pages-dots {
+  display: flex;
+  justify-content: center;
+}
+.ia-pages-v {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.ia-pages-v .ia-pages-track {
+  flex-direction: column;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+}
+.ia-pages-v .ia-page {
+  flex: 0 0 100%;
+  align-content: center;
+}
+
+/* Bento: two columns, a tile may span both or stand two rows tall. */
+.ia-bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: var(--gap, 12px);
+}
+.ia-bento-item {
+  display: grid;
+  min-width: 0;
+}
+
+/* Meter: label and value on one line, the bar under them. */
+.ia-meter {
+  display: grid;
+  gap: 6px;
+}
+.ia-meter-head {
+  display: flex;
+  justify-content: space-between;
+  font: var(--text-body);
+  color: var(--dim);
+}
+.ia-meter-head b {
+  color: var(--fg);
+  font-weight: 600;
+}
+/* A Widget in a screen takes the width it is given: its cell, the column, or its rail slot (the release sizes
+   are for a 390 home screen with 16px of margin and would run 2px over). The height stays the widget's own. */
+.ia-bento .iris-widget,
+.ia-grid .iris-widget,
+.ia-rail-item .iris-widget,
+.ia-parts > .iris-widget,
+.ia-page > .iris-widget,
+.ia-tapbtn > .iris-widget {
+  width: 100%;
+}
+.ia-bento-item[style*="span 2"] .iris-w-tall,
+.ia-bento-item .iris-w-tall {
+  height: 100%;
+  min-height: 352px;
+}
+
+/* The back button of an AppBar points back. The house set has one chevron, drawn pointing forward. */
+.ix-appbar-leading .iris-icon-chevron,
+.ix-appbar-leading [data-icon="chevron"] {
+  transform: scaleX(-1);
+}
+
+/* Nothing found, said inside the results: plain text, not a card in the dropdown. */
+.ix-results-empty {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  font: 400 13px/1.45 var(--font-text);
+  color: var(--label);
+}
+.ix-results-empty strong {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--fg);
+}
+
+.ix-menu-trigger-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A bottom sheet needs room to show its rows: the stage it covers grows with it. */
+.ix-stage:has(.ix-sheet[data-side="bottom"]) {
+  min-height: 400px;
+}
+
+.ix-steps-wrap { container-type: inline-size; width: 100%; }
+@container (max-width: 440px) {
+  .ix-step:not([data-state="now"]) .ix-step-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
+.ix-search { box-sizing: border-box; }
+.ix-search input { min-width: 0; flex: 1; }
+.ix-split-btn.iris-btn-primary { box-shadow: inset 1px 0 0 rgba(7, 9, 12, 0.22); }
+.ia-app[data-frame="window"] .ia-snack {
+  bottom: 24px;
+  left: auto;
+  width: min(420px, calc(100% - 32px));
+}
+
+/* LoopScreen shipped as a 300px phone of its own. The page or the app around it is the phone: no second frame. */
+.iris-loop {
+  width: 100%;
+  max-width: 360px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0 22px 0 0;
+  overflow: visible;
+}
+/* the line under her word wraps to two lines instead of losing its end */
+.iris-phase.labelled .iris-mid .iris-phase-sub {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Widgets shipped at a fixed 360px: on a phone narrower than that, they take the width there is. */
+.iris-w-wide,
+.iris-w-large {
+  max-width: 100%;
+}
+
+/* A Pen mark draws past its word; in a sentence it needs a little air on both sides. */
+.iris-pen { margin-inline: 0.6em; }
+
+/* ---------- IrisApp as a window: the rail on the left, the page beside it, sheets from the right ---------- */
+.ia-win {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.ia-win .ia-rail-col {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+}
+.ia-win .ia-rail-col .ix-rail {
+  height: 100%;
+}
+.ia-win .ia-scroll {
+  position: relative;
+  inset: auto;
+  height: 100%;
+  padding: 24px clamp(16px, 4vw, 40px) 40px;
+}
+.ia-win .ia-screen {
+  max-width: 760px;
+}
+
+/* Word stands on the page: no tinted box, no rounded clip around it. */
+.ix-word .iris-word {
+  border-radius: 0;
+  overflow: visible;
+}
+/* The wrapper is as wide as the Word would have been: in a centring grid it would otherwise shrink to nothing. */
+.ix-word {
+  width: 100%;
+}
+
+/* ---------- MacPill ---------- */
+
+.ix-macpill {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 8px 0;
+}
+
+.ix-pill-words {
+  margin: 0;
+  max-width: 34ch;
+  text-align: center;
+  font: var(--text-sub);
+  color: var(--fg);
+}
+
+.ix-pill-stage {
+  position: relative;
+  width: var(--pill-orb);
+  height: var(--pill-orb);
+}
+
+.ix-pill-bar {
+  position: absolute;
+  top: calc(var(--pill-orb) / 2 - 22px);
+  height: 44px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--glass);
+  box-shadow: inset 0 0 0 1px var(--edge);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: transform var(--motion-base) var(--ease-house), opacity var(--motion-fast) var(--ease-house),
+    filter var(--motion-base) var(--ease-house);
+}
+
+/* folded: behind the orb, small and blurred, out of the way of the hand and the keyboard */
+.ix-pill-bar[data-open="0"] {
+  transform: scaleX(0.3) scaleY(0.8);
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.ix-pill-side {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+
+.ix-pill-btn[data-on="1"] .iris-btn {
+  color: var(--accent);
+  background: var(--state-selected);
+}
+
+.ix-pill-orb {
+  position: relative;
+  width: var(--pill-orb);
+  height: var(--pill-orb);
+}
+
+.ix-pill-work {
+  position: absolute;
+  inset: -5px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.ix-pill-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 10px;
+  max-width: 40ch;
+  text-align: center;
+  font: var(--text-sub);
+  color: var(--label);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-pill-bar { transition: none; }
+}
+
+/* ---------- VaultAsk ---------- */
+
+.ix-vaultask {
+  display: grid;
+  gap: 14px;
+  max-width: 460px;
+}
+
+.ix-vaultask-title {
+  margin: 0;
+  font: 600 17px/1.3 var(--font-text);
+  color: var(--fg);
+}
+
+.ix-vaultask-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.ix-vaultask-fact {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 10px;
+  font: 400 15px/1.35 var(--font-text);
+}
+
+.ix-vaultask-fact dt {
+  font: 500 13px var(--font-text);
+  color: var(--label);
+  padding-top: 2px;
+}
+
+.ix-vaultask-fact dd {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* a line nobody filled in is said, in the wait colour: something is missing, nothing is destroyed */
+.ix-vaultask-fact dd[data-unsaid] {
+  color: var(--wait);
+}
+
+.ix-vaultask-scope {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--glass);
+  font: var(--text-sub);
+  color: var(--dim);
+}
+
+.ix-vaultask-note {
+  margin: 0;
+  font: var(--text-sub);
+  color: var(--wait);
+}
+
+.ix-vaultask-actions {
+  display: grid;
+  gap: 8px;
+}
+
+/* ---------- TableApp ---------- */
+
+.ix-table {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  min-height: 420px;
+  overflow: hidden;
+}
+
+.ix-table .ix-appbar-actions {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.ix-table-search {
+  /* a fixed basis: typing (and the clear button) never makes the field grow */
+  flex: 0 1 240px;
+  min-width: 0;
+  max-width: 240px;
+}
+
+.ix-vaultask-actions .iris-btn {
+  text-align: center;
+}
+
+.ix-table-body {
+  display: grid;
+  gap: 12px;
+  padding: 12px 16px 16px;
+  align-content: start;
+}
+
+.ix-table-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ix-table-empty,
+.ix-table-count {
+  margin: 0;
+  font: var(--text-sub);
+  color: var(--label);
+}
+.ia-head-top {
+  position: relative;
+}
+.ia-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* In an IrisApp screen the page already has its gutter: the TableApp's bar and body line up with it. */
+.ia-screen .ix-table .ix-appbar {
+  margin: 0 0 4px;
+  padding: 8px 0 10px;
+}
+.ia-screen .ix-table-body {
+  padding: 12px 0 16px;
+}
+
+/* A step in a detail wraps instead of losing its end. */
+.ix-sheet .iris-check .txt {
+  white-space: normal;
+}
+.ia-hero > .ix-frost {
+  width: 100%;
+}
+.ix-frost {
+  cursor: pointer;
+}
+.ia-screen .ix-appbar[data-variant="small"] {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+.ia-head-deep .ia-eyebrow {
+  margin-top: 0;
+}
+
+/* The one action sits at the foot of the screen, in thumb reach (Meaning: "a full-width button in thumb reach at the
+   bottom"): a short screen no longer ends in dead space under its button. */
+.ia-screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.ia-screen > .iris-topic {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.ia-screen .ia-action {
+  padding-top: 20px;
+}
+.ia-scroll {
+  display: flex;
+  flex-direction: column;
+}
+.ia-scroll > .ia-screen {
+  flex: 1 0 auto;   /* grows, never shrinks: a shrunk screen let its parts overflow past the room kept for the tab bar */
+}
+/* A sheet in an app is solid enough that nothing behind it ghosts through. */
+.ia-layer .ix-sheet {
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(24px);
+}
+/* The theme behind every screen: quiet, under the content, never catching a tap. */
+.ia-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.ia-backdrop > * {
+  width: 100%;
+  height: 100%;
+}
+.ia-app > .ia-scroll {
+  z-index: 1;
+}
+/* The backdrop lives in the header zone of each screen and fades out before the content, so nothing drifts over text. */
+.ia-backdrop {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 22%, transparent 42%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 22%, transparent 42%);
+}
+.iris-card > .ia-label:first-child {
+  margin: 0 0 8px;
+}
+.ia-value.ia-act {
+  color: var(--k, var(--accent));
+  font-weight: 600;
+}
+/* A widget's number fits its tile: €3,000 in a small tile shrinks instead of losing its last digit. */
+.iris-widget {
+  container-type: inline-size;
+}
+.iris-widget .iris-wvalue {
+  font-size: min(46px, 24cqi);
+}
+/* The one action stays in reach: it sticks just above the tab bar (or the screen's foot) while the content scrolls. */
+
+.ia-screen .ia-action::before {
+  display: none;
+  content: "";
+  position: absolute;
+  inset: -16px calc(-1 * var(--gutter, 16px)) -24px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+  z-index: -1;
+  pointer-events: none;
+}
+/* Secondary text in an app reads for everyone: a little larger and lighter than the release's sub line. */
+.ia-app .iris-row-sub {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--fg) 68%, transparent);
+}
+.ia-app .ia-lede {
+  color: color-mix(in srgb, var(--fg) 74%, transparent);
+}
+.ia-value.ia-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+
+/* Content scrolls away under a soft fade above the tab bar, never hard under it. */
+.ia-tabbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+/* A note field grows with what you type; the browser's resize grip does not belong on glass. */
+.ix-textarea textarea,
+textarea.ix-textarea {
+  resize: none;
+}
+/* The fact her pen marks stays whole on its line, with room for the stroke round it. */
+.ia-mark {
+  white-space: nowrap;
+  display: inline-block;
+  margin: 0 3px;
+}
+.ia-value.ia-pill {
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--k, var(--accent)) 12%, transparent);
+  color: color-mix(in srgb, var(--fg) 80%, transparent);
+}
+.ia-value.ia-pill.ia-act {
+  background: color-mix(in srgb, var(--k, var(--accent)) 26%, transparent);
+  color: var(--k, var(--accent));
+}
+/* A tall tile in a bento stands two rows high and its siblings stack beside it. */
+.ia-bento-item .iris-w-tall {
+  height: 100%;
+  min-height: 352px;
+}
+.ia-bento {
+  grid-auto-rows: minmax(0, auto);
+}
+.ia-value.ia-num {
+  color: var(--fg);
+  font-weight: 600;
+}
+/* In a window the page is wider and the bento has three columns: a phone grid stretched wide reads as a stack. */
+.ia-win .ia-screen {
+  max-width: 1040px;
+}
+.ia-win .ia-bento {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+/* Picture: a photo in an app. Rounded like a card, its caption on a soft shade at the foot. */
+.ia-pic {
+  position: relative;
+  margin: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  background: var(--glass);
+}
+.ia-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ia-pic figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 14px 12px;
+  font: var(--text-sub);
+  color: #f4f7fa;   /* on the photo's dark shade: light in both modes */
+  background: linear-gradient(transparent, rgba(7, 9, 12, 0.85));
+}
+.ia-pic > .ix-photo { width: 100%; height: 100%; }
+.ia-pic > figcaption { z-index: 1; }   /* above the Photo's canvases */
+/* Over: eyebrow, title and a line on a tall shade at the foot, like a story cover. */
+.ia-pic-words { display: grid; gap: 4px; }
+.ia-pic-over .ia-pic-words { padding: 64px 18px 18px; background: linear-gradient(transparent, rgba(7, 9, 12, 0.55) 40%, rgba(7, 9, 12, 0.9)); }
+.ia-pic-eyebrow { font: 600 11px/1.2 var(--font-mono, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase; color: color-mix(in srgb, var(--k, var(--accent)) 55%, #fff); }
+.ia-pic-title { font: 700 24px/1.12 var(--font-display, system-ui); letter-spacing: -.01em; text-wrap: balance; }
+.ia-pic-text { font: var(--text-sub); opacity: .82; text-wrap: pretty; }
+/* Side: the photo and its words next to each other, on the card's glass; flip puts the photo right. */
+.ia-pic-side { display: grid; grid-template-columns: 42% 1fr; align-items: center; }
+.ia-pic-side.ia-pic-flip { grid-template-columns: 1fr 42%; }
+.ia-pic-side.ia-pic-flip .ia-pic-img { order: 2; }
+.ia-pic-side .ia-pic-img { overflow: hidden; height: 100%; }
+.ia-pic-side .ia-pic-img > * { width: 100%; height: 100%; }
+.ia-pic-side .ia-pic-words { position: static; background: none; padding: 16px; color: var(--fg); }
+.ia-pic-side .ia-pic-eyebrow { color: var(--k, var(--accent)); }
+.ia-pic-side .ia-pic-title { font-size: 19px; }
+
+/* ---------- light: the release's own fixed colours ----------
+ * bundle.css draws some parts with fixed dark values instead of tokens. Each is restated here with light-dark(light,
+ * dark): the dark half is the release's value unchanged, the light half follows `color-scheme` (set at the top).
+ * Goes upstream into the release as tokens. */
+
+.iris-row-icon { color: light-dark(rgba(13, 26, 34, .72), rgba(232, 242, 247, .8)); }
+.iris-toggle { background: light-dark(rgba(90, 106, 120, .3), rgba(120, 130, 145, .45)); }
+.iris-toggle i { box-shadow: 0 2px 6px light-dark(rgba(16, 40, 60, .22), rgba(0, 0, 0, .3)); }
+
+/* Primary: light ink on a dark fill in light, as it is dark ink on a light fill in dark. A topic's button keeps its
+   hue, taken down to a lightness that carries white text (7:1). */
+.iris-btn-primary {
+  background: light-dark(oklch(from var(--k-button, var(--fg)) min(l, .45) c h), var(--k-button, #e9f1f5));
+  color: light-dark(#ffffff, #07090c);
+}
+.iris-btn-primary[aria-busy="true"] {
+  background: light-dark(color-mix(in srgb, oklch(from var(--k-button, var(--fg)) min(l, .45) c h) 70%, #ffffff),
+    color-mix(in srgb, var(--k-button, #e9f1f5) 70%, #0e1218));
+}
+.iris-btn-accent {
+  background: light-dark(rgba(3, 105, 161, .12), rgba(125, 211, 252, .28));
+  border-color: light-dark(rgba(3, 105, 161, .45), rgba(125, 211, 252, .55));
+  box-shadow: 0 0 14px light-dark(rgba(3, 105, 161, .12), rgba(125, 211, 252, .25));
+}
+:is(.iris-topic, .iris-btngroup) .iris-btn-glass {
+  background: color-mix(in srgb, var(--k, var(--accent)) 8%, light-dark(#ffffff, #12161d));
+  box-shadow: inset 0 0 0 1px light-dark(rgba(16, 48, 72, .13), rgba(255, 255, 255, .08));
+}
+:is(.iris-topic, .iris-btngroup) .iris-btn-glass:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#ffffff, #12161d));
+}
+.iris-btn-icon-only { background: light-dark(rgba(16, 48, 72, .07), #1a2029); }
+:is(.iris-topic, .iris-btngroup) .iris-btn-off:disabled { background: light-dark(#e4eaee, #151a21); color: light-dark(#6b7a85, #56606d); }
+
+.iris-orb .echo { border-color: light-dark(rgba(3, 105, 161, .5), rgba(125, 211, 252, .55)); }
+.iris-tabbar-glass { background: light-dark(rgba(255, 255, 255, .78), rgba(20, 26, 34, .72)); box-shadow: inset 0 0 0 1px light-dark(var(--edge), transparent); }
+.iris-tab.on .iris-tab-icon { filter: drop-shadow(0 0 9px light-dark(rgba(3, 105, 161, .3), rgba(125, 211, 252, .75))); }
+
+/* Her talk orb: the disc is the page's ground, lit violet at the centre, in both modes. */
+.iris-talkorb-disc {
+  background: radial-gradient(circle, rgba(139, 92, 246, .16) 0%, light-dark(rgba(255, 255, 255, .96), rgba(17, 21, 27, .96)) 62%);
+  box-shadow: inset 0 0 0 1px light-dark(rgba(16, 48, 72, .12), rgba(190, 230, 255, .12)), 0 0 calc(var(--s) * .3) rgba(139, 92, 246, .2);
+}
+.iris-talkorb-away .iris-talkorb-disc { box-shadow: inset 0 0 0 1px light-dark(rgba(16, 48, 72, .12), rgba(190, 230, 255, .12)); }
+.iris-talkorb-muted-mic { color: light-dark(rgba(13, 26, 34, .85), rgba(232, 242, 247, .9)); }
+.iris-talkorb-echo, .iris-orb3d-echo {
+  border-color: light-dark(rgba(3, 105, 161, .55), rgba(125, 211, 252, .7));
+  box-shadow: 0 0 4px light-dark(rgba(3, 105, 161, .25), rgba(125, 211, 252, .4));
+}
+
+.iris-skeleton {
+  background: linear-gradient(100deg, light-dark(rgba(16, 48, 72, .05), rgba(255, 255, 255, .05)) 30%,
+      light-dark(rgba(16, 48, 72, .1), rgba(255, 255, 255, .13)) 50%, light-dark(rgba(16, 48, 72, .05), rgba(255, 255, 255, .05)) 70%)
+    0 0 / 300% 100%;
+}
+
+/* Widget and pattern: the ground is the topic's --kd (light in light, see TOPIC_LIGHT in ext.tsx), lifted to white. */
+.iris-widget {
+  --iris-track: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#e3e9ee, #1a2027));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--kd, light-dark(#eaf4fa, #08183a)) 70%, light-dark(#ffffff, #0c0f14)), light-dark(#fbfcfd, #090b0f));
+  border-color: light-dark(color-mix(in srgb, var(--k, var(--accent)) 22%, #dde4ea), color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027));
+}
+.iris-look-pattern, .iris-pattern { background: var(--kd, light-dark(#eaf4fa, #08183a)); }
+.iris-pattern { border-color: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#dde4ea, #1a2027)); }
+.iris-wpanel, .iris-pattern-panel { background: color-mix(in srgb, var(--kd, light-dark(#eaf4fa, #08183a)) 72%, transparent); }
+.iris-wvalue {
+  background: linear-gradient(180deg, light-dark(var(--k, var(--accent)), color-mix(in srgb, var(--k, var(--accent)) 45%, white)),
+    light-dark(color-mix(in srgb, var(--k, var(--accent)) 75%, black), var(--k, var(--accent))));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.iris-rows li { border-top-color: light-dark(var(--line), #1a212b); }
+.iris-rows.tick li::before, .iris-check .box { border-color: light-dark(#7b8a95, #4a5361); }
+.iris-pen-spot::before { box-shadow: 0 0 0 9999px light-dark(rgba(244, 247, 249, .78), rgba(7, 9, 12, .72)); }
+.iris-dot i { background: color-mix(in srgb, var(--k, light-dark(#8696a1, #5a6b78)) 30%, light-dark(#d5dde3, #2a313b)); }
+.iris-chip.on { color: var(--kd, light-dark(#ffffff, #07171f)); }
+.iris-bar { background: color-mix(in srgb, var(--k, var(--accent)) 18%, light-dark(#e3e9ee, #0b0f0d)); }
+.iris-phase-label.now { color: light-dark(var(--fg), #fff); }
+.iris-gradient { background: linear-gradient(180deg, light-dark(var(--fg), #e8f2f7), var(--phase, var(--accent))); -webkit-background-clip: text; background-clip: text; }
+.iris-loop { border-color: light-dark(var(--line), #1f2630); }
+.iris-nowcard { background: linear-gradient(160deg, light-dark(#ffffff, #111a24), light-dark(#eef3f6, #0a0e14)); border-color: light-dark(var(--line), #1f2b36); }
+.iris-nowcard-text { color: light-dark(var(--dim), #c3cbd6); }
+.iris-nowcard-dots i { background: light-dark(#d5dde3, #243040); }
+
+/* ProgressRing's track and the muted mic's cut-out are SVG attributes in the release: a stylesheet wins over them. */
+.iris-pring circle:first-child {
+  stroke: light-dark(color-mix(in srgb, var(--k, var(--accent)) 18%, #e3e9ee), color-mix(in srgb, var(--k, var(--accent)) 18%, #0b0f0d));
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) path.gap { stroke: #ffffff; }
+}
+:root[data-mode="light"] path.gap { stroke: #ffffff; }
+
+/* Lettering drawn on a canvas (Word, ThemeWord): the release lightens it to read on a dark ground. On a light page
+   the drawing is turned over, lightness inverted and the hue put back, so the same letters read dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) .ix-word canvas { filter: invert(1) hue-rotate(180deg); }
+}
+:root[data-mode="light"] .ix-word canvas { filter: invert(1) hue-rotate(180deg); }
+
+/* The tick in a done Check is drawn in the page's ink on the topic colour; light topics are dark, so it turns white. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) .iris-check .done .box { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+}
+:root[data-mode="light"] .iris-check .done .box { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+/* ---------- light: an app has a ground, not a white sheet ----------
+ * Dark has its glow; light gets a wash of the app's own colour from the top, a faint second one at the foot, and
+ * cards that sit on it with a soft shadow in that colour. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) .ia-app { background:
+    radial-gradient(130% 55% at 50% -6%, color-mix(in srgb, var(--k, var(--accent)) 24%, transparent), transparent 70%),
+    radial-gradient(90% 45% at 100% 105%, color-mix(in srgb, var(--k, var(--accent)) 12%, transparent), transparent 70%),
+    color-mix(in srgb, var(--k, var(--accent)) 5%, #f2f4f7); }
+  :root:not([data-mode="dark"]) .ia-app .iris-card:not(.iris-row) { background: linear-gradient(165deg, color-mix(in srgb, var(--k, var(--accent)) 9%, #ffffff), #ffffff 65%); box-shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 12px 28px -14px color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }
+}
+:root[data-mode="light"] .ia-app { background:
+  radial-gradient(130% 55% at 50% -6%, color-mix(in srgb, var(--k, var(--accent)) 24%, transparent), transparent 70%),
+  radial-gradient(90% 45% at 100% 105%, color-mix(in srgb, var(--k, var(--accent)) 12%, transparent), transparent 70%),
+  color-mix(in srgb, var(--k, var(--accent)) 5%, #f2f4f7); }
+:root[data-mode="light"] .ia-app .iris-card:not(.iris-row) { background: linear-gradient(165deg, color-mix(in srgb, var(--k, var(--accent)) 9%, #ffffff), #ffffff 65%); box-shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 12px 28px -14px color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Iris UI examples: Chrome</title>
+<meta name="description" content="Iris for Chrome: logins, codes and cards from the vault, and a side panel where Iris uses the browser.">
+<link rel="stylesheet" href="../../ds/tokens.css">
+<link rel="stylesheet" href="../../ds/bundle.css">
+<link rel="stylesheet" href="../../ds/ext.css">
+<link rel="stylesheet" href="../../ds/extra.css">
+<link rel="stylesheet" href="../shared.css">
+<link rel="icon" href="../../favicon.svg">
+<style>
+  /* A browser window, in the house colours. The site in it is someone else's: plain, no Iris parts. */
+  .browser { border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: var(--bg); }
+  .tabs { display: flex; gap: 6px; padding: 8px 10px 0; background: var(--glass); }
+  .tabs span { padding: 7px 14px; border-radius: 9px 9px 0 0; font: var(--text-sub); color: var(--dim); }
+  .tabs span.on { background: var(--bg); color: var(--fg); }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .url { flex: 1; height: 30px; border-radius: var(--radius-pill); background: var(--glass); display: flex; align-items: center; padding: 0 14px; font: var(--text-sub); color: var(--dim); }
+  .ext { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+  .ext:hover { background: var(--glass); }
+  .view { display: flex; height: 460px; }
+  .site { flex: 1; position: relative; overflow: hidden; color: var(--fg); font-family: var(--font-text); }
+  .site header { display: flex; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--line); font-weight: 700; }
+  .site header span:last-child { font-weight: 400; font: var(--text-body); color: var(--dim); }
+  .form { width: 320px; margin: 36px auto; display: grid; gap: 12px; }
+  .form h2 { margin: 0 0 6px; font: var(--text-page-title); }
+  .form label { display: grid; gap: 5px; font: var(--text-sub); color: var(--dim); }
+  .inp { position: relative; display: flex; gap: 6px; align-items: center; }
+  .inp > :first-child { flex: 1; }
+  .filled { font: var(--text-sub); color: var(--dim); margin: 0; }
+  .shop { padding: 22px 24px; display: grid; gap: 10px; }
+  .prod { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-button); padding: 10px 14px; font: var(--text-body); }
+  /* Her hand on the page: a ring on the thing she is about to press. */
+  .hand { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-pill); }
+  .save { position: absolute; right: 12px; top: 56px; z-index: 5; width: 320px; animation: rise var(--motion-base) var(--ease-house); }
+  .save h3 { font: var(--text-row-title); font-weight: 600; margin: 0 0 4px; }
+  .save p { color: var(--dim); font: var(--text-body); margin: 0 0 12px; }
+  .save .row { display: flex; gap: 8px; }
+
+  /* The side panel: the house AppBar, a log, the field at the foot. */
+  .panel { width: 340px; flex: none; border-left: 1px solid var(--line); position: relative; transform: translateZ(0); }
+  .panel .ia-scroll { padding: 16px 14px 24px; }
+  .reopen { position: absolute; right: 16px; bottom: 16px; }
+
+  @media (max-width: 760px) { .view { flex-direction: column; height: auto; } .panel { width: auto; border-left: 0; border-top: 1px solid var(--line); min-height: 420px; } .site { min-height: 380px; } .form { width: auto; margin: 24px; } }
+</style>
+</head>
+<body data-platform="chrome">
+<script src="../nav.js"></script>
+<div id="root"></div>
+<script src="../../ds/vendor/react.js"></script>
+<script src="../../ds/vendor/react-dom.js"></script>
+<script src="../../ds/bundle.js"></script>
+<script src="../../ds/ext.js"></script>
+<script src="../scenes.js"></script>
+<script>
+(() => {
+  const h = React.createElement;
+  const { useState, useEffect } = React;
+  const { Button, Orb, Menu, Icon, Field, Card, Snackbar, IrisApp, VaultAsk } = window.IrisUi;
+
+  // The toolbar holds her one orb in Chrome. Click it: the menu for this site.
+  function Browser({ host, tab, children, panel, menu }) {
+    return h("main", { className: "browser", "aria-label": "Chrome" },
+      h("div", { className: "tabs", "aria-hidden": "true" }, h("span", { className: "on" }, tab), h("span", null, "Iris")),
+      h("div", { className: "bar" },
+        h("div", { className: "url" }, host),
+        h(Menu, { label: "Iris", align: "end", trigger: h("span", { className: "ext" }, h(Orb, { size: 16 })), items: menu ?? [] })),
+      h("div", { className: "view" }, h("div", { className: "site" }, children), panel));
+  }
+  // The vault button in a field: a shield, the vault's sign. Not an orb: the vault fills it, not Iris.
+  const vault = (label, items) => h(Menu, { label, align: "end", items, trigger: h("span", { className: "ext" }, h(Icon, { name: "shield", size: 16 })) });
+
+  /* ------------------------------------------------------------ fill a login */
+
+  function Login() {
+    const [who, setWho] = useState(null);
+    const [signed, setSigned] = useState(false);
+    const fill = (w) => ({ label: w, shortcut: w === "alex@example.com" ? "Used today" : "From Sam", onSelect: () => setWho(w) });
+    const logins = [{ kind: "label", label: "From your vault, for shop.example.com" }, fill("alex@example.com"), fill("sam@example.com")];
+    return h(Browser, { host: "shop.example.com/sign-in", tab: "Sign in", menu: logins },
+      h("header", null, h("span", null, "Shop"), h("span", null, "Help")),
+      signed ? h("div", { className: "form" }, h("h2", null, "Welcome back"), h("p", { className: "filled" }, `Signed in as ${who}.`))
+      : h("form", { className: "form", onSubmit: (e) => { e.preventDefault(); if (who) setSigned(true); } },
+        h("h2", null, "Sign in"),
+        h("label", null, "Email", h("div", { className: "inp" }, h(Field, { value: who ?? "", readOnly: true, "aria-label": "Email" }), vault("Fill in from your vault", logins))),
+        h("label", null, "Password", h("div", { className: "inp" }, h(Field, { type: "password", value: who ? "correct-horse" : "", readOnly: true, "aria-label": "Password" }))),
+        who ? h("p", { className: "filled", role: "status" }, "Filled in from your vault. Nothing was shown to Iris.") : null,
+        h(Button, { variant: "glass", disabled: !who }, "Sign in")));
+  }
+
+  function Code() {
+    const [filled, setFilled] = useState(false);
+    const [left, setLeft] = useState(21);
+    useEffect(() => { if (filled || left <= 0) return; const t = setTimeout(() => setLeft(left - 1), 1000); return () => clearTimeout(t); }, [left, filled]);
+    const code = left > 0 ? "482 913" : "730 118";
+    const items = [{ kind: "label", label: "From your vault" }, { label: `Fill in ${code}`, shortcut: `${left > 0 ? left : 30} s left`, onSelect: () => setFilled(true) }];
+    return h(Browser, { host: "shop.example.com/verify", tab: "Verify", menu: items },
+      h("header", null, h("span", null, "Shop"), h("span", null, "Help")),
+      h("div", { className: "form" },
+        h("h2", null, "Enter the code"),
+        h("label", null, "6-digit code", h("div", { className: "inp" }, h(Field, { value: filled ? code : "", readOnly: true, "aria-label": "Code" }), vault("Fill in the code", items))),
+        filled ? h("p", { className: "filled", role: "status" }, "Filled in from your vault.") : h("p", { className: "filled" }, `The code for this site holds ${left > 0 ? left + " more seconds" : "a new 30 seconds"}.`),
+        h(Button, { variant: "glass", disabled: !filled }, "Verify")));
+  }
+
+  function Save() {
+    const [done, setDone] = useState(null);
+    return h(Browser, { host: "da-mario.example/account", tab: "Account made" },
+      h("header", null, h("span", null, "Pizzeria Da Mario"), h("span", null, "Book")),
+      h("div", { className: "form" }, h("h2", null, "Welcome, Alex"), h("p", { className: "filled" }, "Your account is ready.")),
+      h("div", { className: "save" }, h(Card, null,
+        done ? h("div", { role: "status" }, h("h3", null, done === "save" ? "Saved in your vault" : "Not saved"),
+            h("p", { style: { margin: 0 } }, done === "save" ? "Iris can sign in here next time. Touch ID confirmed." : "Chrome will not ask again for this site."))
+          : h(VaultAsk, { title: "Save this password?", who: "The Chrome extension", from: "Chrome on this Mac, da-mario.example",
+              why: "You made an account to book the table for Sam's party", does: "Stores it, so Iris can sign in next time",
+              scope: "store", biometric: "Touch ID", denyLabel: "Not now", onAllow: () => setDone("save"), onDeny: () => setDone("no") }))));
+  }
+
+  /* ------------------------------------------------------- Iris uses the browser */
+
+  const STEPS = ["Read the page", "Searched for candles", "Added candles", "Added balloons"];
+  // The side panel is a small IrisApp. The page around it runs her steps; the app reports Stop and Close back (onState).
+  const panelSpec = (step, stopped, carry) => {
+    const busy = !stopped && step < 3;
+    return { name: "Iris", start: "task",
+      state: { sent: [], draft: "", paid: "ask", ...carry, stopped, closed: false },
+      screens: { task: { title: "Iris", top: busy ? { label: "Stop", on: "set:stopped=true" } : { label: "Close", on: "set:closed=true" },
+        status: busy ? { state: "busy", label: "On this tab" } : stopped ? { state: "idle", label: "Stopped" } : { state: "idle" },
+        parts: [
+          { c: "Group", parts: [{ c: "Row", icon: "person", title: "Order the party things on the list.", subtitle: "You" }] },
+          { c: "Label", text: `Filling the basket, ${Math.min(step + 1, 4)} of 4` },
+          { c: "Card", parts: [{ c: "CheckList", items: STEPS.slice(0, step + 1), done: STEPS.slice(0, step + 1).map((_, i) => i).filter((i) => i < step || !busy) }] },
+          ...(step >= 1 ? [{ c: "Text", text: "Could not type in the search once: the page moved. Tried again, it worked." }] : []),
+          ...(step >= 3 && !stopped ? [
+            { c: "Text", if: "paid==ask", text: "Two things are in the basket. Shall I pay with your Visa ending 4412? I ask your phone first." },
+            { c: "Buttons", if: "paid==ask", stack: false, parts: [
+              { c: "Button", variant: "glass", label: "Pay", on: "set:paid=yes;snack:Your phone said yes. Paid €8.40." },
+              { c: "Button", variant: "text", label: "Not now", on: "set:paid=no;snack:The basket stays as it is." }] },
+            { c: "Text", if: "paid==yes", text: "Paid €8.40 with your Visa. Delivery on Friday." }] : []),
+          { c: "Group", if: "sent!=", parts: [{ c: "Row", each: "sent", icon: "person", title: "{$.v}", subtitle: "You. Iris adds it to this task." }] },
+          { c: "Field", placeholder: "Type to Iris, Enter sends", bind: "draft", add: "sent" }],
+      } } };
+  };
+  function Panel({ go }) {
+    const [step, setStep] = useState(0);
+    const [shown, setShown] = useState(true);
+    const [stopped, setStopped] = useState(false);
+    const [basket, setBasket] = useState([]);
+    const carry = React.useRef({});
+    useEffect(() => { if (stopped || step >= 3) return; const t = setTimeout(() => setStep(step + 1), 1600); return () => clearTimeout(t); }, [step, stopped]);
+    useEffect(() => { if (step >= 2 && !basket.includes("Candles, 12 pieces")) setBasket((b) => [...b, "Candles, 12 pieces"]);
+                      if (step >= 3 && !basket.includes("Balloons, 20 pieces")) setBasket((b) => [...b, "Balloons, 20 pieces"]); }, [step]);
+    const busy = !stopped && step < 3;
+    const spec = React.useMemo(() => panelSpec(step, stopped, carry.current), [step, stopped, shown]);
+    const onState = (st) => { const { stopped: s0, closed, ...rest } = st; carry.current = rest; if (s0 && !stopped) setStopped(true); if (closed) setShown(false); };
+    const panel = shown ? h("aside", { className: "panel", "aria-label": "Iris side panel" }, h(IrisApp, { key: `${step}-${stopped}-${shown}`, spec, frame: "window", onState })) : null;
+    const target = busy && step >= 1 ? step - 1 : -1;
+    const menu = [{ label: shown ? "Close the side panel" : "Open the side panel", onSelect: () => setShown(!shown) }];
+    return h(Browser, { host: "shop.example.com/search?q=party", tab: "Party", panel, menu },
+      h("header", null, h("span", null, "Shop"), h("span", null, `Basket (${basket.length})`)),
+      h("div", { className: "shop" }, ["Candles, 12 pieces", "Balloons, 20 pieces", "Paper plates"].map((p, i) =>
+        h("div", { key: p, className: "prod" }, h("span", null, p),
+          h("span", { className: i === target ? "hand" : "" }, h(Button, { variant: "glass", size: "sm", disabled: basket.includes(p),
+            onClick: () => setBasket((b) => [...b, p]) }, basket.includes(p) ? "In basket" : "Add"))))),
+      shown ? null : h("div", { className: "reopen" }, h(Button, { variant: "glass", size: "sm", onClick: () => setShown(true) }, "Open Iris")));
+  }
+
+  // The toolbar menu: only what belongs to this site. Talk to Iris opens the side panel scene.
+  function Popup({ go }) {
+    const [snack, setSnack] = useState(null);
+    const items = [
+      { kind: "label", label: "shop.example.com" },
+      { label: "alex@example.com", shortcut: "Login", onSelect: () => setSnack("Signed in as alex@example.com, from your vault.") },
+      { label: "Visa ending 4412", shortcut: "Card", onSelect: () => setSnack("Card filled in. Your phone confirmed it.") },
+      { kind: "sep" },
+      { label: "Talk to Iris", shortcut: "Side panel", onSelect: () => go("panel") },
+    ];
+    return h(Browser, { host: "shop.example.com", tab: "Shop", menu: items },
+      h("header", null, h("span", null, "Shop"), h("span", null, "Basket (0)")),
+      h("div", { className: "shop" }, h("div", { className: "prod" }, h("span", null, "Welcome back. Click the orb in the toolbar."))),
+      snack ? h("div", { style: { position: "absolute", left: 16, right: 16, bottom: 16 } }, h(Snackbar, { text: snack, tone: "ok" })) : null);
+  }
+
+  const STAGES = { login: Login, code: Code, save: Save, panel: Panel, popup: Popup };
+  window.exampleScenes({
+    title: "Chrome",
+    stage: ({ scene, go }) => h(STAGES[scene.id], { go }),
+    scenes: [
+      { id: "panel", name: "Iris uses the browser",
+        ok: ["The panel is a small IrisApp: her StatusPill says busy only while she runs, Stop and Close report back", "One line says Iris is using this tab, with Stop next to it", "Her hand: a ring on what she is about to press", "The slip says what happened and what she did next, in plain grey", "Paying asks first; Close hides the panel, the toolbar opens it again"],
+        ask: ["Show the step count, or only the current step?"] },
+      { id: "login", name: "Fill a login",
+        ok: ["The shield in the field opens the vault's menu: the vault fills it, not Iris", "Says after: nothing was shown to Iris"], ask: [] },
+      { id: "code", name: "2FA code",
+        ok: ["The countdown is real, a new code comes after it"], ask: [] },
+      { id: "save", name: "Save a password",
+        ok: ["The house VaultAsk: the same question the vault asks everywhere, scope store"], ask: ["Ask for Touch ID on save, or only on use?"] },
+      { id: "popup", name: "Toolbar menu",
+        ok: ["The house Menu, from her orb in the toolbar", "Only what belongs to this site", "Talk to Iris opens the side panel"], ask: [] },
+    ],
+    all: { label: "Whole extension", items: ["Her orb lives in the toolbar, top right: Chrome decides where extensions go, not the Meaning table.", "The side panel stays a panel next to the page, not a Sheet: Iris and the page are both in use."] },
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "v": 3,
+  "assetGroups": {},
+  "blobs": {},
+  "createdOnFiles": {
+    "at": "2026-09-28T10:25:33Z",
+    "v": 1
+  },
+  "docs": {
+    "readme": "project/README.md",
+    "sections": [
+      "project/marketing.md",
+      "project/web-app.md",
+      "project/website.md"
+    ]
+  },
+  "groups": [],
+  "lastChange": {
+    "at": "2026-09-29T19:52:40Z",
+    "by": "Okayiris.com",
+    "note": "Previews for Chip, Progress, Stat, CheckList, Segmented, Field; the MacPill badge in magenta on the orb's rim (badge tokens)"
+  },
+  "layout": "files",
+  "libraries": [
+    {
+      "global": "React",
+      "name": "react",
+      "version": "18"
+    },
+    {
+      "global": "ReactDOM",
+      "name": "react-dom",
+      "version": "18"
+    }
+  ],
+  "namespace": "IrisUi",
+  "sections": {},
+  "title": "Iris"
+}

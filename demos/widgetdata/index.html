@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<!-- @dsCard group="Showcases" height=3300 width=1180 page subtitle="Real demo data over twelve topics, where the widget came from, and the word recipes" -->
+<style>main > section:nth-of-type(3) { display: none; }main > section:nth-of-type(4) { display: none; }main > section:nth-of-type(5) { display: none; }main > section:nth-of-type(6) { display: none; }main > section:nth-of-type(7) { display: none; }main > section:nth-of-type(8) { display: none; }main > section:nth-of-type(9) { display: none; }</style>
+<style>
+/* layout: per look a row with four sizes and varying content; below that the scroll examples at phone width */
+:root {
+  --bg: #07090c; --card: #0e1218; --line: #1c232d; --fg: #e8f2f7; --dim: #8fa3b0; --ice: #7dd3fc;
+  --sans: -apple-system, "SF Pro Text", system-ui, sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); padding: 24px 16px 60px; margin: 0; }
+main { max-width: 1180px; margin: 0 auto; display: grid; gap: 34px; }
+h1 { font-size: 22px; margin: 0; } h2 { font-size: 16px; margin: 0 0 4px; }
+.sub { color: var(--dim); margin: 4px 0 0; font-size: 14px; }
+section > p { color: var(--dim); font-size: 13px; margin: 0 0 14px; max-width: 70ch; }
+.row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+
+/* ---- widget: size ---- */
+.w { --accent: #4ade80; --accentInk: #04241f; border-radius: 26px; padding: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; flex: none; }
+.small { width: 170px; height: 170px; } .wide { width: 360px; height: 170px; } .tall { width: 170px; height: 376px; } .large { width: 360px; height: 376px; }
+.w > * { position: relative; }
+.head { font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.value { font: 700 52px/1 var(--mono); letter-spacing: -.02em; }
+.small .value, .tall .value { font-size: 46px; }
+.unit { font-size: 14px; opacity: .8; margin-top: 4px; }
+.side { display: flex; gap: 16px; flex: 1; min-height: 0; }
+.side > div { display: flex; flex-direction: column; min-width: 0; }
+.side > div:first-child { flex: none; }
+.push { margin-top: auto; }
+ul.things { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 14px; min-width: 0; }
+.things li { display: flex; gap: 8px; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.things li::before { content: ""; width: 15px; height: 15px; border-radius: 50%; border: 2px solid #4a5361; flex: none; box-sizing: border-box; }
+.things li.done { color: var(--dim); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--dim) 60%, transparent); }
+.things li.done::before { border: 0; background: var(--ice) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%2307090c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.things.time li::before { display: none; }
+.things .t { font: 600 12px var(--mono); color: var(--accent); width: 42px; flex: none; }
+.more { color: var(--dim); font-size: 13px; margin-top: 8px; }
+.dots { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 22%, #0b0f0d); }
+.dots i.done { background: var(--accent); }
+
+/* ---- look: glass ---- */
+.glass { background: linear-gradient(160deg, color-mix(in srgb, var(--accentInk) 70%, #0c0f14), #090b0f); border: 1px solid color-mix(in srgb, var(--accent) 16%, #1a2027); }
+.glass .value { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 45%, white), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* ---- look: pattern ---- */
+.pattern { background: var(--accentInk); color: #f2fbf6; }
+.pattern canvas.background { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pattern .head { color: #fff; opacity: .92; }
+.pattern .value { text-shadow: 0 2px 20px var(--accentInk), 0 0 2px var(--accentInk); }
+.pattern .panel { background: color-mix(in srgb, var(--accentInk) 78%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 10px 12px; }
+/* ---- look: ring ---- */
+.ring { background: radial-gradient(120% 120% at 30% 0%, color-mix(in srgb, var(--accentInk) 80%, #0c0f14), #07090c 72%); border: 1px solid color-mix(in srgb, var(--accent) 14%, #1a2027); }
+.ringBox { position: relative; display: grid; place-items: center; flex: none; }
+.ringBox svg { position: absolute; inset: 0; }
+.ringBox .center { text-align: center; display: grid; justify-items: center; }
+.ringBox .value { font-size: 40px; }
+.ringBox .unit { font-size: 11px; color: var(--dim); opacity: 1; margin-top: 2px; }
+/* ---- look: small list / typographic ---- */
+.list { background: var(--card); border: 1px solid var(--line); }
+.typo { background: var(--accentInk); color: color-mix(in srgb, var(--accent) 30%, white); }
+.typo .shadow { position: absolute; right: -14px; bottom: -44px; font: 800 190px/1 var(--mono); color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--accent) 45%, transparent); white-space: nowrap; }
+.typo .front { font: 700 26px/1.1 var(--sans); color: #fff; }
+.now { background: #4ade80; color: #052e16; }
+.now .head { color: #052e16; }
+
+.caption { color: var(--dim); font-size: 12px; margin-top: 6px; text-align: center; }
+.with { display: grid; justify-items: center; }
+
+/* ---- scroll examples ---- */
+.phone { width: 392px; max-width: 100%; background: #05070a; border: 1px solid var(--line); border-radius: 36px; padding: 16px; }
+.hscroll { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 2px; }
+.hscroll::-webkit-scrollbar { display: none; }
+.hscroll > .w { scroll-snap-align: start; }
+.pager { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
+.pager i { --a: #7dd3fc; --b: #7dd3fc; width: 6px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--a) 35%, #2a313b); transition: all .25s; }
+.pager i.on { width: 18px; background: linear-gradient(90deg, var(--a), var(--b)); }
+.vwrap { position: relative; display: flex; gap: 12px; }
+.vscroll { height: 376px; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; display: grid; gap: 12px; flex: 1; }
+.vscroll::-webkit-scrollbar { display: none; }
+.vscroll > .w { scroll-snap-align: start; width: 100%; }
+.vpager { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.vpager i { --a: #7dd3fc; --b: #7dd3fc; width: 6px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--a) 35%, #2a313b); transition: all .25s; }
+.vpager i.on { height: 18px; background: linear-gradient(180deg, var(--a), var(--b)); }
+@media (prefers-reduced-motion: reduce) { .pager i, .vpager i { transition: none; } }
+.screen { display: grid; gap: 12px; align-content: start; position: relative; }
+.screen .screenHead { display: flex; justify-content: space-between; align-items: baseline; padding: 2px 4px; }
+.screen .screenHead b { font-size: 20px; } .screen .screenHead span { color: var(--dim); font-size: 13px; }
+.screen .pair { display: flex; gap: 12px; }
+.screen .pair .w { width: calc(50% - 6px); height: 150px; }
+.week { border-radius: 26px; padding: 14px 16px 6px; position: relative; overflow: hidden; }
+.week ul { list-style: none; margin: 8px 0 0; padding: 0; }
+.week li { display: flex; gap: 14px; align-items: center; padding: 12px 0; border-top: 1px solid #1f2630; font-size: 16px; font-weight: 600; cursor: pointer; }
+.week li:first-child { border-top: 0; }
+.week li::before { content: ""; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #4a5361; box-sizing: border-box; flex: none; }
+.week li.done { color: var(--dim); text-decoration: line-through; }
+.week li.done::before { border: 0; background: var(--ice) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%2307090c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.week .weekHead { display: flex; justify-content: space-between; align-items: center; min-height: 26px; }
+.week.patternBand { padding-top: 0; }
+.week .band { position: relative; height: 74px; margin: 0 -16px 4px; padding: 14px 16px; display: flex; align-items: flex-end; justify-content: space-between; }
+.week .band canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.week .band > *:not(canvas) { position: relative; }
+.week .band .large { font: 700 30px/1 var(--mono); color: #fff; text-shadow: 0 2px 14px var(--accentInk); }
+.screen .vpager { position: absolute; right: -14px; top: 50%; transform: translateY(-50%); }
+.word { width: 360px; height: 200px; border-radius: 22px; background: #0b0e13; border: 1px solid var(--line); position: relative; overflow: hidden; }
+.word canvas { width: 100%; height: 100%; }
+.recipe { color: var(--dim); font: 11px/1.5 var(--mono); max-width: 360px; margin-top: 6px; }
+.recipe b { color: var(--fg); font-family: var(--sans); font-size: 13px; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: auto; }
+.tile { aspect-ratio: 1; border-radius: 14px; background: color-mix(in srgb, var(--accent) 12%, #0c1014); display: grid; place-items: center; position: relative; }
+.tile svg { width: 72%; height: 72%; }
+.tile.done::after { content: ""; position: absolute; right: -4px; top: -4px; width: 18px; height: 18px; border-radius: 50%; background: var(--ice) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%2307090c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.tile small { position: absolute; bottom: -18px; font-size: 11px; color: var(--dim); }
+</style>
+
+<main>
+  <header>
+    <h1>Iris widgets: demo data</h1>
+    <p class="sub">Real sample content across twelve topics, each with its own colour and pattern; the old widget next to it; and the word styles as a recipe.</p>
+  </header>
+
+  <section>
+    <h2>Where we come from</h2>
+    <p>The current widget next to the same content in the four new styles.</p>
+    <div class="row" id="compare"></div>
+  </section>
+
+  <section><h2>Demo data</h2><p>Demo data: 18 widgets across 12 topics, each topic with its own colour and pattern, spread over the four styles and sizes.</p><div class="row" id="demo"></div></section>
+
+  <section><h2>Glass</h2><p>Dark glass, the topic colour as accent. Dots show progress.</p><div class="row" id="glass"></div></section>
+  <section><h2>Pattern</h2><p>Each topic its own moving world from the Patterns lab: lanes, grid, bubbles, rain.</p><div class="row" id="pattern"></div></section>
+  <section><h2>Ring</h2><p>Progress as a ring, like Iris' own ring. In the centre what is still to do or what is coming up.</p><div class="row" id="ring"></div></section>
+  <section><h2>Small list and typographic</h2><p>The things themselves up front. Small: large value as background; larger: the list.</p><div class="row" id="list"></div></section>
+
+  <section>
+    <h2>Scrolling</h2>
+    <p>Left horizontal with dots below, right vertical with the app's pager on the side. Swipe or scroll inside.</p>
+    <div class="row">
+      <div class="phone"><div class="hscroll" id="hscroll"></div><div class="pager" id="hpager"></div></div>
+      <div class="phone"><div class="vwrap"><div class="vscroll" id="vscroll"></div><div class="vpager" id="vpager"></div></div></div>
+    </div>
+  </section>
+  <section>
+    <h2>Pattern art and drawn tiles</h2>
+    <p>Each topic draws its own moving pattern on the canvas, and the tiles for the things themselves are flat drawings in the trip style.</p>
+    <div class="row" id="visuals"></div>
+  </section>
+
+  <section>
+    <h2>The whole screen: Groceries</h2>
+    <p>As in the app now (head, two small widgets, the week list, pager on the right), in three styles. Tap a thing to check it off: counter, dots and ring follow along.</p>
+    <div class="row" id="screens"></div>
+  </section>
+
+  <section>
+    <h2>Words lab: bold letters</h2>
+    <p>Same idea as the Patterns lab: I build the letter styles, an AI picks a recipe per word (look, colours, rhythm). Everything runs on the same tick as the music (125 bpm).</p>
+    <div class="row" id="words"></div>
+  </section>
+</main>
+
+<script>
+// ---------- Content: six topics, each with its own colour and pattern ----------
+const CONTENT = {
+  list: { head: 'On the list', accent: '#4ade80', accentInk: '#04241f', palette: ['#4ade80', '#2ee6d6', '#14b8a6', '#a7f3d0'], pattern: 'lanes',
+    value: '8', unit: 'things', items: ['Milk', 'Bread', 'Eggs', 'Cheese', 'Apples', 'Coffee', 'Tomatoes', 'Pasta'], done: 3, ring: [3 / 8, '5', 'still to get'] },
+  agenda: { head: 'Today', accent: '#7dd3fc', accentInk: '#08183a', palette: ['#7dd3fc', '#38bdf8', '#e8f2f7', '#2ee6d6'], pattern: 'grid', time: true,
+    value: '14:00', unit: 'Dentist', items: [['09:30', 'Stand-up'], ['14:00', 'Dentist'], ['16:30', 'Call a colleague'], ['19:00', "Dinner at Alex's"]], done: 1, ring: [0.55, '14:00', 'next'] },
+  mail: { head: 'Mail', accent: '#a78bfa', accentInk: '#18123c', palette: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#7dd3fc'], pattern: 'bubbles',
+    value: '3', unit: 'important', items: ['Contractor: quote', 'Tax office', 'Alex: Saturday?', 'Newsletter'], done: 0, ring: [0.25, '3', 'of 12'] },
+  parcel: { head: 'On the way', accent: '#fbbf24', accentInk: '#221a0e', palette: ['#fde68a', '#fbbf24', '#7dd3fc', '#a78bfa'], pattern: 'band', time: true,
+    value: '2', unit: 'parcels', items: [['14-17', 'Book, today'], ['tomorrow', 'Headphones']], done: 0, ring: [0.8, '14:00', 'almost here'] },
+  weather: { head: 'Weather', accent: '#38bdf8', accentInk: '#081a34', palette: ['#7dd3fc', '#38bdf8', '#e8f2f7'], pattern: 'rain', time: true,
+    value: '17°', unit: 'showers after 15:00', items: [['now', '17° partly cloudy'], ['15:00', 'rain'], ['18:00', '14° dry']], done: 0, ring: [0.6, '60%', 'chance of rain'] },
+  tasks: { head: 'To do', accent: '#f0abfc', accentInk: '#2c0b26', palette: ['#f0abfc', '#c026d3', '#fda4af', '#c4b5fd'], pattern: 'drift',
+    value: '5', unit: 'tasks', items: ['Sign quote', 'Tape band', "the neighbour's birthday", 'Taxes', 'Water plants'], done: 2, ring: [2 / 5, '3', 'to go'] },
+};
+
+// ---------- Small pattern engine (same shape language as the Patterns lab) ----------
+const patterns = [];
+function drawPattern(ctx, w, h, kind, palette, t) {
+  ctx.clearRect(0, 0, w, h);
+  const s = 2, hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const pill = (x, y, l, d, c, a) => { ctx.globalAlpha = a; ctx.fillStyle = c; ctx.beginPath(); ctx.roundRect(x - l / 2, y - d / 2, l, d, d / 2); ctx.fill(); };
+  if (kind === 'lanes') {
+    const rows = Math.round(h / (28 * s));
+    for (let l = 0; l < rows; l++) for (let j = 0; j < 3; j++) {
+      const step = (w + 120 * s) / 3, x = ((j / 3 + (l % 2 ? 1 : -1) * t * 0.04 * (1 + l % 3 * 0.4)) % 1 + 1) % 1 * (w + 120 * s) - 60 * s;
+      pill(x, (l + 0.5) * h / rows, step * (0.35 + 0.25 * hash(l * 9 + j)), 11 * s, palette[(l + j) % palette.length], 0.34);
+    }
+  } else if (kind === 'grid') {
+    const sp = 30 * s, cols = Math.ceil(w / sp), row = Math.ceil(h / sp), tick = Math.floor(t / 0.48);
+    for (let r = 0; r < row; r++) for (let q = 0; q < cols; q++) {
+      const i = r * 50 + q, on = hash(i + tick * 7) < 0.1 ? Math.exp(-(t - tick * 0.48) * 4) : 0;
+      ctx.globalAlpha = 0.18 + 0.5 * on; ctx.strokeStyle = ctx.fillStyle = palette[i % palette.length]; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(q * sp + 5, r * sp + 5, sp - 10, sp - 10, 5); on > 0.2 ? ctx.fill() : ctx.stroke();
+    }
+  } else if (kind === 'bubbles') {
+    for (let i = 0; i < 16 * s; i++) {
+      const y = h + 20 - ((hash(i) + t * (0.05 + hash(i + 3) * 0.05)) % 1) * (h + 40), x = ((i * 0.618) % 1) * w + Math.sin(t + i) * 6;
+      ctx.globalAlpha = 0.35; ctx.strokeStyle = palette[i % palette.length]; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, (5 + hash(i + 7) * 9) * s, 0, Math.PI * 2); ctx.stroke();
+    }
+  } else if (kind === 'band') {
+    const step = Math.floor(t / 0.96) + Math.min(1, ((t / 0.96) % 1) / 0.35);
+    for (let r = 0; r < Math.max(2, Math.round(h / 80)); r++) for (let i = 0; i < 6; i++) {
+      const x = ((i * 70 * s - step * 70 * s * (r % 2 ? -1 : 1)) % (420 * s) + 420 * s) % (420 * s) - 50 * s, y = (r + 0.5) * h / Math.max(2, Math.round(h / 80));
+      ctx.globalAlpha = 0.3; ctx.strokeStyle = palette[(i + r) % palette.length]; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(x - 26 * s, y - 17 * s, 52 * s, 34 * s, 8 * s); ctx.stroke();
+    }
+  } else if (kind === 'rain') {
+    for (let i = 0; i < 26 * s; i++) {
+      const x = ((i * 0.618) % 1) * w, y = ((hash(i) + t * (0.5 + hash(i + 2) * 0.3)) % 1) * (h + 30) - 15;
+      ctx.globalAlpha = 0.3; ctx.strokeStyle = palette[i % palette.length]; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 12 * s); ctx.stroke();
+    }
+  } else {   // drift
+    for (let i = 0; i < 9 * s; i++) {
+      const u = Math.sqrt((i + 0.5) / (9 * s)), a = i * 2.39996 + t * 0.08, x = w / 2 + Math.cos(a) * u * w * 0.55, y = h / 2 + Math.sin(a) * u * h * 0.55;
+      const pop = 1 + 0.25 * Math.exp(-((t % 0.48)) * 6) * (i % 2);
+      ctx.globalAlpha = 0.32; ctx.fillStyle = ctx.strokeStyle = palette[i % palette.length]; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(x, y, (4 + hash(i) * 7) * s * pop, 0, Math.PI * 2); i % 3 ? ctx.stroke() : ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ---------- Building blocks ----------
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+function smallList(d, n) {
+  const ul = el('ul', 'things' + (d.time ? ' time' : ''));
+  d.items.slice(0, n).forEach((it, i) => {
+    const li = el('li', (d.checked ? d.checked.has(i) : i < d.done) ? 'done' : '');
+    if (Array.isArray(it)) { li.append(el('span', 't', it[0]), el('span', '', it[1])); } else li.textContent = it;
+    ul.append(li);
+  });
+  return ul;
+}
+const rest = (d, n) => d.items.length > n ? el('div', 'more', `${d.items.length - n} more`) : null;
+function dots(d) { const s = el('div', 'dots'); d.items.forEach((_, i) => s.append(el('i', (d.checked ? d.checked.has(i) : i < d.done) ? 'done' : ''))); return s; }
+function ringSvg(d, size) {
+  const r = size / 2 - 8, circ = 2 * Math.PI * r, v = d.ring[0];
+  const box = el('div', 'ringBox'); box.style.width = box.style.height = size + 'px';
+  box.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="color-mix(in srgb, ${d.accent} 16%, #0b0f0d)" stroke-width="8"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${d.accent}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${circ * v} ${circ}" transform="rotate(-90 ${size / 2} ${size / 2})"/></svg>`;
+  const m = el('div', 'center'); m.append(el('div', 'value', d.ring[1]), el('div', 'unit', d.ring[2])); box.append(m);
+  // Long values (16:00, 5.2 km) smaller, so they fit in the ring.
+  const length = String(d.ring[1]).length, base = size < 120 ? 28 : size < 150 ? 34 : 40;
+  m.querySelector('.value').style.fontSize = Math.round(base * Math.min(1, 3.2 / Math.max(3, length))) + 'px';
+  return box;
+}
+function headValue(d, withUnit = true) {
+  const f = document.createDocumentFragment();
+  f.append(el('div', 'value', d.value)); if (withUnit) f.append(el('div', 'unit', d.unit));
+  return f;
+}
+
+// ---------- One widget: look x size x content ----------
+function widget(look, size, key) {
+  const d = CONTENT[key], w = el('div', `w ${size} ${look}`);
+  w.style.setProperty('--accent', d.accent); w.style.setProperty('--accentInk', d.accentInk);
+  const head = el('div', 'head', d.head), large = size === 'large', wide = size === 'wide', tall = size === 'tall';
+  if (look === 'now') { w.append(el('div', 'head', d.head), el('div', 'value push', d.value), el('div', 'unit', d.unit)); return w; }
+
+  if (look === 'pattern') {
+    const c = el('canvas', 'background'), dpr = 2, [cw, ch] = [{ small: 170, wide: 360, tall: 170, large: 360 }[size], { small: 170, wide: 170, tall: 376, large: 376 }[size]];
+    c.width = cw * dpr; c.height = ch * dpr; w.append(c);
+    patterns.push({ ctx: c.getContext('2d'), w: cw * dpr, h: ch * dpr, kind: d.pattern, palette: d.palette, phase: Math.random() * 10 });
+  }
+
+  if (look === 'ring') {
+    if (wide) { const z = el('div', 'side'); const l = el('div'); l.append(ringSvg(d, 136)); const r = el('div'); r.append(head, el('div', 'push'), smallList(d, 3)); z.append(l, r); w.append(z); }
+    else if (large) { w.append(head); const box = el('div'); box.style.cssText = 'display:grid;place-items:center;margin:10px 0'; box.append(ringSvg(d, 180)); w.append(box, smallList(d, 4)); const m = rest(d, 4); m && w.append(m); }
+    else if (tall) { w.append(head); const box = el('div'); box.style.cssText = 'display:grid;place-items:center;margin:10px 0'; box.append(ringSvg(d, 132)); w.append(box, smallList(d, 4)); }
+    else { w.style.alignItems = 'center'; w.style.justifyContent = 'center'; w.style.padding = '10px'; w.append(ringSvg(d, 126)); }
+    return w;
+  }
+
+  if (look === 'list') {
+    if (size === 'small') {
+      w.className = 'w small typo'; w.style.setProperty('--accent', d.accent); w.style.setProperty('--accentInk', d.accentInk);
+      const first = d.items.slice(d.done, d.done + 2).map(x => Array.isArray(x) ? x[1] : x);
+      w.append(el('div', 'shadow', d.value), head, el('div', 'push'), el('div', 'front', first.join(',<br>')), el('div', 'unit', `${Math.max(0, d.items.length - d.done - 2)} more`));
+      return w;
+    }
+    const n = wide ? 3 : tall ? 7 : 8;
+    const headRow = el('div', 'head', `${d.head} · ${d.value}`);
+    if (wide) { const z = el('div', 'side'); const l = el('div'); l.append(smallList(d, 3)); l.style.flex = '1'; w.append(headRow, el('div', '', '')); w.lastChild.style.height = '12px'; z.append(l); w.append(z); const m = rest(d, 3); m && w.append(m); }
+    else { w.append(headRow, el('div', '', '')); w.lastChild.style.height = '12px'; w.append(smallList(d, n)); const m = rest(d, n); m && w.append(m); }
+    return w;
+  }
+
+  // glass and pattern: same build-up, different background
+  const panel = x => { if (look !== 'pattern') return x; const p = el('div', 'panel'); p.append(x); return p; };
+  if (wide) {
+    const z = el('div', 'side'), l = el('div'), r = el('div');
+    l.append(head, el('div', 'push'), headValue(d)); r.style.flex = '1'; r.style.justifyContent = 'center'; r.append(panel(smallList(d, 3)));
+    z.append(l, r); w.append(z);
+  } else if (large) {
+    w.append(head, el('div', '', '')); w.lastChild.style.height = '8px';
+    w.append(headValue(d)); const lst = el('div', 'push'); lst.append(panel(smallList(d, 5))); w.append(lst);
+    if (look === 'glass' && !d.time) w.append(dots(d));
+  } else if (tall) {
+    w.append(head, el('div', '', '')); w.lastChild.style.height = '8px';
+    w.append(headValue(d)); const lst = el('div', 'push'); lst.append(panel(smallList(d, 5))); w.append(lst);
+  } else {
+    w.append(head, el('div', 'push'), headValue(d, !(look === 'glass' && !d.time)));
+    if (look === 'glass' && !d.time) w.append(dots(d));
+  }
+  return w;
+}
+
+// ---------- Fill the page ----------
+const withCaption = (w, text) => { const m = el('div', 'with'); m.append(w, el('div', 'caption', text)); return m; };
+// ---------- Demo data ----------
+const DEMO = [{"topic": "list", "head": "On the list", "value": "7", "unit": "groceries to go", "time": false, "items": ["Milk", "Bread", "Eggs", "Apples", "Coffee beans", "Yoghurt"], "done": 2, "ring": [0.29, "7", "items to go"]}, {"topic": "list", "head": "Alex's list", "value": "5", "unit": "groceries to do", "time": true, "items": [["the supermarket", "Milk, cheese"], ["the supermarket", "Bread, eggs"], ["the supermarket", "Apples, bananas"], ["the pharmacy", "Toothpaste"], ["the bookshop", "Gift for the neighbour"]], "done": 1, "ring": [0.2, "5", "to do"]}, {"topic": "agenda", "head": "Today", "value": "3", "unit": "appointments today", "time": true, "items": [["09:30", "Team meeting with a colleague"], ["11:00", "Dentist"], ["14:30", "Lunch with Alex"], ["16:00", "Call the neighbour"]], "done": 1, "ring": [0.25, "16:00", "next appointment"]}, {"topic": "agenda", "head": "Tomorrow", "value": "2", "unit": "appointments tomorrow", "time": true, "items": [["10:00", "Work call"], ["13:30", "Cobbler"], ["19:00", "Dinner at parents"]], "done": 0, "ring": [0, "10:00", "first appointment"]}, {"topic": "mail", "head": "Inbox", "value": "6", "unit": "new mails", "time": true, "items": [["Alex", "Friday drinks?"], ["a colleague", "Quote approved"], ["the railway", "a delay"], ["the bookshop", "Order shipped"], ["the neighbour", "Yesterday's photos"]], "done": 0, "ring": [0, "6", "still unread"]}, {"topic": "parcel", "head": "On the way", "value": "14:20", "unit": "delivery today", "time": true, "items": [["14:20", "a parcel"], ["15:10", "a parcel"], ["16:45", "a return"], ["Tomorrow", "a delivery"]], "done": 1, "ring": [0.25, "14:20", "next parcel"]}, {"topic": "weather", "head": "Outside", "value": "18°C", "unit": "now, in the city", "time": true, "items": [["Now", "Partly cloudy"], ["15:00", "18°C"], ["17:00", "17°C"], ["20:00", "15°C"], ["23:00", "13°C"]], "done": 1, "ring": [0.5, "18°C", "max today"]}, {"topic": "weather", "head": "Rain", "value": "70%", "unit": "chance of rain", "time": true, "items": [["12:00", "Light rain"], ["13:00", "Showers"], ["15:00", "Clearings"], ["18:00", "Dry"]], "done": 0, "ring": [0.7, "13:00", "wettest moment"]}, {"topic": "tasks", "head": "Today", "value": "5", "unit": "tasks open", "time": false, "items": ["Pay bill", "Call Alex", "Buy gift", "Fix bike tyre", "Do groceries"], "done": 2, "ring": [0.4, "3", "still to do"]}, {"topic": "tasks", "head": "Home", "value": "4", "unit": "jobs around the house", "time": false, "items": ["Empty washing machine", "Water plants", "Vacuum", "Change bed"], "done": 1, "ring": [0.25, "4", "jobs left"]}, {"topic": "sport", "head": "Running", "value": "5.2 km", "unit": "run today", "time": true, "items": [["07:30", "a lap in the park"], ["08:05", "5.2 km"], ["08:07", "Avg 5:45 min/km"], ["08:10", "Stretch and warm down"]], "done": 3, "ring": [1, "5.2 km", "goal reached"]}, {"topic": "sport", "head": "Football", "value": "2-1", "unit": "half-time score Sunday", "time": true, "items": [["13:00", "Arrive"], ["14:30", "Kick-off"], ["15:15", "Goal by a colleague"], ["16:20", "End"]], "done": 2, "ring": [0.5, "2-1", "second half"]}, {"topic": "money", "head": "Spending", "value": "€84.30", "unit": "this week", "time": true, "items": [["the supermarket", "€32.10"], ["the railway", "€18.40"], ["the bookshop", "€12.80"], ["the supermarket", "€21.00"]], "done": 0, "ring": [0.6, "€84", "budget used"]}, {"topic": "travel", "head": "On the way", "value": "22 min", "unit": "to the city", "time": true, "items": [["14:05", "Depart the town"], ["14:27", "Arrive in the city"], ["14:35", "Tram 22"], ["14:50", "Arrive at Alex's"]], "done": 1, "ring": [0.4, "14:27", "arrival in the city"]}, {"topic": "health", "head": "Today", "value": "8,240", "unit": "steps taken", "time": false, "items": ["Morning walk", "Vitamin D", "2 litres of water", "Evening rest"], "done": 2, "ring": [0.82, "8,240", "of 10,000"]}, {"topic": "home", "head": "Energy", "value": "€62", "unit": "electricity this month", "time": true, "items": [["Week 1", "€14"], ["Week 2", "€16"], ["Week 3", "€15"], ["Week 4", "€17"]], "done": 3, "ring": [0.75, "€62", "under budget"]}, {"topic": "music", "head": "Mix", "value": "18", "unit": "tracks in mix", "time": true, "items": [["01", "Calm"], ["02", "Morning"], ["03", "Dance"], ["04", "Focus"]], "done": 0, "ring": [0.3, "18", "tracks done"]}, {"topic": "music", "head": "On the way", "value": "42 min", "unit": "playtime left", "time": true, "items": [["14:00", "Heading home"], ["14:15", "Podcast episode"], ["14:30", "Music mix"], ["14:42", "Arrival"]], "done": 2, "ring": [0.5, "42 min", "still to go"]}];
+const TOPIC_COLOR = {
+  list: CONTENT.list, agenda: CONTENT.agenda, mail: CONTENT.mail, parcel: CONTENT.parcel, weather: CONTENT.weather, tasks: CONTENT.tasks,
+  sport: { accent: '#fb7185', accentInk: '#2a0f18', palette: ['#fb7185', '#fda4af', '#f0abfc'], pattern: 'lanes' },
+  money: { accent: '#a7f3d0', accentInk: '#062016', palette: ['#a7f3d0', '#4ade80', '#2ee6d6'], pattern: 'grid' },
+  travel: { accent: '#38bdf8', accentInk: '#08183a', palette: ['#38bdf8', '#7dd3fc', '#a78bfa'], pattern: 'band' },
+  health: { accent: '#2ee6d6', accentInk: '#052331', palette: ['#2ee6d6', '#7dd3fc', '#a7f3d0'], pattern: 'bubbles' },
+  home: { accent: '#fde68a', accentInk: '#1f1a0e', palette: ['#fde68a', '#fbbf24', '#7dd3fc'], pattern: 'grid' },
+  music: { accent: '#c4b5fd', accentInk: '#161433', palette: ['#c4b5fd', '#8b5cf6', '#f0abfc'], pattern: 'drift' },
+};
+const LOOK_SIZE = [['pattern', 'wide'], ['glass', 'small'], ['ring', 'small'], ['list', 'large'], ['glass', 'wide'], ['pattern', 'small'],
+  ['ring', 'wide'], ['list', 'small'], ['pattern', 'tall'], ['glass', 'large'], ['ring', 'tall'], ['list', 'wide']];
+DEMO.forEach((w, i) => {
+  const color = TOPIC_COLOR[w.topic] || CONTENT.agenda, key = 'demo' + i;
+  CONTENT[key] = { ...color, ...w, accent: color.accent, accentInk: color.accentInk, palette: color.palette, pattern: color.pattern, done: Math.min(w.done || 0, (w.items || []).length), ring: w.ring || [0.5, w.value, w.unit] };
+  const [look, size] = LOOK_SIZE[i % LOOK_SIZE.length];
+  document.getElementById('demo').append(withCaption(widget(look, size, key), `${size} · ${w.topic}`));
+});
+
+const COMPARE = document.getElementById('compare');
+COMPARE.append(withCaption(widget('now', 'small', 'list'), 'now'), withCaption(widget('glass', 'small', 'list'), 'glass'), withCaption(widget('pattern', 'small', 'list'), 'pattern'),
+  withCaption(widget('ring', 'small', 'list'), 'ring'), withCaption(widget('list', 'small', 'list'), 'typographic'), withCaption(widget('list', 'wide', 'list'), 'small list'));
+const layout = { glass: [['small', 'agenda'], ['wide', 'mail'], ['tall', 'tasks'], ['large', 'list'], ['small', 'weather'], ['wide', 'parcel']],
+  pattern: [['small', 'weather'], ['wide', 'list'], ['tall', 'mail'], ['large', 'agenda'], ['small', 'tasks'], ['wide', 'parcel']],
+  ring: [['small', 'tasks'], ['wide', 'agenda'], ['tall', 'list'], ['large', 'weather'], ['small', 'parcel'], ['wide', 'mail']],
+  list: [['small', 'tasks'], ['wide', 'agenda'], ['tall', 'list'], ['large', 'mail'], ['small', 'parcel'], ['wide', 'weather']] };
+for (const [look, sizeList] of Object.entries(layout))
+  for (const [size, contentKey] of sizeList) document.getElementById(look).append(withCaption(widget(look, size, contentKey), `${size} · ${CONTENT[contentKey].head.toLowerCase()}`));
+
+// Scrolling: horizontal (wide) and vertical (large), with pagers that follow along.
+const HSCROLL = document.getElementById('hscroll'), HPAGER = document.getElementById('hpager');
+[['pattern', 'list'], ['glass', 'agenda'], ['ring', 'weather'], ['pattern', 'parcel'], ['list', 'mail']].forEach(([s, i]) => { HSCROLL.append(widget(s, 'wide', i)); HPAGER.append(el('i')); });
+const VSCROLL = document.getElementById('vscroll'), VPAGER = document.getElementById('vpager');
+[['pattern', 'agenda'], ['ring', 'list'], ['glass', 'tasks'], ['list', 'mail']].forEach(([s, i]) => { VSCROLL.append(widget(s, 'large', i)); VPAGER.append(el('i')); });
+const setPager = (pager, n) => [...pager.children].forEach((p, i) => p.classList.toggle('on', i === n));
+HSCROLL.addEventListener('scroll', () => setPager(HPAGER, Math.round(HSCROLL.scrollLeft / (360 + 12))), { passive: true });
+VSCROLL.addEventListener('scroll', () => setPager(VPAGER, Math.round(VSCROLL.scrollTop / (376 + 12))), { passive: true });
+setPager(HPAGER, 0); setPager(VPAGER, 0);
+
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function render(ms) {
+  const t = still ? 3 : ms / 1000;
+  for (let i = patterns.length - 1; i >= 0; i--) if (!patterns[i].ctx.canvas.isConnected && patterns[i].detached !== true) patterns.splice(i, 1);
+  for (const p of patterns) drawPattern(p.ctx, p.w, p.h, p.kind, p.palette, t + p.phase);
+  if (!still) requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+// ================= Part 2: colour dots, pattern art, the whole screen, words lab =================
+
+// ---------- Dots in their widget's colour; the active bar runs from this colour to the next (duotone) ----------
+function colorPager(pager, widgets) {
+  const k = widgets.map(w => w.style.getPropertyValue('--accent'));
+  [...pager.children].forEach((p, i) => { p.style.setProperty('--a', k[i]); p.style.setProperty('--b', k[(i + 1) % k.length]); });
+}
+colorPager(HPAGER, [...HSCROLL.children]); colorPager(VPAGER, [...VSCROLL.children]);
+
+// Flat pictures (trip shape language): two tints per picture.
+const DRAWINGS = {
+  milk: (a, b) => `<rect x="30" y="22" width="40" height="66" rx="6" fill="${a}"/><path d="M30 30 L40 12 H60 L70 30Z" fill="${b}"/><rect x="38" y="48" width="24" height="18" rx="4" fill="${b}"/>`,
+  bread: (a, b) => `<path d="M16 58 C16 30 84 30 84 58 V78 H16Z" fill="${a}"/><path d="M34 40 l8 10 M50 36 l8 10 M66 40 l6 8" stroke="${b}" stroke-width="5" stroke-linecap="round"/>`,
+  eggs: (a, b) => `<ellipse cx="38" cy="56" rx="17" ry="22" fill="${a}"/><ellipse cx="64" cy="58" rx="17" ry="22" fill="${b}"/>`,
+  cheese: (a, b) => `<path d="M14 70 L86 70 L86 46 L30 30Z" fill="${a}"/><circle cx="50" cy="56" r="6" fill="${b}"/><circle cx="72" cy="60" r="4" fill="${b}"/><circle cx="36" cy="48" r="3.5" fill="${b}"/>`,
+  apple: (a, b) => `<circle cx="50" cy="58" r="26" fill="${a}"/><path d="M50 32 C52 22 60 18 66 18 C64 26 58 30 50 32Z" fill="${b}"/>`,
+  coffee: (a, b) => `<rect x="22" y="36" width="44" height="44" rx="10" fill="${a}"/><path d="M66 46 h8 a10 10 0 0 1 0 20 h-8" fill="none" stroke="${b}" stroke-width="6"/><path d="M34 20 q6 6 0 12 M48 20 q6 6 0 12" stroke="${b}" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  pasta: (a, b) => `<rect x="26" y="20" width="48" height="64" rx="10" fill="${a}"/><path d="M36 36 h28 M36 48 h28 M36 60 h28" stroke="${b}" stroke-width="5" stroke-linecap="round"/>`,
+  tomato: (a, b) => `<circle cx="50" cy="56" r="26" fill="${a}"/><path d="M40 32 l10 6 l10 -6 l-4 10 h-12z" fill="${b}"/>`,
+};
+const svg = (name, a, b) => `<svg viewBox="0 0 100 100">${DRAWINGS[name](a, b)}</svg>`;
+
+const VISUALS = document.getElementById('visuals'), GREEN_BLUE = ['#4ade80', '#38bdf8'];   // green and blue
+VISUALS.append(
+  withCaption(widget('pattern', 'small', 'weather'), 'small · weather, pattern'),
+  withCaption(widget('pattern', 'wide', 'parcel'), 'wide · on the way, pattern'),
+  withCaption(widget('pattern', 'large', 'agenda'), 'large · today, pattern'),
+  withCaption(widget('pattern', 'small', 'tasks'), 'small · to do, pattern'),
+  withCaption((() => {
+    const w = widget('glass', 'wide', 'list'); w.innerHTML = '';
+    w.style.setProperty('--accent', '#4ade80'); w.style.setProperty('--accentInk', '#08183a');
+    w.append(el('div', 'head', 'On the list · 8'));
+    const t = el('div', 'tiles');
+    ['milk', 'bread', 'eggs', 'cheese'].forEach((n, i) => { const g = el('div', 'tile' + (i < 2 ? ' done' : ''), svg(n, GREEN_BLUE[i % 2], GREEN_BLUE[(i + 1) % 2])); t.append(g); });
+    w.append(t); return w;
+  })(), 'wide · pictures green and blue'),
+  withCaption((() => {
+    const w = widget('glass', 'large', 'list'); w.innerHTML = '';
+    w.style.setProperty('--accent', '#4ade80'); w.style.setProperty('--accentInk', '#08183a');
+    w.append(el('div', 'head', 'On the list'), el('div', 'value', '5'), el('div', 'unit', 'still to get'));
+    const t = el('div', 'tiles'); t.style.rowGap = '26px'; t.style.marginBottom = '14px';
+    ['milk', 'bread', 'eggs', 'cheese', 'apple', 'coffee', 'pasta', 'tomato'].forEach((n, i) => {
+      const g = el('div', 'tile' + (i < 3 ? ' done' : ''), svg(n, GREEN_BLUE[i % 2], GREEN_BLUE[(i + 1) % 2])); g.append(el('small', '', n)); t.append(g);
+    });
+    w.append(t); return w;
+  })(), 'large · pictures, done gets a tick'),
+);
+
+// ---------- The whole screen ----------
+const WEEK = ['milk and eggs', 'cheese and butter', 'coffee and tea', 'fruit', 'vegetables', 'potatoes', 'pasta and rice', 'toilet paper'];
+const NEXT = { time: true, head: 'Next time', accent: '#7dd3fc', accentInk: '#08183a', palette: ['#7dd3fc', '#38bdf8', '#e8f2f7'], pattern: 'grid', value: 'sun', unit: 'at 10:00', items: [], done: 0, ring: [0.7, 'sun', 'at 10:00'] };
+function screenFrame(look) {
+  const checked = new Set([0]), wrap = el('div', 'phone screen');
+  const draw = () => {
+    wrap.replaceChildren();
+    const k = el('div', 'screenHead'); k.append(el('b', '', 'Groceries'), el('span', '', 'Sunday 10:00')); wrap.append(k);
+    CONTENT._week = { ...CONTENT.list, items: WEEK, checked, value: String(WEEK.length - checked.size), unit: 'still to get', ring: [checked.size / WEEK.length, String(WEEK.length - checked.size), 'still to get'] };
+    CONTENT._next = NEXT;
+    const pair = el('div', 'pair');
+    const nextW = widget(look, 'small', '_next'), weekW = widget(look, 'small', '_week');
+    [nextW, weekW].forEach(x => { x.style.width = 'calc(50% - 6px)'; x.style.height = '150px'; });
+    pair.append(nextW, weekW); wrap.append(pair);
+    // Week list in the same style
+    const d = CONTENT.list, week = el('div', 'week ' + (look === 'pattern' ? 'patternBand' : ''));
+    week.style.setProperty('--accent', d.accent); week.style.setProperty('--accentInk', d.accentInk);
+    if (look === 'glass') { week.classList.add('glass'); week.append(Object.assign(el('div', 'weekHead'), { innerHTML: `<span class="head">Week list</span><span class="head" style="color:var(--dim)">${checked.size} / ${WEEK.length}</span>` })); week.append(dots({ items: WEEK, checked })); }
+    if (look === 'ring') {
+      week.classList.add('ring');
+      const head = el('div', 'weekHead'); head.append(el('span', 'head', 'Week list'));
+      const mini = el('div'); mini.innerHTML = `<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="13" fill="none" stroke="#16261d" stroke-width="5"/><circle cx="17" cy="17" r="13" fill="none" stroke="${d.accent}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${81.7 * checked.size / WEEK.length} 82" transform="rotate(-90 17 17)"/></svg>`;
+      head.append(mini); week.append(head);
+    }
+    if (look === 'pattern') {
+      week.style.background = '#0c1014'; week.style.border = '1px solid #1c232d';
+      const band = el('div', 'band'); band.style.background = d.accentInk;
+      const c = el('canvas'); c.width = 720; c.height = 148; band.append(c);
+      patterns.push({ ctx: c.getContext('2d'), w: 720, h: 148, kind: 'lanes', palette: d.palette, phase: 1.3 });
+      const l = el('div'); l.append(el('div', 'head', 'Week list')); l.firstChild.style.color = '#fff';
+      band.append(l, el('div', 'large', `${checked.size}/${WEEK.length}`)); week.append(band);
+    }
+    const ul = el('ul');
+    WEEK.forEach((it, i) => { const li = el('li', checked.has(i) ? 'done' : '', it); li.onclick = () => { checked.has(i) ? checked.delete(i) : checked.add(i); draw(); }; ul.append(li); });
+    week.append(ul); wrap.append(week);
+    const vp = el('div', 'vpager'); for (let i = 0; i < 5; i++) vp.append(el('i', i === 0 ? 'on' : '')); wrap.append(vp);
+    colorPager(vp, [weekW, nextW, weekW, nextW, weekW]);
+  };
+  draw();
+  return wrap;
+}
+const SCREENS = document.getElementById('screens');
+SCREENS.append(withCaption(screenFrame('glass'), 'glass'), withCaption(screenFrame('pattern'), 'pattern'), withCaption(screenFrame('ring'), 'ring'));
+
+// ---------- Words lab: letter styles as a recipe ----------
+const TICK = 60 / 125;
+const back = u => { u = Math.max(0, Math.min(1, u)) - 1; return 1 + 2.70158 * u * u * u + 1.70158 * u * u; };
+const WORDS = [
+  { word: 'Groceries', look: 'patternFill', palette: ['#4ade80', '#38bdf8', '#a7f3d0'], background: '#04241f', recipe: 'fill: pattern lanes · weight 900 · green and blue' },
+  { word: 'Done!', look: 'echo', palette: ['#f0abfc', '#c026d3', '#8b5cf6', '#7dd3fc'], background: '#2c0b26', recipe: 'echo: 5 layers · pop on the tick · pink to ice blue' },
+  { word: '3 / 8', look: 'fill', palette: ['#4ade80', '#38bdf8'], background: '#081a34', recipe: 'outlined · fills up to progress (3 of 8) · wavy surface' },
+  { word: 'Sunday', look: 'pop', palette: ['#7dd3fc', '#8b5cf6', '#2ee6d6', '#f0abfc'], background: '#140f33', recipe: 'letter by letter · spring (backOut) · each letter its own colour' },
+  { word: 'DENTIST', look: 'tiles', palette: ['#7dd3fc', '#e8f2f7'], background: '#0b1026', recipe: 'keys · light on per tick · white on ice blue' },
+  { word: 'on the way', look: 'wave', palette: ['#fbbf24', '#fde68a', '#7dd3fc'], background: '#221a0e', recipe: 'wave through the letters · drop shadow · amber' },
+  { word: 'Iris', look: 'shine', palette: ['#8b5cf6', '#7dd3fc', '#c026d3'], background: '#0b0e13', recipe: '3D depth · shine that sweeps over · Iris gradient' },
+  { word: 'MAIL 3', look: 'stretch', palette: ['#a78bfa', '#7dd3fc'], background: '#18123c', recipe: 'tall and narrow · stretches on the tick · half and half' },
+];
+const wordCanvases = [];
+const WORDLAB = document.getElementById('words');
+for (const w of WORDS) {
+  const box = el('div', 'word'), c = el('canvas'); c.width = 720; c.height = 400; box.style.background = w.background; box.append(c);
+  const r = el('div', 'recipe', `<b>${w.look}</b><br>${w.recipe}`);
+  const m = el('div'); m.append(box, r); WORDLAB.append(m);
+  wordCanvases.push({ ctx: c.getContext('2d'), ...w, pattern: w.look === 'patternFill' ? Object.assign(document.createElement('canvas'), { width: 720, height: 400 }) : null });
+}
+function fit(ctx, text, weight, max, height = 1) {   // largest font size that fits
+  let px = 220; do { ctx.font = `${weight} ${px}px -apple-system, "SF Pro Display", system-ui, sans-serif`; px -= 4; } while (ctx.measureText(text).width > max && px > 20);
+  return px + 4;
+}
+function drawWord(w, t) {
+  const ctx = w.ctx, W = 720, Hh = 400, tick = Math.floor(t / TICK), p = Math.exp(-(t - tick * TICK) * 6);
+  ctx.clearRect(0, 0, W, Hh); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.globalAlpha = 1; ctx.lineJoin = 'round';
+  const [x, y] = [W / 2, Hh / 2 + 8];
+  switch (w.look) {
+    case 'patternFill': {
+      // Letters filled green-to-blue, with dark lanes (as in the Patterns lab) sliding through them.
+      fit(ctx, w.word, 900, 640);
+      const g = ctx.createLinearGradient(0, y - 80, 0, y + 80); g.addColorStop(0, w.palette[0]); g.addColorStop(1, w.palette[1]);
+      ctx.fillStyle = g; ctx.fillText(w.word, x, y);
+      ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.fillStyle = w.background; ctx.globalAlpha = 0.55;
+      for (let l = 0; l < 9; l++) for (let k = 0; k < 4; k++) {
+        const yy = 70 + l * 30, xx = (((k / 4) + (l % 2 ? 1 : -1) * t * 0.06 * (1 + (l % 3) * 0.3)) % 1 + 1) % 1 * 900 - 90, len = 60 + ((l * 7 + k * 13) % 5) * 22;
+        ctx.beginPath(); ctx.roundRect(xx - len / 2, yy - 6, len, 12, 6); ctx.fill();
+      }
+      ctx.restore();
+      break;
+    }
+    case 'echo': {
+      fit(ctx, w.word, 900, 560);
+      for (let i = 4; i >= 0; i--) {
+        const d = i * (10 + 8 * p);
+        ctx.globalAlpha = i ? 0.85 - i * 0.15 : 1;
+        if (i) { ctx.strokeStyle = w.palette[i % w.palette.length]; ctx.lineWidth = 4; ctx.strokeText(w.word, x + d, y + d); }
+        else { ctx.fillStyle = w.palette[0]; ctx.fillText(w.word, x, y); }
+      }
+      break;
+    }
+    case 'fill': {
+      fit(ctx, w.word, 900, 560);
+      const level = 3 / 8, top = Hh * 0.82 - level * Hh * 0.62;
+      ctx.save(); ctx.beginPath(); ctx.moveTo(0, Hh);
+      for (let xx = 0; xx <= W; xx += 12) ctx.lineTo(xx, top + Math.sin(xx / 60 + t * 3) * 8 * (1 + p));
+      ctx.lineTo(W, Hh); ctx.closePath(); ctx.clip();
+      const g = ctx.createLinearGradient(0, top, 0, Hh); g.addColorStop(0, w.palette[0]); g.addColorStop(1, w.palette[1]);
+      ctx.fillStyle = g; ctx.fillText(w.word, x, y); ctx.restore();
+      ctx.strokeStyle = w.palette[1]; ctx.lineWidth = 4; ctx.strokeText(w.word, x, y);
+      break;
+    }
+    case 'pop': {
+      const px = fit(ctx, w.word, 900, 600), letters = [...w.word], widths = letters.map(l => ctx.measureText(l).width), total = widths.reduce((a, b) => a + b, 0);
+      let xx = x - total / 2; const cyc = (t % (TICK * 8)) / (TICK * 8) * 8 * TICK;
+      letters.forEach((l, i) => {
+        const s = back((cyc - i * 0.09) / 0.4) * (1 + 0.12 * p * (i % 2 === tick % 2 ? 1 : 0.2));
+        ctx.save(); ctx.translate(xx + widths[i] / 2, y); ctx.scale(s, s); ctx.fillStyle = w.palette[i % w.palette.length]; ctx.fillText(l, 0, 0); ctx.restore();
+        xx += widths[i];
+      });
+      break;
+    }
+    case 'tiles': {
+      const letters = [...w.word], n = letters.length, size = Math.min(80, 640 / n - 8);
+      ctx.font = `800 ${size * 0.62}px ui-monospace, "SF Mono", Menlo, monospace`;
+      letters.forEach((l, i) => {
+        const cx = x + (i - (n - 1) / 2) * (size + 8), on = tick % n === i ? p : 0;
+        ctx.fillStyle = on > 0.1 ? w.palette[1] : '#141b2e'; ctx.strokeStyle = w.palette[0]; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.roundRect(cx - size / 2, y - size / 2 - on * 8, size, size, 14); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = on > 0.1 ? '#0b1026' : w.palette[0]; ctx.fillText(l, cx, y - on * 8 + 2);
+      });
+      break;
+    }
+    case 'wave': {
+      fit(ctx, w.word, 900, 600);
+      const letters = [...w.word], widths = letters.map(l => ctx.measureText(l).width), total = widths.reduce((a, b) => a + b, 0);
+      for (let layer = 2; layer >= 0; layer--) {
+        let xx = x - total / 2;
+        letters.forEach((l, i) => {
+          const dy = Math.sin(t * 4 - i * 0.6 - layer * 0.35) * 22;
+          ctx.globalAlpha = layer ? 0.25 : 1; ctx.fillStyle = w.palette[layer ? 2 : i % 2];
+          ctx.fillText(l, xx + widths[i] / 2, y + dy + layer * 6); xx += widths[i];
+        });
+      }
+      break;
+    }
+    case 'shine': {
+      fit(ctx, w.word, 900, 440);
+      for (let i = 14; i >= 1; i--) { ctx.fillStyle = `rgba(20, 12, 50, ${0.9 - i * 0.04})`; ctx.fillText(w.word, x + i * 1.6, y + i * 2); }
+      const g = ctx.createLinearGradient(x - 260, 0, x + 260, 0); w.palette.forEach((c, i) => g.addColorStop(i / (w.palette.length - 1), c));
+      ctx.fillStyle = g; ctx.fillText(w.word, x, y);
+      const sx = ((t / (TICK * 8)) % 1) * 1000 - 140;
+      ctx.save(); ctx.globalCompositeOperation = 'source-atop';
+      const gl = ctx.createLinearGradient(sx - 60, 0, sx + 60, 0); gl.addColorStop(0, 'rgba(255,255,255,0)'); gl.addColorStop(0.5, 'rgba(255,255,255,.75)'); gl.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = gl; ctx.fillRect(0, 0, W, Hh); ctx.restore();
+      break;
+    }
+    case 'stretch': {
+      ctx.font = `900 150px -apple-system, "SF Pro Display", system-ui, sans-serif`;
+      const s = 1 + 0.12 * p, wbr = ctx.measureText(w.word).width;
+      ctx.save(); ctx.translate(x, y); ctx.scale(Math.min(1, 620 / (wbr * 0.62)) * 0.62, 1.55 * s);
+      ctx.save(); ctx.beginPath(); ctx.rect(-600, -200, 600, 400); ctx.clip(); ctx.fillStyle = w.palette[0]; ctx.fillText(w.word, 0, 0); ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.rect(0, -200, 600, 400); ctx.clip(); ctx.fillStyle = w.palette[1]; ctx.fillText(w.word, 0, 0); ctx.restore();
+      ctx.restore();
+      break;
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+(function wordLoop(ms) {
+  const t = still ? 3 : (ms || 0) / 1000;
+  for (const w of wordCanvases) drawWord(w, t);
+  if (!still) requestAnimationFrame(wordLoop);
+})();
+</script>
+
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()</script>
+<title>Iris UI preview</title>
+<link rel="stylesheet" href="/irisui/ds/tokens.css">
+<link rel="stylesheet" href="/irisui/ds/bundle.css">
+<link rel="stylesheet" href="/irisui/ds/ext.css">
+<link rel="stylesheet" href="/irisui/ds/extra.css">
+<link rel="stylesheet" href="/irisui/ds/placeholder.css">
+<link rel="stylesheet" href="/irisui/demos.css">
+<link rel="icon" href="/favicon.svg">
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}#root .ix-macpill div{max-width:none}
+/* Orb3D's hero ships with its formula editor: lab tooling. On the component page the orb stands alone. */
+[data-demo="orb3d:0"] .o3-controls,[data-demo="orb3d:0"] textarea,[data-demo="orb3d:0"] textarea~*{display:none}</style>
+</head><body>
+<script src="/irisui/ds/vendor/react.js"></script>
+<script src="/irisui/ds/vendor/react-dom.js"></script>
+<script src="/irisui/ds/bundle.js"></script>
+<script src="/irisui/ds/ext.js"></script>
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement, root = document.getElementById("root");
+  // Sloppy mode on purpose: a with block puts every IrisUi part in scope, so a variant's code reads exactly
+  // as it was written for the artifact (h(Badge, ...), not IrisUi.Badge).
+  const run = (source) => new Function("h", "IrisUi", "with (IrisUi) { return (" + source + "); }")(h, window.IrisUi);
+  // A variant whose code is a function is a component, not a value to call: it may use hooks (useState for a
+  // slider, a menu that is open). Handing it to createElement lets React run it as a component, which is what
+  // the artifact does too.
+  const mount = (node, el) =>
+    ReactDOM.createRoot(node).render(h(window.IrisUi.PreviewI18nProvider, null, typeof el === "function" ? h(el) : el));
+  {
+    const cell = document.createElement("div");
+    cell.innerHTML = '' + '<div style="position:relative"></div>';
+    root.appendChild(cell);
+    try { mount(cell.lastChild, run("() => { const [t, setT] = React.useState(\"14:30\");\n  return h(TimePicker, { value: t, onChange: setT, label: \"When should the bins go out?\" }); }")); }
+    catch (e) { cell.lastChild.textContent = "preview failed: " + e.message; }
+  }
+  document.documentElement.setAttribute("data-demo", "timepicker");
+})();
+</script>
+<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>
+</body></html>

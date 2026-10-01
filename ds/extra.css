@@ -1,0 +1,17 @@
+/* What the system still loads from somewhere else.
+ *
+ * bundle.css asks for `Caveat, "Bradley Hand", "Segoe Print", cursive` for the handwritten anchor
+ * (.iris-anchor) and the widget note, but the system ships the face for neither. The previews of Anchor and
+ * Widget therefore pulled Caveat from fonts.googleapis.com, which a public page should not depend on.
+ * This file carries the face itself, from /ds/fonts/.
+ *
+ * This belongs in the design system (a face in fonts/, a @font-face in tokens.css, a --font-anchor token).
+ * Until it is there, this is the one file that is ours rather than the artifact's. */
+
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/Caveat-700.woff2") format("woff2");
+}
