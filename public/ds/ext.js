@@ -264,7 +264,7 @@
           "header",
           { className: "ia-head ia-head-deep" },
           s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
-          h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
+          h2("h2", { className: "ia-title" }, fill(s.title, ctx.state))
         )
       ) : h2(
         "header",
@@ -272,7 +272,7 @@
         top ? h2("div", { className: "ia-top" }, top) : null,
         s.status ? h2("div", { className: "ia-status" }, h2(I.StatusPill, s.status)) : null,
         s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
-        h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
+        h2("h2", { className: "ia-title" }, fill(s.title, ctx.state))
       ),
       s.lede ? h2(Lede, { text: fill(s.lede, ctx.state), mark: s.mark }) : null,
       s.hero ? h2("div", { className: "ia-hero" }, h2(Part, { p: s.hero, ctx })) : null,

@@ -38,19 +38,12 @@
   const bar = document.createElement("header");
   bar.className = "plat";
   bar.innerHTML =
-    `<a href="${base}../">‹ Iris UI</a><span class="name">Examples</span>` +
+    `<a href="${base}../">‹ Iris UI</a><h1 class="name">Examples</h1>` +
     `<nav aria-label="Platform">${PLATFORMS.map(([id, label, href]) =>
       `<a href="${base}${href}"${id === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav>` +
     `<span class="story">One day of Alex, on every device: the dentist moved, Sam's party on Saturday.</span>`;
   document.body.prepend(bar);
-  // The labs are internal: only a local build carries examples/labs/, so the link appears only where it leads somewhere.
-  fetch(`${base}labs/`, { method: "HEAD" }).then((r) => {
-    if (!r.ok) return;
-    const a = document.createElement("a");
-    a.href = `${base}labs/`; a.textContent = "Labs";
-    if (here === "labs") a.setAttribute("aria-current", "page");
-    bar.querySelector("nav").append(a);
-  }).catch(() => {});
+  // The labs are internal (examples/labs/ exists only in a local build), so the public bar does not name them.
   // A lab may pad or centre its body: the bar still runs edge to edge, and the lab keeps its own top room under it.
   const b = getComputedStyle(document.body);
   const px = (v) => parseFloat(v) || 0;

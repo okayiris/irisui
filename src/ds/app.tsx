@@ -261,12 +261,12 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
       ? h(React.Fragment, null, h(I.AppBar, { title: "", leading: back, actions: top }),
           s.bare ? null : h("header", { className: "ia-head ia-head-deep" },
             s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
-            h("h1", { className: "ia-title" }, fill(s.title, ctx.state))))
+            h("h2", { className: "ia-title" }, fill(s.title, ctx.state))))
       : h("header", { className: "ia-head" + (top ? " ia-head-top" : "") },
           top ? h("div", { className: "ia-top" }, top) : null,
           s.status ? h("div", { className: "ia-status" }, h(I.StatusPill, s.status)) : null,
           s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
-          h("h1", { className: "ia-title" }, fill(s.title, ctx.state))),
+          h("h2", { className: "ia-title" }, fill(s.title, ctx.state))),
     s.lede ? h(Lede, { text: fill(s.lede, ctx.state), mark: s.mark }) : null,
     s.hero ? h("div", { className: "ia-hero" }, h(Part, { p: s.hero, ctx })) : null,
     h("div", { className: "ia-parts" }, (s.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx }))),
