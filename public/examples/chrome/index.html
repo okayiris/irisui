@@ -36,7 +36,7 @@
   .prod { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-button); padding: 10px 14px; font: var(--text-body); }
   /* Her hand on the page: a ring on the thing she is about to press. */
   .hand { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-pill); }
-  .save { position: absolute; right: 12px; top: 8px; z-index: 5; width: 320px; animation: rise var(--motion-base) var(--ease-house); }
+  .save { position: absolute; right: 12px; top: 56px; z-index: 5; width: 320px; animation: rise var(--motion-base) var(--ease-house); }
   .save h3 { font: var(--text-row-title); font-weight: 600; margin: 0 0 4px; }
   .save p { color: var(--dim); font: var(--text-body); margin: 0 0 12px; }
   .save .row { display: flex; gap: 8px; }
@@ -61,7 +61,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect } = React;
-  const { Button, Orb, Menu, Icon, Field, Card, Snackbar, IrisApp } = window.IrisUi;
+  const { Button, Orb, Menu, Icon, Field, Card, Snackbar, IrisApp, VaultAsk } = window.IrisUi;
 
   // The toolbar holds her one orb in Chrome. Click it: the menu for this site.
   function Browser({ host, tab, children, panel, menu }) {
@@ -115,11 +115,10 @@
       h("div", { className: "form" }, h("h2", null, "Welcome, Alex"), h("p", { className: "filled" }, "Your account is ready.")),
       h("div", { className: "save" }, h(Card, null,
         done ? h("div", { role: "status" }, h("h3", null, done === "save" ? "Saved in your vault" : "Not saved"),
-            h("p", { style: { margin: 0 } }, done === "save" ? "Iris can sign in here next time. Face ID confirmed." : "Chrome will not ask again for this site."))
-          : h("div", { role: "dialog", "aria-label": "Save password" },
-              h("h3", null, "Save this password?"),
-              h("p", null, "For da-mario.example. It goes into your vault, so Iris can book here without asking you to type."),
-              h("div", { className: "row" }, h(Button, { variant: "primary", size: "sm", onClick: () => setDone("save") }, "Save"), h(Button, { variant: "glass", size: "sm", onClick: () => setDone("no") }, "Not now"))))));
+            h("p", { style: { margin: 0 } }, done === "save" ? "Iris can sign in here next time. Touch ID confirmed." : "Chrome will not ask again for this site."))
+          : h(VaultAsk, { title: "Save this password?", who: "The Chrome extension", from: "Chrome on this Mac, da-mario.example",
+              why: "You made an account to book the table for Sam's party", does: "Stores it, so Iris can sign in next time",
+              scope: "store", biometric: "Touch ID", denyLabel: "Not now", onAllow: () => setDone("save"), onDeny: () => setDone("no") }))));
   }
 
   /* ------------------------------------------------------- Iris uses the browser */
@@ -200,7 +199,7 @@
       { id: "code", name: "2FA code",
         ok: ["The countdown is real, a new code comes after it"], ask: [] },
       { id: "save", name: "Save a password",
-        ok: ["Says what saving is for: Iris can book here next time"], ask: ["Ask for Face ID on save, or only on use?"] },
+        ok: ["The house VaultAsk: the same question the vault asks everywhere, scope store"], ask: ["Ask for Touch ID on save, or only on use?"] },
       { id: "popup", name: "Toolbar menu",
         ok: ["The house Menu, from her orb in the toolbar", "Only what belongs to this site", "Talk to Iris opens the side panel"], ask: [] },
     ],
