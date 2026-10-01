@@ -235,7 +235,7 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
     s.action || s.second
       ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true, topic: s.topic },
           s.action ? h(I.Button, { variant: s.action.danger ? "danger" : "primary", size: "lg", topic: s.topic, onClick: () => s.action!.on && ctx.run(s.action!.on) }, fill(s.action.label, ctx.state)) : null,
-          s.second ? h(I.Button, { variant: "glass", onClick: () => s.second!.on && ctx.run(s.second!.on) }, s.second.label) : null))
+          s.second ? h(I.Button, { variant: "glass", onClick: () => s.second!.on && ctx.run(s.second!.on) }, fill(s.second.label, ctx.state)) : null))
       : null);
   return s.topic ? h(I.Topic, { name: s.topic }, body) : body;
 }
@@ -299,7 +299,7 @@ export function IrisApp({ spec, start, onNavigate, frame = "phone" }: { spec: Ap
       else if (verb === "toggle") setState((s) => ({ ...s, [arg]: !s[arg] }));
       else if (verb === "inc") { const [k, max] = arg.split("/"); setState((s) => ({ ...s, [k]: Math.min(Number(max ?? Infinity), (Number(s[k]) || 0) + 1) })); }
       else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v })); }
-      else if (verb === "snack") setSnack(arg);
+      else if (verb === "snack") setSnack(fill(arg, state));
       else if (verb === "talk") { const t = Object.keys(spec.screens).find((id) => spec.screens[id].kind === "talk"); if (t) { setLayer({}); setStack((s) => [...s, t]); } }
     }
   };
@@ -320,10 +320,10 @@ export function IrisApp({ spec, start, onNavigate, frame = "phone" }: { spec: Ap
       : null,
     snack ? h("div", { className: "ia-snack" }, h(I.Snackbar, { text: snack, tone: "ok" })) : null,
     h("div", { className: "ia-layer" },
-      sheet ? h(I.Sheet, { open: true, onClose: () => setLayer({}), title: sheet.title, sub: sheet.lede },
+      sheet ? h(I.Sheet, { open: true, onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
         h("div", { className: "ia-sheet-body" }, (sheet.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx })),
-          sheet.action ? h("div", { className: "ia-action" }, h(I.Button, { variant: sheet.action.danger ? "danger" : "primary", size: "lg", onClick: () => run(sheet.action!.on ?? "close") }, sheet.action.label)) : null)) : null,
-      dialog ? h(I.Dialog, { open: true, onClose: () => run("close"), title: dialog.title, body: dialog.body,
+          sheet.action ? h("div", { className: "ia-action" }, h(I.Button, { variant: sheet.action.danger ? "danger" : "primary", size: "lg", onClick: () => run(sheet.action!.on ?? "close") }, fill(sheet.action.label, state))) : null)) : null,
+      dialog ? h(I.Dialog, { open: true, onClose: () => run("close"), title: fill(dialog.title, state), body: fill(dialog.body, state),
           actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on!), 0) })) }) : null));
 }
 
