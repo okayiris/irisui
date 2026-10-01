@@ -209,7 +209,7 @@
   const peek = document.createElement("div");
   peek.className = "peek";
   peek.hidden = true;
-  peek.innerHTML = '<span class="gal-shot"><iframe tabindex="-1" aria-hidden="true"></iframe></span><b></b>';
+  peek.innerHTML = '<span class="gal-shot"><iframe tabindex="-1" aria-hidden="true" title="Preview"></iframe></span><b></b>';
   document.body.append(peek);
   const frame = peek.querySelector("iframe");
   watch(frame);
