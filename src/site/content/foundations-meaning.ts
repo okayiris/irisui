@@ -85,7 +85,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
                 "as a heading style, in running text, twice on one screen",
               ],
               [
-                "Ringlab form (a /orbs recipe)",
+                "Her role form (an orb recipe)",
                 "The personality of one of her roles in a team room",
                 "only on that role's own screen or the governance screen, as one Orb3D per screen",
                 "in the rail, the chat or the canvas, as the role's avatar",
@@ -283,7 +283,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
               "One flat Orb, 22 or 28, in the app bar, with the true state of whoever speaks or works; each role a StatusPill. The role is told apart by its word, never by its own colour or ring gradient.",
               "One orb per screen, in the app bar, with the true state of whoever speaks or works. Working and speaking roles get a StatusPill; a resting role shows its word only.",
               "Who is not Iris never gets an orb: a human team member or an outside agent gets an initial in a phase ring.",
-              "A role's personality (its Ringlab recipe) shows only on its own role screen or the governance screen, as the one Orb3D of that screen.",
+              "A role's personality (its orb recipe) shows only on its own role screen or the governance screen, as the one Orb3D of that screen.",
               "Cursor colours are a neutral, low-chroma set that means nothing: never ice blue, violet, red or the ring gradient, never a fill, always with a name flag.",
             ],
           },

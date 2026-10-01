@@ -1030,7 +1030,7 @@ td code {
   background: var(--bg);
 }
 
-/* A Ringlab module, live: tall enough to work in. */
+/* An internal module, live: tall enough to work in. */
 .lab-frame {
   display: block;
   width: 100%;
