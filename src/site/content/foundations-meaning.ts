@@ -28,7 +28,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
             items: [
               "An orb is always her. What is not Iris never gets an orb: not a person, not another app, not a feature.",
               "The state tells the truth. Busy only while she works on it, listening only while the mic is open, thinking only while she thinks. Never motion for show.",
-              "One Iris per place. One orb per surface that speaks for her; in a list, only the rows she is handling right now carry one.",
+              "One Iris per place. One orb per screen, fixed top left, showing the true state of whoever speaks or works; the talk button does not count. Rows and roles she carries get a StatusPill (\"Iris\", \"speaking\", \"working\"), never a second orb (AGI docs/merge-decisions.md, 01-10).",
               "Never decoration: no orb as a bullet, a divider, a background, an illustration, an avatar or a spinner for work that is not hers.",
               "A new drawing needs a meaning first. A ring, form or pattern from the lab stays in the lab until this page says what it stands for.",
             ],
