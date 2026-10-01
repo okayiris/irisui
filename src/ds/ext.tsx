@@ -1882,7 +1882,7 @@ export function ChatStack({
                     h(
                       "span",
                       { className: "ix-chat-line" },
-                      h("span", { className: "ix-chat-phase", style: { color: design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
+                      h("span", { className: "ix-chat-phase", style: { color: l.step === YOU ? "var(--wait)" : design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
                       l.line ? `, ${l.line}` : "",
                     ),
                   ),
@@ -2110,6 +2110,27 @@ const TOPIC_FIX: Record<string, string[]> = {
   if (topics) for (const [name, colours] of Object.entries(TOPIC_FIX)) if (topics[name]) topics[name].splice(0, 3, ...colours);
 }
 
+// Word: the release paints the topic's dark ground as a tinted box behind the word. The word now stands on the page:
+// the full-size ground fill that starts every frame becomes a clear, everything drawn after it stays. The letters
+// were already lightened to read on that ground, which is as dark as the page, so they still read.
+const BaseWord = (window as Any).IrisUi?.Word;
+function Word(props: Any) {
+  const host = useRef<Any>(null);
+  useEffect(() => {
+    const cv = host.current?.querySelector("canvas");
+    const ctx = cv?.getContext("2d");
+    if (!ctx || ctx.irisNoGround) return;
+    const fill = ctx.fillRect;
+    ctx.fillRect = function (this: Any, x: number, y: number, w: number, hh: number) {
+      const t = this.getTransform();
+      if (x === 0 && y === 0 && w * t.a >= this.canvas.width - 2 && hh * t.d >= this.canvas.height - 2) return this.clearRect(x, y, w, hh);
+      return fill.call(this, x, y, w, hh);
+    };
+    ctx.irisNoGround = true;
+  });
+  return h("div", { ref: host, className: "ix-word" }, h(BaseWord, props));
+}
+
 // The shipped Toggle only moves when a parent hands it onChange, and it has no name: alone it is a dead switch a
 // screen reader calls "switch". This one keeps its own state when nobody controls it, and takes `label`.
 function Toggle({ on = false, onChange, label, disabled }: { on?: boolean; onChange?: (on: boolean) => void; label?: string; disabled?: boolean }) {
@@ -2178,6 +2199,7 @@ const SHIPPED = {
   EdgeText,
   THINKING,
   Toggle,
+  ...(BaseWord ? { Word } : {}),
   ...(TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {}),
   ...(Orb3DThinks ? { Orb3D: Orb3DThinks } : {}),
 };

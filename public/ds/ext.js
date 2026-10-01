@@ -1940,7 +1940,7 @@
                   h3(
                     "span",
                     { className: "ix-chat-line" },
-                    h3("span", { className: "ix-chat-phase", style: { color: design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
+                    h3("span", { className: "ix-chat-phase", style: { color: l.step === YOU ? "var(--wait)" : design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
                     l.line ? `, ${l.line}` : ""
                   )
                 )
@@ -2233,6 +2233,23 @@
       for (const [name, colours] of Object.entries(TOPIC_FIX)) if (topics[name]) topics[name].splice(0, 3, ...colours);
     }
   }
+  var BaseWord = window.IrisUi?.Word;
+  function Word(props) {
+    const host = useRef(null);
+    useEffect(() => {
+      const cv = host.current?.querySelector("canvas");
+      const ctx = cv?.getContext("2d");
+      if (!ctx || ctx.irisNoGround) return;
+      const fill2 = ctx.fillRect;
+      ctx.fillRect = function(x, y, w, hh) {
+        const t = this.getTransform();
+        if (x === 0 && y === 0 && w * t.a >= this.canvas.width - 2 && hh * t.d >= this.canvas.height - 2) return this.clearRect(x, y, w, hh);
+        return fill2.call(this, x, y, w, hh);
+      };
+      ctx.irisNoGround = true;
+    });
+    return h3("div", { ref: host, className: "ix-word" }, h3(BaseWord, props));
+  }
   function Toggle({ on = false, onChange, label, disabled }) {
     const [own, setOwn] = useState(on);
     const value = onChange ? on : own;
@@ -2295,6 +2312,7 @@
     EdgeText,
     THINKING,
     Toggle,
+    ...BaseWord ? { Word } : {},
     ...TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {},
     ...Orb3DThinks ? { Orb3D: Orb3DThinks } : {}
   };

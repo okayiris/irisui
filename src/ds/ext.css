@@ -2341,3 +2341,9 @@
 .ia-win .ia-screen {
   max-width: 760px;
 }
+
+/* Word stands on the page: no tinted box, no rounded clip around it. */
+.ix-word .iris-word {
+  border-radius: 0;
+  overflow: visible;
+}
