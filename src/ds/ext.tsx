@@ -50,8 +50,10 @@ export function Mark({ size = 64, label = "Iris" }: { size?: number; label?: str
 
 /* ---------------------------------------------------------------- Tooltip */
 
-export function Tooltip({ label, children, delay = 320 }: { label: string; children: Any; delay?: number }) {
-  const [open, setOpen] = useState(false);
+export function Tooltip({ label, children, delay = 320, open: shown }: { label: string; children: Any; delay?: number; open?: boolean }) {
+  const [hovered, setOpen] = useState(false);
+  /** `open` holds the tooltip out, for a screenshot or a guide; without it hover and focus decide. */
+  const open = shown ?? hovered;
   const timer = useRef<Any>(null);
   const id = useId();
 
@@ -100,14 +102,18 @@ export function Menu({
   side = "start",
   trigger,
   align,
+  defaultOpen = false,
 }: {
   items: MenuItem[];
   label?: string;
   side?: "start" | "end";
   trigger?: Any;
   align?: "start" | "end";
+  /** Starts open, for a guide or a screenshot. Focus moves into it only when a hand opens it. */
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
+  const handOpened = useRef(false);
   const host = useRef<Any>(null);
   const list = useRef<Any>(null);
   const rows = (items ?? []).filter((it) => (it.kind ?? "item") === "item" && !it.disabled);
@@ -122,7 +128,8 @@ export function Menu({
   }, [open]);
 
   useEffect(() => {
-    if (open) list.current?.querySelector('[role="menuitem"]')?.focus();
+    if (open && handOpened.current) list.current?.querySelector('[role="menuitem"], [role="menuitemcheckbox"]')?.focus();
+    handOpened.current = true;
   }, [open]);
 
   const onKey = (e: Any) => {
@@ -578,7 +585,11 @@ export function Tabs({
 /* ------------------------------------------------------------------ Steps */
 
 export function Steps({ items, active = 0 }: { items: string[]; active?: number }) {
+  // The wrap is a size container: on a phone only the current step keeps its word, the others keep their dot.
   return h(
+    "div",
+    { className: "ix-steps-wrap" },
+    h(
     "ol",
     { className: "ix-steps" },
     items.map((label, i) =>
@@ -594,6 +605,7 @@ export function Steps({ items, active = 0 }: { items: string[]; active?: number 
         h("span", { className: "ix-step-label" }, label),
         i < items.length - 1 ? h("span", { className: "ix-step-line", "data-done": i < active ? "1" : "0" }) : null,
       ),
+    ),
     ),
   );
 }
@@ -626,7 +638,13 @@ export function EmptyState({
 }
 
 export function Divider({ label, inset }: { label?: string; inset?: boolean }) {
-  return h("hr", { className: "ix-divider", "data-label": label ?? "", "data-inset": inset ? "1" : undefined });
+  // An hr cannot hold text, so a labelled divider is a separator with the label between two lines.
+  if (!label) return h("hr", { className: "ix-divider", "data-inset": inset ? "1" : undefined });
+  return h(
+    "div",
+    { className: "ix-divider", role: "separator", "aria-label": label, "data-label": label, "data-inset": inset ? "1" : undefined },
+    h("span", null, label),
+  );
 }
 
 
@@ -728,6 +746,12 @@ function monthGrid(year: number, month: number) {
   return cells;
 }
 
+/** "2026-10-01" as people say it: "Thu 1 Oct". */
+const dayName = (day: string) => {
+  const d = new Date(`${day}T00:00:00Z`);
+  return `${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getUTCDay()]} ${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}`;
+};
+
 const iso = (y: number, m: number, d: number) =>
   `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
@@ -820,7 +844,7 @@ export function DatePicker({
           "div",
           { className: "ix-dp-foot" },
           houseButton({ variant: "glass", size: "sm", onClick: () => onChange?.(todayIso) }, "Today"),
-          h("span", { className: "ix-dp-hint" }, value ? `Chosen: ${value}` : "No day chosen"),
+          h("span", { className: "ix-dp-hint" }, value ? dayName(value) : "No day chosen"),
         )
       : null,
   );

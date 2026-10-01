@@ -101,6 +101,7 @@
   left: 50%;
   transform: translate(-50%, 4px);
   z-index: 40;
+  width: max-content;
   max-width: 22ch;
   padding: 6px 10px;
   border-radius: 9px;
@@ -281,6 +282,7 @@
   bottom: 0;
   z-index: 60;
   max-height: 82%;
+  overflow: auto;
   padding: 10px 16px 20px;
   background: var(--sheet-bg);
   border-top: 1px solid var(--edge);
@@ -365,7 +367,8 @@
 }
 
 .ix-snack[data-tone="error"] .ix-snack-dot {
-  background: var(--error);
+  /* a failure is not a destruction: red stays for destructive actions */
+  background: var(--wait);
 }
 
 .ix-snack-text {
@@ -381,6 +384,8 @@
   background: none;
   color: var(--accent);
   font: 500 13px var(--font-text);
+  white-space: nowrap;
+  flex: none;
   cursor: pointer;
 }
 
@@ -513,9 +518,7 @@
 
 .ix-field > label,
 .ix-field-label {
-  font: 500 10.5px var(--font-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 500 13px var(--font-text);
   color: var(--label);
 }
 
@@ -636,8 +639,8 @@
 }
 
 .ix-results {
+  box-sizing: border-box;
   width: 100%;
-  max-width: 460px;
   margin-top: 8px;
   padding: 6px;
   background: var(--sheet-bg);
@@ -654,7 +657,6 @@
   gap: 4px;
   border-bottom: 1px solid var(--line);
   width: 100%;
-  max-width: 560px;
 }
 
 .ix-tab {
@@ -686,6 +688,9 @@
 }
 
 .ix-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -697,7 +702,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .ix-step-dot {
@@ -727,7 +733,12 @@
 .ix-step-label {
   font: 400 13px var(--font-text);
   color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+.ix-step-dot { flex: none; }
+.ix-step-line { min-width: 8px; }
 
 .ix-step[data-state="now"] .ix-step-label,
 .ix-step[data-state="done"] .ix-step-label {
@@ -822,8 +833,7 @@
   position: relative;
   min-height: 260px;
   border-radius: var(--radius-card);
-  background: rgba(180, 225, 255, 0.03);
-  border: 1px dashed var(--line);
+  border: 1px solid var(--line);
   overflow: hidden;
 }
 
@@ -863,7 +873,7 @@
 
 .ix-search-glass {
   color: var(--label);
-  font-size: 15px;
+  font-size: 20px;
   line-height: 1;
 }
 
@@ -901,9 +911,7 @@
 
 .ix-toolbar-title {
   padding: 0 10px 0 12px;
-  font: 500 10.5px var(--font-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 500 13.5px var(--font-text);
   color: var(--label);
   white-space: nowrap;
 }
@@ -954,7 +962,9 @@
 /* ---------- DatePicker ---------- */
 
 .ix-datepicker {
-  width: 306px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 336px;
   padding: 14px;
   background: var(--glass);
   border: 1px solid var(--edge);
@@ -1058,7 +1068,9 @@
 /* ---------- TimePicker ---------- */
 
 .ix-timepicker {
-  width: 306px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 336px;
   padding: 14px;
   background: var(--glass);
   border: 1px solid var(--edge);
@@ -1088,15 +1100,14 @@
 }
 
 .ix-tp-strip {
-  display: flex;
+  /* every hour in view at once: a strip that scrolls hid 07 to 23 with nothing saying so */
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 4px;
-  overflow-x: auto;
-  padding-bottom: 4px;
 }
 
 .ix-tp-chip {
-  flex: none;
-  min-width: 40px;
+  min-width: 0;
   height: 30px;
   border: 1px solid var(--edge);
   border-radius: 999px;
@@ -1832,6 +1843,14 @@
 .iris-card > .iris-row + .iris-row {
   box-shadow: inset 0 1px 0 var(--line);
 }
+.ix-sheet-body > .iris-row {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.ix-sheet-body > .iris-row + .iris-row {
+  box-shadow: inset 0 1px 0 var(--line);
+}
 .iris-card > .iris-row.iris-press:hover {
   background: rgba(180, 225, 255, 0.04);
 }
@@ -2078,3 +2097,173 @@
 .ia-hero > .iris-word {
   width: 100%;
 }
+.ia-hero > .ia-grid {
+  width: 100%;
+}
+.ia-status {
+  margin: 0 0 14px;
+}
+/* Stat: a long value (12.4 kWh, €2,480) shrinks to its tile instead of running into the next one. */
+.iris-stat {
+  container-type: inline-size;
+}
+.iris-stat b {
+  font-size: min(28px, 17cqi);
+}
+
+/* ---------- IrisApp: parts you swipe ---------- */
+
+/* Rail: tiles side by side, swiped sideways, the next one peeking in at the edge of the screen. */
+.ia-rail {
+  display: flex;
+  gap: var(--gap, 12px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--gutter, 16px);
+  margin: 0 calc(-1 * var(--gutter, 16px));
+  padding: 2px var(--gutter, 16px) 6px;
+  scrollbar-width: none;
+}
+.ia-rail::-webkit-scrollbar {
+  display: none;
+}
+.ia-rail-item {
+  flex: none;
+  scroll-snap-align: start;
+  display: grid;
+}
+.ia-rail-item > * {
+  min-width: 0;
+}
+
+/* Pages: one page per swipe, dots under them (or beside them, standing up). */
+.ia-pages {
+  display: grid;
+  gap: 10px;
+}
+.ia-pages-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.ia-pages-track::-webkit-scrollbar {
+  display: none;
+}
+.ia-page {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: grid;
+  align-content: start;
+  gap: var(--gap, 12px);
+}
+.ia-pages-dots {
+  display: flex;
+  justify-content: center;
+}
+.ia-pages-v {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.ia-pages-v .ia-pages-track {
+  flex-direction: column;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+}
+.ia-pages-v .ia-page {
+  flex: 0 0 100%;
+  align-content: center;
+}
+
+/* Bento: two columns, a tile may span both or stand two rows tall. */
+.ia-bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: var(--gap, 12px);
+}
+.ia-bento-item {
+  display: grid;
+  min-width: 0;
+}
+
+/* Meter: label and value on one line, the bar under them. */
+.ia-meter {
+  display: grid;
+  gap: 6px;
+}
+.ia-meter-head {
+  display: flex;
+  justify-content: space-between;
+  font: var(--text-body);
+  color: var(--dim);
+}
+.ia-meter-head b {
+  color: var(--fg);
+  font-weight: 600;
+}
+/* A Widget in a screen takes the width it is given: its cell, the column, or its rail slot (the release sizes
+   are for a 390 home screen with 16px of margin and would run 2px over). The height stays the widget's own. */
+.ia-bento .iris-widget,
+.ia-grid .iris-widget,
+.ia-rail-item .iris-widget,
+.ia-parts > .iris-widget,
+.ia-page > .iris-widget,
+.ia-tapbtn > .iris-widget {
+  width: 100%;
+}
+.ia-bento-item[style*="span 2"] .iris-w-tall,
+.ia-bento-item .iris-w-tall {
+  height: 100%;
+  min-height: 352px;
+}
+
+/* The back button of an AppBar points back. The house set has one chevron, drawn pointing forward. */
+.ix-appbar-leading .iris-icon-chevron,
+.ix-appbar-leading [data-icon="chevron"] {
+  transform: scaleX(-1);
+}
+
+/* Nothing found, said inside the results: plain text, not a card in the dropdown. */
+.ix-results-empty {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  font: 400 13px/1.45 var(--font-text);
+  color: var(--label);
+}
+.ix-results-empty strong {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--fg);
+}
+
+.ix-menu-trigger-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A bottom sheet needs room to show its rows: the stage it covers grows with it. */
+.ix-stage:has(.ix-sheet[data-side="bottom"]) {
+  min-height: 400px;
+}
+
+.ix-steps-wrap { container-type: inline-size; width: 100%; }
+@container (max-width: 440px) {
+  .ix-step:not([data-state="now"]) .ix-step-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
+.ix-search { box-sizing: border-box; }
+.ix-search input { min-width: 0; flex: 1; }

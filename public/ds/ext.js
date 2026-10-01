@@ -86,6 +86,23 @@
         return h2("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
       case "Tap":
         return h2("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
+      case "Rail":
+        return h2(
+          "div",
+          { className: "ia-rail", role: "group", "aria-label": props.label ?? "More" },
+          (p.parts ?? []).map((q, i) => h2("div", { key: i, className: "ia-rail-item", style: { width: q.w ?? props.w ?? 160 } }, h2(Part, { p: q, ctx, item })))
+        );
+      case "Pages":
+        return h2(Pages, { p, ctx, item, vertical: !!props.vertical, height: props.height, topic: props.topic });
+      case "Bento":
+        return h2("div", { className: "ia-bento" }, (p.parts ?? []).map((q, i) => h2("div", { key: i, className: "ia-bento-item", style: { gridColumn: q.span === 2 ? "span 2" : void 0, gridRow: q.tall ? "span 2" : void 0 } }, h2(Part, { p: q, ctx, item }))));
+      case "Meter":
+        return h2(
+          "div",
+          { className: "ia-meter" },
+          h2("div", { className: "ia-meter-head" }, h2("span", null, props.label), h2("b", null, props.value)),
+          h2(I.Progress, { value: props.of, topic: props.topic })
+        );
       case "Stack":
         return h2("div", { className: "ia-stack" }, kids);
       case "Row": {
@@ -171,6 +188,31 @@
       }
     }
   }
+  function Pages({ p, ctx, item, vertical, height, topic }) {
+    const I = UI();
+    const [at, setAt] = useState(0);
+    const track = useRef(null);
+    const pages = p.parts ?? [];
+    const onScroll = () => {
+      const el = track.current;
+      if (!el) return;
+      setAt(Math.round(vertical ? el.scrollTop / el.clientHeight : el.scrollLeft / el.clientWidth));
+    };
+    const go = (i) => {
+      const el = track.current;
+      if (el) el.scrollTo({ [vertical ? "top" : "left"]: i * (vertical ? el.clientHeight : el.clientWidth), behavior: "smooth" });
+    };
+    return h2(
+      "div",
+      { className: "ia-pages" + (vertical ? " ia-pages-v" : ""), style: vertical ? { height: height ?? 420 } : void 0 },
+      h2(
+        "div",
+        { ref: track, className: "ia-pages-track", onScroll, role: "group", "aria-label": p.label ?? "Pages" },
+        pages.map((q, i) => h2("div", { key: i, className: "ia-page" }, h2(Part, { p: q, ctx, item })))
+      ),
+      h2("div", { className: "ia-pages-dots" }, h2(I.PageDots, { count: pages.length, active: at, topic, vertical, onSelect: go }))
+    );
+  }
   function Page({ s, ctx, depth }) {
     const I = UI();
     const back = depth > 0 ? h2(I.Button, {
@@ -185,6 +227,7 @@
       depth > 0 ? h2(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back }) : h2(
         "header",
         { className: "ia-head" },
+        s.status ? h2("div", { className: "ia-status" }, h2(I.StatusPill, s.status)) : null,
         s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
         h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
       ),
@@ -276,7 +319,10 @@
           setDir("");
           setStack([spec.tabs[Number(arg)].to]);
         } else if (verb === "toggle") setState((s2) => ({ ...s2, [arg]: !s2[arg] }));
-        else if (verb === "set") {
+        else if (verb === "inc") {
+          const [k, max] = arg.split("/");
+          setState((s2) => ({ ...s2, [k]: Math.min(Number(max ?? Infinity), (Number(s2[k]) || 0) + 1) }));
+        } else if (verb === "set") {
           const [k, v] = arg.split("=");
           setState((s2) => ({ ...s2, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v }));
         } else if (verb === "snack") setSnack(arg);
@@ -352,6 +398,7 @@
       const parts = [...s.hero ? [s.hero] : [], ...s.parts ?? []];
       let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0;
       if (s.kind === "talk") orbs = 1;
+      if (s.status) orbs++;
       let busy = 0, words = 0, pens = 0, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
       walk(parts, (p) => {
         if (ORBS.has(p.c) || p.c === "Widget" && p.look === "orb") orbs++;
@@ -443,8 +490,9 @@
       })
     );
   }
-  function Tooltip({ label, children, delay = 320 }) {
-    const [open, setOpen] = useState(false);
+  function Tooltip({ label, children, delay = 320, open: shown }) {
+    const [hovered, setOpen] = useState(false);
+    const open = shown ?? hovered;
     const timer = useRef(null);
     const id = useId();
     const show = useCallback(() => {
@@ -475,9 +523,11 @@
     label = "More",
     side = "start",
     trigger,
-    align
+    align,
+    defaultOpen = false
   }) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(defaultOpen);
+    const handOpened = useRef(false);
     const host = useRef(null);
     const list = useRef(null);
     const rows = (items ?? []).filter((it) => (it.kind ?? "item") === "item" && !it.disabled);
@@ -490,7 +540,8 @@
       return () => document.removeEventListener("mousedown", onDoc);
     }, [open]);
     useEffect(() => {
-      if (open) list.current?.querySelector('[role="menuitem"]')?.focus();
+      if (open && handOpened.current) list.current?.querySelector('[role="menuitem"], [role="menuitemcheckbox"]')?.focus();
+      handOpened.current = true;
     }, [open]);
     const onKey = (e) => {
       const nodes = Array.from(list.current?.querySelectorAll('[role="menuitem"]') ?? []);
@@ -852,20 +903,24 @@
   }
   function Steps({ items, active = 0 }) {
     return h3(
-      "ol",
-      { className: "ix-steps" },
-      items.map(
-        (label, i) => h3(
-          "li",
-          {
-            key: label,
-            className: "ix-step",
-            "data-state": i < active ? "done" : i === active ? "now" : "next",
-            "aria-current": i === active ? "step" : void 0
-          },
-          h3("span", { className: "ix-step-dot" }, i < active ? "\u2713" : String(i + 1)),
-          h3("span", { className: "ix-step-label" }, label),
-          i < items.length - 1 ? h3("span", { className: "ix-step-line", "data-done": i < active ? "1" : "0" }) : null
+      "div",
+      { className: "ix-steps-wrap" },
+      h3(
+        "ol",
+        { className: "ix-steps" },
+        items.map(
+          (label, i) => h3(
+            "li",
+            {
+              key: label,
+              className: "ix-step",
+              "data-state": i < active ? "done" : i === active ? "now" : "next",
+              "aria-current": i === active ? "step" : void 0
+            },
+            h3("span", { className: "ix-step-dot" }, i < active ? "\u2713" : String(i + 1)),
+            h3("span", { className: "ix-step-label" }, label),
+            i < items.length - 1 ? h3("span", { className: "ix-step-line", "data-done": i < active ? "1" : "0" }) : null
+          )
         )
       )
     );
@@ -888,7 +943,12 @@
     );
   }
   function Divider({ label, inset }) {
-    return h3("hr", { className: "ix-divider", "data-label": label ?? "", "data-inset": inset ? "1" : void 0 });
+    if (!label) return h3("hr", { className: "ix-divider", "data-inset": inset ? "1" : void 0 });
+    return h3(
+      "div",
+      { className: "ix-divider", role: "separator", "aria-label": label, "data-label": label, "data-inset": inset ? "1" : void 0 },
+      h3("span", null, label)
+    );
   }
   function Toolbar({
     items = [],
@@ -963,6 +1023,10 @@
     while (cells.length % 7) cells.push(null);
     return cells;
   }
+  var dayName = (day) => {
+    const d = /* @__PURE__ */ new Date(`${day}T00:00:00Z`);
+    return `${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getUTCDay()]} ${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}`;
+  };
   var iso = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   function DatePicker({
     value,
@@ -1040,7 +1104,7 @@
         "div",
         { className: "ix-dp-foot" },
         houseButton({ variant: "glass", size: "sm", onClick: () => onChange?.(todayIso) }, "Today"),
-        h3("span", { className: "ix-dp-hint" }, value ? `Chosen: ${value}` : "No day chosen")
+        h3("span", { className: "ix-dp-hint" }, value ? dayName(value) : "No day chosen")
       ) : null
     );
   }

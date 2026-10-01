@@ -12,7 +12,9 @@ const CSS = (ds: string) => `<link rel="stylesheet" href="${ds}/tokens.css">
 <link rel="stylesheet" href="${ds}/extra.css">
 <link rel="stylesheet" href="${ds}/placeholder.css">
 <link rel="icon" href="/favicon.svg">
-<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}</style>`;
+<style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
+/* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
+#root{box-sizing:border-box;max-width:100%}#root>*{min-width:0;max-width:100%}#root div[style*="width:"]{max-width:100%}</style>`;
 
 /** React, ReactDOM, the shipped bundle and the additions load before any preview script runs. */
 const LIBS = (ds: string) => `<script src="${ds}/vendor/react.js"></script>
@@ -60,9 +62,7 @@ function addedFrame(c: Component, only?: { variant: Variant; index: number }, ds
     .map(
       (item) => `  {
     const cell = document.createElement("div");
-    cell.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + ${JSON.stringify(
-      item.variant.label,
-    )} + '</div><div style="position:relative"></div>';
+    cell.innerHTML = ${only ? "''" : `'<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--label);margin:0 0 8px 2px">' + ${JSON.stringify(item.variant.label)} + '</div>'`} + '<div style="position:relative"></div>';
     root.appendChild(cell);
     try { mount(cell.lastChild, run(${JSON.stringify(safe(item.variant.code))})); }
     catch (e) { cell.lastChild.textContent = "preview failed: " + e.message; }
@@ -115,6 +115,9 @@ export function demoFrame(c: Component, only?: { variant: Variant; index: number
   const text = (el) => (el.textContent || "").replace(/\\s+/g, " ").trim();
   const keep = cells.find((el) => text(el).startsWith(label)) ?? cells[${only.index}];
   for (const el of cells) if (el !== keep) el.remove();
+  // The page already names the variant above the frame; the preview's own small caps caption goes.
+  const cap = keep.firstElementChild;
+  if (cap && /uppercase/.test(cap.getAttribute("style") || "") && text(cap) === label) cap.remove();
   document.documentElement.setAttribute("data-demo", ${JSON.stringify(`${c.id}:${only.index}`)});
 })();
 </script>`,

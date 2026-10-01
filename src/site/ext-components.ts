@@ -35,16 +35,15 @@ const SPECS: Spec[] = [
         label: "Sort and filter",
         code: `() => {
   const [picked, setPicked] = React.useState(null);
-  return h("div", { style: { display: "grid", gap: 14, minHeight: 200, alignContent: "start" } },
-    h(Menu, { label: "Sort", items: [
+  return h("div", { style: { minHeight: 250 } },
+    h(Menu, { label: "Sort", defaultOpen: true, items: [
       { label: "Newest first", checked: picked === "Newest first", onSelect: () => setPicked("Newest first") },
       { label: "By name", checked: picked === "By name", onSelect: () => setPicked("By name") },
       { kind: "label", label: "Show" },
       { label: "Only unread", checked: picked === "Only unread", onSelect: () => setPicked("Only unread") },
       { kind: "sep" },
       { label: "Delete all", danger: true, onSelect: () => setPicked("Delete all") },
-    ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, picked ? "Chose: " + picked : "Nothing chosen yet"));
+    ] }));
 }`,
       },
       {
@@ -69,10 +68,9 @@ const SPECS: Spec[] = [
       {
         label: "Unpair, a destructive decision",
         code: `() => { const [open, setOpen] = React.useState(true);
-  return h("div", null, h(Dialog, { open, onClose: () => setOpen(false), title: "Unpair this device?",
+  return h(Dialog, { open, onClose: () => setOpen(false), title: "Unpair this device?",
     body: "She stops listening and talking here. Everything she stored stays in your vault.",
-    actions: [ { label: "Unpair", variant: "danger" }, { label: "Keep it" } ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, open ? "Waiting on you" : "Closed")); }`,
+    actions: [ { label: "Keep it" }, { label: "Unpair", variant: "danger" } ] }); }`,
       },
       {
         label: "A waiting question",
@@ -99,13 +97,11 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "Bottom, choosing a voice",
-        code: `() => { const [open, setOpen] = React.useState(true);
+        code: `() => { const [open, setOpen] = React.useState(true); const [voice, setVoice] = React.useState("Alex");
+  const pick = (title, subtitle) => h(Row, { key: title, title, subtitle, onClick: () => setVoice(title),
+    trailing: voice === title ? h("span", { "aria-label": "Chosen", style: { color: "var(--accent)", fontSize: 17 } }, "✓") : null });
   return h(Sheet, { open, onClose: () => setOpen(false), title: "Voice", sub: "How she sounds on this device",
-    children: [
-      h(Row, { key: "a", title: "Alex", subtitle: "Dutch, warm and clear", trailing: h(Toggle, { on: true }) }),
-      h(Row, { key: "b", title: "Calmer", subtitle: "Dutch, softer" }),
-      h(Row, { key: "c", title: "No voice", subtitle: "She only writes here" }),
-    ] }); }`,
+    children: [ pick("Alex", "Dutch, warm and clear"), pick("Calmer", "Dutch, softer"), pick("No voice", "She only writes here") ] }); }`,
       },
       {
         label: "Side, on a wide window",
@@ -150,11 +146,7 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "On an icon button",
-        code: `() => h("div", { style: { paddingTop: 60 } }, h(Tooltip, { label: "Unpair this device" }, h(Button, { variant: "icon", label: "Speaker", icon: h(Icon, { name: "speaker", size: 18 }) })))`,
-      },
-      {
-        label: "On a word",
-        code: `() => h("div", { style: { paddingTop: 60, fontSize: 15 } }, "The vault is ", h(Tooltip, { label: "Only your iPhone can open it" }, h("span", { style: { borderBottom: "1px dashed var(--edge)", cursor: "help" } }, "sealed")), " on this device.")`,
+        code: `() => h("div", { style: { paddingTop: 60 } }, h(Tooltip, { label: "Read it out", open: true }, h(Button, { variant: "icon", label: "Read it out", icon: h(Icon, { name: "speaker", size: 18 }) })))`,
       },
     ],
   },
@@ -174,9 +166,9 @@ const SPECS: Spec[] = [
       {
         label: "Count, dot and a capped count",
         code: `() => h("div", { style: { display: "flex", gap: 30, alignItems: "center", paddingTop: 8 } },
-    h(Badge, { count: 3 }, h(Button, { variant: "icon", label: "Loops", icon: h(Icon, { name: "loop", size: 18 }) })),
-    h(Badge, { dot: true }, h("span", { style: { fontSize: 15 } }, "Camera")),
-    h(Badge, { count: 128, max: 99, tone: "violet" }, h("span", { style: { fontSize: 15 } }, "Mail")))`,
+    h(Badge, { count: 3 }, h(Button, { variant: "icon", label: "Loops, 3 new", icon: h(Icon, { name: "loop", size: 18 }) })),
+    h(Badge, { dot: true }, h(Button, { variant: "icon", label: "Camera, something new", icon: h(Icon, { name: "camera", size: 18 }) })),
+    h(Badge, { count: 128, max: 99 }, h(Button, { variant: "icon", label: "Calls, 128 missed", icon: h(Icon, { name: "phone", size: 18 }) })))`,
       },
     ],
   },
@@ -204,7 +196,7 @@ const SPECS: Spec[] = [
       },
       {
         label: "In a topic",
-        code: `() => { const [v, setV] = React.useState(3); return h(Topic, { name: "sport" }, h(Slider, { value: v, onChange: setV, min: 1, max: 7, label: "Days a week", format: (n) => n + "×" })); }`,
+        code: `() => { const [v, setV] = React.useState(3); return h(Topic, { name: "health" }, h(Slider, { value: v, onChange: setV, min: 1, max: 7, label: "Walks a week", format: (n) => n + "×" })); }`,
       },
     ],
   },
@@ -226,7 +218,7 @@ const SPECS: Spec[] = [
         label: "A note to her",
         code: `() => { const [v, setV] = React.useState("The bin must go out by 8 on Tuesday"); return h("div", { style: { display: "grid", gap: 10 } },
     h(TextArea, { label: "What should she remember?", value: v, onChange: setV, rows: 3, maxLength: 280 }),
-    h("div", { style: { fontSize: 12, color: "var(--faint)", fontFamily: "var(--mono)" } }, v.length + " / 280")); }`,
+    h("div", { style: { fontSize: 12, color: "var(--label)", fontFamily: "var(--mono)" } }, v.length + " / 280")); }`,
       },
     ],
   },
@@ -244,9 +236,8 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "A language",
-        code: `() => { const [v, setV] = React.useState("nl"); return h("div", { style: { display: "grid", gap: 12 } },
-    h(Select, { label: "She talks to you in", value: v, onChange: setV, options: [ { value: "nl", label: "Nederlands" }, { value: "en", label: "English" }, { value: "de", label: "Deutsch" } ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, "Chosen: " + v)); }`,
+        code: `() => { const [v, setV] = React.useState("nl");
+  return h(Select, { label: "She talks to you in", value: v, onChange: setV, options: [ { value: "nl", label: "Nederlands" }, { value: "en", label: "English" }, { value: "de", label: "Deutsch" } ] }); }`,
       },
     ],
   },
@@ -273,7 +264,7 @@ const SPECS: Spec[] = [
       {
         label: "Nothing found",
         code: `() => h(SearchField, { value: "xyz", onChange: () => {} },
-    h(EmptyState, { title: "Nothing by that name", line: "Try a subject, a person or a date. She searches everything you kept." }))`,
+    h("div", { className: "ix-results-empty" }, h("strong", null, "Nothing by that name"), h("span", null, "Try a subject, a person or a date. She searches everything you kept.")))`,
       },
     ],
   },
@@ -292,7 +283,7 @@ const SPECS: Spec[] = [
         label: "Three angles",
         code: `() => { const [i, setI] = React.useState(0); return h("div", { style: { display: "grid", gap: 14 } },
     h(Tabs, { items: ["Today", "Loops", "Kept"], active: i, onSelect: setI }),
-    h("div", { style: { fontSize: 14, color: "var(--dim)" } }, "Showing: " + ["Today", "Loops", "Kept"][i])); }`,
+    h("div", { role: "tabpanel", style: { fontSize: 15 } }, ["The dentist at 9:30, lunch with Tom at 13:00", "Six loops, two waiting on you", "Twelve things she kept for you"][i])); }`,
       },
     ],
   },
@@ -346,18 +337,17 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "Docked, in a screen",
-        code: `() => h(Toolbar, { title: "This week", items: [
+        code: `() => { const [unread, setUnread] = React.useState(true);
+  return h(Toolbar, { title: "This week", items: [
     { label: "New", icon: h(Icon, { name: "sparkles", size: 16 }) },
-    { label: "Sort", icon: h(Icon, { name: "loop", size: 16 }) },
-    { label: "Only unread", active: true },
-    { label: "Unpair", danger: true },
-  ], trailing: h(Badge, { count: 3 }, h(Icon, { name: "phone", size: 18 })) })`,
+    { label: "Only unread", active: unread, onSelect: () => setUnread(!unread) },
+  ] }); }`,
       },
       {
         label: "Floating over content",
         code: `() => h(Toolbar, { variant: "floating", items: [
     { label: "Read out", icon: h(Icon, { name: "speaker", size: 16 }), active: true },
-    { label: "Mark", icon: h(Icon, { name: "loop", size: 16 }) },
+    { label: "Keep" },
     { label: "Delete", danger: true },
   ] })`,
       },
@@ -382,9 +372,7 @@ const SPECS: Spec[] = [
       {
         label: "Pick a day",
         code: `() => { const [day, setDay] = React.useState("2026-10-01");
-  return h("div", { style: { display: "grid", gap: 14 } },
-    h(DatePicker, { value: day, onChange: setDay, label: "When should she remind you?" }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, "Chosen: " + day)); }`,
+  return h(DatePicker, { value: day, onChange: setDay, label: "When should she remind you?" }); }`,
       },
       {
         label: "Within two weeks",
@@ -408,9 +396,7 @@ const SPECS: Spec[] = [
       {
         label: "Pick a time",
         code: `() => { const [t, setT] = React.useState("14:30");
-  return h("div", { style: { display: "grid", gap: 14 } },
-    h(TimePicker, { value: t, onChange: setT, label: "When should the bins go out?" }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, "Chosen: " + t)); }`,
+  return h(TimePicker, { value: t, onChange: setT, label: "When should the bins go out?" }); }`,
       },
       {
         label: "Every quarter hour",
@@ -435,17 +421,15 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "Small, with actions",
-        code: `() => h("div", { style: { border: "1px solid var(--line)", borderRadius: 18, overflow: "hidden" } },
-    h(AppBar, { title: "Loops", leading: h(Button, { variant: "icon", label: "Back", icon: h(Icon, { name: "chevron", size: 18 }) }),
-      actions: [ h(Button, { key: "a", variant: "icon", label: "Search", icon: h(Icon, { name: "sparkles", size: 18 }) }),
-                 h(Button, { key: "b", variant: "icon", label: "Settings", icon: h(Icon, { name: "person", size: 18 }) }) ] }),
-    h("div", { style: { padding: 16, fontSize: 14, color: "var(--dim)" } }, "The screens below live under this bar."))`,
+        code: `() => h("div", null,
+    h(AppBar, { title: "Bins", sub: "A loop, every Tuesday", leading: h(Button, { variant: "icon", label: "Back", icon: h("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, h(Icon, { name: "chevron", size: 18 })) }),
+      actions: h(Button, { variant: "icon", label: "Talk about this loop", icon: h(Icon, { name: "mic", size: 18 }) }) }),
+    h(Card, { style: { margin: 16 } }, h(Row, { title: "Next time", subtitle: "Tuesday 6 Oct, out by 8" }), h(Row, { title: "Who", subtitle: "You, she reminds you at 7" })))`,
       },
       {
         label: "Large, the title of a screen",
-        code: `() => h("div", { style: { border: "1px solid var(--line)", borderRadius: 18, overflow: "hidden" } },
-    h(AppBar, { variant: "large", title: "This week", sub: "Six loops, two waiting on you",
-      actions: h(Button, { variant: "icon", label: "New", icon: h(Icon, { name: "sparkles", size: 18 }) }) }))`,
+        code: `() => h(AppBar, { variant: "large", title: "This week", sub: "Six loops, two waiting on you",
+      actions: h(Button, { variant: "icon", label: "New loop", icon: h(Icon, { name: "sparkles", size: 18 }) }) })`,
       },
     ],
   },
@@ -487,15 +471,13 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "Send, or send another way",
-        code: `() => { const [said, setSaid] = React.useState(null);
-  return h("div", { style: { display: "grid", gap: 12, minHeight: 150 } },
-    h(SplitButton, { onSelect: () => setSaid("sent"), items: [
-      { label: "Send as a mail", onSelect: () => setSaid("mail") },
-      { label: "Send as a text", onSelect: () => setSaid("text") },
+        code: `() => h("div", { style: { minHeight: 180 } },
+    h(SplitButton, { items: [
+      { label: "Send as a mail" },
+      { label: "Send as a text" },
       { kind: "sep" },
-      { label: "Schedule for tomorrow", onSelect: () => setSaid("tomorrow") },
-    ] }, "Send it"),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, said ? "Chose: " + said : "Nothing chosen yet")); }`,
+      { label: "Schedule for tomorrow" },
+    ] }, "Send it"))`,
       },
       {
         label: "In a topic",
@@ -519,14 +501,14 @@ const SPECS: Spec[] = [
       {
         label: "Three cards",
         code: `() => h(Carousel, { label: "What is waiting" }, [
-    h(Card, { key: 1, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Tandarts"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Dinsdag 14:00, bevestigen")),
-    h(Card, { key: 2, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Pakket"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Komt vandaag tussen 13 en 15")),
-    h(Card, { key: 3, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Aannemer"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Offerte vergelijken")),
+    h(Card, { key: 1, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Dentist"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Tuesday 14:00, confirm it")),
+    h(Card, { key: 2, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Parcel"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Arrives today between 13 and 15")),
+    h(Card, { key: 3, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Contractor"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Compare the quotes")),
   ])`,
       },
       {
         label: "With arrows",
-        code: `() => h(Carousel, { arrows: true, label: "This week" }, [0, 1, 2].map((i) => h(Card, { key: i, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, ["Maandag", "Dinsdag", "Woensdag"][i]), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Three things, one waiting on you"))))`,
+        code: `() => h(Carousel, { arrows: true, label: "This week" }, [0, 1, 2].map((i) => h(Card, { key: i, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, ["Monday", "Tuesday", "Wednesday"][i]), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Three things, one waiting on you"))))`,
       },
     ],
   },
@@ -540,8 +522,11 @@ const SPECS: Spec[] = [
       { name: "label", type: "string" },
     ],
     variants: [
-      { label: "Lock screen size", code: `h(Mark, { size: 64 })` },
-      { label: "Three sizes", code: `h("div", { style: { display: "flex", gap: 40, alignItems: "center", padding: 24 } }, h(Mark, { size: 48 }), h(Mark, { size: 64 }), h(Mark, { size: 96 }))` },
+      { label: "Lock screen size", code: `h("div", { style: { display: "grid", justifyItems: "center", gap: 18, padding: "36px 16px", maxWidth: 300, borderRadius: 32, background: "var(--glass)", border: "1px solid var(--edge)" } },
+    h("div", { style: { font: "200 56px/1 var(--font-text)", fontVariantNumeric: "tabular-nums" } }, "9:41"),
+    h(Mark, { size: 64 }),
+    h("div", { style: { fontSize: 13, color: "var(--label)" } }, "Look at your phone to open"))` },
+      { label: "Three sizes", code: `h("div", { style: { display: "flex", flexWrap: "wrap", gap: 32, alignItems: "center", padding: 16 } }, h(Mark, { size: 48 }), h(Mark, { size: 64 }), h(Mark, { size: 96 }))` },
       { label: "Which Iris, how big", code: `h("div", { style: { display: "flex", gap: 36, alignItems: "center", flexWrap: "wrap", padding: 12, font: "var(--text-sub)", color: "var(--dim)" } }, ...[["Orb 22", h(Orb, { size: 22 })], ["Orb 34", h(Orb, { size: 34, state: "listening" })], ["Mark 64", h(Mark, { size: 64 })], ["TalkOrb talking", h(TalkOrb, { size: 120, state: "talking" })], ["TalkOrb thinking", h(TalkOrb, { size: 120, state: "thinking" })], ["Orb3D", h(Orb3D, { size: 180 })]].map(([t, el]) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 10 } }, el, t)))` },
     ],
   },
@@ -561,9 +546,12 @@ const SPECS: Spec[] = [
       { name: "speed", type: "number" },
     ],
     variants: [
-      { label: "She thinks, each time another", code: `h("div", { style: { display: "flex", gap: 26, flexWrap: "wrap", padding: 16, font: "var(--text-sub)", color: "var(--dim)" } }, ...THINKING.map((t) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 22 } }, h(TalkOrb, { size: 90, state: "thinking", thinking: t }), t)))` },
+      { label: "She thinks, each time another", code: `() => { const [n, setN] = React.useState(0);
+  React.useEffect(() => { const t = setInterval(() => setN((x) => x + 1), 4000); return () => clearInterval(t); }, []);
+  return h("div", { style: { display: "flex", gap: 20, alignItems: "center", padding: 16 } },
+    h(TalkOrb, { size: 90, state: "thinking", thinking: THINKING[n % THINKING.length] }),
+    h("div", { style: { display: "grid", gap: 4 } }, h("div", { style: { fontSize: 17 } }, "Comparing three quotes"), h("div", { style: { fontSize: 13, color: "var(--label)" } }, "Each time she thinks, the light runs another way"))); }` },
       { label: "Round a screen, while it reloads", code: `h("div", { style: { padding: 20 } }, h(Edge, { pattern: "comet", shape: "rect", width: 180, height: 120, radius: 28 }))` },
-      { label: "Along any SVG path", code: `h("div", { style: { display: "flex", gap: 40, padding: 20 } }, h(Edge, { path: "M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2.2 0 3.6 1.3 5.4 3.3 1.8-2 3.2-3.3 5.4-3.3 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z", width: 110, pattern: "comet" }), h(Edge, { path: "M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2.2 0 3.6 1.3 5.4 3.3 1.8-2 3.2-3.3 5.4-3.3 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z", width: 110, pattern: "party" }))` },
     ],
   },
   {
@@ -580,7 +568,7 @@ const SPECS: Spec[] = [
       { name: "speed", type: "number" },
     ],
     variants: [
-      { label: "Four patterns", code: `h("div", { style: { display: "flex", gap: 32, flexWrap: "wrap", padding: 12 } }, ...["comet", "sparks", "zip", "party"].map((p) => h(EdgeText, { key: p, text: "Iris", pattern: p, size: 64 })))` },
+      { label: "The word of a big moment", code: `h("div", { style: { padding: 12 } }, h(EdgeText, { text: "Done", pattern: "comet", size: 64 }))` },
     ],
   },
   {
@@ -626,15 +614,12 @@ const SPECS: Spec[] = [
       {
         label: "Fanned out",
         code: `() => {
-  const [picked, setPicked] = React.useState("");
-  return h("div", { style: { display: "grid", gap: 8 } },
-    h(CircleStack, { open: true, onSelect: setPicked, items: [
+  return h(CircleStack, { open: true, items: [
       { id: "debtors", title: "Debtors", line: "Van Dijk is 34 days late", unread: 1, loops: [{ title: "Van Dijk", step: 3 }, { title: "Bakker", step: 2 }, { title: "Peters", step: 4 }, { title: "Jansen", step: 1 }] },
       { id: "groceries", title: "Groceries", line: "Saturday delivery, 8 on the list", loops: [{ title: "Groceries", step: 1 }] },
       { id: "renovation", title: "Renovation", line: "Comparing 3 quotes" },
       { id: "dentist", title: "Dentist", line: "Pick a time" },
-    ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)", paddingLeft: 8 } }, picked ? "Opens: " + picked : "Tap a circle"));
+    ] });
 }`,
       },
     ],
@@ -652,8 +637,8 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "Every phase",
-        code: `() => h("div", { style: { display: "flex", gap: 14, alignItems: "center", paddingTop: 8 } },
-    ["Recognised", "Planned", "Busy", "You", "Check", "Done"].map((t, i) => h(LoopBubble, { key: t, title: t, step: i })))`,
+        code: `() => h("div", { style: { display: "flex", flexWrap: "wrap", gap: 16, paddingTop: 8 } },
+    ["Recognised", "Planned", "Busy", "You", "Check", "Done"].map((t, i) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 6, fontSize: 12, color: "var(--label)" } }, h(LoopBubble, { title: t, step: i }), t)))`,
       },
     ],
   },
@@ -677,12 +662,7 @@ const SPECS: Spec[] = [
     variants: [
       {
         label: "The word behind the person",
-        code: `() => {
-  const [edge, setEdge] = React.useState(0.5);
-  return h("div", { style: { display: "grid", gap: 12, maxWidth: 380 } },
-    h(Photo, { kind: "back", word: "CALM", threshold: edge, alt: "A figure in front of two ridges at dusk" }),
-    h(Slider, { label: "Where the near part starts", min: 5, max: 90, value: Math.round(edge * 100), onChange: (v) => setEdge(v / 100) }));
-}`,
+        code: `() => h("div", { style: { maxWidth: 380 } }, h(Photo, { kind: "back", word: "CALM", alt: "A figure in front of two ridges at dusk" }))`,
       },
       {
         label: "Parallax and duotone",
@@ -706,12 +686,13 @@ const SPECS: Spec[] = [
     ],
     variants: [
       {
-        label: "All eight",
-        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 14 } },
-    [["comet", "Refreshing"], ["breathe", "Listening"], ["orbit", "Thinking"], ["sparks", "Working on a loop"], ["wave", "She speaks"], ["stream", "Waits on you"], ["heartbeat", "A new loop"], ["zip", "Saving"]].map(([p, when]) =>
-      h("div", { key: p, style: { display: "grid", gap: 6, justifyItems: "center" } },
-        h("div", { style: { width: 96, height: 180 } }, h(BorderPattern, { pattern: p, radius: 22, label: when }, h("div", { style: { height: 180 } }))),
-        h("div", { style: { fontSize: 12, color: "var(--label)", textAlign: "center" } }, when))))`,
+        label: "All eight, one at a time",
+        code: `() => { const all = [["comet", "Refreshing"], ["breathe", "Listening"], ["orbit", "Thinking"], ["sparks", "Working on a loop"], ["wave", "She speaks"], ["stream", "Waits on you"], ["heartbeat", "A new loop"], ["zip", "Saving"]];
+  const [p, setP] = React.useState("comet"); const when = all.find((x) => x[0] === p)[1];
+  return h("div", { style: { display: "grid", gap: 16, maxWidth: 360 } },
+    h(Select, { label: "The moment", value: p, onChange: setP, options: all.map(([value, label]) => ({ value, label })) }),
+    h(BorderPattern, { key: p, pattern: p, label: when },
+      h("div", { style: { padding: "var(--pad-card)", display: "grid", gap: 4 } }, h("div", { style: { fontSize: 17 } }, "Groceries for Saturday"), h("div", { style: { fontSize: 12, color: "var(--label)" } }, when)))); }`,
       },
       {
         label: "Round a card",
