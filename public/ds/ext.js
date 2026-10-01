@@ -55,7 +55,7 @@
     Orb3D: () => 2
   };
   var ORBS = /* @__PURE__ */ new Set(["Orb", "TalkOrb", "Orb3D", "StatusPill", "MacPill"]);
-  var HEROES = /* @__PURE__ */ new Set(["Word", "ThemeWord", "EdgeText", "Orb3D", "PhaseRing", "Progress", "Stat", "Photo", "Widget", "Pattern"]);
+  var HEROES = /* @__PURE__ */ new Set(["LabWord", "Word", "ThemeWord", "EdgeText", "Orb3D", "PhaseRing", "Progress", "Stat", "Photo", "Widget", "Pattern"]);
   function icon(name, size = 20) {
     return typeof name === "string" ? h2(UI().Icon, { name, size }) : name;
   }
@@ -117,7 +117,7 @@
       case "Row": {
         let trailing = props.trailing;
         if (b) trailing = h2(I.Toggle, { on: !!val, onChange: (x) => set(b, x) });
-        else if (props.value != null) trailing = h2("span", { className: "ia-value" }, props.value);
+        else if (props.value != null) trailing = h2("span", { className: "ia-value" + (/await|missing|overdue|sign|waits|late/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
         const ic = p.icon && typeof p.icon === "object" ? h2(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : void 0;
         return h2(I.Row, {
           ...props,
@@ -232,11 +232,23 @@
       onClick: () => ctx.run("back"),
       icon: h2("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, icon("chevron", 18))
     }) : null;
-    const top = s.top ? h2(I.Button, { variant: "glass", size: "sm", icon: s.top.icon ? icon(s.top.icon, 14) : void 0, onClick: () => s.top.on && ctx.run(s.top.on) }, fill(s.top.label, ctx.state)) : null;
+    const top = s.top ? s.top.icon ? h2(I.Button, { variant: "icon", label: fill(s.top.label, ctx.state), icon: icon(s.top.icon, 18), onClick: () => s.top.on && ctx.run(s.top.on) }) : h2(I.Button, { variant: "glass", size: "sm", onClick: () => s.top.on && ctx.run(s.top.on) }, fill(s.top.label, ctx.state)) : null;
     const body = h2(
       react_shim_default.Fragment,
       null,
-      depth > 0 ? h2(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back, actions: top }) : h2(
+      // One header everywhere: one level down the app bar holds only the way back (and its one action); the title stands
+      // large under it, as on the first screen, so every screen has the same hierarchy.
+      depth > 0 ? h2(
+        react_shim_default.Fragment,
+        null,
+        h2(I.AppBar, { title: "", leading: back, actions: top }),
+        s.bare ? null : h2(
+          "header",
+          { className: "ia-head ia-head-deep" },
+          s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
+          h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
+        )
+      ) : h2(
         "header",
         { className: "ia-head" + (top ? " ia-head-top" : "") },
         top ? h2("div", { className: "ia-top" }, top) : null,
@@ -244,20 +256,24 @@
         s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
         h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
       ),
-      depth > 0 && s.eyebrow ? h2("p", { className: "ia-eyebrow ia-sub" }, fill(s.eyebrow, ctx.state)) : null,
-      s.lede ? h2("p", { className: "ia-lede", dangerouslySetInnerHTML: { __html: lede(fill(s.lede, ctx.state)) } }) : null,
+      s.lede ? h2(Lede, { text: fill(s.lede, ctx.state), mark: s.mark }) : null,
       s.hero ? h2("div", { className: "ia-hero" }, h2(Part, { p: s.hero, ctx })) : null,
       h2("div", { className: "ia-parts" }, (s.parts ?? []).map((p, i) => h2(Part, { key: i, p, ctx }))),
       s.action || s.second ? h2("div", { className: "ia-action" }, h2(
         I.ButtonGroup,
-        { stack: true, topic: s.topic },
-        s.action ? h2(I.Button, { variant: s.action.danger ? "danger" : "primary", size: "lg", topic: s.topic, onClick: () => s.action.on && ctx.run(s.action.on) }, fill(s.action.label, ctx.state)) : null,
+        { stack: true, topic: s.topic ?? ctx.topic },
+        s.action ? h2(I.Button, { variant: s.action.danger ? "danger" : "primary", size: "lg", topic: s.topic ?? ctx.topic, onClick: () => s.action.on && ctx.run(s.action.on) }, fill(s.action.label, ctx.state)) : null,
         s.second ? h2(I.Button, { variant: "glass", onClick: () => s.second.on && ctx.run(s.second.on) }, fill(s.second.label, ctx.state)) : null
       )) : null
     );
-    return s.topic ? h2(I.Topic, { name: s.topic }, body) : body;
+    const t = s.topic ?? ctx.topic;
+    return t ? h2(I.Topic, { name: t }, body) : body;
   }
-  var lede = (t) => t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  function Lede({ text, mark }) {
+    const I = UI();
+    const bits = String(text).split(/(\*\*.+?\*\*|==.+?==)/g).filter(Boolean);
+    return h2("p", { className: "ia-lede" }, bits.map((b, i) => b.startsWith("**") ? h2("b", { key: i }, b.slice(2, -2)) : b.startsWith("==") ? mark && I.Pen ? h2(I.Pen, { key: i, kind: mark.kind ?? "underline", look: mark.look ?? "clean" }, b.slice(2, -2)) : h2("b", { key: i }, b.slice(2, -2)) : b));
+  }
   var TALK = ["listening", "thinking", "talking"];
   function Talk({ s, ctx }) {
     const I = UI();
@@ -355,18 +371,21 @@
         }
       }
     };
-    const ctx = { state, set, run };
+    const ctx = { state, set, run, topic: spec.topic };
     const id = stack[stack.length - 1], s = spec.screens[id];
     const talking = s.kind === "talk";
     const tabOf = (sid) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
-    const activeTab = Math.max(0, ...stack.map(tabOf).filter((i) => i >= 0).slice(0, 1));
+    const activeTab = Math.max(0, [...stack].reverse().map(tabOf).find((i) => i >= 0) ?? 0);
     const railAt = spec.rail ? Math.max(0, spec.rail.findIndex((r) => stack.includes(r.to))) : -1;
     const wide = !!spec.rail || frame === "window";
     const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
+    const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
+    const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2] } : void 0;
     return h2(
       "div",
-      { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame },
+      { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, style: tint },
       spec.rail ? h2("div", { className: "ia-rail-col" }, h2(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) => ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
+      spec.backdrop ? h2("div", { className: "ia-backdrop", "aria-hidden": "true" }, h2(Part, { p: spec.backdrop, ctx })) : null,
       h2(
         "main",
         { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
@@ -388,7 +407,7 @@
       h2(
         "div",
         { className: "ia-layer" },
-        sheet ? h2(
+        sheet ? h2(spec.topic ? I.Topic : react_shim_default.Fragment, spec.topic ? { name: spec.topic } : null, h2(
           I.Sheet,
           { open: true, side: wide ? "end" : "bottom", onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
           h2(
@@ -399,10 +418,10 @@
               I.ButtonGroup,
               { stack: true },
               // The one primary first, then the rest as glass: action is the primary, actions[] the others.
-              [...sheet.action ? [{ ...sheet.action, primary: true }] : [], ...sheet.actions ?? []].map((a, i) => h2(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", onClick: () => run(a.on ?? "close") }, fill(a.label, state)))
+              [...sheet.action && (!sheet.action.if || test(sheet.action.if, state)) ? [{ ...sheet.action, primary: true }] : [], ...sheet.actions ?? []].map((a, i) => h2(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", topic: spec.topic, onClick: () => run(a.on ?? "close") }, fill(a.label, state)))
             )) : null
           )
-        ) : null,
+        )) : null,
         dialog ? h2(I.Dialog, {
           open: true,
           onClose: () => run("close"),
@@ -427,11 +446,11 @@
       let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0;
       if (s.kind === "talk") orbs = 1;
       if (s.status) orbs++;
-      let busy = 0, words = 0, pens = 0, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
+      let busy = s.mark && /==.+==/.test(s.lede ?? "") ? BUSY.Pen({ c: "Pen", look: s.mark.look }) : 0, markPen = s.mark && /==.+==/.test(s.lede ?? "") ? 1 : 0, words = 0, pens = markPen, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
       walk(parts, (p) => {
         if (ORBS.has(p.c) || p.c === "Widget" && p.look === "orb") orbs++;
-        busy += BUSY[p.c]?.(p) ?? 0;
-        if (p.c === "Word" || p.c === "ThemeWord" || p.c === "EdgeText") words++;
+        busy += BUSY[p.c]?.(p) ?? (Number(p.busy) || 0);
+        if (p.c === "Word" || p.c === "ThemeWord" || p.c === "EdgeText" || p.big) words++;
         if (p.c === "Pen") pens++;
         if (p.c === "Anchor") anchors++;
         if (p.c === "Button" && p.variant === "primary") primaries++;
@@ -466,11 +485,12 @@
   function costOf(s) {
     const out = [];
     const walk = (ps = []) => ps.forEach((p) => {
-      const c = BUSY[p.c]?.(p) ?? 0;
+      const c = BUSY[p.c]?.(p) ?? (Number(p.busy) || 0);
       if (c) out.push([p.c + (p.look ? ", " + p.look : p.effect ? ", " + p.effect : ""), c]);
       walk(p.parts);
     });
     walk([...s.hero ? [s.hero] : [], ...s.parts ?? []]);
+    if (s.mark?.look === "neon" && /==.+==/.test(s.lede ?? "")) out.push(["Pen, neon", 2]);
     return out;
   }
   function depthOf(spec) {
@@ -961,11 +981,11 @@
     icon: icon2,
     children
   }) {
-    const Icon = window.IrisUi?.Icon;
+    const Icon2 = window.IrisUi?.Icon;
     return h3(
       "div",
       { className: "ix-empty" },
-      icon2 && Icon ? h3("span", { className: "ix-empty-icon", "aria-hidden": "true" }, h3(Icon, { name: icon2, size: 22 })) : null,
+      icon2 && Icon2 ? h3("span", { className: "ix-empty-icon", "aria-hidden": "true" }, h3(Icon2, { name: icon2, size: 22 })) : null,
       h3("span", { className: "ix-empty-title" }, title),
       line ? h3("span", { className: "ix-empty-line" }, line) : null,
       action || children ? h3("div", { className: "ix-empty-actions" }, action ? houseButton({ variant: "glass", size: "sm", onClick: action.onClick }, action.label) : children) : null
@@ -1868,7 +1888,7 @@
         const c = cv.getContext("2d");
         c.scale(dpr, dpr);
         const R = radius ?? (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0);
-        pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--wait") };
+        pen = { c, ...edgeOf(W, H, R, 3), ...tokenOf(el, "--k") ? { violet: tokenOf(el, "--k"), ice: tokenOf(el, "--k"), you: tokenOf(el, "--k") } : { violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--wait") } };
       };
       const paint = (ms) => {
         if (pen) {
@@ -2511,6 +2531,41 @@
   function ThemeWord(props) {
     return props.theme === "frozen" || !props.theme ? h3(FrostWord, { text: props.text, height: props.height }) : h3(Word, { text: props.text, theme: props.theme, height: props.height });
   }
+  var MORE_PATHS = {
+    calendar: "M5 6h14v14H5zM5 10h14M9 3v5M15 3v5",
+    doc: "M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5",
+    euro: "M17 7a6 6 0 1 0 0 10M5 10h9M5 14h9",
+    box: "M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8",
+    chart: "M5 20V10M10 20V5M15 20v-7M20 20v-4",
+    people: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c1-3 3.3-5 6-5s5 2 6 5M16 11a2.5 2.5 0 1 0 0-5M17 15c2 .5 3.4 2.2 4 5",
+    check: "M5 12l4 4 10-10",
+    clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+    bell: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0",
+    home: "M4 11l8-7 8 7v9H4zM10 20v-5h4v5",
+    search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4",
+    plus: "M12 5v14M5 12h14",
+    wrench: "M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 1-2-2zM14 6l3-3",
+    heart: "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z",
+    flag: "M5 21V4M5 4h11l-2 4 2 4H5",
+    pin: "M12 21s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+    chat: "M4 5h16v11H9l-5 4z"
+  };
+  var BaseIcon = window.IrisUi?.Icon;
+  function Icon({ name, size = 20 }) {
+    const d = MORE_PATHS[name];
+    if (!d) return BaseIcon ? h3(BaseIcon, { name, size }) : null;
+    return h3("svg", {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: 2,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      "aria-hidden": true
+    }, h3("path", { d }));
+  }
   function Toggle({ on = false, onChange, label, disabled }) {
     const [own, setOwn] = useState(on);
     const value = onChange ? on : own;
@@ -2577,6 +2632,7 @@
     VaultAsk,
     TableApp,
     ...BaseWord ? { Word } : {},
+    ...BaseIcon ? { Icon } : {},
     ...BaseThemeWord && BaseWord ? { ThemeWord } : {},
     ...TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {},
     ...Orb3DThinks ? { Orb3D: Orb3DThinks } : {}

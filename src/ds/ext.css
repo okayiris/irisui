@@ -2581,3 +2581,107 @@
 .ix-frost {
   cursor: pointer;
 }
+.ia-screen .ix-appbar[data-variant="small"] {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+.ia-head-deep .ia-eyebrow {
+  margin-top: 0;
+}
+
+/* The one action sits at the foot of the screen, in thumb reach (Meaning: "a full-width button in thumb reach at the
+   bottom"): a short screen no longer ends in dead space under its button. */
+.ia-screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.ia-screen > .iris-topic {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.ia-screen .ia-action {
+  padding-top: 20px;
+}
+.ia-scroll {
+  display: flex;
+  flex-direction: column;
+}
+.ia-scroll > .ia-screen {
+  flex: 1;
+}
+/* A sheet in an app is solid enough that nothing behind it ghosts through. */
+.ia-layer .ix-sheet {
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(24px);
+}
+/* The theme behind every screen: quiet, under the content, never catching a tap. */
+.ia-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.ia-backdrop > * {
+  width: 100%;
+  height: 100%;
+}
+.ia-app > .ia-scroll {
+  z-index: 1;
+}
+/* The backdrop lives in the header zone of each screen and fades out before the content, so nothing drifts over text. */
+.ia-backdrop {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 22%, transparent 42%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 22%, transparent 42%);
+}
+.iris-card > .ia-label:first-child {
+  margin: 0 0 8px;
+}
+.ia-value.ia-act {
+  color: var(--k, var(--accent));
+  font-weight: 600;
+}
+/* A widget's number fits its tile: €3,000 in a small tile shrinks instead of losing its last digit. */
+.iris-widget {
+  container-type: inline-size;
+}
+.iris-widget .iris-wvalue {
+  font-size: min(46px, 24cqi);
+}
+/* The one action stays in reach: it sticks just above the tab bar (or the screen's foot) while the content scrolls. */
+
+.ia-screen .ia-action::before {
+  display: none;
+  content: "";
+  position: absolute;
+  inset: -16px calc(-1 * var(--gutter, 16px)) -24px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+  z-index: -1;
+  pointer-events: none;
+}
+/* Secondary text in an app reads for everyone: a little larger and lighter than the release's sub line. */
+.ia-app .iris-row-sub {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--fg) 68%, transparent);
+}
+.ia-app .ia-lede {
+  color: color-mix(in srgb, var(--fg) 74%, transparent);
+}
+.ia-value.ia-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+
+/* Content scrolls away under a soft fade above the tab bar, never hard under it. */
+.ia-tabbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}

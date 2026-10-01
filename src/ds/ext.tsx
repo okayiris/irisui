@@ -1759,7 +1759,8 @@ export function BorderPattern({
       const c = cv.getContext("2d") as CanvasRenderingContext2D;
       c.scale(dpr, dpr);
       const R = radius ?? (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0);
-      pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--wait") };
+      // Inside a Topic the light takes the topic's two tints, so it belongs to the screen instead of fighting it.
+      pen = { c, ...edgeOf(W, H, R, 3), ...(tokenOf(el, "--k") ? { violet: tokenOf(el, "--k"), ice: tokenOf(el, "--k"), you: tokenOf(el, "--k") } : { violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--wait") }) };
     };
     const paint = (ms: number) => {
       if (pen) {
@@ -2440,6 +2441,35 @@ function ThemeWord(props: Any) {
   return props.theme === "frozen" || !props.theme ? h(FrostWord, { text: props.text, height: props.height }) : h(Word, { text: props.text, theme: props.theme, height: props.height });
 }
 
+// Icon: the release has 14 line icons, so a list of agenda, documents and money got a globe, a shield and a loop. These
+// are drawn the same way (24 grid, stroke 2, round caps and joins, like SF Symbols) and named for what they show.
+const MORE_PATHS: Record<string, string> = {
+  calendar: "M5 6h14v14H5zM5 10h14M9 3v5M15 3v5",
+  doc: "M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5",
+  euro: "M17 7a6 6 0 1 0 0 10M5 10h9M5 14h9",
+  box: "M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8",
+  chart: "M5 20V10M10 20V5M15 20v-7M20 20v-4",
+  people: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c1-3 3.3-5 6-5s5 2 6 5M16 11a2.5 2.5 0 1 0 0-5M17 15c2 .5 3.4 2.2 4 5",
+  check: "M5 12l4 4 10-10",
+  clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  bell: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0",
+  home: "M4 11l8-7 8 7v9H4zM10 20v-5h4v5",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4",
+  plus: "M12 5v14M5 12h14",
+  wrench: "M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 1-2-2zM14 6l3-3",
+  heart: "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z",
+  flag: "M5 21V4M5 4h11l-2 4 2 4H5",
+  pin: "M12 21s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+  chat: "M4 5h16v11H9l-5 4z",
+};
+const BaseIcon = (window as Any).IrisUi?.Icon;
+function Icon({ name, size = 20 }: { name: string; size?: number }) {
+  const d = MORE_PATHS[name];
+  if (!d) return BaseIcon ? h(BaseIcon, { name, size }) : null;
+  return h("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2,
+    strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true }, h("path", { d }));
+}
+
 // The shipped Toggle only moves when a parent hands it onChange, and it has no name: alone it is a dead switch a
 // screen reader calls "switch". This one keeps its own state when nobody controls it, and takes `label`.
 function Toggle({ on = false, onChange, label, disabled }: { on?: boolean; onChange?: (on: boolean) => void; label?: string; disabled?: boolean }) {
@@ -2512,6 +2542,7 @@ const SHIPPED = {
   VaultAsk,
   TableApp,
   ...(BaseWord ? { Word } : {}),
+  ...(BaseIcon ? { Icon } : {}),
   ...(BaseThemeWord && BaseWord ? { ThemeWord } : {}),
   ...(TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {}),
   ...(Orb3DThinks ? { Orb3D: Orb3DThinks } : {}),
