@@ -57,6 +57,19 @@ export const OVERRIDES_CORE: Record<string, Override> = {
   },
 
   buttongroup: {
+    demos: [
+      {
+        label: "One decision",
+        code: `() => h(ButtonGroup, { topic: "agenda" },
+  h(Button, { variant: "primary" }, "Schedule it"),
+  h(Button, { variant: "glass" }, "Later"),
+  h(Button, { variant: "text" }, "Details"))`,
+      },
+      {
+        label: "In the parcel topic",
+        code: `() => h(ButtonGroup, { topic: "parcel" }, h(Button, { variant: "primary" }, "Track parcel"), h(Button, { variant: "glass" }, "Other address"))`,
+      },
+    ],
     when: "The button set of one screen in its topic: primary flat, secondary glass, the quieter kinds beside them.",
     parts: [
       { name: "primary", what: "Button variant primary: the topic accent flat with dark ink." },
@@ -136,6 +149,31 @@ export const OVERRIDES_CORE: Record<string, Override> = {
   },
 
   row: {
+    demos: [
+      {
+        label: "Chevron",
+        code: `() => h(Row, { icon: h(Icon, { name: "phone" }), title: "This device", subtitle: "Blocks, voice, notifications and how she talks here.", chevron: true, onClick: () => {} })`,
+      },
+      {
+        label: "Toggle",
+        code: `() => h(Row, { icon: h(Icon, { name: "car" }), title: "On the road", subtitle: "She listens and talks through this iPhone, even when locked.", trailing: h(Toggle, { label: "On the road" }) })`,
+      },
+      {
+        label: "Menu",
+        code: `() => h(Row, { icon: h(Icon, { name: "wave" }), title: "Voice", subtitle: "Dutch, warm and clear", trailing: h(Menu, { label: "Alex", align: "end", items: [ { label: "Alex", checked: true }, { label: "Calmer", checked: false }, { label: "No voice", checked: false } ] }) })`,
+      },
+      {
+        label: "Grouped in a card",
+        code: `() => h(Card, { padding: 0 },
+  h(Row, { icon: h(Icon, { name: "mic" }), title: "Listen for her name", subtitle: "Say Iris and she answers", trailing: h(Toggle, { on: true, label: "Listen for her name" }) }),
+  h(Row, { icon: h(Icon, { name: "speaker" }), title: "Read mail out loud", subtitle: "Only from people you know", trailing: h(Toggle, { label: "Read mail out loud" }) }),
+  h(Row, { icon: h(Icon, { name: "shield" }), title: "Vault", subtitle: "Only your iPhone opens it", chevron: true, onClick: () => {} }))`,
+      },
+      {
+        label: "Danger",
+        code: `() => h(Row, { icon: h(Icon, { name: "trash" }), title: "Delete account", subtitle: "Deletes her and everything she stored.", danger: true, onClick: () => {} })`,
+      },
+    ],
     when: "One line of a settings page: icon, title, the dim line under it, and a control on the right.",
     parts: [
       { name: "icon", what: "24px icon at 80% --fg in a 24px box, flex none." },
@@ -178,6 +216,16 @@ export const OVERRIDES_CORE: Record<string, Override> = {
   },
 
   toggle: {
+    demos: [
+      {
+        label: "Off, in its row",
+        code: `() => h(Row, { icon: h(Icon, { name: "car" }), title: "On the road", subtitle: "She listens and talks through this iPhone, even when locked.", trailing: h(Toggle, { label: "On the road" }) })`,
+      },
+      {
+        label: "On, in its row",
+        code: `() => h(Row, { icon: h(Icon, { name: "mic" }), title: "Listen for her name", subtitle: "Say Iris and she answers", trailing: h(Toggle, { on: true, label: "Listen for her name" }) })`,
+      },
+    ],
     when: "A setting that is on or off and takes effect at once.",
     parts: [
       { name: "on", what: "Prop for the state; violet when on, grey glass when off." },
@@ -408,6 +456,18 @@ export const OVERRIDES_CORE: Record<string, Override> = {
   },
 
   stat: {
+    demos: [
+      {
+        label: "Pair",
+        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12 } },
+  h(Stat, { topic: "groceries", value: "5", label: "to get" }), h(Stat, { topic: "groceries", value: "€42", label: "estimate" }))`,
+      },
+      {
+        label: "Three, one topic",
+        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 } },
+  h(Stat, { topic: "agenda", value: "14:00", label: "next" }), h(Stat, { topic: "agenda", value: "4", label: "today" }), h(Stat, { topic: "agenda", value: "1", label: "waiting" }))`,
+      },
+    ],
     when: "One number and one word, at the top of a card or a window.",
     parts: [
       { name: "value", what: "The number, short: a count, a time, an amount." },

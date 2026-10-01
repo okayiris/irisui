@@ -159,7 +159,7 @@ export function Menu({
     "span",
     { className: "ix-menu-host", ref: host },
     trigger
-      ? h("span", { className: "ix-menu-trigger", onClick: () => setOpen((v) => !v), "aria-haspopup": "menu", "aria-expanded": open, tabIndex: 0, onKeyDown: (e: Any) => e.key === "Enter" && setOpen((v) => !v) }, trigger)
+      ? h("span", { className: "ix-menu-trigger", role: "button", "aria-label": label || undefined, onClick: () => setOpen((v) => !v), "aria-haspopup": "menu", "aria-expanded": open, tabIndex: 0, onKeyDown: (e: Any) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen((v) => !v)) }, trigger)
       : houseButton(
           {
             variant: "glass",
@@ -1067,14 +1067,11 @@ export function SplitButton({
       "span",
       { className: "ix-split-caret" },
       h(Menu, {
-        label: "",
+        label: "More actions",
         align: "end",
         items,
-        trigger: h(
-          "span",
-          { className: "ix-split-btn", role: "button", tabIndex: 0, "aria-label": "More actions" },
-          h("span", { "aria-hidden": "true" }, "⌄"),
-        ),
+        // The caret wears the house button's own classes, so both halves share one fill, one height, one shape.
+        trigger: h("span", { className: `ix-split-btn iris-btn iris-btn-${variant} iris-btn-${size}`, "aria-hidden": "true" }, "⌄"),
       }),
     ),
   );
@@ -2099,6 +2096,26 @@ function thinksWith(Base: Any, ring: number, fallback: number) {
 const TalkOrbThinks = thinksWith((window as Any).IrisUi?.TalkOrb, 70 / 60, 66);
 const Orb3DThinks = thinksWith((window as Any).IrisUi?.Orb3D, 0.72, 220);
 
+// The shipped Toggle only moves when a parent hands it onChange, and it has no name: alone it is a dead switch a
+// screen reader calls "switch". This one keeps its own state when nobody controls it, and takes `label`.
+function Toggle({ on = false, onChange, label, disabled }: { on?: boolean; onChange?: (on: boolean) => void; label?: string; disabled?: boolean }) {
+  const [own, setOwn] = useState(on);
+  const value = onChange ? on : own;
+  return h(
+    "button",
+    {
+      type: "button",
+      className: "iris-toggle" + (value ? " on" : ""),
+      role: "switch",
+      "aria-checked": value,
+      "aria-label": label,
+      disabled,
+      onClick: () => (onChange ? onChange(!value) : setOwn(!value)),
+    },
+    h("i"),
+  );
+}
+
 // The shipped Orb3D shader declares its own round(); GLSL ES 3.00 already has one, so the compile fails and the
 // orb draws nothing. Until the release renames it, the source is renamed on its way to the GPU.
 for (const C of [(window as Any).WebGL2RenderingContext, (window as Any).WebGLRenderingContext]) {
@@ -2146,6 +2163,7 @@ const SHIPPED = {
   Edge,
   EdgeText,
   THINKING,
+  Toggle,
   ...(TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {}),
   ...(Orb3DThinks ? { Orb3D: Orb3DThinks } : {}),
 };

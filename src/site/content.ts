@@ -17,7 +17,7 @@ import { OVERRIDES_APPS } from "./content/overrides-apps";
 import { RESOURCE_DOCS_EXT } from "./content/resources";
 
 /** The published system plus the parts this project added, in the sidebar's own order. */
-export const components: Component[] = [...loadComponents(), ...EXT_COMPONENTS].sort((a, b) => {
+export const components: Component[] = [...loadComponents().map(withDemos), ...EXT_COMPONENTS].sort((a, b) => {
   const at = GROUPS.findIndex((g) => g.key === groupOf(a));
   const bt = GROUPS.findIndex((g) => g.key === groupOf(b));
   return at - bt || a.name.localeCompare(b.name);
@@ -37,6 +37,16 @@ export type Block =
 export type Section = { title: string; blocks: Block[] };
 export type Doc = { id: string; label: string; lede: string; sections: Section[] };
 
+/**
+ * A shipped part whose own preview breaks the system's rules (placeholder copy, a dead control, a destructive
+ * action in the middle of a group) gets its demos from its override instead. Each demo runs the variant's code
+ * with the whole system in scope, exactly like the parts this project added.
+ */
+function withDemos(c: Component): Component {
+  const demos = (OVERRIDES_CORE[c.id] ?? OVERRIDES_BRAND[c.id] ?? OVERRIDES_APPS[c.id])?.demos;
+  return demos?.length ? { ...c, variants: demos, preview: undefined, showcase: false } : c;
+}
+
 /** A component's own extra guidance, kept next to the code it describes. */
 export type Override = {
   when?: string;
@@ -45,6 +55,8 @@ export type Override = {
   specs?: { label: string; value: string }[];
   a11y?: string[];
   related?: string[];
+  /** Demos that replace the release's own preview on the component page. */
+  demos?: { label: string; code: string }[];
 };
 
 export const OVERRIDES: Record<string, Override> = {

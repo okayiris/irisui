@@ -1262,28 +1262,34 @@
 .ix-split {
   display: inline-flex;
   align-items: stretch;
-  gap: 6px;
 }
 
-.ix-split-caret {
-  display: inline-flex;
+/* one shape: the action on the left, the caret on the right, a hairline between */
+.ix-split > .iris-btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ix-split-caret,
+.ix-split .ix-menu-host {
+  display: flex;
+}
+
+.ix-split .ix-menu-trigger {
+  all: unset;
+  display: flex;
+  cursor: pointer;
+  border-radius: 0 999px 999px 0;
+}
+
+.ix-split .ix-menu-trigger:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 .ix-split-btn {
-  display: inline-grid;
-  place-items: center;
-  min-width: 40px;
-  height: 100%;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: var(--glass);
-  border: 1px solid var(--edge);
-  color: var(--fg);
-  cursor: pointer;
-}
-
-.ix-split-btn:hover {
-  background: var(--state-hover);
+  padding: 0 14px 0 12px;
+  border-radius: 0 999px 999px 0;
+  box-shadow: inset 1px 0 0 var(--line);
 }
 
 /* ---------- Carousel ---------- */
@@ -2108,7 +2114,7 @@
   container-type: inline-size;
 }
 .iris-stat b {
-  font-size: min(28px, 17cqi);
+  font-size: clamp(17px, 22cqi, 28px);
 }
 
 /* ---------- IrisApp: parts you swipe ---------- */
@@ -2267,3 +2273,4 @@
 }
 .ix-search { box-sizing: border-box; }
 .ix-search input { min-width: 0; flex: 1; }
+.ix-split-btn.iris-btn-primary { box-shadow: inset 1px 0 0 rgba(7, 9, 12, 0.22); }

@@ -568,7 +568,7 @@
     return h3(
       "span",
       { className: "ix-menu-host", ref: host },
-      trigger ? h3("span", { className: "ix-menu-trigger", onClick: () => setOpen((v) => !v), "aria-haspopup": "menu", "aria-expanded": open, tabIndex: 0, onKeyDown: (e) => e.key === "Enter" && setOpen((v) => !v) }, trigger) : houseButton(
+      trigger ? h3("span", { className: "ix-menu-trigger", role: "button", "aria-label": label || void 0, onClick: () => setOpen((v) => !v), "aria-haspopup": "menu", "aria-expanded": open, tabIndex: 0, onKeyDown: (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen((v) => !v)) }, trigger) : houseButton(
         {
           variant: "glass",
           size: "sm",
@@ -1281,14 +1281,11 @@
         "span",
         { className: "ix-split-caret" },
         h3(Menu, {
-          label: "",
+          label: "More actions",
           align: "end",
           items,
-          trigger: h3(
-            "span",
-            { className: "ix-split-btn", role: "button", tabIndex: 0, "aria-label": "More actions" },
-            h3("span", { "aria-hidden": "true" }, "\u2304")
-          )
+          // The caret wears the house button's own classes, so both halves share one fill, one height, one shape.
+          trigger: h3("span", { className: `ix-split-btn iris-btn iris-btn-${variant} iris-btn-${size}`, "aria-hidden": "true" }, "\u2304")
         })
       )
     );
@@ -2213,6 +2210,23 @@
   }
   var TalkOrbThinks = thinksWith(window.IrisUi?.TalkOrb, 70 / 60, 66);
   var Orb3DThinks = thinksWith(window.IrisUi?.Orb3D, 0.72, 220);
+  function Toggle({ on = false, onChange, label, disabled }) {
+    const [own, setOwn] = useState(on);
+    const value = onChange ? on : own;
+    return h3(
+      "button",
+      {
+        type: "button",
+        className: "iris-toggle" + (value ? " on" : ""),
+        role: "switch",
+        "aria-checked": value,
+        "aria-label": label,
+        disabled,
+        onClick: () => onChange ? onChange(!value) : setOwn(!value)
+      },
+      h3("i")
+    );
+  }
   for (const C of [window.WebGL2RenderingContext, window.WebGLRenderingContext]) {
     const shaderSource = C?.prototype?.shaderSource;
     if (!shaderSource || shaderSource.irisFixed) continue;
@@ -2257,6 +2271,7 @@
     Edge,
     EdgeText,
     THINKING,
+    Toggle,
     ...TalkOrbThinks ? { TalkOrb: TalkOrbThinks } : {},
     ...Orb3DThinks ? { Orb3D: Orb3DThinks } : {}
   };
