@@ -16,59 +16,9 @@
   /* The page around the app: the app window, and the rules beside it (never inside it). */
   .ex { grid-template-columns: minmax(0, 1080px) 300px; }
   @media (max-width: 1240px) { .ex { grid-template-columns: minmax(0, 1080px); } }
-
-  /* The app window: NavRail on the left, the app bar on top, the composer at the foot. */
-  .app { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); height: min(780px, calc(100dvh - 110px)); min-height: 600px;
-         border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: var(--bg); }
-  .app > .ix-rail { height: 100%; border: 0; border-right: 1px solid var(--line); border-radius: 0; }
-  .main { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-width: 0; container-type: inline-size; }
-  .main .ix-appbar { padding: 10px 20px; }
-  .main .ix-appbar-title { font: var(--text-row-title); font-weight: 600; }
-  .body { overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1fr) 16rem; gap: 32px; align-items: start; padding: 20px 24px 24px; }
-  .body > main { min-width: 0; }
-  .col { width: 100%; max-width: 44rem; display: grid; gap: 18px; align-content: start; }
-  .lede { font: var(--text-body); color: var(--dim); line-height: 1.5; margin: 0; }
-  .lede b { color: var(--fg); font-weight: 600; }
-  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .firstrow { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
-  .firstrow .iris-stat { width: 140px; }
-  .note { font: var(--text-sub); color: var(--dim); margin: 0; }
-  .count { font: var(--text-sub); color: var(--label); margin: 0; }
-
-  /* The conversation: a timeline with a hairline. */
-  .log { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 1px solid var(--line); display: grid; gap: 16px; }
-  .log li { position: relative; font: var(--text-body); line-height: 1.55; }
-  .log li::before { content: ""; position: absolute; left: -21px; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--fg); }
-  .log .you { color: var(--accent); }
-  .log .you::before { background: var(--accent); }
-  .log .step { color: var(--dim); }
-  .log .step::before { background: var(--label); }
-  .time { display: block; font: var(--text-label); color: var(--label); margin-bottom: 2px; }
-
-  /* Right side: what runs, and the one question waiting. */
-  .side { position: sticky; top: 0; display: grid; gap: 14px; }
-  .job { display: grid; gap: 6px; font: var(--text-body); padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-  .job small { font: var(--text-sub); color: var(--dim); }
-  .ask { display: grid; gap: 10px; padding: 14px; }
-  .ask p { margin: 0; }
-  @container (max-width: 820px) { .body { grid-template-columns: minmax(0, 1fr); } .side { display: none; } }
-  @container (max-width: 520px) { .ix-appbar-row { flex-wrap: wrap; } .ix-appbar-actions { margin-left: 0; } }
-
-  /* The composer, at the foot of every screen. */
-  .composer { padding: 10px 24px 16px; border-top: 1px solid var(--line); }
-  .composer form { max-width: 44rem; display: flex; gap: 8px; align-items: center; }
-  .composer form > :first-child { flex: 1; }
-
-  /* Sheet, dialog and snackbar cover this window, not the page. */
-  .snack { position: absolute; left: 50%; bottom: 88px; translate: -50% 0; z-index: 50; }
-  .sheet-body { display: grid; gap: 14px; }
-
-  @media (max-width: 640px) {
-    .ex { padding: 0 0 40px; }
-    .app { border-radius: 0; height: calc(100dvh - 90px); }
-    .body { padding: 16px; }
-    .composer { padding: 10px 16px 14px; }
-  }
+  .app { position: relative; height: min(780px, calc(100dvh - 110px)); min-height: 600px; border-radius: var(--radius-card); overflow: hidden;
+         box-shadow: 0 0 0 1px var(--edge); transform: translateZ(0); }
+  @media (max-width: 640px) { .ex { padding: 0 0 40px; } .app { border-radius: 0; height: calc(100dvh - 90px); } }
 </style>
 </head>
 <body data-platform="web">
@@ -81,231 +31,109 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { useState, useEffect, useRef } = React;
-  const { PreviewI18nProvider, Button, ButtonGroup, Segmented, Field, CheckList, Topic, Progress, Chip, SplitButton, Stat, Card, Row,
-          SearchField, Icon, NavRail, AppBar, StatusPill, Sheet, Dialog, Snackbar, BorderPattern } = window.IrisUi;
-  const I = (name, size = 18) => h(Icon, { name, size });
-  const now = () => new Date().toTimeString().slice(0, 5);
-  const Lab = ({ children }) => h("p", { className: "lab", style: { margin: 0 } }, children);
+  const { useState } = React;
+  const { PreviewI18nProvider, IrisApp, checkApp } = window.IrisUi;
 
-  /* ------------------------------------------------------------ the talk page */
+  // The whole web app is one spec: IrisApp draws the NavRail, the pages, the sheets from the right and the dialogs.
+  const did = (rows) => ({ c: "Group", parts: rows.map(([icon, title, sub, to]) => ({ c: "Row", icon, title, subtitle: sub, on: `push:${to}` })) });
+  const CALL = ["phone", "Moved the dentist to Wednesday 09:30", "14:10, called, 2 minutes", "t-dentist"];
+  const MARIO = ["phone", "Booked a table at Da Mario", "13:41, Saturday 20:00, six people", "t-mario"];
+  const FUNDA = ["globe", "Looked up houses on Funda", "13:52, read 12 pages, one step tried twice", "t-funda"];
+  const steps = (title, sub, items) => ({ title, eyebrow: sub, parts: [{ c: "Card", parts: [{ c: "CheckList", items }] }] });
 
-  function Talk({ log }) {
-    return h("div", { className: "col" },
-      h("p", { className: "lede" }, h("b", null, "Alex"), ", the dentist moved to Wednesday 09:30. Saturday stays free for Sam's party."),
-      h("ol", { className: "log", "aria-label": "Conversation", "aria-live": "polite" },
-        log.map((m, i) => h("li", { key: i, className: m.who },
-          m.who === "step" ? null : h("span", { className: "time" }, m.at), m.text))));
-  }
+  const WEB = {
+    name: "Iris", start: "talk",
+    rail: [{ label: "Talk", icon: "wave", to: "talk" }, { label: "Groceries", icon: "car", to: "groceries" },
+           { label: "What Iris did", icon: "loop", to: "did" }, { label: "Subscription", icon: "person", to: "plan" }],
+    state: { sent: [], draft: "", cake: "ask", items: ["Candles", "Balloons", "Lemonade", "Bread", "Milk", "Eggs"], done: [0, 4], add: "",
+             shop: "Albert Heijn", show: "All", awake: 1, next: "" },
+    screens: {
+      talk: { title: "Talk", status: { state: "idle" },
+        lede: "**Alex**, the dentist moved to Wednesday 09:30. Saturday stays free for Sam's party.",
+        parts: [
+          { c: "Group", parts: [
+            { c: "Row", icon: "person", title: "Can you move the dentist to Wednesday?", subtitle: "You, 14:02" },
+            { c: "Row", icon: "phone", title: "Called the dentist, 2 minutes", subtitle: "Iris, 14:03" },
+            { c: "Row", title: "Done, Alex. Wednesday at 09:30. The candles are still on your list.", subtitle: "Iris, 14:05" },
+            { c: "Row", each: "sent", icon: "person", title: "{$.v}", subtitle: "You, just now. Iris is on it." }] },
+          { c: "Field", placeholder: "Type to Iris, Enter sends", bind: "draft", add: "sent" },
+          { c: "BorderPattern", pattern: "stream", label: "Waits on you", if: "cake==ask", parts: [{ c: "Card", parts: [
+            { c: "Text", text: "Which cake for Sam? I put it on the grocery list." },
+            { c: "Buttons", stack: false, parts: [
+              { c: "Button", variant: "glass", label: "Chocolate", on: "set:cake=Chocolate;snack:Chocolate cake is on the grocery list." },
+              { c: "Button", variant: "glass", label: "Lemon", on: "set:cake=Lemon;snack:Lemon cake is on the grocery list." },
+              { c: "Button", variant: "text", label: "Not now", on: "set:cake=later;snack:She asks again tomorrow." }] }] }] }],
+        action: { label: "Talk to Iris", on: "talk" } },
+      voice: { kind: "talk", title: "Talk", lede: "Tap her orb and ask anything.",
+        parts: [{ c: "Text", text: "Go ahead, I am listening." }, { c: "Text", text: "Looking at your agenda." },
+                { c: "Text", text: "Tomorrow you have the dentist at half past nine." }] },
 
-  /* --------------------------------------------------------------- groceries */
+      groceries: { title: "Groceries", topic: "groceries", status: { state: "idle" },
+        lede: "**Alex**, the candles are at the Hema, next to the dentist. I order the rest at {shop} when you say so.",
+        hero: { c: "Progress", ring: true, size: 110, value: "=done/items", centre: "{done}/{items}", topic: "groceries" },
+        parts: [
+          { c: "Card", parts: [{ c: "CheckList", topic: "groceries", items: "{items}", bind: "done" }] },
+          { c: "Field", topic: "groceries", placeholder: "Add something", bind: "add", add: "items" }],
+        action: { label: "Order at {shop}", on: "sheet:order" }, second: { label: "Share the list", on: "snack:Link copied. Sam can add to it too." } },
+      order: { kind: "sheet", title: "Order at {shop}", lede: "What is not ticked yet, delivered to your door.",
+        parts: [
+          { c: "Chips", bind: "shop", items: ["Albert Heijn", "Jumbo", "Picnic"] },
+          { c: "Group", parts: [{ c: "Row", icon: "car", title: "Delivery", value: "Tomorrow, 16:00" }, { c: "Row", icon: "shield", title: "Pay with", value: "iDEAL" }] }],
+        action: { label: "Order at {shop}", on: "close;snack:Ordered at {shop}. Tomorrow between 16:00 and 18:00." },
+        actions: [{ label: "Not now", on: "close" }] },
 
-  const TAGS = ["All", "Party", "Daily"];
-  function Groceries({ g, setG }) {
-    const shown = g.items.map((it, i) => ({ ...it, i })).filter((it) => g.tag === "All" || it.tag === g.tag);
-    const left = g.items.length - g.done.length;
-    const [draft, setDraft] = useState("");
-    const toggle = (i) => setG({ ...g, done: g.done.includes(i) ? g.done.filter((x) => x !== i) : [...g.done, i] });
-    return h(Topic, { name: "groceries" }, h("div", { className: "col" },
-      h("p", { className: "lede" }, h("b", null, "Alex"), `, the candles are at the Hema, next to the dentist. I order the rest at ${g.shop} when you say so.`),
-      h("div", { className: "firstrow" },
-        h(Progress, { ring: true, size: 96, value: g.done.length / g.items.length, centre: `${g.done.length}/${g.items.length}`, topic: "groceries" }),
-        h(Stat, { topic: "groceries", value: String(left), label: "to get" }),
-        h(Stat, { topic: "groceries", value: `€${(left * 3.9).toFixed(2)}`, label: "estimate" })),
-      h("div", { className: "row", role: "group", "aria-label": "Show" },
-        TAGS.map((t) => h(Chip, { key: t, topic: "groceries", on: g.tag === t, onClick: () => setG({ ...g, tag: t }) }, t))),
-      h(Card, null,
-        shown.length ? h(CheckList, { topic: "groceries", items: shown.map((x) => x.t), done: shown.map((x, k) => (g.done.includes(x.i) ? k : -1)).filter((k) => k >= 0),
-          onToggle: (k) => toggle(shown[k].i) }) : h("p", { className: "note" }, "Nothing here yet."),
-        h("form", { style: { marginTop: 12 }, onSubmit: (e) => { e.preventDefault(); const t = draft.trim(); if (!t) return;
-            setG({ ...g, items: [...g.items, { t, tag: g.tag === "All" ? "Daily" : g.tag }] }); setDraft(""); } },
-          h(Field, { topic: "groceries", placeholder: "Add something", "aria-label": "Add something", value: draft, onChange: (e) => setDraft(e.target.value) })))));
-  }
+      did: { title: "What Iris did", status: { state: "idle" }, lede: "One line per task, not per click. Open a line for the steps.",
+        parts: [
+          { c: "Chips", bind: "show", items: ["All", "Calls", "On the web"] },
+          { ...did([CALL, FUNDA, MARIO]), if: "show==All" },
+          { ...did([CALL, MARIO]), if: "show==Calls" },
+          { ...did([FUNDA]), if: "show==On the web" }] },
+      "t-dentist": steps("Moved the dentist", "Called at 14:10", [["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]]),
+      "t-mario": steps("Booked Da Mario", "Called at 13:40", [["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]]),
+      "t-funda": steps("Looked up houses", "On funda.nl at 13:50", [["13:50", "Opened Utrecht, 3 rooms"], ["13:51", "The page moved while she typed. Tried again, it worked."], ["13:52", "Saved 4 houses to your list"]]),
 
-  /* ------------------------------------------------- what Iris did: a table of tasks */
-
-  const KINDS = [["All", null], ["Calls", "call"], ["On the web", "web"], ["Failed once", "bad"]];
-  function Activity({ did, q, open }) {
-    const [kind, setKind] = useState(0);
-    const k = KINDS[kind][1];
-    const shown = did.filter((d) => (!k || d.kind === k || (k === "bad" && d.bad)) && (d.t + d.s).toLowerCase().includes(q.toLowerCase()));
-    return h("div", { className: "col" },
-      h("p", { className: "lede" }, "One line per task, not per click. Open a line for the steps."),
-      h("div", { className: "row", role: "group", "aria-label": "Show" }, KINDS.map(([l], i) => h(Chip, { key: l, on: kind === i, onClick: () => setKind(i) }, l))),
-      shown.length
-        ? h(Card, { padding: 4 }, shown.map((d) => h(Row, { key: d.at + d.t, icon: I(d.kind === "call" ? "phone" : d.kind === "web" ? "globe" : "mic"),
-            title: d.t, subtitle: `${d.at}, ${d.s}`, chevron: true, onClick: () => open(d) })))
-        : h("p", { className: "note" }, q ? `Nothing she did matches "${q}".` : "Nothing in this group today."),
-      h("p", { className: "count" }, `${shown.length} of ${did.length} tasks today`));
-  }
-
-  /* ----------------------------------------------------------- subscription */
-
-  const PLANS = [
-    { id: "free", name: "Free", price: 0, line: "Talk and lists, one device" },
-    { id: "plus", name: "Plus", price: 6, line: "Calls for you, three devices" },
-    { id: "pro", name: "Pro", price: 12, line: "Five times the room, and faster" },
-  ];
-  function Plan({ plan, next, ask }) {
-    const [code, setCode] = useState(null);
-    const [codeMsg, setCodeMsg] = useState(null);
-    const [awake, setAwake] = useState(1);
-    const nextPlan = PLANS.find((p) => p.id === next);
-    return h("div", { className: "col" },
-      h("p", { className: "lede" }, next
-        ? `You keep Pro until 18 October. Then ${nextPlan.name} starts, at €${nextPlan.price} a month.`
-        : "You are on Pro, €12 a month. It renews on 18 October."),
-      h(Lab, null, "Plans"),
-      h(Card, { padding: 4 }, PLANS.map((p) => h(Row, { key: p.id, title: p.name, subtitle: p.line,
-        trailing: h("span", { className: "note" }, p.id === plan ? "Your plan" : p.id === next ? "From 18 October" : `€${p.price} a month`),
-        chevron: p.id !== plan && p.id !== next, onClick: p.id === plan || p.id === next ? undefined : () => ask(p) }))),
-      h(Lab, null, "Code"),
-      code === null
-        ? h("div", null, h(Button, { variant: "glass", onClick: () => setCode("") }, "I have a code"))
-        : h("form", { onSubmit: (e) => { e.preventDefault(); const c = code.trim().toUpperCase();
-              setCodeMsg(c === "IRIS10" ? "IRIS10 is on: your next month is €6." : `"${code.trim() || "empty"}" is not a code we know. Nothing changed.`); } },
-            h("div", { className: "row" },
-              h("div", { style: { flex: 1, minWidth: 180 } }, h(Field, { autoFocus: true, placeholder: "For example IRIS10", "aria-label": "Code", value: code,
-                onChange: (e) => { setCode(e.target.value); setCodeMsg(null); } })),
-              h(Button, { variant: "glass" }, "Apply")),
-            codeMsg ? h("p", { className: "note", role: "status", style: { marginTop: 10 } }, codeMsg) : null),
-      h(Lab, null, "Awake"),
-      h(Segmented, { items: ["Stays awake", "Sleeps when idle"], active: awake, onSelect: setAwake }),
-      h("p", { className: "note" }, awake === 0
-        ? "Iris answers at once, always. Uses more of your plan."
-        : "Iris sleeps after half an hour without use, and only when no work is waiting. The first answer takes a few seconds."));
-  }
-
-  /* -------------------------------------------------------------- the app */
-
-  const DID = [
-    { at: "14:10", t: "Moved the dentist to Wednesday 09:30", s: "called, 2 minutes", kind: "call",
-      steps: [["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]] },
-    { at: "13:52", t: "Looked up houses on Funda", s: "read 12 pages", kind: "web",
-      steps: [["13:50", "Opened Funda, Utrecht, 3 rooms"], ["13:51", "Could not type in the search: the page moved. Tried again, it worked."], ["13:52", "Saved 4 houses to your list"]], bad: true },
-    { at: "13:41", t: "Booked a table at Da Mario", s: "Saturday 20:00, six people", kind: "call",
-      steps: [["13:40", "Called Da Mario"], ["13:41", "Table for six, 20:00"]] },
-  ];
-  const SCREENS = {
-    talk: { name: "Talk", icon: "wave",
-      ok: ["Her presence top left: the StatusPill, with the state in words", "Her words as the lede, the talk under it", "Send shows your line, then that she thinks, then her answer", "The mic is a plain mic: no strike unless you muted her"] },
-    groceries: { name: "Groceries", icon: "car",
-      ok: ["The one action top right: the order, with other shops in its caret", "The ring and two numbers are the first row", "The chips filter the list; adding puts it in the chip you are on", "Order opens a sheet from the right, Share says what happened"] },
-    did: { name: "What Iris did", icon: "loop",
-      ok: ["Search top right in the app bar", "Chips and search filter the same rows, count under it", "Every row opens its steps in a sheet", "A task that failed once and then worked is not red"] },
-    plan: { name: "Subscription", icon: "person",
-      ok: ["The plan you are on, once, in her words", "Every plan shows its price, the same way", "Switching asks first: it is about money", "A code that is not known says nothing changed, in plain grey"] },
+      plan: { title: "Subscription", status: { state: "idle" }, lede: "You are on Pro, €12 a month, until 18 October. {next}",
+        parts: [
+          { c: "Label", text: "Plans" },
+          { c: "Group", parts: [
+            { c: "Row", title: "Free", subtitle: "Talk and lists, one device", value: "€0 a month", on: "dialog:to-free" },
+            { c: "Row", title: "Plus", subtitle: "Calls for you, three devices", value: "€6 a month", on: "dialog:to-plus" },
+            { c: "Row", title: "Pro", subtitle: "Five times the room, and faster", value: "Your plan" }] },
+          { c: "Label", text: "Awake" },
+          { c: "Segmented", bind: "awake", items: ["Stays awake", "Sleeps when idle"] },
+          { c: "Text", if: "awake==0", text: "Iris answers at once, always. Uses more of your plan." },
+          { c: "Text", if: "awake==1", text: "Iris sleeps after half an hour without use, and only when no work is waiting. The first answer takes a few seconds." }] },
+      "to-plus": { kind: "dialog", title: "Switch to Plus?", body: "Plus starts on 18 October at €6 a month. Until then you keep Pro.",
+        actions: [{ label: "Switch to Plus", on: "set:next=Then Plus, at €6 a month.;snack:Plus starts on 18 October." }, { label: "Keep Pro" }] },
+      "to-free": { kind: "dialog", title: "Switch to Free?", body: "Free starts on 18 October. Calls stop then, your lists stay.",
+        actions: [{ label: "Switch to Free", on: "set:next=Then Free.;snack:Free starts on 18 October." }, { label: "Keep Pro" }] },
+    },
   };
-  const ALL = ["The house Icon has 14 names: no cart, no card. Groceries uses car (delivery), Subscription person.",
-               "The NavRail always carries Collapse. On a phone width it stays a rail of icons; the phone app uses the tab bar instead."];
+  const FOUND = checkApp(WEB);
+
+  const RULES = {
+    talk: ["Her presence top left: the StatusPill", "Her words as the lede, the talk under it", "Enter sends your line; Talk to Iris opens her orb", "The question she asks has answers and Not now"],
+    groceries: ["The ring is the count and moves when you tick", "Order opens a sheet from the right: pick the shop there", "Share says what happened"],
+    did: ["Chips filter the rows", "Every row opens its steps, back in the app bar", "A task that failed once and then worked is not red"],
+    plan: ["The plan you are on, once, in her words", "Every plan shows its price the same way", "Switching asks first: it is about money"],
+  };
+  const TOP = { "t-dentist": "did", "t-mario": "did", "t-funda": "did", voice: "talk" };
+  const ALL = ["One spec, drawn by IrisApp with spec.rail: NavRail, pages, sheets from the right, dialogs.",
+               "IrisApp cannot yet filter a list by a search field, or answer later: no search on What Iris did, and a sent line waits.",
+               "The house Icon has 14 names: Groceries uses car, Subscription person."];
 
   function App() {
-    const [id, setId] = useState(() => (SCREENS[new URLSearchParams(location.search).get("s")] ? new URLSearchParams(location.search).get("s") : "talk"));
-    const go = (next) => { setId(next); const u = new URL(location.href); u.searchParams.set("s", next); history.replaceState(null, "", u); };
-    const [narrow, setNarrow] = useState(() => matchMedia("(max-width: 700px)").matches);
-    useEffect(() => { const m = matchMedia("(max-width: 700px)"); const f = () => setNarrow(m.matches); m.addEventListener("change", f); return () => m.removeEventListener("change", f); }, []);
-
-    // Her state, top left. Idle shows only the orb: a pill with nothing to report says nothing.
-    const [mode, setMode] = useState("idle");
-    const [text, setText] = useState("");
-    const [log, setLog] = useState([
-      { who: "you", at: "14:02", text: "Can you move the dentist to Wednesday?" },
-      { who: "step", text: "Called the dentist, 2 minutes" },
-      { who: "agi", at: "14:05", text: "Done, Alex. Wednesday at 09:30. That leaves Saturday free for Sam's party, and the candles are still on your list." },
-    ]);
-    const [did, setDid] = useState(DID);
-    const [g, setG] = useState({ shop: "Albert Heijn", tag: "All", done: [0, 4],
-      items: [{ t: "Candles", tag: "Party" }, { t: "Balloons", tag: "Party" }, { t: "Lemonade", tag: "Party" }, { t: "Bread", tag: "Daily" }, { t: "Milk", tag: "Daily" }, { t: "Eggs", tag: "Daily" }] });
-    const [cake, setCake] = useState(null);
-    const [plan, setPlan] = useState({ now: "pro", next: null });
-    const [q, setQ] = useState("");
-    const [sheet, setSheet] = useState(null);   // { kind: "order" } | { kind: "task", d }
-    const [dialog, setDialog] = useState(null); // a plan to switch to
-    const [snack, setSnack] = useState(null);
-    useEffect(() => { if (!snack) return; const t = setTimeout(() => setSnack(null), 3600); return () => clearTimeout(t); }, [snack]);
-    const timer = useRef(0);
-
-    const send = (e) => {
-      e.preventDefault();
-      const t = text.trim(); if (!t) return;
-      const at = now();
-      setText(""); go("talk");
-      setLog((l) => [...l, { who: "you", at, text: t }, { who: "step", text: "Thinking" }]);
-      setMode("thinking");
-      clearTimeout(timer.current);
-      timer.current = setTimeout(() => {
-        setLog((l) => [...l.filter((m) => m.text !== "Thinking"), { who: "agi", at: now(), text: "On it, Alex. You can follow it under What Iris did." }]);
-        setDid((d) => [{ at, t, s: "you asked, Iris is on it", kind: "asked", steps: [[at, "You asked: " + t], [now(), "Iris started"]] }, ...d]);
-        setMode("idle");
-      }, 1600);
-    };
-    const pill = { idle: { state: "idle" }, listening: { state: "listening", label: "Listening" }, thinking: { state: "busy", label: "Thinking" } }[mode];
-
-    const actions = id === "groceries"
-      ? h("div", { className: "row" },
-          h(Button, { variant: "glass", size: "sm", onClick: () => setSnack("Link copied. Sam can add to the list too.") }, "Share"),
-          h(SplitButton, { size: "sm", onSelect: () => setSheet({ kind: "order" }),
-            items: ["Albert Heijn", "Jumbo", "Picnic"].filter((x) => x !== g.shop).map((x) => ({ label: `Order at ${x}`, onSelect: () => { setG({ ...g, shop: x }); setSheet({ kind: "order", shop: x }); } })) },
-            `Order at ${g.shop}`))
-      : id === "did" ? h("div", { style: { width: 240 } }, h(SearchField, { value: q, onChange: setQ, placeholder: "Search what she did" }))
-      : null;
-
-    const left = g.items.filter((_, i) => !g.done.includes(i));
-    const s = SCREENS[id];
+    const q = new URLSearchParams(location.search).get("s");
+    const [at, setAt] = useState(WEB.screens[q] ? q : "talk");
+    const top = TOP[at] ?? (RULES[at] ? at : "talk");
+    const go = (id) => { setAt(id); const u = new URL(location.href); u.searchParams.set("s", TOP[id] ?? id); history.replaceState(null, "", u); };
     return h("div", { className: "ex" },
-      h("div", { className: "app" },
-        h(NavRail, { label: "Iris", collapsed: narrow, onToggle: () => setNarrow(!narrow),
-          items: Object.entries(SCREENS).map(([k, v]) => ({ label: v.name, icon: I(v.icon), active: k === id, onSelect: () => go(k) })) }),
-        h("div", { className: "main" },
-          h(AppBar, { title: s.name, leading: h(StatusPill, pill), actions }),
-          h("div", { className: "body" },
-            h("main", { "aria-label": s.name },
-              id === "talk" ? h(Talk, { log })
-              : id === "groceries" ? h(Groceries, { g, setG })
-              : id === "did" ? h(Activity, { did, q, open: (d) => setSheet({ kind: "task", d }) })
-              : h(Plan, { plan: plan.now, next: plan.next, ask: setDialog })),
-            h("aside", { className: "side", "aria-label": "Running" },
-              h(Lab, null, "Running"),
-              h("div", { className: "job" }, h("span", null, "Parcel from Coolblue"), h("small", null, "Arrives 17:00 to 18:00"), h(Progress, { value: .6 })),
-              h("div", { className: "job" }, h("span", null, "Calling Coolblue again"), h("small", null, "At 16:00")),
-              cake === null
-                ? h(BorderPattern, { pattern: "stream", label: "Waits on you" },
-                    h("div", { className: "ask" },
-                      h("p", null, "Which cake for Sam?"),
-                      h("p", { className: "note" }, "I put it on the grocery list."),
-                      h("div", { className: "row" },
-                        ["Chocolate", "Lemon"].map((c) => h(Button, { key: c, variant: "glass", size: "sm", onClick: () => {
-                          setCake(c); setG((x) => ({ ...x, items: [...x.items, { t: `${c} cake`, tag: "Party" }] })); setSnack(`${c} cake is on the grocery list.`); } }, c)),
-                        h(Button, { variant: "text", size: "sm", onClick: () => setCake("") }, "Not now"))))
-                : h("div", { className: "job" }, h("span", null, cake ? `${cake} cake` : "Which cake"), h("small", null, cake ? "On the grocery list" : "She asks again tomorrow")))),
-          h("div", { className: "composer" },
-            h("form", { onSubmit: send },
-              h(Field, { placeholder: mode === "listening" ? "Listening. Talk normally, or type" : "Talk normally, or type to Iris", "aria-label": "Message to Iris",
-                value: text, onChange: (e) => setText(e.target.value) }),
-              text.trim()
-                ? h(Button, { variant: "icon", label: "Send", icon: I("chevron") })
-                : h(Button, { variant: "icon", label: mode === "listening" ? "Stop listening" : "Start listening", icon: I("mic"),
-                    onClick: () => setMode(mode === "listening" ? "idle" : "listening") })))),
-        snack ? h("div", { className: "snack" }, h(Snackbar, { text: snack, tone: "ok" })) : null,
-        h("div", { className: "ia-layer" },
-          sheet?.kind === "order" ? h(Sheet, { open: true, side: "end", onClose: () => setSheet(null), title: `Order at ${sheet.shop ?? g.shop}`, sub: "What is not ticked yet, delivered to your door." },
-            h("div", { className: "sheet-body" },
-              h(Card, { padding: 4 },
-                h(Row, { icon: I("car"), title: "Delivery", trailing: h("span", { className: "note" }, "Tomorrow, 16:00") }),
-                h(Row, { icon: I("shield"), title: "Pay with", trailing: h("span", { className: "note" }, "iDEAL") })),
-              h("p", { className: "note" }, left.map((x) => x.t).join(", ") || "Everything is ticked."),
-              h(Button, { variant: "primary", size: "lg", disabled: !left.length, onClick: () => {
-                setSheet(null); setSnack(`Ordered at ${sheet.shop ?? g.shop}. Tomorrow between 16:00 and 18:00.`);
-                setDid((d) => [{ at: now(), t: `Ordered ${left.length} groceries at ${sheet.shop ?? g.shop}`, s: "delivery tomorrow 16:00", kind: "web", steps: [[now(), "Filled the basket"], [now(), "Paid with iDEAL"]] }, ...d]);
-              } }, `Order for €${(left.length * 3.9).toFixed(2)}`))) : null,
-          sheet?.kind === "task" ? h(Sheet, { open: true, side: "end", onClose: () => setSheet(null), title: sheet.d.t, sub: sheet.d.s },
-            h("ol", { className: "log" }, sheet.d.steps.map(([at, t], i) => h("li", { key: i }, h("span", { className: "time" }, at), t)))) : null,
-          dialog ? h(Dialog, { open: true, onClose: () => setDialog(null), title: `Switch to ${dialog.name}?`,
-            body: `${dialog.name} starts on 18 October at €${dialog.price} a month. Until then you keep Pro.`,
-            actions: [{ label: `Switch to ${dialog.name}`, onClick: () => { setPlan({ now: "pro", next: dialog.id }); setSnack(`${dialog.name} starts on 18 October.`); } }, { label: "Keep Pro" }] }) : null)),
+      h("div", { className: "app" }, h(IrisApp, { spec: WEB, start: WEB.screens[q] ? q : "talk", onNavigate: go })),
       h("aside", { className: "rules", "aria-label": "Rules" },
-        h("p", { className: "lab" }, s.name),
-        h("ul", { className: "checks" }, s.ok.map((t) => h("li", { key: t }, t))),
+        h("p", { className: "lab" }, WEB.screens[top].title),
+        h("ul", { className: "checks" }, RULES[top].map((t) => h("li", { key: t }, t)),
+          FOUND.map((f, i) => h("li", { key: i, className: "q" }, `${f.screen}: ${f.rule}`))),
+        h("p", { className: "lab" }, FOUND.length ? `checkApp: ${FOUND.length} to look at` : "checkApp: keeps every rule"),
         h("p", { className: "lab" }, "Whole web app"),
         h("ul", { className: "checks" }, ALL.map((t) => h("li", { key: t, className: "q" }, t)))));
   }
