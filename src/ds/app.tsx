@@ -9,7 +9,7 @@
 //
 // A Part is { c: "Row", title: "Voice", on: "push:voice" } with the component's own props. Strings may hold
 // {key} (state, or the item inside `each`). Actions: push:id, sheet:id, dialog:id, back, close, tab:i,
-// toggle:key, set:key=value, add:key, snack:text, talk. Two-way state: `bind: "key"` on Toggle, Chip, Segmented,
+// toggle:key, set:key=value, inc:key/max, snack:text, talk. Two-way state: `bind: "key"` on Toggle, Chip, Segmented,
 // Tabs, Slider, Select, TextArea, Field, SearchField, DatePicker, TimePicker, CheckList, Steps.
 
 import React, { useEffect, useRef, useState } from "react";
@@ -32,6 +32,7 @@ export type Screen = {
   actions?: { label: string; on?: Act; danger?: boolean }[]; // dialog
   body?: string; // dialog
   tab?: number;
+  status?: { state: string; label: string }; // her StatusPill, top left: only in an app without a tab bar
   bare?: boolean; // the AppBar shows only the way back: a part on the screen carries the title
 };
 export type AppSpec = {
@@ -120,6 +121,18 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       return h("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
     case "Tap": // makes a part that is a picture (a Widget) open something
       return h("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
+    case "Rail": // a row you swipe sideways: tiles at their own width, the next one peeks in
+      return h("div", { className: "ia-rail", role: "group", "aria-label": props.label ?? "More" },
+        (p.parts ?? []).map((q, i) => h("div", { key: i, className: "ia-rail-item", style: { width: q.w ?? props.w ?? 160 } }, h(Part, { p: q, ctx, item }))));
+    case "Pages": // pages you swipe through, with dots that say where you are; vertical pages stack in a fixed height
+      return h(Pages, { p, ctx, item, vertical: !!props.vertical, height: props.height, topic: props.topic });
+    case "Bento": // a grid of two columns where a tile may take both columns (span: 2) or two rows (tall: true)
+      return h("div", { className: "ia-bento" }, (p.parts ?? []).map((q, i) =>
+        h("div", { key: i, className: "ia-bento-item", style: { gridColumn: q.span === 2 ? "span 2" : undefined, gridRow: q.tall ? "span 2" : undefined } }, h(Part, { p: q, ctx, item }))));
+    case "Meter": // one measured thing: a label, its value, and a bar of how far
+      return h("div", { className: "ia-meter" },
+        h("div", { className: "ia-meter-head" }, h("span", null, props.label), h("b", null, props.value)),
+        h(I.Progress, { value: props.of, topic: props.topic }));
     case "Stack":
       return h("div", { className: "ia-stack" }, kids);
     case "Row": {
@@ -180,6 +193,26 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
   }
 }
 
+function Pages({ p, ctx, item, vertical, height, topic }: Any) {
+  const I = UI();
+  const [at, setAt] = useState(0);
+  const track = useRef<HTMLDivElement>(null);
+  const pages = p.parts ?? [];
+  const onScroll = () => {
+    const el = track.current;
+    if (!el) return;
+    setAt(Math.round(vertical ? el.scrollTop / el.clientHeight : el.scrollLeft / el.clientWidth));
+  };
+  const go = (i: number) => {
+    const el = track.current;
+    if (el) el.scrollTo({ [vertical ? "top" : "left"]: i * (vertical ? el.clientHeight : el.clientWidth), behavior: "smooth" });
+  };
+  return h("div", { className: "ia-pages" + (vertical ? " ia-pages-v" : ""), style: vertical ? { height: height ?? 420 } : undefined },
+    h("div", { ref: track, className: "ia-pages-track", onScroll, role: "group", "aria-label": p.label ?? "Pages" },
+      pages.map((q: Part, i: number) => h("div", { key: i, className: "ia-page" }, h(Part, { p: q, ctx, item })))),
+    h("div", { className: "ia-pages-dots" }, h(I.PageDots, { count: pages.length, active: at, topic, vertical, onSelect: go })));
+}
+
 /* ------------------------------------------------------------------ screens */
 
 function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
@@ -192,6 +225,7 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
     depth > 0
       ? h(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back })
       : h("header", { className: "ia-head" },
+          s.status ? h("div", { className: "ia-status" }, h(I.StatusPill, s.status)) : null,
           s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
           h("h1", { className: "ia-title" }, fill(s.title, ctx.state))),
     depth > 0 && s.eyebrow ? h("p", { className: "ia-eyebrow ia-sub" }, fill(s.eyebrow, ctx.state)) : null,
@@ -263,6 +297,7 @@ export function IrisApp({ spec, start, onNavigate, frame = "phone" }: { spec: Ap
         else { setDir("out"); setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)); }
       } else if (verb === "tab") { setLayer({}); setDir(""); setStack([spec.tabs![Number(arg)].to]); }
       else if (verb === "toggle") setState((s) => ({ ...s, [arg]: !s[arg] }));
+      else if (verb === "inc") { const [k, max] = arg.split("/"); setState((s) => ({ ...s, [k]: Math.min(Number(max ?? Infinity), (Number(s[k]) || 0) + 1) })); }
       else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v })); }
       else if (verb === "snack") setSnack(arg);
       else if (verb === "talk") { const t = Object.keys(spec.screens).find((id) => spec.screens[id].kind === "talk"); if (t) { setLayer({}); setStack((s) => [...s, t]); } }
@@ -309,6 +344,7 @@ export function checkApp(spec: AppSpec): Finding[] {
     const parts = [...(s.hero ? [s.hero] : []), ...(s.parts ?? [])];
     let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0; // the TalkOrb in the tab bar
     if (s.kind === "talk") orbs = 1;
+    if (s.status) orbs++;
     let busy = 0, words = 0, pens = 0, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
     walk(parts, (p) => {
       if (ORBS.has(p.c) || (p.c === "Widget" && p.look === "orb")) orbs++;
