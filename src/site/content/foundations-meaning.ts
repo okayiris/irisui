@@ -87,7 +87,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
               [
                 "Ringlab form (a /orbs recipe)",
                 "The personality of one of her roles in a team room",
-                "only on that role's card or the governance screen, as one Orb3D per screen",
+                "only on that role's own screen or the governance screen, as one Orb3D per screen",
                 "in the rail, the chat or the canvas, as the role's avatar",
               ],
               [

@@ -320,7 +320,7 @@
         } else if (verb === "tab") {
           setLayer({});
           setDir("");
-          setStack([spec.tabs[Number(arg)].to]);
+          setStack([(spec.tabs ?? spec.rail)[Number(arg)].to]);
         } else if (verb === "toggle") setState((s2) => ({ ...s2, [arg]: !s2[arg] }));
         else if (verb === "inc") {
           const [k, max] = arg.split("/");
@@ -343,10 +343,13 @@
     const talking = s.kind === "talk";
     const tabOf = (sid) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
     const activeTab = Math.max(0, ...stack.map(tabOf).filter((i) => i >= 0).slice(0, 1));
+    const railAt = spec.rail ? Math.max(0, spec.rail.findIndex((r) => stack.includes(r.to))) : -1;
+    const wide = !!spec.rail || frame === "window";
     const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
     return h2(
       "div",
-      { className: "ia-app", "data-frame": frame },
+      { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame },
+      spec.rail ? h2("div", { className: "ia-rail-col" }, h2(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) => ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
       h2(
         "main",
         { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
@@ -370,7 +373,7 @@
         { className: "ia-layer" },
         sheet ? h2(
           I.Sheet,
-          { open: true, onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
+          { open: true, side: wide ? "end" : "bottom", onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
           h2(
             "div",
             { className: "ia-sheet-body" },
@@ -436,6 +439,7 @@
     }
     reach.add(spec.start);
     spec.tabs?.forEach((t) => reach.add(t.to));
+    spec.rail?.forEach((t) => reach.add(t.to));
     if (Object.values(spec.screens).some((s) => s.kind === "talk") && spec.tabs) {
       for (const [id, s] of Object.entries(spec.screens)) if (s.kind === "talk") reach.add(id);
     }
@@ -2218,6 +2222,17 @@
   }
   var TalkOrbThinks = thinksWith(window.IrisUi?.TalkOrb, 70 / 60, 66);
   var Orb3DThinks = thinksWith(window.IrisUi?.Orb3D, 0.72, 220);
+  var TOPIC_FIX = {
+    mail: ["#94a3b8", "#cbd5e1", "#121821"],
+    sport: ["#fb923c", "#fdba74", "#26140a"],
+    tasks: ["#2dd4bf", "#99f6e4", "#05211f"]
+  };
+  {
+    const topics = window.IrisUi?.design?.TOPIC;
+    if (topics) {
+      for (const [name, colours] of Object.entries(TOPIC_FIX)) if (topics[name]) topics[name].splice(0, 3, ...colours);
+    }
+  }
   function Toggle({ on = false, onChange, label, disabled }) {
     const [own, setOwn] = useState(on);
     const value = onChange ? on : own;

@@ -77,3 +77,79 @@ De labs waren losse schetsen. Nu zijn het echte onderdelen die je kunt hergebrui
 
 **Bestanden**
 `src/ds/ext.tsx`, `src/ds/ext.css`, `src/site/ext-components.ts`, `src/site/ext-docs.ts`, `artifact/components/{Photo,BorderPattern,ChatStack}/`. Screenshot: ![ChatStack](.playwright/screenshots/werklog/2026-09-30-photo-border-chatstack.png)
+
+## 2026-10-01 Voorbeelden aangevuld: alle onderdelen in een echt scherm
+
+**Wat**
+31 onderdelen uit de Iris UI zaten in geen enkel voorbeeld; nu staat elk minstens een keer in een echt scherm.
+Telefoon (`public/examples/index.html`): nieuwe schermen Weather (ThemeWord, Stat, Carousel), Loops (AppBar, PhaseRing, LoopBubble), One loop (LoopScreen), Chats (ChatStack), Remind me (Steps, TextArea, DatePicker, TimePicker). Verder CircleStack op Today, Sheet met Slider/Select/Divider op You, Edge langs het ladende blok.
+Web (`web/index.html`): SplitButton, Stat, Pattern, BorderPattern, Tabs, SearchField, Toolbar, Menu, Tooltip, Badge. Mac (`mac/index.html`): Settings-zijbalk is NavRail. TV (`tv/index.html`): EdgeText, Orb3D, Photo met PageDots.
+Niet toegevoegd: MacPill (zit niet in de bundle), App layouts en Showcases (docs-demo's). Gate: examples schoon; 111 site-fouten "iframe zonder title" komen uit ander werk. Commit a10258e, niet gepusht.
+
+**Waarom**
+De voorbeelden testen het systeem; onderdelen zonder voorbeeld waren nooit in een echt scherm geprobeerd.
+
+**Bestanden**
+`public/examples/index.html`, `public/examples/web/index.html`, `public/examples/mac/index.html`, `public/examples/tv/index.html`. Screenshot: ![Voorbeelden aangevuld](.playwright/screenshots/werklog/2026-10-01-examples-aangevuld.png)
+
+## 2026-10-01 Interactieregels voor Iris UI
+
+**Wat**
+Nieuwe foundation-pagina "Interaction" (`/foundations/interaction`) met regels voor indrukken, openen en terug, sheets, vegen over rijen, lijsten die veranderen, het klaar-moment, haptics (iOS en Android), springs alleen na een vinger en zuinig bewegen. Bron: de audit van de micro-interacties in de iPhone- en Android-app van 1 oktober.
+Motion-pagina (`foundations-b.ts`): een uitzondering op "no springs", alleen waar een vinger loslaat en zonder doorschieten.
+`pages.tsx`: helper `ink()` toont backticks in geschreven content nu als code. Voorheen stonden ze op de hele site letterlijk in beeld.
+Commit bf94d30, niet gepusht, niet gepubliceerd.
+
+**Waarom**
+Joris vroeg om interactieregels. De audit liet zien dat de apps op dit vlak van elkaar afweken, dus de regels staan nu op een plek.
+
+**Bestanden**
+`src/site/content/foundations-interaction.ts` (nieuw), `src/site/content.ts`, `src/site/nav.ts`, `src/site/content/foundations-b.ts`, `src/site/pages.tsx`. Screenshot: ![Interactieregels](.playwright/screenshots/werklog/2026-10-01-interaction.png)
+
+## 2026-10-01 IrisApp: hele app uit een JSON-spec
+
+**Wat**
+`IrisApp` (`src/ds/app.tsx`) tekent een hele app uit een JSON-spec met de echte componenten: navigatiestapel, sheet, dialoog (4 tot 5 lagen) en Rail, Pages, Bento en Meter om te swipen. `checkApp` toetst de Meaning-regels als code.
+Telefoonvoorbeelden (`public/examples/index.html`) herbouwd als een spec, alles klikbaar, met live regelcheck per scherm.
+Componentfixes in `src/ds/ext.css` en `ext.tsx`: Row in Card zonder eigen glas, LoopScreen zonder tweede frame, AppBar-sub, EmptyState zonder nep-orb, Stat krimpt mee.
+Commits d30ecb6, 751ceba. Aanvulling: commit 0521a7b, IrisApp vult nu `{state}` in teksten van sheets en dialogen, in de tweede knop en in snackbar-meldingen (voorheen stond er "Call at {retry}"). Op een breed scherm staat de snackbar rechtsonder. Gevonden door de agent die de voorbeelden voor de andere platformen fixt.
+Aanvulling: commit d4dfa65, `IrisApp` meldt zijn stand aan de pagina eromheen (`onState`) en een sheet kan na de primaire knop extra knoppen dragen (`actions[]`). Nodig voor de voorbeelden die web, Mac, Chrome, TV en vault herbouwden (9da954c, 7dfe009, eb8a684, 2c20b89, ea205b8, c4d0280, eb72709).
+
+**Waarom**
+Voorbeelden en layout-generator waren statisch en liepen achter op de componenten. Joris wees 8 fouten aan: 2 orbs, dozen in dozen, LoopScreen-frame, AppBar, demo-schakelaars.
+
+**Bestanden**
+`src/ds/app.tsx`, `src/ds/ext.css`, `src/ds/ext.tsx`, `public/examples/index.html`.
+
+![IrisUI](.playwright/screenshots/werklog/2026-10-01-irisapp-voorbeelden.png)
+
+## 2026-10-01 Voorbeelden web, Mac, Chrome, TV en vault met echte componenten
+
+**Wat**
+Voorbeeldpagina's web, Mac, Chrome, TV en vault herbouwd na een harde audit (51 punten). Nagebouwde lookalikes vervangen door echte house-componenten: NavRail, AppBar, StatusPill, Menu, Sheet, Dialog, Row, SearchField. Paneel- en telefoonachtige delen (Mac calls/vault, TV scherm kiezen, vault telefoon) draaien op `IrisApp` met een JSON-spec.
+`nav.js`: de balk loopt nu van rand tot rand, ook op de labs.
+Commits 9da954c, 7dfe009, 2c20b89, ea205b8, c4d0280, eb72709.
+Aanvulling: het Mac-voorbeeld toont "Call at {retry}" weer ingevuld, nu `IrisApp` sheet-tekst en snacks invult (commit eb8a684, `public/examples/mac/index.html`).
+Open: `MacPill`, `DashboardApp`, `TableApp` e.d. bestaan niet als component. Android-punten zitten in `index.html` en zijn niet aangeraakt.
+
+**Waarom**
+Meaning-regels afdwingen: een orb per oppervlak, rood alleen voor verwijderen, violet alleen voor aan en haar ring, haar aanwezigheid linksboven, een primaire actie. Elke knop doet iets echts, demo-knoppen staan niet meer in de app.
+
+**Bestanden**
+`public/examples/{web,mac,chrome,tv,vault}/index.html`, `public/examples/scenes.js`, `public/examples/nav.js`. Screenshot (web, `?s=groceries`, 1440x900): ![Voorbeelden met echte componenten](.playwright/screenshots/werklog/2026-10-01-voorbeelden-echte-componenten.png)
+
+## 2026-10-01 Componentbevindingen uit de strenge audit opgelost
+
+**Wat**
+Live frames krijgen de hoogte van hun inhoud (`public/site.js`). Op 390 en 1400 breed loopt geen frame meer over (`src/site/demos.ts`, `public/demos.css`).
+Orb3D tekent weer (shaderfout). Toggle schakelt zelf en heeft een naam. SplitButton is een vorm. Divider toont zijn label. DatePicker en TimePicker passen op een telefoon (`src/ds/ext.tsx`, `src/ds/ext.css`).
+Debugregels ("Chosen: ...") onder componenten weg, demo-knoppen doen iets.
+Overrides kunnen release-previews vervangen door eigen demo's (`src/site/content.ts`, `overrides-core.ts`, `overrides-brand.ts`, `ext-components.ts`).
+Commits 41dc700, 5eb4562, ec02d1c, ea40ed3, ed17540, 4b81521.
+Open smaakvragen voor Joris: topic-kleuren (mail violet, sport rood, tasks magenta), het doosje van Word, de kwaliteit van ThemeWord, de magenta "you"-fasekleur in ChatStack.
+
+**Waarom**
+Demo's liepen over op 390 breed, frames hadden vaste hoogtes, demo-knoppen deden niets, er stonden debugregels onder componenten en kleur- en copyregels werden gebroken.
+
+**Bestanden**
+`public/site.js`, `public/demos.css`, `src/site/{demos,content,overrides-core,overrides-brand,ext-components}.ts`, `src/ds/ext.tsx`, `src/ds/ext.css`.

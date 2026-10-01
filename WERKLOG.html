@@ -72,6 +72,112 @@
 <p class="intro">Een overzicht van wat er is gedaan, in gewone taal.</p>
 
 <article>
+<h2>2026-10-01 Fouten in de onderdelen uit de strenge controle opgelost</h2>
+<h3>Wat</h3>
+<p>Een strenge controle van het ontwerpsysteem vond een reeks fouten in de
+losse onderdelen. Die zijn opgelost. De voorbeelden lopen op een telefoon en op
+een groot scherm niet meer over de rand. De kaders passen zich aan de hoogte van
+hun inhoud aan. De bol (Orb3D) wordt weer getekend. De aan/uit-schakelaar
+werkt zelf en heeft een naam. De knop met een uitklapdeel is nu een
+geheel. De scheidingslijn laat zijn tekst zien. De datum- en tijdkiezer passen
+op een telefoon. De losse testregels onder onderdelen ("Chosen: ...") zijn weg
+en knoppen in de voorbeelden doen nu iets. Een pagina kan nu ook een eigen
+voorbeeld tonen in plaats van het standaardplaatje.</p>
+<h3>Waarom</h3>
+<p>Voorbeelden zaten te breed of te hoog in hun kader, knoppen deden niets,
+er stonden testregels in beeld en regels over kleur en tekst werden
+overtreden.</p>
+<h3>Nog te beslissen</h3>
+<p>Vier smaakvragen voor Joris: de kleuren per onderwerp (mail paars, sport
+rood, taken magenta), het doosje om Word, de kwaliteit van ThemeWord en de
+magenta kleur voor "jij" in ChatStack.</p>
+</article>
+
+<article>
+<h2>2026-10-01 Voorbeeldpagina's gebouwd met de echte onderdelen</h2>
+<h3>Wat</h3>
+<p>De voorbeeldpagina's voor web, Mac, Chrome, tv en de kluis zijn opnieuw
+opgebouwd. Eerst zat er veel in dat alleen leek op de echte onderdelen. Nu
+gebruiken ze de echte: de zijbalk, de bovenbalk, het statuslabeltje, menu's,
+uitschuifpanelen, vensters, lijstrijen en het zoekveld. De schermen die op een
+paneel of telefoon lijken (Mac-gesprekken en kluis, tv-schermkeuze, kluis op
+telefoon) worden getekend vanuit een korte beschrijving. De balk bovenin loopt
+nu ook op de proefpagina's van rand tot rand.</p>
+<p>De lege plekken in meldingen en knoppen (zoals "Bel om {retry}") zijn
+inmiddels ingevuld, ook in het Mac-voorbeeld. Nog niet af: enkele onderdelen
+uit het ontwerp bestaan nog niet als bouwsteen. De Android-punten zijn niet aangeraakt.</p>
+<h3>Waarom</h3>
+<p>Een strenge controle vond 51 punten. De vaste ontwerpregels moesten
+daarin echt gelden: een bol per scherm, rood alleen om iets te verwijderen,
+paars alleen voor aan en haar ring, haar aanwezigheid linksboven en een
+hoofdactie per scherm. Elke knop doet iets echts. Knoppen die er alleen voor
+de demo zaten zijn weg.</p>
+<p><img src=".playwright/screenshots/werklog/2026-10-01-voorbeelden-echte-componenten.png" alt="De webversie van het voorbeeld met de echte onderdelen" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
+</article>
+
+<article>
+<h2>2026-10-01 Een hele app uit een korte beschrijving</h2>
+<h3>Wat</h3>
+<p>Het ontwerpsysteem kan nu een complete app tekenen uit een korte
+beschrijving, met de echte bouwstenen. Er zijn schermen die je opent en weer
+sluit, uitschuifpanelen en meldingen in meerdere lagen, en onderdelen waar je
+doorheen veegt. Een ingebouwde controle toetst de ontwerpregels automatisch.</p>
+<p>De telefoonvoorbeelden zijn opnieuw opgebouwd op deze manier. Alles is
+aanklikbaar en bij elk scherm staat direct of het de regels haalt. Ook zijn
+een paar bouwstenen verbeterd: rijen in een kaart hebben geen eigen
+glanslaag meer, een enkele lus heeft geen dubbele rand meer en een lege
+staat toont geen nep-bol meer. Later is ook de invulling van teksten
+verbeterd: in meldingen en knoppen stond soms nog een lege plek (zoals
+"Bel om {retry}") en die wordt nu met de echte waarde gevuld. Op een breed
+scherm staat de melding rechtsonder. Daarna kreeg de app twee extra
+mogelijkheden: hij kan de pagina eromheen laten weten in welke toestand hij zit,
+en een uitschuifpaneel kan na de hoofdknop nog meer knoppen krijgen. Dat was
+nodig voor de voorbeeldpagina's van web, Mac, Chrome, tv en de kluis.</p>
+<h3>Waarom</h3>
+<p>De voorbeelden en de indelingsmaker stonden stil, terwijl de bouwstenen
+verder waren. Joris wees acht fouten aan, zoals twee bollen op een scherm,
+vakken in vakken en schakelaars die er alleen voor de demo zaten.</p>
+</article>
+
+<article>
+<h2>2026-10-01 Regels voor hoe Iris UI aanvoelt bij aanraken</h2>
+<h3>Wat</h3>
+<p>Er is een nieuwe pagina "Interaction" in het ontwerpsysteem. Die legt vast
+hoe de app reageert als je iets aanraakt: hoe een knop voelt als je hem indrukt,
+hoe dingen openen en weer sluiten, hoe je over een rij veegt, wat er gebeurt
+als een lijst verandert en hoe een klaar-moment voelt. Ook staat erin wanneer
+de telefoon trilt (iPhone en Android) en dat veerkracht alleen mag waar een
+vinger loslaat. Verder geldt: zuinig met beweging. Op de pagina over beweging
+staat die ene uitzondering nu ook. Daarnaast is een fout op de hele site
+hersteld: tekst tussen bepaalde aanhalingstekens (backticks) verscheen
+letterlijk in beeld en wordt nu netjes als code getoond. Nog niet gepubliceerd.</p>
+<h3>Waarom</h3>
+<p>Joris vroeg om deze regels. Een controle van de kleine bewegingen in de
+iPhone- en Android-app van vandaag liet zien waar ze uiteenliepen. Nu staat er
+op een plek wat de bedoeling is.</p>
+<p><img src=".playwright/screenshots/werklog/2026-10-01-interaction.png" alt="De nieuwe pagina Interaction in het ontwerpsysteem" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
+</article>
+
+<article>
+<h2>2026-10-01 Voorbeelden aangevuld met alle bouwstenen</h2>
+<h3>Wat</h3>
+<p>Van de bouwstenen van het ontwerpsysteem misten er 31 in de voorbeeldschermen.
+Nu komt elke bouwsteen minstens een keer voor in een echt scherm. Op de
+telefoon zijn er schermen bij voor weer, lussen, een enkele lus, chats en een
+herinnering instellen. Op de webversie, de Mac en de tv zijn onder meer
+knoppen, tabbladen, zoekvelden, menu's, tooltips, een zijbalk en een
+fotoscherm toegevoegd. Twee dingen zijn bewust weggelaten: een onderdeel dat
+niet in het pakket zit en twee demo-pagina's die alleen voor de uitleg dienen.
+De controle op de voorbeelden is schoon. Er staan nog 111 meldingen open over
+ingesloten pagina's zonder titel, maar die komen uit ander werk. Nog niet
+gepubliceerd.</p>
+<h3>Waarom</h3>
+<p>De voorbeelden zijn de test voor het systeem. Wat nergens in een echt
+scherm voorkwam, was ook nooit echt uitgeprobeerd.</p>
+<p><img src=".playwright/screenshots/werklog/2026-10-01-examples-aangevuld.png" alt="Een van de nieuwe voorbeeldschermen" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
+</article>
+
+<article>
 <h2>2026-09-30 Foto met diepte, bewegende randen en gestapelde chats</h2>
 <h3>Wat</h3>
 <p>Drie nieuwe bouwstenen voor het ontwerpsysteem. Een foto waarbij een woord
@@ -172,28 +278,6 @@ projecten hergebruikt kan worden.</p>
 project en een klein stukje van het ontwerpsysteem. Het pakket is nog niet
 gepubliceerd: daarvoor ontbreken nog een npm-account en een organisatie met de
 naam okayiris.</p>
-</article>
-
-<article>
-<h2>2026-09-30 Controle van het losse Iris-ontwerpsysteem</h2>
-<h3>Wat</h3>
-<p>Het losse ontwerpsysteem van Iris (versie 32) is nagelopen, er is niets
-aangepast. Alle automatische controles slagen: 100 pagina's, 136 voorbeeldschermen
-en 21 voorbeeldplaatjes werken, en er verschijnen geen foutmeldingen. Er staan
-geen wachtwoorden of verwijzingen naar de echte Iris-server in. Wel een paar
-losse eindjes: er is nog niets opgeslagen in de versiegeschiedenis en er is
-geen online opslagplaats gekoppeld. In veel teksten (113 plekken) staan nog
-lange streepjes die we niet willen gebruiken. In de handleiding wordt een
-commando genoemd dat niet bestaat. Op een telefoon breekt de naam "Iris UI"
-boven aan de pagina over twee regels. Het pakket staat nog als openbaar
-gemarkeerd. Tot slot werkt het versiebeheer op deze Mac even niet, omdat de
-licentie van Xcode nog geaccepteerd moet worden.</p>
-<h3>Waarom</h3>
-<p>Nagaan of de map netjes en zelfstandig is, voordat hij voor het eerst
-wordt opgeslagen en gedeeld.</p>
-<h3>Bestanden</h3>
-<p>Niets gewijzigd. De lange streepjes zitten vooral in de handleidingen en
-een paar tekstbestanden van de website.</p>
 </article>
 
 </body>

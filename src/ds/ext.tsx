@@ -2096,6 +2096,20 @@ function thinksWith(Base: Any, ring: number, fallback: number) {
 const TalkOrbThinks = thinksWith((window as Any).IrisUi?.TalkOrb, 70 / 60, 66);
 const Orb3DThinks = thinksWith((window as Any).IrisUi?.Orb3D, 0.72, 220);
 
+// Three topic colours of the release broke the colour rules: mail was violet (violet means on and the ring), sport
+// was red (red means destructive), tasks magenta (the ring's colour). The release keeps its topics in one table on
+// IrisUi.design; the colours are changed in place, so every part that asks for a topic later gets the new ones.
+// Each accent stays above 7:1 on --bg.
+const TOPIC_FIX: Record<string, string[]> = {
+  mail: ["#94a3b8", "#cbd5e1", "#121821"],
+  sport: ["#fb923c", "#fdba74", "#26140a"],
+  tasks: ["#2dd4bf", "#99f6e4", "#05211f"],
+};
+{
+  const topics = (window as Any).IrisUi?.design?.TOPIC;
+  if (topics) for (const [name, colours] of Object.entries(TOPIC_FIX)) if (topics[name]) topics[name].splice(0, 3, ...colours);
+}
+
 // The shipped Toggle only moves when a parent hands it onChange, and it has no name: alone it is a dead switch a
 // screen reader calls "switch". This one keeps its own state when nobody controls it, and takes `label`.
 function Toggle({ on = false, onChange, label, disabled }: { on?: boolean; onChange?: (on: boolean) => void; label?: string; disabled?: boolean }) {
