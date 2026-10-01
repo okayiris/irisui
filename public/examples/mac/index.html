@@ -78,13 +78,10 @@
   .win-body h2 { font: var(--text-page-title); margin: 0 0 14px; }
   .win-foot { padding: 10px 22px; border-top: 1px solid var(--line); font: var(--text-sub); color: var(--label); }
 
-  .prefs { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); height: 360px; }
-  .prefs > .ix-rail { height: 100%; border: 0; border-right: 1px solid var(--line); border-radius: 0; background: none; }
-  .prefs .pane { padding: 16px 22px 20px; overflow: auto; display: grid; gap: 12px; align-content: start; }
-  .prefs .pane h3 { font: var(--text-page-title); margin: 0; }
+  .prefs { position: relative; height: 400px; transform: translateZ(0); }
   .sheet-body { display: grid; gap: 14px; }
 
-  @media (max-width: 620px) { .prefs { grid-template-columns: 1fr; } .prefs > .ix-rail { display: none; } .panel { width: calc(100% - 24px); } }
+  @media (max-width: 620px) { .panel { width: calc(100% - 24px); } }
 </style>
 </head>
 <body data-platform="macos">
@@ -98,7 +95,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect, useRef } = React;
-  const { PreviewI18nProvider, TalkOrb, Card, Row, Toggle, Icon, Segmented, NavRail, Button, Field, Tooltip, Badge, Edge, Sheet, Chip, Slider,
+  const { PreviewI18nProvider, TalkOrb, Card, Row, Icon, Segmented, NavRail, Button, Field, Tooltip, Badge, Edge, Slider,
           IrisApp, checkApp } = window.IrisUi;
   const I = (name, size = 16) => h(Icon, { name, size });
   const hhmm = () => new Date().toTimeString().slice(0, 5);
@@ -172,41 +169,36 @@
     children,
     foot ? h("div", { className: "win-foot" }, foot) : null);
 
-  // Settings is a real window: a Mac user looks for it there. The sidebar is the house NavRail, flush with the edge.
-  function Settings({ onClose, openVault }) {
-    const [tab, setTab] = useState("listen");
-    const [on, setOn] = useState({ login: true, listen: true, windows: true, loud: true, touch: true });
-    const [where, setWhere] = useState(0);
-    const [voice, setVoice] = useState("Wiep");
-    const [speed, setSpeed] = useState(100);
-    const [sheet, setSheet] = useState(false);
-    const T = (k, title, subtitle, icon) => h(Row, { key: k, icon: icon ? I(icon, 18) : undefined, title, subtitle, trailing: h(Toggle, { on: on[k], onChange: (v) => setOn({ ...on, [k]: v }) }) });
-    const TABS = [["listen", "Listening", "mic"], ["voice", "Voice", "speaker"], ["screens", "Screens", "external"], ["vault", "Vault", "shield"]];
-    const PANES = {
-      listen: ["Which device hears you, and when she starts.", [
-        T("listen", "Listens on this Mac", "The phone stays quiet while this one hears you"),
-        T("login", "Starts with the Mac", "The pill is there when you log in")]],
-      voice: ["How Iris sounds.", [
-        h(Row, { key: 1, title: "Voice", trailing: h("span", { className: "say" }, voice), chevron: true, onClick: () => setSheet(true) }),
-        T("loud", "Speaks out loud", "Off: she only writes")]],
-      screens: ["Where Iris may put a window.", [
-        T("windows", "Iris may open windows", "A plan, a list, a call. Never over full screen apps."),
-        on.windows ? h("div", { key: 2, style: { padding: "10px 12px" } }, h(Segmented, { items: ["This screen", "Second screen"], active: where, onSelect: setWhere })) : null]],
-      vault: ["What Iris may use, and how it opens.", [
-        T("touch", "Open with Touch ID", "Otherwise your PIN"),
-        h(Row, { key: 2, title: "Logins", trailing: h("span", { className: "say" }, "2"), chevron: true, onClick: openVault })]],
-    };
-    const [say, rows] = PANES[tab];
-    return h(Win, { title: "Iris Settings", width: 640, onClose },
-      h("div", { className: "prefs" },
-        h(NavRail, { label: "Settings", items: TABS.map(([k, t, i]) => ({ label: t, icon: I(i, 18), active: tab === k, onSelect: () => setTab(k) })) }),
-        h("div", { className: "pane" }, h("h3", null, TABS.find((t) => t[0] === tab)[1]), h("p", { className: "say" }, say), h(Card, { padding: 4 }, rows)),
-        h("div", { className: "ia-layer" }, sheet ? h(Sheet, { open: true, side: "end", title: "Voice", sub: "How she sounds on this Mac.", onClose: () => setSheet(false) },
-          h("div", { className: "sheet-body" },
-            h("div", { style: { display: "flex", gap: 8 } }, ["Wiep", "Joris"].map((v) => h(Chip, { key: v, on: voice === v, onClick: () => setVoice(v) }, v))),
-            h(Slider, { value: speed, onChange: setSpeed, min: 80, max: 130, step: 5, label: "Speed", unit: "%" }),
-            h(Button, { variant: "primary", size: "lg", onClick: () => setSheet(false) }, "Done"))) : null)));
-  }
+  // Settings is a real window: a Mac user looks for it there. Inside it, one IrisApp with spec.rail.
+  const SETTINGS = {
+    name: "Settings", start: "listen",
+    rail: [{ label: "Listening", icon: "mic", to: "listen" }, { label: "Voice", icon: "speaker", to: "voice" },
+           { label: "Screens", icon: "external", to: "screens" }, { label: "Vault", icon: "shield", to: "vault" }],
+    state: { listen: true, login: true, loud: true, windows: true, where: 0, touch: true, voice: "Wiep", speed: 100 },
+    screens: {
+      listen: { title: "Listening", lede: "Which device hears you, and when she starts.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", title: "Listens on this Mac", subtitle: "The phone stays quiet while this one hears you", bind: "listen" },
+          { c: "Row", title: "Starts with the Mac", subtitle: "The pill is there when you log in", bind: "login" }] }] },
+      voice: { title: "Voice", lede: "How Iris sounds.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", title: "Voice", value: "{voice}", on: "sheet:pick" },
+          { c: "Row", title: "Speaks out loud", subtitle: "Off: she only writes", bind: "loud" }] }] },
+      pick: { kind: "sheet", title: "Voice", lede: "How she sounds on this Mac.",
+        parts: [{ c: "Chips", bind: "voice", items: ["Wiep", "Joris"] }, { c: "Slider", bind: "speed", min: 80, max: 130, step: 5, label: "Speed", unit: "%" }],
+        action: { label: "Done", on: "close" } },
+      screens: { title: "Screens", lede: "Where Iris may put a window.",
+        parts: [{ c: "Group", parts: [{ c: "Row", title: "Iris may open windows", subtitle: "A plan, a list, a call. Never over full screen apps.", bind: "windows" }] },
+                { c: "Segmented", if: "windows", bind: "where", items: ["This screen", "Second screen"] }] },
+      vault: { title: "Vault", lede: "What Iris may use, and how it opens.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", title: "Open with Touch ID", subtitle: "Otherwise your PIN", bind: "touch" },
+          { c: "Row", title: "Logins", value: "2", on: "push:logins" }] }] },
+      logins: { title: "Logins", lede: "The vault opens above the pill." },
+    },
+  };
+  const Settings = ({ onClose, openVault }) => h(Win, { title: "Iris Settings", width: 680, onClose },
+    h("div", { className: "prefs" }, h(IrisApp, { spec: SETTINGS, onNavigate: (id) => id === "logins" && openVault() })));
 
   const Shown = ({ onClose }) => h(Win, { title: "Iris", width: 440, onClose, foot: "Iris opened this for you. Say close, or press the first light." },
     h("div", { className: "win-body" },
@@ -228,7 +220,7 @@
     { id: "vault", name: "Vault", orb: "rest", panel: "vault",
       ok: ["Each login opens: who, the toggle, remove last", "Remove asks first and says it cannot be undone"] },
     { id: "settings", name: "Settings", orb: "rest", panel: "settings",
-      ok: ["A real window, the NavRail flush with its edge", "One card of rows per pane, no box in a box", "Voice opens a sheet from the right, Logins the vault"] },
+      ok: ["A real window with one IrisApp inside: spec.rail draws the sidebar", "One group of rows per pane, no box in a box", "Voice opens a sheet from the right, Logins the vault"] },
     { id: "screen", name: "A window from Iris", orb: "talking", words: "Here is Saturday", window: true,
       ok: ["Iris opens a window herself: the answer, big", "Says where it came from and how to close it"] },
     { id: "type", name: "Type to Iris", orb: "rest", type: true,
