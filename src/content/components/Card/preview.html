@@ -7,6 +7,7 @@
   window.__dsPreview = {
   Default: () => h(Card, null, h("div", {style:{fontSize:17}}, "Live report"), h("div", {style:{fontSize:12,color:"var(--dim)",marginTop:3}}, "Updated while we talk")),
   Stat: () => h(Card, {padding:18}, h("div", {style:{fontSize:34,fontWeight:500}}, "4/4"), h("div", {style:{fontSize:15,color:"var(--dim)"}}, "points")),
+  Topic: () => h(Card, {topic:"groceries"}, h("div", {style:{font:"500 11px var(--mono)",letterSpacing:".14em",color:"var(--k)"}}, "GROCERIES"), h("div", {style:{fontSize:15,marginTop:6}}, "Your weekly list, ticked off as you shop.")),
   };
 })();
 

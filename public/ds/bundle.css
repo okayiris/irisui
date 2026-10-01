@@ -187,6 +187,9 @@ button.iris-orb3d:active .iris-orb3d-canvas { transform: scale(.96); }
   --iris-track: color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027);
   background: linear-gradient(160deg, color-mix(in srgb, var(--kd, #08183a) 70%, #0c0f14), #090b0f);
   border: 1px solid color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027); }
+.iris-card.iris-card-topic { background: linear-gradient(160deg, color-mix(in srgb, var(--kd, #08183a) 70%, #0c0f14), #090b0f);
+  border-color: color-mix(in srgb, var(--k, var(--accent)) 16%, #1a2027); }
+.iris-card-topic > .ia-label:first-child, .iris-card-topic > .iris-section:first-child { color: var(--k, var(--accent)); }
 .iris-w-small { width: 170px; height: 170px; } .iris-w-wide { width: 360px; height: 170px; }
 .iris-w-tall { width: 170px; height: 376px; } .iris-w-large { width: 360px; height: 376px; }
 .iris-widget > * { position: relative; }

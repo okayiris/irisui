@@ -29,8 +29,11 @@
   }
 
   // A frosted card: the one surface of the app. Radius 18, --glass fill, 1px --edge stroke, padding 14.
-  function Card({ children, className, style, padding = 14 }) {
-    return h("div", { className: cx("iris-card", className), style: { padding, ...style } }, children);
+  // topic: the card stands on its topic's ground, the same still fade as a Widget (no motion, no busy cost), so a
+  // grid of cards can carry colour per category without a moving pattern in every one.
+  function Card({ children, className, style, padding = 14, topic }) {
+    const d = topic && window.IrisUi && window.IrisUi.design;
+    return h("div", { className: cx("iris-card", d && "iris-card-topic", className), style: { padding, ...(d ? d.topicStyle(topic) : null), ...style } }, children);
   }
 
   // A settings row on the "You" page: icon, title, a grey line under it, and something on the right

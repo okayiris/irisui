@@ -152,6 +152,24 @@ export const RESOURCE_DOCS_EXT: Record<string, Doc> = {
     lede: "What v33 adds, what v32 is, what changed in it, and what this project added on top of the release.",
     sections: [
       {
+        title: "Release v34",
+        blocks: [
+          {
+            kind: "p",
+            text: "v34 is this project's release of 1 october 2026, the same day as v33. The package is version 34.0.0. It is also the first kit a house gets as a package: iris-ui, installed and updated by an order, never copied.",
+          },
+          {
+            kind: "table",
+            head: ["what", "in v34"],
+            rows: [
+              ["Card topic", "a card on its topic's ground: the same still fade as a Widget, the first label in the topic colour. No motion and no busy cost, so a grid of cards carries a colour per category. IrisApp passes topic to Card."],
+              ["Package for a house", "scripts/build-house.mjs writes the kit as iris-ui (kind kit) with its tokens, the package a house installs and upgrades with plugin update iris-ui."],
+              ["Fixes", "a bound Row flips its switch once (the switch and the row both set it, so under preact it flipped back)."],
+            ],
+          },
+        ],
+      },
+      {
         title: "Release v33",
         blocks: [
           {

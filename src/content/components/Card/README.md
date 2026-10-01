@@ -6,9 +6,11 @@ Card from IrisUi (`window.IrisUi.Card`, bundle `_ds_bundle.js`, styles `styles.c
 
 The one surface of the app: frosted glass (--glass), 1px --edge stroke, radius 18, padding 14. Every row, panel and sheet section is a Card on the near-black --bg.
 
-Props: `{ children?: ReactNode; padding?: number; className?: string; style?: CSSProperties }`
+Props: `{ children?: ReactNode; padding?: number; className?: string; style?: CSSProperties; topic?: string }`
 
-Variants: Default, Stat.
+`topic` puts the card on its topic's ground: the same still fade as a Widget, the first label in the topic colour. No motion and no busy cost, so a grid of cards can carry a colour per category.
+
+Variants: Default, Stat, Topic.
 
 ```js
 const { h } = { h: React.createElement };

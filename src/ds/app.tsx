@@ -202,7 +202,7 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
     case "Icon":
       return icon(props.name, props.size);
     case "Card":
-      return h(I.Card, { padding: props.padding, onClick: act, className: act ? "ia-tap" : undefined }, kids.length ? kids : props.text);
+      return h(I.Card, { padding: props.padding, topic: props.topic, onClick: act, className: act ? "ia-tap" : undefined }, kids.length ? kids : props.text);
     case "Topic":
       return h(I.Topic, { name: props.name }, kids);
     case "Carousel":
