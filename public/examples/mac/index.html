@@ -10,130 +10,81 @@
 <link rel="stylesheet" href="../../ds/bundle.css">
 <link rel="stylesheet" href="../../ds/ext.css">
 <link rel="stylesheet" href="../../ds/extra.css">
+<link rel="stylesheet" href="../shared.css">
 <link rel="icon" href="../../favicon.svg">
 <style>
-  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-text); }
-  * { box-sizing: border-box; }
+  .ex { grid-template-columns: 200px minmax(0, 880px) 300px; }
+  .list .lab { grid-column: 1 / -1; }
+  @media (max-width: 1240px) { .ex { grid-template-columns: minmax(0, 880px); } }
 
-  .ex { display: grid; grid-template-columns: 200px minmax(0, 880px) 300px; gap: 32px; justify-content: center; align-items: start; padding: 28px 16px 60px; }
-  .lab { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 10px; }
-  .list { display: grid; gap: 4px; }
-  .list .sep { margin: 14px 0 6px; }
-  .list button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 10px; color: var(--dim); font: var(--text-body); }
-  .list button:hover { background: var(--glass); color: var(--fg); }
-  .list button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .list button[aria-current="true"] { background: var(--glass); color: var(--fg); box-shadow: inset 0 0 0 1px var(--edge); }
-
-  /* The desk: wallpaper, the menu bar, the pill low in the middle. */
-  .desk { position: relative; height: 580px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--edge);
-          background: radial-gradient(520px 320px at 18% 22%, rgba(56, 189, 248, .28), transparent 70%),
-                      radial-gradient(480px 320px at 84% 78%, rgba(192, 38, 211, .22), transparent 70%),
-                      linear-gradient(to bottom left, #291f52, #0a0d1f); }
-  .menubar { height: 28px; display: flex; align-items: center; gap: 18px; padding: 0 16px; font: 500 13px var(--font-text);
-             background: rgba(7, 9, 12, .35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+  /* The desk: a wallpaper in the house colours, the menu bar, the pill low in the middle. */
+  .desk { position: relative; height: min(620px, calc(100dvh - 120px)); min-height: 540px; border-radius: var(--radius-card); overflow: hidden;
+          box-shadow: 0 0 0 1px var(--edge);
+          background: radial-gradient(60% 50% at 18% 22%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+                      radial-gradient(55% 50% at 84% 78%, color-mix(in srgb, var(--violet) 22%, transparent), transparent 70%), var(--bg); }
+  .menubar { height: 28px; display: flex; align-items: center; gap: 18px; padding: 0 16px; font: var(--text-sub); color: var(--fg);
+             background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); white-space: nowrap; overflow: hidden; }
   .menubar .sp { flex: 1; }
-  .menubar span { opacity: .9; }
-  .menubar b { font-weight: 700; }
 
-  /* The pill, as the MacPill preview draws it. */
-  .mp-pill { position: absolute; left: 50%; top: 84%; width: 0; height: 0; }
-  .mp-bar { position: absolute; top: -22px; height: 44px; border-radius: 22px; display: flex; align-items: center; padding: 0 6px;
-    background: rgba(7, 9, 12, .78); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 0 0 1px rgba(0, 0, 0, .25), 0 0 5px rgba(0, 0, 0, .3);
-    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    transition: transform .42s cubic-bezier(.34, 1.3, .64, 1), opacity .25s, filter .3s; }
+  /* The pill, as the MacPill card describes it: only the orb, a bar of buttons grows out from behind it. */
+  .mp { position: absolute; left: 50%; bottom: 100px; width: 0; height: 0; }
+  .mp-bar { position: absolute; top: -22px; height: 44px; border-radius: var(--radius-pill); display: flex; align-items: center; padding: 0 4px;
+            background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            transition: transform var(--motion-base) var(--ease-house), opacity var(--motion-fast) var(--ease-house), filter var(--motion-base) var(--ease-house); }
   .mp-bar.closed { transform: scaleX(.3) scaleY(.8); opacity: 0; filter: blur(6px); pointer-events: none; }
   .mp-side { display: flex; gap: 2px; }
   .mp-gap { width: 68px; flex: none; }
-  .mp-btn { all: unset; position: relative; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: rgba(232, 242, 247, .85); }
-  .mp-btn:hover, .mp-btn.on { color: #2ee6d6; background: rgba(46, 230, 214, .16); }
-  .mp-btn.on { box-shadow: inset 0 0 0 1px rgba(46, 230, 214, .6), 0 0 6px rgba(46, 230, 214, .35); }
-  .mp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .mp-btn .tip { position: absolute; bottom: 42px; left: 50%; transform: translate(-50%, 3px); background: #fff; color: #0b0f13;
-    font: 500 11px var(--font-text); padding: 3px 8px; border-radius: 6px; white-space: nowrap; opacity: 0; transition: .12s; pointer-events: none; }
-  .mp-btn:hover .tip { opacity: 1; transform: translate(-50%, 0); }
-  .mp-orb { all: unset; position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; cursor: pointer; border-radius: 50%; }
-  .mp-orb:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-  .mp-work { position: absolute; left: -35px; top: -35px; width: 70px; height: 70px; pointer-events: none; animation: mp-turn 4s linear infinite; }
-  @keyframes mp-turn { to { transform: rotate(360deg); } }
-  .mp-badge { position: absolute; left: 21px; top: -21px; transform: translate(-50%, -50%); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
-    background: #c026d3; color: #fff; font: 700 11px var(--font-text); display: grid; place-items: center; z-index: 3;
-    box-shadow: 0 0 0 2px #07090c, 0 0 8px rgba(192, 38, 211, .55); }
-  .mp-label { position: absolute; left: -200px; width: 400px; top: 36px; text-align: center; font: 500 9.5px var(--font-mono); letter-spacing: 1.4px; color: #8fa3b0; }
-  .mp-above { position: absolute; left: -250px; width: 500px; top: -72px; display: flex; justify-content: center; align-items: center; gap: 8px;
-    font: 500 12px var(--font-text); color: rgba(232, 242, 247, .9); }
-  .mp-dot { width: 6px; height: 6px; border-radius: 50%; background: #7dd3fc; box-shadow: 0 0 3px rgba(125, 211, 252, .8); }
+  .mp-side .on button { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .mp-orb { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; }
+  .mp-work { position: absolute; left: -35px; top: -35px; width: 70px; height: 70px; }
+  .mp-above { position: absolute; left: -260px; width: 520px; top: -76px; text-align: center; font: var(--text-sub); color: var(--fg); }
+  .mp-under { position: absolute; left: -220px; width: 440px; top: 38px; display: grid; justify-items: center; gap: 6px; text-align: center; font: var(--text-sub); color: var(--label); }
 
   /* A panel opens above the pill. */
-  .panel { position: absolute; left: 50%; bottom: calc(16% + 44px); translate: -50% 0; width: 380px; max-height: 390px; overflow: auto;
-           padding: 16px; border-radius: 18px; background: rgba(7, 9, 12, .82); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14);
-           backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); animation: rise var(--motion-base) var(--ease-house); }
-  @keyframes rise { from { opacity: 0; transform: translateY(8px) scale(.98); } }
-  .panel h2 { font: 600 17px var(--font-display); margin: 0 0 4px; }
-  .panel .say { color: var(--dim); font: var(--text-body); margin: 0 0 14px; }
-  .log { list-style: none; margin: 0; padding: 0 0 0 16px; border-left: 1px solid var(--line); display: grid; gap: 12px; font: var(--text-body); }
+  .panel { position: absolute; left: 50%; bottom: 196px; translate: -50% 0; width: 380px; height: 380px; border-radius: var(--radius-card); overflow: hidden;
+           background: var(--bg); box-shadow: 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
+  .panel .ia-app { position: absolute; inset: 0; }
+  .chats { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: 16px; gap: 10px; }
+  .chats h2 { font: var(--text-page-title); margin: 0; }
+  .say { color: var(--dim); font: var(--text-body); margin: 0; }
+  .log { list-style: none; margin: 0; padding: 0 0 0 16px; border-left: 1px solid var(--line); display: grid; gap: 12px; align-content: start; overflow: auto; font: var(--text-body); }
   .log li { position: relative; line-height: 1.45; }
   .log li::before { content: ""; position: absolute; left: -19px; top: 7px; width: 5px; height: 5px; border-radius: 50%; background: var(--fg); }
   .log .you { color: var(--accent); }
   .log .you::before { background: var(--accent); }
-  .time { display: block; font: 500 10px var(--font-mono); letter-spacing: .12em; color: var(--label); }
-  .stack { display: grid; gap: 10px; }
-
-  /* Click the orb: type to her, like Spotlight. */
-  .spot { position: absolute; left: 50%; top: 24%; translate: -50% 0; width: 540px; display: flex; align-items: center; gap: 12px;
-          padding: 14px 18px; border-radius: 16px; background: rgba(7, 9, 12, .82); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14);
-          backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); animation: rise var(--motion-base) var(--ease-house); }
-  .spot input { all: unset; flex: 1; font: 400 22px var(--font-display); color: var(--fg); }
-  .spot input::placeholder { color: var(--label); }
-  .spot .hint { font: var(--text-sub); color: var(--label); }
-
-  /* A Mac window: Iris' own window, or her settings. Traffic lights close it. */
-  .win { position: absolute; left: 50%; top: 52px; translate: -50% 0; border-radius: 12px; overflow: hidden;
-         background: rgba(16, 20, 27, .94); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 24px 60px rgba(0, 0, 0, .5);
-         backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); animation: rise var(--motion-base) var(--ease-house); }
-  .win-top { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; font: 600 13px var(--font-text); color: var(--dim); }
-  .win-top .t { flex: 1; text-align: center; margin-right: 52px; }
-  .lights { display: flex; gap: 8px; }
-  .lights button { all: unset; width: 12px; height: 12px; border-radius: 50%; background: #3a3f47; cursor: pointer; }
-  .lights button:first-child { background: #ff5f57; }
-  .lights button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .win-body { padding: 4px 22px 20px; }
-  .win-body h2 { font: 700 28px var(--font-display); letter-spacing: -.01em; margin: 0 0 14px; }
-  .win-foot { padding: 10px 22px; border-top: 1px solid var(--line); font: var(--text-sub); color: var(--label); }
-
-  .prefs { display: grid; grid-template-columns: auto 1fr; height: 330px; }
-  .prefs nav { display: grid; align-content: start; gap: 2px; padding: 8px; border-right: 1px solid var(--line); }
-  .prefs nav button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; font: var(--text-body); color: var(--dim); }
-  .prefs nav button:hover { color: var(--fg); }
-  .prefs nav button[aria-current="true"] { background: var(--glass); color: var(--fg); }
-  .prefs nav button:focus-visible { outline: 2px solid var(--accent); }
-  .prefs .pane { padding: 6px 22px 20px; overflow: auto; }
-  .prefs .pane h3 { font: 600 20px var(--font-display); margin: 4px 0 4px; }
-  .prefs .pane .say { color: var(--dim); font: var(--text-body); margin: 0 0 14px; }
-
-  /* The chat bar: at the foot of Chats, and what the Spotlight field sends to. */
-  .chatbar { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding: 6px 6px 6px 14px; border-radius: 22px;
-             background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
-  .chatbar:focus-within { box-shadow: inset 0 0 0 1px var(--accent-line, rgba(125, 211, 252, .45)); }
-  .chatbar input { all: unset; flex: 1; font: var(--text-body); color: var(--fg); }
-  .chatbar input::placeholder { color: var(--label); }
-  .round { all: unset; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--dim); }
-  .round:hover { color: var(--fg); background: var(--glass); }
-  .round.send { background: var(--accent); color: #07090c; }
-  .round:disabled { opacity: .35; cursor: default; }
-  .round:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .log .wait { color: var(--label); }
   .log .wait::before { background: var(--label); }
+  .time { display: block; font: var(--text-label); color: var(--label); }
+  .chatbar { display: flex; gap: 8px; align-items: center; }
+  .chatbar > :first-child { flex: 1; }
 
-  .rules { display: grid; gap: 14px; }
-  .checks { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font: var(--text-body); }
-  .checks li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; color: var(--dim); }
-  .checks li::before { content: ""; width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--ok); }
-  .checks li.q { color: var(--fg); }
-  .checks li.q::before { background: var(--wait); }
+  /* Type to her, like Spotlight. */
+  .spot { position: absolute; left: 50%; top: 22%; translate: -50% 0; width: min(540px, calc(100% - 32px)); display: flex; align-items: center; gap: 12px;
+          padding: 12px 16px; border-radius: var(--radius-card); background: var(--bg); box-shadow: 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
+  .spot > :first-child { flex: 1; }
+  .spot .hint { font: var(--text-sub); color: var(--label); }
 
-  @media (max-width: 1180px) { .ex { grid-template-columns: minmax(0, 880px); } .list { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
-  @media (max-width: 620px) { .prefs { grid-template-columns: 1fr; } .prefs nav { display: none; } .win { width: calc(100% - 24px) !important; } .panel, .spot { width: calc(100% - 32px); } .desk { height: 620px; } }
-  @media (prefers-reduced-motion: reduce) { .mp-work, .panel, .spot { animation: none; } }
+  /* A Mac window: Iris' own, or her settings. The first light closes it. */
+  .win { position: absolute; left: 50%; top: 48px; translate: -50% 0; max-width: calc(100% - 24px); border-radius: var(--radius-card); overflow: hidden;
+         background: var(--bg); box-shadow: 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
+  .win-top { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; font: var(--text-sub); color: var(--dim); border-bottom: 1px solid var(--line); }
+  .win-top .t { flex: 1; text-align: center; margin-right: 52px; }
+  .lights { display: flex; gap: 8px; }
+  .lights button { all: unset; width: 12px; height: 12px; border-radius: 50%; background: var(--edge); cursor: pointer; }
+  .lights button:hover { background: var(--dim); }
+  .lights button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+  .win-body { padding: 14px 22px 20px; }
+  .win-body h2 { font: var(--text-page-title); margin: 0 0 14px; }
+  .win-foot { padding: 10px 22px; border-top: 1px solid var(--line); font: var(--text-sub); color: var(--label); }
+
+  .prefs { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); height: 360px; }
+  .prefs > .ix-rail { height: 100%; border: 0; border-right: 1px solid var(--line); border-radius: 0; background: none; }
+  .prefs .pane { padding: 16px 22px 20px; overflow: auto; display: grid; gap: 12px; align-content: start; }
+  .prefs .pane h3 { font: var(--text-page-title); margin: 0; }
+  .sheet-body { display: grid; gap: 14px; }
+
+  @media (max-width: 620px) { .prefs { grid-template-columns: 1fr; } .prefs > .ix-rail { display: none; } .panel { width: calc(100% - 24px); } }
 </style>
 </head>
 <body data-platform="macos">
@@ -146,179 +97,208 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { useState, useEffect } = React;
-  const { PreviewI18nProvider, TalkOrb, Orb, Card, Row, Toggle, Icon, Segmented, NavRail } = window.IrisUi;
-
-  // The pill's own icons, as the MacPill preview draws them; phone is Lucide, for Calls.
-  const svg = (d, fill) => h("svg", { width: 16, height: 16, viewBox: "0 0 24 24", "aria-hidden": "true" },
-    d.map((p, i) => h("path", { key: i, d: p, fill: fill ? "currentColor" : "none", stroke: fill ? "none" : "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" })));
-  const ICON = {
-    calls: svg(["M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"]),
-    chats: svg(["M3 5.5A2.5 2.5 0 0 1 5.5 3h8A2.5 2.5 0 0 1 16 5.5v5a2.5 2.5 0 0 1-2.5 2.5H8l-3.5 3v-3A2.5 2.5 0 0 1 3 10.5z", "M18 8h.5A2.5 2.5 0 0 1 21 10.5v5a2.5 2.5 0 0 1-1.5 2.3V21l-3.5-3h-4.5A2.5 2.5 0 0 1 9 16v-1h5a4 4 0 0 0 4-4z"], true),
-    vault: svg(["M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6z"], true),
-    settings: svg(["M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z", "M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"]),
-    mic: svg(["M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z", "M19 11a7 7 0 0 1-14 0M12 18v3"]),
-    send: svg(["M12 19V5M5 12l7-7 7 7"]),
-    screen: svg(["M3 4h18v12H3z", "M8 20h8M12 16v4"]),
-  };
-
-  /* ------------------------------------------------------------------ panels */
-
-  // Chats with its chat bar. What you send shows at once; her answer comes from Iris, so the demo shows only that she is on it.
+  const { useState, useEffect, useRef } = React;
+  const { PreviewI18nProvider, TalkOrb, Card, Row, Toggle, Icon, Segmented, NavRail, Button, Field, Tooltip, Badge, Edge, Sheet, Chip, Slider,
+          IrisApp, checkApp } = window.IrisUi;
+  const I = (name, size = 16) => h(Icon, { name, size });
   const hhmm = () => new Date().toTimeString().slice(0, 5);
-  function Chats({ first }) {
-    const [sent, setSent] = useState(first ? [first] : []);
+
+  /* ------------------------------------------------- calls and vault: one small app in the panel */
+
+  const PANEL = {
+    name: "Iris on the Mac", start: "calls",
+    state: { retry: "16:00", ah: true, cb: true },
+    screens: {
+      calls: { title: "Calls", lede: "Who Iris called for you, and how it went.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "phone", title: "Dentist", subtitle: "Moved to Wednesday 09:30", on: "push:dentist" },
+          { c: "Row", icon: "phone", title: "Pizzeria Da Mario", subtitle: "Table for six on Saturday, 20:00", on: "push:mario" },
+          { c: "Row", icon: "phone", title: "Coolblue", subtitle: "No answer. She tries again at {retry}.", on: "sheet:retry" }] }] },
+      dentist: { title: "Dentist", eyebrow: "Iris called at 14:10", lede: "Moved to **Wednesday 09:30**. Bring the old card.",
+        parts: [{ c: "Card", parts: [{ c: "CheckList", items: [["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]] }] }] },
+      mario: { title: "Da Mario", eyebrow: "Iris called at 13:40", lede: "A table for six on **Saturday at 20:00**. Sam does not know.",
+        parts: [{ c: "Card", parts: [{ c: "CheckList", items: [["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]] }] }] },
+      retry: { kind: "sheet", title: "Call Coolblue again", lede: "About the washing machine that did not come.",
+        parts: [{ c: "Chips", bind: "retry", items: ["16:00", "18:00", "Tomorrow 09:00"] }],
+        action: { label: "Call again", on: "close;snack:Done. She calls Coolblue at the time you picked." } },
+      vault: { title: "Vault", lede: "What Iris may use, locked with Touch ID.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "shield", title: "Albert Heijn", subtitle: "Used for the grocery order, 30 September", on: "push:ah" },
+          { c: "Row", icon: "shield", title: "Coolblue", subtitle: "Not used yet", on: "push:cb" }] }] },
+      ah: { title: "Albert Heijn", eyebrow: "Login", lede: "Iris used it for the grocery order. She never saw the password.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "person", title: "alex@example.com" },
+          { c: "Row", icon: "shield", title: "Iris may use it", subtitle: "Touch ID each time", bind: "ah" },
+          { c: "Row", icon: "trash", title: "Remove from the vault", danger: true, on: "dialog:remove" }] }] },
+      cb: { title: "Coolblue", eyebrow: "Login", lede: "Not used yet. Iris asks you first, every time.",
+        parts: [{ c: "Group", parts: [
+          { c: "Row", icon: "person", title: "alex@example.com" },
+          { c: "Row", icon: "shield", title: "Iris may use it", subtitle: "Touch ID each time", bind: "cb" }] }] },
+      remove: { kind: "dialog", title: "Remove this login?", body: "Iris can no longer sign in there until you add it again. This cannot be undone.",
+        actions: [{ label: "Remove", danger: true, on: "snack:Removed from the vault." }, { label: "Keep it" }] },
+    },
+  };
+  const FINDINGS = [...checkApp(PANEL), ...checkApp({ ...PANEL, start: "vault" })].filter((f, i, all) => f.rule !== "No way to reach this screen" || all.filter((g) => g.screen === f.screen && g.rule === f.rule).length > 1)
+    .filter((f, i, all) => all.findIndex((g) => g.screen === f.screen && g.rule === f.rule) === i);
+
+  /* ---------------------------------------------------------------- chats */
+
+  function Chats({ first, talk }) {
+    const [log, setLog] = useState(first ? [{ who: "you", ...first }] : []);
     const [text, setText] = useState("");
-    const send = (e) => { e.preventDefault(); if (!text.trim()) return; setSent([...sent, { at: hhmm(), text: text.trim() }]); setText(""); };
-    return h("div", null,
-      h("h2", null, "Chats"),
-      h("p", { className: "say" }, "The same talk as on your phone."),
-      h("ol", { className: "log" },
+    useEffect(() => { if (first) answer(); }, []);
+    const answer = () => {
+      setLog((l) => [...l, { who: "wait", text: "Thinking" }]);
+      setTimeout(() => setLog((l) => [...l.filter((m) => m.who !== "wait"), { who: "her", at: hhmm(), text: "On it, Alex. I tell you here when it is done." }]), 1500);
+    };
+    const send = (e) => { e.preventDefault(); const t = text.trim(); if (!t) return; setLog((l) => [...l, { who: "you", at: hhmm(), text: t }]); setText(""); answer(); };
+    return h("div", { className: "chats" },
+      h("div", null, h("h2", null, "Chats"), h("p", { className: "say" }, "The same talk as on your phone.")),
+      h("ol", { className: "log", "aria-live": "polite" },
         h("li", { className: "you" }, h("span", { className: "time" }, "14:02"), "Can you move the dentist to Wednesday?"),
         h("li", null, h("span", { className: "time" }, "14:05"), "Done, Alex. Wednesday at 09:30. That leaves Saturday free for Sam's party."),
-        sent.map((m, i) => h("li", { key: i, className: "you" }, h("span", { className: "time" }, m.at), m.text)),
-        sent.length ? h("li", { className: "wait", role: "status" }, "Iris is on it") : null),
+        log.map((m, i) => h("li", { key: i, className: m.who }, m.at ? h("span", { className: "time" }, m.at) : null, m.text))),
       h("form", { className: "chatbar", onSubmit: send },
-        h("input", { autoFocus: !!first || undefined, value: text, onChange: (e) => setText(e.target.value), placeholder: "Message Iris", "aria-label": "Message Iris" }),
-        text ? null : h("button", { type: "button", className: "round", "aria-label": "Hold to talk" }, ICON.mic),
-        h("button", { className: "round send", "aria-label": "Send", disabled: !text.trim() }, ICON.send)));
+        h(Field, { autoFocus: !!first || undefined, value: text, onChange: (e) => setText(e.target.value), placeholder: "Message Iris", "aria-label": "Message Iris" }),
+        h(Button, { variant: "primary", size: "sm", disabled: !text.trim() }, "Send")));
   }
 
-  const Calls = () => h("div", null,
-    h("h2", null, "Calls"),
-    h("p", { className: "say" }, "Who Iris called for you, and how it went."),
-    h(Card, { padding: 4 },
-      h(Row, { icon: h(Icon, { name: "phone" }), title: "Dentist", subtitle: "Moved to Wednesday 09:30" }),
-      h(Row, { icon: h(Icon, { name: "phone" }), title: "Pizzeria Da Mario", subtitle: "Table for six on Saturday, 20:00" }),
-      h(Row, { icon: h(Icon, { name: "phone" }), title: "Coolblue", subtitle: "No answer. Iris tries again at 16:00." })));
+  /* ----------------------------------------------------------- windows */
 
-  // A Mac window. The red light closes it, as every Mac window does.
   const Win = ({ title, width, onClose, children, foot }) => h("section", { className: "win", style: { width }, "aria-label": title },
     h("div", { className: "win-top" },
-      h("div", { className: "lights" }, h("button", { "aria-label": "Close", onClick: onClose }), h("button", { tabIndex: -1, "aria-hidden": "true" }), h("button", { tabIndex: -1, "aria-hidden": "true" })),
+      h("div", { className: "lights" }, h("button", { "aria-label": "Close", onClick: onClose }), h("i", { "aria-hidden": "true" }), h("i", { "aria-hidden": "true" })),
       h("span", { className: "t" }, title)),
     children,
     foot ? h("div", { className: "win-foot" }, foot) : null);
 
-  // Settings is a real window: a Mac user looks for it there, and it has more than fits in a panel.
-  function Settings({ onClose }) {
-    const [tab, setTab] = useState("general");
-    const [on, setOn] = useState({ login: true, listen: true, windows: true, ask: false, touch: true });
+  // Settings is a real window: a Mac user looks for it there. The sidebar is the house NavRail, flush with the edge.
+  function Settings({ onClose, openVault }) {
+    const [tab, setTab] = useState("listen");
+    const [on, setOn] = useState({ login: true, listen: true, windows: true, loud: true, touch: true });
     const [where, setWhere] = useState(0);
-    const T = (k) => h(Toggle, { on: on[k], onChange: (v) => setOn({ ...on, [k]: v }) });
-    const TABS = [["general", "General", "sparkles"], ["listen", "Listening", "mic"], ["voice", "Voice", "speaker"], ["screens", "Screens", "globe"], ["vault", "Vault", "shield"]];
+    const [voice, setVoice] = useState("Wiep");
+    const [speed, setSpeed] = useState(100);
+    const [sheet, setSheet] = useState(false);
+    const T = (k, title, subtitle, icon) => h(Row, { key: k, icon: icon ? I(icon, 18) : undefined, title, subtitle, trailing: h(Toggle, { on: on[k], onChange: (v) => setOn({ ...on, [k]: v }) }) });
+    const TABS = [["listen", "Listening", "mic"], ["voice", "Voice", "speaker"], ["screens", "Screens", "external"], ["vault", "Vault", "shield"]];
     const PANES = {
-      general: ["General", "How Iris starts on this Mac.", [
-        h(Row, { key: 1, title: "Open at login", trailing: T("login") }),
-        h(Row, { key: 2, title: "Light or dark", subtitle: "Follows the Mac", trailing: h("span", { style: { color: "var(--dim)" } }, "Automatic") })]],
-      listen: ["Listening", "Which device hears you.", [
-        h(Row, { key: 1, title: "Listens on this Mac", subtitle: "The phone stays quiet while this one hears you", trailing: T("listen") }),
-        h(Row, { key: 2, title: "Hold to talk", trailing: h("span", { style: { color: "var(--dim)", font: "500 12px var(--font-mono)" } }, "fn") })]],
-      voice: ["Voice", "How Iris sounds.", [
-        h(Row, { key: 1, title: "Voice", trailing: h("span", { style: { color: "var(--dim)" } }, "Wiep"), chevron: true }),
-        h(Row, { key: 2, title: "Speaks out loud", subtitle: "Off: she only writes", trailing: T("ask") })]],
-      screens: ["Screens", "Where Iris may put a window.", [
-        h(Row, { key: 1, title: "Iris may open windows here", subtitle: "A plan, a list, a call. Never over full screen apps.", trailing: T("windows") }),
+      listen: ["Which device hears you, and when she starts.", [
+        T("listen", "Listens on this Mac", "The phone stays quiet while this one hears you"),
+        T("login", "Starts with the Mac", "The pill is there when you log in")]],
+      voice: ["How Iris sounds.", [
+        h(Row, { key: 1, title: "Voice", trailing: h("span", { className: "say" }, voice), chevron: true, onClick: () => setSheet(true) }),
+        T("loud", "Speaks out loud", "Off: she only writes")]],
+      screens: ["Where Iris may put a window.", [
+        T("windows", "Iris may open windows", "A plan, a list, a call. Never over full screen apps."),
         on.windows ? h("div", { key: 2, style: { padding: "10px 12px" } }, h(Segmented, { items: ["This screen", "Second screen"], active: where, onSelect: setWhere })) : null]],
-      vault: ["Vault", "What Iris may use, and how it opens.", [
-        h(Row, { key: 1, title: "Open with Touch ID", trailing: T("touch") }),
-        h(Row, { key: 2, title: "Logins", trailing: h("span", { style: { color: "var(--dim)" } }, "2"), chevron: true })]],
+      vault: ["What Iris may use, and how it opens.", [
+        T("touch", "Open with Touch ID", "Otherwise your PIN"),
+        h(Row, { key: 2, title: "Logins", trailing: h("span", { className: "say" }, "2"), chevron: true, onClick: openVault })]],
     };
-    const [title, say, rows] = PANES[tab];
-    return h(Win, { title: "Iris Settings", width: 600, onClose },
+    const [say, rows] = PANES[tab];
+    return h(Win, { title: "Iris Settings", width: 640, onClose },
       h("div", { className: "prefs" },
-        h(NavRail, { label: "Settings", items: TABS.map(([k, t, i]) => ({ label: t, icon: h(Icon, { name: i, size: 16 }), active: tab === k, onSelect: () => setTab(k) })) }),
-        h("div", { className: "pane" }, h("h3", null, title), h("p", { className: "say" }, say), h(Card, { padding: 4 }, rows))));
+        h(NavRail, { label: "Settings", items: TABS.map(([k, t, i]) => ({ label: t, icon: I(i, 18), active: tab === k, onSelect: () => setTab(k) })) }),
+        h("div", { className: "pane" }, h("h3", null, TABS.find((t) => t[0] === tab)[1]), h("p", { className: "say" }, say), h(Card, { padding: 4 }, rows)),
+        h("div", { className: "ia-layer" }, sheet ? h(Sheet, { open: true, side: "end", title: "Voice", sub: "How she sounds on this Mac.", onClose: () => setSheet(false) },
+          h("div", { className: "sheet-body" },
+            h("div", { style: { display: "flex", gap: 8 } }, ["Wiep", "Joris"].map((v) => h(Chip, { key: v, on: voice === v, onClick: () => setVoice(v) }, v))),
+            h(Slider, { value: speed, onChange: setSpeed, min: 80, max: 130, step: 5, label: "Speed", unit: "%" }),
+            h(Button, { variant: "primary", size: "lg", onClick: () => setSheet(false) }, "Done"))) : null)));
   }
 
-  // A window Iris puts on the desk herself: the answer, big, with where it came from.
-  const Shown = ({ onClose }) => h(Win, { title: "Iris", width: 440, onClose, foot: "Iris opened this for you. Say 'close' or press the red light." },
+  const Shown = ({ onClose }) => h(Win, { title: "Iris", width: 440, onClose, foot: "Iris opened this for you. Say close, or press the first light." },
     h("div", { className: "win-body" },
       h("h2", null, "Saturday"),
       h("ol", { className: "log" },
         h("li", null, h("span", { className: "time" }, "14:00"), "Pick up the candles"),
-        h("li", { className: "you" }, h("span", { className: "time" }, "20:00"), "Da Mario, table for six. Iris booked it by phone."),
+        h("li", null, h("span", { className: "time" }, "20:00"), "Da Mario, table for six. Iris booked it by phone."),
         h("li", null, h("span", { className: "time" }, "22:30"), "Cake, when Sam turns 30"))));
-
-  const Vault = () => h("div", null,
-    h("h2", null, "Vault"),
-    h("p", { className: "say" }, "What Iris may use, locked with Touch ID."),
-    h(Card, { padding: 4 },
-      h(Row, { icon: h(Icon, { name: "shield" }), title: "Albert Heijn", subtitle: "Used for the grocery order, 30 September" }),
-      h(Row, { icon: h(Icon, { name: "shield" }), title: "Coolblue", subtitle: "Not used yet" })));
-
-  const PANELS = { calls: Calls, chats: Chats, vault: Vault };
 
   /* ------------------------------------------------------------------ scenes */
 
   const SCENES = [
     { id: "rest", name: "At rest", orb: "rest", badge: 2,
-      ok: ["Only the orb: the bar hides until the mouse rests on it", "Badge on the rim at 45 degrees, never cut off"],
-      ask: ["The badge is magenta: a third colour next to ice and violet. Keep it only here?"] },
+      ok: ["Only the orb: the bar grows out when the mouse rests on it", "The badge counts what is new, in the accent", "Click the orb and she listens: the TalkOrb only ever starts talking"] },
     { id: "chats", name: "Chats", orb: "rest", panel: "chats",
-      ok: ["The panel opens above the pill", "The same conversation as the phone and the web", "The chat bar at the foot: type and send, or hold the mic", "The mic gives way to send as soon as you type"],
-      ask: ["Panel cards: the app's 18px or the web's .9rem?"] },
+      ok: ["The panel opens above the pill", "The same talk as the phone and the web", "Send shows your line, that she thinks, then her answer", "One way to talk by voice: the pill. The chat bar only types."] },
     { id: "calls", name: "Calls", orb: "rest", panel: "calls",
-      ok: ["Calls took the place of Loops in the bar"],
-      ask: ["The bar had Loops and Chats on the left. Calls there now, or does Chats go first?"] },
-    { id: "settings", name: "Settings", orb: "rest", panel: "settings",
-      ok: ["A real window with a sidebar, as Mac users expect", "The sidebar is the house NavRail: it folds to icons", "Screens: may Iris open windows, and on which screen", "Light or dark follows the Mac"],
-      ask: ["Toggles are violet (on), the bar hover is neon teal. Two 'on' colours on one screen?", "The house Icon has no screen and no gear: globe and sparkles stand in."] },
-    { id: "screen", name: "A window from Iris", orb: "talking", words: "Here is Saturday", window: true,
-      ok: ["Iris opens a window herself: the answer, big", "Says where it came from and how to close it", "Only when Screens allows it in Settings"],
-      ask: ["Close it by itself after a while, or keep it until you close it?"] },
+      ok: ["A small IrisApp in the panel: every row opens", "A call opens its steps, Coolblue a sheet to call again", "Back in the app bar, one level down"] },
     { id: "vault", name: "Vault", orb: "rest", panel: "vault",
-      ok: ["Says when each login was last used"],
-      ask: [] },
-    { id: "type", name: "Type to Iris", orb: "listening", type: true,
-      ok: ["Click the orb: one field, like Spotlight", "Enter sends it to Chats, Escape closes it"],
-      ask: [] },
+      ok: ["Each login opens: who, the toggle, remove last", "Remove asks first and says it cannot be undone"] },
+    { id: "settings", name: "Settings", orb: "rest", panel: "settings",
+      ok: ["A real window, the NavRail flush with its edge", "One card of rows per pane, no box in a box", "Voice opens a sheet from the right, Logins the vault"] },
+    { id: "screen", name: "A window from Iris", orb: "talking", words: "Here is Saturday", window: true,
+      ok: ["Iris opens a window herself: the answer, big", "Says where it came from and how to close it"] },
+    { id: "type", name: "Type to Iris", orb: "rest", type: true,
+      ok: ["Option Space opens one field, like Spotlight", "Enter sends it to Chats, Escape closes it", "No second orb in the field: the pill is her"] },
     { sep: "States" },
-    { id: "talking", name: "Talking", orb: "talking", words: "Move the dentist to Wednesday",
-      ok: ["What you said, above the orb", "No state word: the ring already talks"], ask: [] },
-    { id: "thinking", name: "Thinking", orb: "thinking", label: "THINKING",
-      ok: ["A light pattern round the orb, another each time she thinks", "Pick this scene again for the next one"], ask: [] },
-    { id: "working", name: "Working", orb: "rest", label: "WORKING", working: 3,
-      ok: ["A dotted ring turns while she works", "The step count above"], ask: ["Steps link to What Iris did on the web: the same list?"] },
-    { id: "muted", name: "Muted", orb: "muted", label: "MUTED",
-      ok: ["One word under the orb"], ask: [] },
-    { id: "away", name: "Connection lost", orb: "away", label: "CONNECTION LOST",
-      ok: ["Says what happened"], ask: ["Say what Iris does next, as the web error does?"] },
+    { id: "talking", name: "Talking", orb: "talking", words: "Tomorrow at half past nine you have the dentist.",
+      ok: ["Her words above the orb", "No state word: the orb already talks"] },
+    { id: "thinking", name: "Thinking", orb: "thinking", label: "Thinking",
+      ok: ["A light pattern round the orb, a new one each time", "The state also in words, under her"] },
+    { id: "working", name: "Working", orb: "rest", label: "Booking the table, step 3 of 6", working: true,
+      ok: ["Light runs round the orb while she works: the house Edge", "What she does, in words, not only a count"] },
+    { id: "muted", name: "Muted", orb: "muted", label: "Muted",
+      ok: ["One word under the orb, and the way back next to it"] },
+    { id: "away", name: "Connection lost", orb: "away", label: "Cannot reach your house. Trying again in 10 seconds.",
+      ok: ["Says why, and what brings her back", "Try now does it at once"] },
   ];
   const real = SCENES.filter((s) => s.id);
-  const ALL = ["There is no macOS chapter beyond the MacPill card. Panels, windows, the chat bar and the Spotlight field need one.",
-               "The pill's icons are its own drawings, not the house Icon."];
+  const ALL = ["MacPill is a recipe in the release, not a component: this pill is composed from TalkOrb, Button, Tooltip and Badge.",
+               "The house Icon has no chat bubble, no gear and no screen: Chats uses wave, Settings person, Screens external.",
+               "The NavRail always shows Collapse, also in a settings window."];
 
   /* -------------------------------------------------------------------- pill */
 
-  function Pill({ scene, panel, setPanel, setType }) {
+  function Pill({ scene, panel, setPanel }) {
     const [mouse, setMouse] = useState(false);
     const [out, setOut] = useState(false);
+    const [orb, setOrb] = useState(scene.orb);
+    const [label, setLabel] = useState(scene.label);
+    const [words, setWords] = useState(scene.words);
+    const [badge, setBadge] = useState(scene.badge ?? 0);
+    const timers = useRef([]);
     useEffect(() => { const t = setTimeout(() => setOut(mouse), mouse ? 180 : 700); return () => clearTimeout(t); }, [mouse]);
-    const open = !!panel || out;
-    const l = 2 * 36 + 2, r = 3 * 36 + 4, width = 12 + l + 68 + r;
-    const B = (k, tip) => h("button", { className: "mp-btn" + (panel === k ? " on" : ""), "aria-label": tip, "aria-pressed": panel === k,
-      onClick: () => setPanel(panel === k ? null : k) }, ICON[k], h("span", { className: "tip", "aria-hidden": "true" }, tip));
-    return h("div", { className: "mp-pill", onMouseEnter: () => setMouse(true), onMouseLeave: () => setMouse(false) },
-      scene.words ? h("div", { className: "mp-above" }, "“" + scene.words + "”")
-        : scene.working ? h("div", { className: "mp-above" }, h("span", { className: "mp-dot" }), scene.working + " steps") : null,
-      h("div", { className: "mp-bar" + (open ? "" : " closed"), style: { left: -width / 2 + (r - l) / 2, width: width - 12 } },
-        h("div", { className: "mp-side", style: { width: l, justifyContent: "flex-end" } }, B("calls", "Calls"), B("chats", "Chats")),
+    useEffect(() => () => timers.current.forEach(clearTimeout), []);
+    const later = (ms, f) => timers.current.push(setTimeout(f, ms));
+    const stop = () => { timers.current.forEach(clearTimeout); timers.current = []; setOrb("rest"); setLabel(undefined); setWords(undefined); };
+    // Talking: listening while the mic is open, then thinking, then her answer, then rest.
+    const answer = () => {
+      setOrb("thinking"); setLabel("Thinking"); setWords(undefined);
+      later(1400, () => { setOrb("talking"); setLabel(undefined); setWords("Tomorrow at half past nine you have the dentist."); });
+      later(4600, stop);
+    };
+    const listen = () => { stop(); setOrb("listening"); setLabel("Listening"); };
+    const press = () => { if (orb === "listening") answer(); else if (orb === "rest") { listen(); later(1800, answer); } else stop(); };
+    const open = !!panel || out || orb === "listening";
+    const l = 2 * 38, r = 3 * 38, width = 8 + l + 68 + r;
+    const B = (k, tip, icon, extra) => h("span", { key: k, className: panel === k ? "on" : "" },
+      h(Tooltip, { label: tip }, h(Button, { variant: "icon", label: tip, icon: I(icon, 16), ...extra })));
+    const toggle = (k) => ({ onClick: () => { setPanel(panel === k ? null : k); if (k === "chats") setBadge(0); } });
+    const orbEl = h(TalkOrb, { state: orb, size: 60, onPress: press });
+    return h("div", { className: "mp", onMouseEnter: () => setMouse(true), onMouseLeave: () => setMouse(false) },
+      words ? h("div", { className: "mp-above", "aria-live": "polite" }, "“" + words + "”") : null,
+      h("div", { className: "mp-bar" + (open ? "" : " closed"), style: { left: -width / 2 + (r - l) / 2, width } },
+        h("div", { className: "mp-side", style: { width: l, justifyContent: "flex-end" } }, B("calls", "Calls", "phone", toggle("calls")), B("chats", "Chats", "wave", toggle("chats"))),
         h("div", { className: "mp-gap" }),
-        h("div", { className: "mp-side", style: { width: r } }, B("vault", "Vault"), B("settings", "Settings"),
-          h("button", { className: "mp-btn", "aria-label": "Hold to talk" }, ICON.mic, h("span", { className: "tip", "aria-hidden": "true" }, "Hold to talk")))),
-      scene.working ? h("svg", { className: "mp-work", viewBox: "-35 -35 70 70", "aria-hidden": "true" },
-        h("circle", { r: 34, fill: "none", stroke: "#7dd3fc", strokeWidth: 1.4, strokeLinecap: "round", strokeDasharray: "0.1 5.4" })) : null,
-      h("button", { className: "mp-orb", "aria-label": "Type to Iris", onClick: () => setType(true) }, h(TalkOrb, { state: scene.orb, size: 60 })),
-      scene.badge ? h("div", { className: "mp-badge", "aria-label": `${scene.badge} new` }, scene.badge) : null,
-      scene.label ? h("div", { className: "mp-label", role: "status" }, scene.label) : null);
+        h("div", { className: "mp-side", style: { width: r } }, B("vault", "Vault", "shield", toggle("vault")), B("settings", "Settings", "person", toggle("settings")),
+          h("span", { key: "mic", onPointerDown: listen, onPointerUp: answer, onKeyDown: (e) => e.key === " " && !e.repeat && listen(), onKeyUp: (e) => e.key === " " && answer() },
+            h(Tooltip, { label: "Talk while held" }, h(Button, { variant: "icon", label: "Talk while held", icon: I("mic", 16) }))))),
+      scene.working && orb === "rest" ? h("div", { className: "mp-work" }, h(Edge, { pattern: "comet", shape: "ring", width: 70, stroke: 2 })) : null,
+      h("div", { className: "mp-orb" }, badge ? h(Badge, { count: badge }, orbEl) : orbEl),
+      label || (scene.working && orb === "rest") ? h("div", { className: "mp-under", role: "status" },
+        h("span", null, label ?? scene.label),
+        orb === "muted" ? h(Button, { variant: "text", size: "sm", onClick: stop }, "Turn sound on") : null,
+        orb === "away" ? h(Button, { variant: "glass", size: "sm", onClick: () => { setLabel("Connecting"); later(900, stop); } }, "Try now") : null) : null);
   }
 
   function Spot({ onClose, onSend }) {
+    const [q, setQ] = useState("");
     useEffect(() => { const k = (e) => e.key === "Escape" && onClose(); document.addEventListener("keydown", k); return () => document.removeEventListener("keydown", k); }, [onClose]);
-    return h("form", { className: "spot", onSubmit: (e) => { e.preventDefault(); const t = e.target.elements.q.value.trim(); t ? onSend(t) : onClose(); } },
-      h(Orb, { state: "listening", size: 28 }),
-      h("input", { name: "q", autoFocus: true, placeholder: "Ask Iris anything", "aria-label": "Ask Iris" }),
+    return h("form", { className: "spot", onSubmit: (e) => { e.preventDefault(); q.trim() ? onSend(q.trim()) : onClose(); } },
+      h(Field, { autoFocus: true, value: q, onChange: (e) => setQ(e.target.value), placeholder: "Ask Iris anything", "aria-label": "Ask Iris" }),
       h("span", { className: "hint" }, "esc"));
   }
 
@@ -334,7 +314,10 @@
       setId(next); setPanel(s.panel ?? null); setType(!!s.type); setShown(!!s.window); setFirst(null);
       const u = new URL(location.href); u.searchParams.set("s", next); history.replaceState(null, "", u);
     };
-    const Panel = panel && PANELS[panel];
+    useEffect(() => { const k = (e) => { if (e.altKey && e.code === "Space") { e.preventDefault(); setType(true); } };
+      document.addEventListener("keydown", k); return () => document.removeEventListener("keydown", k); }, []);
+    const appPanel = panel === "calls" || panel === "vault";
+    const found = appPanel ? FINDINGS : [];
 
     return h("div", { className: "ex" },
       h("nav", { className: "list", "aria-label": "Scenes" },
@@ -343,15 +326,17 @@
           : h("button", { key: s.id, "aria-current": s.id === scene.id ? "true" : "false", onClick: () => go(s.id) }, s.name))),
       h("main", { className: "desk", "aria-label": "Mac desktop" },
         h("div", { className: "menubar", "aria-hidden": "true" }, h("b", null, "Finder"), h("span", null, "File"), h("span", null, "Edit"), h("span", null, "View"),
-          h("span", { className: "sp" }), h("span", null, "Tue 30 Sep  21:04")),
+          h("span", { className: "sp" }), h("span", null, "Tue 30 Sep 21:04")),
         shown ? h(Shown, { onClose: () => setShown(false) }) : null,
-        panel === "settings" ? h(Settings, { onClose: () => setPanel(null) }) : null,
-        Panel ? h("section", { className: "panel", "aria-label": panel }, h(Panel, { key: first?.text, first })) : null,
+        panel === "settings" ? h(Settings, { onClose: () => setPanel(null), openVault: () => setPanel("vault") }) : null,
+        appPanel ? h("section", { className: "panel", "aria-label": panel }, h(IrisApp, { key: panel, spec: PANEL, start: panel, frame: "window" })) : null,
+        panel === "chats" ? h("section", { className: "panel", "aria-label": "Chats" }, h(Chats, { key: first?.text, first })) : null,
         type ? h(Spot, { onClose: () => setType(false), onSend: (text) => { setFirst({ at: hhmm(), text }); setType(false); setPanel("chats"); } }) : null,
-        h(Pill, { key: scene.id, scene, panel, setPanel, setType })),
+        h(Pill, { key: scene.id, scene, panel, setPanel })),
       h("aside", { className: "rules", "aria-label": "Rules" },
         h("p", { className: "lab" }, scene.name),
-        h("ul", { className: "checks" }, scene.ok.map((t) => h("li", { key: t }, t)), scene.ask.map((t) => h("li", { key: t, className: "q" }, t))),
+        h("ul", { className: "checks" }, scene.ok.map((t) => h("li", { key: t }, t)), found.map((f, i) => h("li", { key: "f" + i, className: "q" }, `${f.screen}: ${f.rule}`))),
+        appPanel ? h("p", { className: "note" }, found.length ? `checkApp: ${found.length} to look at` : "checkApp: the panel app keeps every rule") : null,
         h("p", { className: "lab" }, "Whole Mac app"),
         h("ul", { className: "checks" }, ALL.map((t) => h("li", { key: t, className: "q" }, t)))));
   }
