@@ -18,6 +18,25 @@
     });
   }
 
+  // ---- each live frame as tall as what it draws -------------------------------
+  // Same origin, so the page can read the frame's own height and follow it as the demo opens a menu or a sheet.
+  const fitFrame = (f) => {
+    const doc = f.contentDocument;
+    if (!doc || !doc.body) return;
+    const size = () => {
+      const h = doc.body.scrollHeight;
+      if (h > 0) f.style.height = Math.ceil(h) + "px";
+    };
+    size();
+    try {
+      new ResizeObserver(size).observe(doc.body);
+    } catch {}
+  };
+  for (const f of qa("iframe.demo-frame")) {
+    f.addEventListener("load", () => fitFrame(f));
+    if (f.contentDocument?.readyState === "complete") fitFrame(f);
+  }
+
   // ---- the menu on a phone ----------------------------------------------------
   const menuBtn = q("[data-menu]");
   if (menuBtn) {
