@@ -1526,7 +1526,7 @@
 }
 
 .ix-circle-line[data-you] {
-  color: var(--wait);
+  color: var(--phase-you);
 }
 
 .ix-circle-loops {
@@ -1688,7 +1688,7 @@
 }
 
 .ix-chat-line[data-you] {
-  color: var(--wait);
+  color: var(--phase-you);
 }
 
 .ix-chat-open {
@@ -1769,9 +1769,9 @@
 }
 
 .ix-chat-loop[data-you] {
-  /* waiting on you reads as the wait colour: magenta belongs to the ring */
-  border-color: color-mix(in srgb, var(--wait) 45%, transparent);
-  box-shadow: none;
+  /* the phase colour may leave the ring when it says a loop phase: this loop waits on you */
+  border-color: color-mix(in srgb, var(--phase-you) 55%, transparent);
+  box-shadow: 0 0 16px -6px var(--phase-you);
 }
 
 .ix-chat-loop-title {

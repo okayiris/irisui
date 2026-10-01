@@ -136,7 +136,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
               ["The ring gradient (violet, sky, magenta)", "Iris herself", "as the fill of anything that is not her orb or her talk button"],
               ["Red (--error)", "this destroys something: delete, unpair", "for a warning, a count, a mood or a brand touch"],
               ["The topic colour (--k)", "this screen is about this subject; what matters inside it", "two topics on one screen, or body text in it"],
-              ["Phase colours", "which phase of a loop", "following the topic: they are fixed"],
+              ["Phase colours", "which phase of a loop; outside the ring too, when they say a phase (a LoopBubble, the border of a loop that waits on you)", "following the topic: they are fixed; never for anything that is not a loop phase"],
               ["Grey (--dim)", "later, less, or not yet", "for anything a person must read to decide"],
             ],
           },

@@ -857,6 +857,9 @@ with her. Never put a Mark and an Orb on one screen.
 
 Four drawings of her, and each has its own sizes. What counts is the ring you see, not the box.
 
+This table is documentation, not a product surface: it shows several orbs side by side to compare them. On a
+screen the rule stays one orb per surface.
+
 | Where | Take | size |
 |---|---|---|
 | In a line of text, a chip, a tab | \`Orb\` | 16 |

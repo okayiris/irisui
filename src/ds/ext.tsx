@@ -1882,7 +1882,7 @@ export function ChatStack({
                     h(
                       "span",
                       { className: "ix-chat-line" },
-                      h("span", { className: "ix-chat-phase", style: { color: l.step === YOU ? "var(--wait)" : design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
+                      h("span", { className: "ix-chat-phase", style: { color: design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
                       l.line ? `, ${l.line}` : "",
                     ),
                   ),

@@ -32,3 +32,14 @@
   background: rgba(253, 230, 138, 0.12);
   color: var(--wait);
 }
+
+/* WidgetPagesApp: the day header was red. Red is destructive only: the header is a label, so it goes dim. */
+.w .label[style*="--error"] {
+  color: var(--dim) !important;
+}
+/* A done tick takes the topic colour (the ice accent without a topic), not violet: violet means on and the ring. */
+body .wchk.on .chk {
+  background: var(--k, var(--accent));
+  border-color: var(--k, var(--accent));
+  color: var(--accent-ink);
+}
