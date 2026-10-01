@@ -311,6 +311,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
   const [snack, setSnack] = useState<string | null>(null);
   const [dir, setDir] = useState<"in" | "out" | "">("");
   const scroller = useRef<HTMLDivElement>(null);
+  const [drag, setDrag] = useState(0); // -1..1 while a sideways swipe moves toward the next or previous tab
 
   useEffect(() => { setStack(first); setLayer(layers()); setDir(""); }, [key]);
   useEffect(() => { onNavigate?.(stack[stack.length - 1]); scroller.current?.scrollTo({ top: 0 }); }, [stack]);
@@ -342,6 +343,34 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
     }
   };
   const ctx = { state, set, run, topic: spec.topic };
+
+  // Swipe sideways to change tab: the screen's own Tabs (Today / All) if it has them, else the app's tab bar on a tab's
+  // root screen. A swipe that starts in something that scrolls sideways itself (a rail, pages, a carousel) or in a field
+  // stays with that thing. While dragging, the tab bar's pill follows the finger (TabBar progress).
+  const findTabs = (ps: Part[] = []): Part | null => { for (const p of ps) { if ((p.c === "Tabs" || p.c === "Segmented") && p.bind) return p; const q = findTabs(p.parts); if (q) return q; } return null; };
+  const swipe = useRef<{ x: number; y: number; on: boolean; w: number } | null>(null);
+  const onDown = (e: Any) => {
+    if (e.target.closest?.(".ia-rail, .ia-pages-track, .ix-carousel-track, input, textarea, select, .ix-sheet")) return;
+    swipe.current = { x: e.clientX, y: e.clientY, on: false, w: e.currentTarget.clientWidth || 390 };
+  };
+  const onMove = (e: Any) => {
+    const sw = swipe.current; if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.on && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.5) sw.on = true;
+    if (sw.on) setDrag(Math.max(-1, Math.min(1, -dx / sw.w)));
+  };
+  const onUp = (e: Any) => {
+    const sw = swipe.current; swipe.current = null;
+    if (!sw?.on) return;
+    const dx = e.clientX - sw.x, dir = dx < -60 ? 1 : dx > 60 ? -1 : 0;
+    setDrag(0);
+    if (!dir) return;
+    const sc = spec.screens[stack[stack.length - 1]];
+    const own = findTabs([...(sc.hero ? [sc.hero] : []), ...(sc.parts ?? [])]);
+    if (own) { const n = (own.items ?? []).length, cur = Number(state[own.bind!]) || 0; set(own.bind!, Math.max(0, Math.min(n - 1, cur + dir))); return; }
+    const tabs = spec.tabs ?? spec.rail;
+    if (tabs && stack.length === 1) { const i = tabs.findIndex((t) => t.to === stack[0]); const j = i + dir; if (i >= 0 && j >= 0 && j < tabs.length) { setDir(dir > 0 ? "in" : "out"); setStack([tabs[j].to]); setLayer({}); } }
+  };
   const id = stack[stack.length - 1], s = spec.screens[id];
   const talking = s.kind === "talk";
   const tabOf = (sid: string) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
@@ -357,12 +386,14 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
     spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
       ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
     spec.backdrop ? h("div", { className: "ia-backdrop", "aria-hidden": "true" }, h(Part, { p: spec.backdrop, ctx })) : null,
-    h("main", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
-      h("div", { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : "") },
+    h("main", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title,
+      onPointerDown: onDown, onPointerMove: onMove, onPointerUp: onUp, onPointerCancel: () => { swipe.current = null; setDrag(0); },
+      style: drag ? { touchAction: "pan-y" } : { touchAction: "pan-y" } },
+      h("div", { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : ""), style: drag ? { transform: `translateX(${-drag * 40}px)`, opacity: 1 - Math.abs(drag) * 0.25 } : undefined },
         talking ? h(Talk, { s, ctx }) : h(Page, { s, ctx, depth: stack.length - 1 }))),
     spec.tabs && !talking
       ? h("div", { className: "ia-tabbar" }, h(I.TabBar, { tabs: spec.tabs.map((t) => t.label), icons: spec.tabs.map((t) => t.icon),
-          active: activeTab, talk: "rest", onSelect: (i: number) => run(`tab:${i}`), onTalk: () => run("talk") }))
+          active: activeTab, progress: stack.length === 1 && !findTabs(s.parts) ? drag : 0, talk: "rest", onSelect: (i: number) => run(`tab:${i}`), onTalk: () => run("talk") }))
       : null,
     snack ? h("div", { className: "ia-snack" }, h(I.Snackbar, { text: snack, tone: "ok" })) : null,
     h("div", { className: "ia-layer" },
