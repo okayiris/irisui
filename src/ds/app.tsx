@@ -389,7 +389,8 @@ export function checkApp(spec: AppSpec): Finding[] {
     let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0; // the TalkOrb in the tab bar
     if (s.kind === "talk") orbs = 1;
     if (s.status) orbs++;
-    let busy = s.mark && /==.+==/.test(s.lede ?? "") ? BUSY.Pen({ c: "Pen", look: s.mark.look }) : 0, markPen = s.mark && /==.+==/.test(s.lede ?? "") ? 1 : 0, words = 0, pens = markPen, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
+    // An action shown only on a condition (a flow's last step) takes the place of the step's button, so it is not a second primary.
+    let busy = s.mark && /==.+==/.test(s.lede ?? "") ? BUSY.Pen({ c: "Pen", look: s.mark.look }) : 0, markPen = s.mark && /==.+==/.test(s.lede ?? "") ? 1 : 0, words = 0, pens = markPen, anchors = 0, primaries = s.action && !s.action.danger && !s.action.if ? 1 : 0;
     walk(parts, (p) => {
       if (ORBS.has(p.c) || (p.c === "Widget" && p.look === "orb")) orbs++;
       // A part the system does not know (a lab part) says its own cost and whether it is a big word.
@@ -403,7 +404,7 @@ export function checkApp(spec: AppSpec): Finding[] {
       targets(p.on).forEach((t) => (spec.screens[t] ? reach.add(t) : add(id, `"${p.on}" goes to a screen that does not exist`)));
       if (p.c === "Segmented" && !p.bind) add(id, "A Segmented with nothing behind it is a demo control", "warn");
     });
-    targets(s.action?.on).concat(targets(s.second?.on), ...(s.actions ?? []).map((a) => targets(a.on))).forEach((t) =>
+    targets(s.action?.on).concat(targets(s.second?.on), targets(s.top?.on), ...(s.actions ?? []).map((a) => targets(a.on))).forEach((t) =>
       spec.screens[t] ? reach.add(t) : add(id, `action goes to "${t}", which does not exist`));
     if (orbs > 1) add(id, `${orbs} orbs: one Iris per surface`);
     if (busy > 5) add(id, `busy ${busy} of 5`);
