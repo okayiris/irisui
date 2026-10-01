@@ -2681,7 +2681,7 @@
   flex-direction: column;
 }
 .ia-scroll > .ia-screen {
-  flex: 1;
+  flex: 1 0 auto;   /* grows, never shrinks: a shrunk screen let its parts overflow past the room kept for the tab bar */
 }
 /* A sheet in an app is solid enough that nothing behind it ghosts through. */
 .ia-layer .ix-sheet {
@@ -2820,9 +2820,26 @@ textarea.ix-textarea {
   bottom: 0;
   padding: 28px 14px 12px;
   font: var(--text-sub);
-  color: var(--fg);
+  color: #f4f7fa;   /* on the photo's dark shade: light in both modes */
   background: linear-gradient(transparent, rgba(7, 9, 12, 0.85));
 }
+.ia-pic > .ix-photo { width: 100%; height: 100%; }
+.ia-pic > figcaption { z-index: 1; }   /* above the Photo's canvases */
+/* Over: eyebrow, title and a line on a tall shade at the foot, like a story cover. */
+.ia-pic-words { display: grid; gap: 4px; }
+.ia-pic-over .ia-pic-words { padding: 64px 18px 18px; background: linear-gradient(transparent, rgba(7, 9, 12, 0.55) 40%, rgba(7, 9, 12, 0.9)); }
+.ia-pic-eyebrow { font: 600 11px/1.2 var(--font-mono, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase; color: color-mix(in srgb, var(--k, var(--accent)) 55%, #fff); }
+.ia-pic-title { font: 700 24px/1.12 var(--font-display, system-ui); letter-spacing: -.01em; text-wrap: balance; }
+.ia-pic-text { font: var(--text-sub); opacity: .82; text-wrap: pretty; }
+/* Side: the photo and its words next to each other, on the card's glass; flip puts the photo right. */
+.ia-pic-side { display: grid; grid-template-columns: 42% 1fr; align-items: center; }
+.ia-pic-side.ia-pic-flip { grid-template-columns: 1fr 42%; }
+.ia-pic-side.ia-pic-flip .ia-pic-img { order: 2; }
+.ia-pic-side .ia-pic-img { overflow: hidden; height: 100%; }
+.ia-pic-side .ia-pic-img > * { width: 100%; height: 100%; }
+.ia-pic-side .ia-pic-words { position: static; background: none; padding: 16px; color: var(--fg); }
+.ia-pic-side .ia-pic-eyebrow { color: var(--k, var(--accent)); }
+.ia-pic-side .ia-pic-title { font-size: 19px; }
 
 /* ---------- light: the release's own fixed colours ----------
  * bundle.css draws some parts with fixed dark values instead of tokens. Each is restated here with light-dark(light,

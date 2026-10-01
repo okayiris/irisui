@@ -90,18 +90,29 @@
       case "Label":
         return h2("p", { className: "ia-label" }, props.text);
       case "Group":
-        return h2(I.Card, { padding: 0, className: "ia-group" }, kids);
+        return (p.parts ?? []).length || p.each ? h2(I.Card, { padding: 0, className: "ia-group" }, kids) : null;
+      // an empty group is no card
       case "Grid":
         return h2("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
       case "Tap":
         return h2("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
-      case "Picture":
-        return h2(
+      case "Picture": {
+        const img = props.kind ? h2(I.Photo, { src: props.src, depth: props.depth, alt: props.alt ?? "", kind: props.kind, topic: props.topic, ratio: props.ratio ?? 16 / 10 }) : h2("img", { src: props.src, alt: props.alt ?? "", loading: "lazy", decoding: "async" });
+        const words = props.title || props.text ? h2(
+          "figcaption",
+          { className: "ia-pic-words" },
+          props.eyebrow ? h2("span", { className: "ia-pic-eyebrow" }, props.eyebrow) : null,
+          props.title ? h2("strong", { className: "ia-pic-title" }, props.title) : null,
+          props.text ? h2("span", { className: "ia-pic-text" }, props.text) : null
+        ) : props.caption ? h2("figcaption", null, props.caption) : null;
+        if (props.side) return h2(
           "figure",
-          { className: "ia-pic" + (props.wide ? " ia-pic-wide" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } },
-          h2("img", { src: props.src, alt: props.alt ?? "", loading: "lazy", decoding: "async" }),
-          props.caption ? h2("figcaption", null, props.caption) : null
+          { className: "ia-pic ia-pic-side" + (props.flip ? " ia-pic-flip" : "") },
+          h2("div", { className: "ia-pic-img", style: { aspectRatio: props.ratio ?? 1 } }, img),
+          words
         );
+        return h2("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : "") + (props.title ? " ia-pic-over" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } }, img, words);
+      }
       case "Rail":
         return h2(
           "div",

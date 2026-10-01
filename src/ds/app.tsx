@@ -125,15 +125,26 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
     case "Label":
       return h("p", { className: "ia-label" }, props.text);
     case "Group": // rows that belong together: one card, hairlines between
-      return h(I.Card, { padding: 0, className: "ia-group" }, kids);
+      return (p.parts ?? []).length || p.each ? h(I.Card, { padding: 0, className: "ia-group" }, kids) : null;   // an empty group is no card
     case "Grid":
       return h("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
     case "Tap": // makes a part that is a picture (a Widget) open something
       return h("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
-    case "Picture": // a photo as content: rounded, the caption over its lower edge, never a word drawn on it
-      return h("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } },
-        h("img", { src: props.src, alt: props.alt ?? "", loading: "lazy", decoding: "async" }),
-        props.caption ? h("figcaption", null, props.caption) : null);
+    case "Picture": { // a photo as content: rounded; text over its foot (over), beside it (side) or a caption
+      // kind (duotone, parallax) draws it with the photos lab's Photo; the text stays HTML, so it always reads.
+      const img = props.kind
+        ? h(I.Photo, { src: props.src, depth: props.depth, alt: props.alt ?? "", kind: props.kind, topic: props.topic, ratio: props.ratio ?? 16 / 10 })
+        : h("img", { src: props.src, alt: props.alt ?? "", loading: "lazy", decoding: "async" });
+      const words = props.title || props.text
+        ? h("figcaption", { className: "ia-pic-words" },
+            props.eyebrow ? h("span", { className: "ia-pic-eyebrow" }, props.eyebrow) : null,
+            props.title ? h("strong", { className: "ia-pic-title" }, props.title) : null,
+            props.text ? h("span", { className: "ia-pic-text" }, props.text) : null)
+        : props.caption ? h("figcaption", null, props.caption) : null;
+      if (props.side) return h("figure", { className: "ia-pic ia-pic-side" + (props.flip ? " ia-pic-flip" : "") },
+        h("div", { className: "ia-pic-img", style: { aspectRatio: props.ratio ?? 1 } }, img), words);
+      return h("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : "") + (props.title ? " ia-pic-over" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } }, img, words);
+    }
     case "Rail": // a row you swipe sideways: tiles at their own width, the next one peeks in
       return h("div", { className: "ia-rail", role: "group", "aria-label": props.label ?? "More" },
         (p.parts ?? []).map((q, i) => h("div", { key: i, className: "ia-rail-item", style: { width: q.w ?? props.w ?? 160 } }, h(Part, { p: q, ctx, item }))));
