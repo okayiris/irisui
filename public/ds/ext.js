@@ -12,20 +12,427 @@
   var useId = React.useId;
   var react_shim_default = React;
 
-  // src/ds/ext.tsx
+  // src/ds/app.tsx
   var h2 = react_shim_default.createElement;
+  var UI = () => window.IrisUi ?? {};
+  var get = (scope, path) => path.split(".").reduce((o, k) => o == null ? o : o[k], scope);
+  function fill(v, state, item) {
+    if (typeof v !== "string" || !v.includes("{")) return v;
+    const one = /^\{([^}]+)\}$/.exec(v);
+    const look = (p) => item !== void 0 && p.startsWith("$") ? p === "$" ? item : get(item, p.slice(2)) : get(state, p);
+    if (one) return look(one[1]);
+    return v.replace(/\{([^}]+)\}/g, (_, p) => {
+      const x = look(p);
+      return String(Array.isArray(x) ? x.length : x ?? "");
+    });
+  }
+  function ratio(v, state) {
+    const m = typeof v === "string" && /^=(\w+)\/(\w+)$/.exec(v);
+    if (!m) return v;
+    const a = state[m[1]], b = state[m[2]];
+    const n = (x) => Array.isArray(x) ? x.length : Number(x) || 0;
+    return n(b) ? n(a) / n(b) : 0;
+  }
+  function test(cond, state, item) {
+    const m = /^([\w.$]+)\s*(==|!=)\s*(.*)$/.exec(cond);
+    if (!m) return !!fill(`{${cond}}`, state, item);
+    const v = String(fill(`{${m[1]}}`, state, item));
+    return m[2] === "==" ? v === m[3] : v !== m[3];
+  }
+  var BUSY = {
+    Word: () => 3,
+    ThemeWord: () => 3,
+    EdgeText: () => 3,
+    Pattern: () => 2,
+    PhaseRing: () => 2,
+    LoopScreen: () => 2,
+    Pen: (p) => p.look === "neon" ? 2 : 0,
+    Widget: (p) => p.look === "ring" || p.look === "pattern" ? 1 : 0,
+    Progress: (p) => p.ring ? 1 : 0,
+    Orb3D: () => 2
+  };
+  var ORBS = /* @__PURE__ */ new Set(["Orb", "TalkOrb", "Orb3D", "StatusPill", "MacPill"]);
+  var HEROES = /* @__PURE__ */ new Set(["Word", "ThemeWord", "EdgeText", "Orb3D", "PhaseRing", "Progress", "Stat", "Photo", "Widget", "Pattern"]);
+  function icon(name, size = 20) {
+    return typeof name === "string" ? h2(UI().Icon, { name, size }) : name;
+  }
+  function Part({ p, ctx, item }) {
+    const { state, set, run } = ctx;
+    const I = UI();
+    if (p.each) {
+      const list = get(state, p.each) ?? [];
+      const { each, ...one } = p;
+      return h2(react_shim_default.Fragment, null, list.map((it, i) => h2(Part, { key: i, p: one, ctx, item: { ...typeof it === "object" ? it : { v: it }, i } })));
+    }
+    if (p.if && !test(p.if, state, item)) return null;
+    if (p.unless && test(p.unless, state, item)) return null;
+    const props = {};
+    for (const [k, v] of Object.entries(p)) {
+      if (["c", "on", "bind", "parts", "if", "unless", "add"].includes(k) || v && typeof v === "object" && !Array.isArray(v) && "c" in v) continue;
+      props[k] = Array.isArray(v) ? v.map((x) => typeof x === "string" ? fill(x, state, item) : x) : ratio(fill(v, state, item), state);
+    }
+    const on = p.on ? fill(p.on, state, item) : void 0;
+    const act = on ? () => run(on) : void 0;
+    const kids = (p.parts ?? []).map((q, i) => h2(Part, { key: i, p: q, ctx, item }));
+    const b = p.bind, val = b ? get(state, b) : void 0;
+    switch (p.c) {
+      case "Text":
+        return h2("p", { className: "ia-say" + (p.tone ? " ia-" + p.tone : "") }, props.text);
+      case "Label":
+        return h2("p", { className: "ia-label" }, props.text);
+      case "Group":
+        return h2(I.Card, { padding: 0, className: "ia-group" }, kids);
+      case "Grid":
+        return h2("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
+      case "Tap":
+        return h2("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
+      case "Stack":
+        return h2("div", { className: "ia-stack" }, kids);
+      case "Row": {
+        let trailing = props.trailing;
+        if (b) trailing = h2(I.Toggle, { on: !!val, onChange: (x) => set(b, x) });
+        else if (props.value != null) trailing = h2("span", { className: "ia-value" }, props.value);
+        const ic = p.icon && typeof p.icon === "object" ? h2(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : void 0;
+        return h2(I.Row, {
+          ...props,
+          icon: ic,
+          trailing,
+          chevron: props.chevron ?? (!!act && !b),
+          onClick: act ?? (b ? () => set(b, !val) : void 0)
+        });
+      }
+      case "Button":
+        return h2(I.Button, { ...props, icon: props.icon ? icon(props.icon, 16) : void 0, onClick: act }, props.label);
+      case "Buttons":
+        return h2(I.ButtonGroup, { stack: props.stack ?? true, topic: props.topic }, kids);
+      case "Toggle":
+        return h2(I.Toggle, { on: !!val, onChange: (x) => set(b, x) });
+      case "Chip":
+        return h2(I.Chip, { ...props, on: b ? val === props.value : props.on, onClick: b ? () => set(b, props.value) : act }, props.label);
+      case "Chips":
+        return h2("div", { className: "ia-chips" }, (props.items ?? []).map((l, i) => h2(I.Chip, { key: l, topic: props.topic, on: val === l, onClick: () => set(b, l) }, l)));
+      case "Segmented":
+      case "Tabs":
+      case "Steps":
+        return h2(I[p.c], { ...props, active: b ? val : props.active, onSelect: b ? (i) => set(b, i) : void 0 });
+      case "Slider":
+      case "Select":
+      case "TextArea":
+      case "DatePicker":
+      case "TimePicker":
+        return h2(I[p.c], { ...props, value: val, onChange: (x) => set(b, x) });
+      case "SearchField":
+        return h2(I.SearchField, { ...props, value: val ?? "", onChange: (x) => set(b, x) });
+      case "Field":
+        return h2(
+          "form",
+          { className: "ia-field", onSubmit: (e) => {
+            e.preventDefault();
+            const t = (val ?? "").trim();
+            if (!t) return;
+            if (p.add) set(p.add, [...get(state, p.add) ?? [], t]);
+            set(b, "");
+          } },
+          h2(I.Field, { ...props, "aria-label": props.placeholder, value: val ?? "", onChange: (e) => set(b, e.target.value) })
+        );
+      case "CheckList": {
+        const items = props.items ?? [];
+        if (!b) return h2(I.CheckList, props);
+        const done = val ?? [];
+        return h2(I.CheckList, { ...props, items, done, onToggle: (i) => set(b, done.includes(i) ? done.filter((x) => x !== i) : [...done, i]) });
+      }
+      case "Icon":
+        return icon(props.name, props.size);
+      case "Card":
+        return h2(I.Card, { padding: props.padding, onClick: act, className: act ? "ia-tap" : void 0 }, kids.length ? kids : props.text);
+      case "Topic":
+        return h2(I.Topic, { name: props.name }, kids);
+      case "Carousel":
+        return h2(I.Carousel, props, kids);
+      case "Dialog":
+      case "Sheet":
+        return null;
+      default: {
+        const C = I[p.c];
+        if (!C) return h2("p", { className: "ia-missing" }, `No part ${p.c}`);
+        const extra = {};
+        if (act) {
+          extra.onClick = act;
+          extra.onPress = act;
+          extra.onAction = act;
+        }
+        if (p.c === "EmptyState" && props.action) extra.action = { label: props.action, onClick: act };
+        if (p.c === "LoopScreen") {
+          extra.onDone = act ?? (() => run("back"));
+          extra.onLoops = () => run("back");
+        }
+        if ((p.c === "ChatStack" || p.c === "CircleStack") && p.on) extra.onSelect = (id) => id && run(fill(p.on ?? "", state, { id }) || `push:${id}`);
+        return h2(C, { ...props, ...extra }, kids.length ? kids : props.text);
+      }
+    }
+  }
+  function Page({ s, ctx, depth }) {
+    const I = UI();
+    const back = depth > 0 ? h2(I.Button, {
+      variant: "icon",
+      label: "Back",
+      onClick: () => ctx.run("back"),
+      icon: h2("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, icon("chevron", 18))
+    }) : null;
+    const body = h2(
+      react_shim_default.Fragment,
+      null,
+      depth > 0 ? h2(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back }) : h2(
+        "header",
+        { className: "ia-head" },
+        s.eyebrow ? h2("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
+        h2("h1", { className: "ia-title" }, fill(s.title, ctx.state))
+      ),
+      depth > 0 && s.eyebrow ? h2("p", { className: "ia-eyebrow ia-sub" }, fill(s.eyebrow, ctx.state)) : null,
+      s.lede ? h2("p", { className: "ia-lede", dangerouslySetInnerHTML: { __html: lede(fill(s.lede, ctx.state)) } }) : null,
+      s.hero ? h2("div", { className: "ia-hero" }, h2(Part, { p: s.hero, ctx })) : null,
+      h2("div", { className: "ia-parts" }, (s.parts ?? []).map((p, i) => h2(Part, { key: i, p, ctx }))),
+      s.action || s.second ? h2("div", { className: "ia-action" }, h2(
+        I.ButtonGroup,
+        { stack: true, topic: s.topic },
+        s.action ? h2(I.Button, { variant: s.action.danger ? "danger" : "primary", size: "lg", topic: s.topic, onClick: () => s.action.on && ctx.run(s.action.on) }, fill(s.action.label, ctx.state)) : null,
+        s.second ? h2(I.Button, { variant: "glass", onClick: () => s.second.on && ctx.run(s.second.on) }, s.second.label) : null
+      )) : null
+    );
+    return s.topic ? h2(I.Topic, { name: s.topic }, body) : body;
+  }
+  var lede = (t) => t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  var TALK = ["listening", "thinking", "talking"];
+  function Talk({ s, ctx }) {
+    const I = UI();
+    const [st, setSt] = useState(-1);
+    const lines = (s.parts ?? []).map((p) => p.text);
+    useEffect(() => {
+      if (st < 0 || st >= 2) return;
+      const t = setTimeout(() => setSt(st + 1), st === 0 ? 1800 : 1400);
+      return () => clearTimeout(t);
+    }, [st]);
+    const state = st < 0 ? "rest" : TALK[st];
+    return h2(
+      "div",
+      { className: "ia-talk" },
+      h2("p", { className: "ia-talk-word", "aria-live": "polite" }, st < 0 ? "Tap to talk" : state[0].toUpperCase() + state.slice(1)),
+      h2(I.TalkOrb, { size: 200, state, onPress: () => setSt(st === 2 || st < 0 ? 0 : -1) }),
+      h2("p", { className: "ia-lede ia-talk-line" }, st < 0 ? s.lede ?? "" : lines[st] ?? ""),
+      h2(I.Button, { variant: "glass", onClick: () => ctx.run("back") }, "Close")
+    );
+  }
+  function IrisApp({ spec, start, onNavigate, frame = "phone" }) {
+    const I = UI();
+    const path = (Array.isArray(start) ? start : [start ?? spec.start]).filter((id2) => spec.screens[id2]);
+    const pages = path.filter((id2) => !["sheet", "dialog"].includes(spec.screens[id2].kind ?? "page"));
+    const layers = () => ({ sheet: path.find((id2) => spec.screens[id2].kind === "sheet"), dialog: path.find((id2) => spec.screens[id2].kind === "dialog") });
+    const first = pages.length ? pages : [spec.start];
+    const key = path.join(">");
+    const [stack, setStack] = useState(first);
+    const [layer, setLayer] = useState(layers);
+    const [state, setState] = useState(() => structuredClone(spec.state ?? {}));
+    const [snack, setSnack] = useState(null);
+    const [dir, setDir] = useState("");
+    const scroller = useRef(null);
+    useEffect(() => {
+      setStack(first);
+      setLayer(layers());
+      setDir("");
+    }, [key]);
+    useEffect(() => {
+      onNavigate?.(stack[stack.length - 1]);
+      scroller.current?.scrollTo({ top: 0 });
+    }, [stack]);
+    useEffect(() => {
+      if (!snack) return;
+      const t = setTimeout(() => setSnack(null), 3600);
+      return () => clearTimeout(t);
+    }, [snack]);
+    const set = (k, v) => setState((s2) => ({ ...s2, [k]: v }));
+    const run = (a) => {
+      for (const one of a.split(";").map((x) => x.trim()).filter(Boolean)) {
+        const [verb, ...rest] = one.split(":"), arg = rest.join(":");
+        if (verb === "push" && spec.screens[arg]) {
+          const k = spec.screens[arg].kind;
+          if (k === "sheet") setLayer({ sheet: arg });
+          else if (k === "dialog") setLayer((l) => ({ ...l, dialog: arg }));
+          else {
+            setLayer({});
+            setDir("in");
+            setStack((s2) => [...s2, arg]);
+          }
+        } else if (verb === "sheet") setLayer({ sheet: arg });
+        else if (verb === "dialog") setLayer((l) => ({ ...l, dialog: arg }));
+        else if (verb === "close") setLayer((l) => l.dialog ? { sheet: l.sheet } : {});
+        else if (verb === "back") {
+          if (layer.dialog || layer.sheet) setLayer((l) => l.dialog ? { sheet: l.sheet } : {});
+          else {
+            setDir("out");
+            setStack((s2) => s2.length > 1 ? s2.slice(0, -1) : s2);
+          }
+        } else if (verb === "tab") {
+          setLayer({});
+          setDir("");
+          setStack([spec.tabs[Number(arg)].to]);
+        } else if (verb === "toggle") setState((s2) => ({ ...s2, [arg]: !s2[arg] }));
+        else if (verb === "set") {
+          const [k, v] = arg.split("=");
+          setState((s2) => ({ ...s2, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v }));
+        } else if (verb === "snack") setSnack(arg);
+        else if (verb === "talk") {
+          const t = Object.keys(spec.screens).find((id2) => spec.screens[id2].kind === "talk");
+          if (t) {
+            setLayer({});
+            setStack((s2) => [...s2, t]);
+          }
+        }
+      }
+    };
+    const ctx = { state, set, run };
+    const id = stack[stack.length - 1], s = spec.screens[id];
+    const talking = s.kind === "talk";
+    const tabOf = (sid) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
+    const activeTab = Math.max(0, ...stack.map(tabOf).filter((i) => i >= 0).slice(0, 1));
+    const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
+    return h2(
+      "div",
+      { className: "ia-app", "data-frame": frame },
+      h2(
+        "main",
+        { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
+        h2(
+          "div",
+          { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : "") },
+          talking ? h2(Talk, { s, ctx }) : h2(Page, { s, ctx, depth: stack.length - 1 })
+        )
+      ),
+      spec.tabs && !talking ? h2("div", { className: "ia-tabbar" }, h2(I.TabBar, {
+        tabs: spec.tabs.map((t) => t.label),
+        icons: spec.tabs.map((t) => t.icon),
+        active: activeTab,
+        talk: "rest",
+        onSelect: (i) => run(`tab:${i}`),
+        onTalk: () => run("talk")
+      })) : null,
+      snack ? h2("div", { className: "ia-snack" }, h2(I.Snackbar, { text: snack, tone: "ok" })) : null,
+      h2(
+        "div",
+        { className: "ia-layer" },
+        sheet ? h2(
+          I.Sheet,
+          { open: true, onClose: () => setLayer({}), title: sheet.title, sub: sheet.lede },
+          h2(
+            "div",
+            { className: "ia-sheet-body" },
+            (sheet.parts ?? []).map((p, i) => h2(Part, { key: i, p, ctx })),
+            sheet.action ? h2("div", { className: "ia-action" }, h2(I.Button, { variant: sheet.action.danger ? "danger" : "primary", size: "lg", onClick: () => run(sheet.action.on ?? "close") }, sheet.action.label)) : null
+          )
+        ) : null,
+        dialog ? h2(I.Dialog, {
+          open: true,
+          onClose: () => run("close"),
+          title: dialog.title,
+          body: dialog.body,
+          actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on), 0) }))
+        }) : null
+      )
+    );
+  }
+  function checkApp(spec) {
+    const out = [];
+    const add = (screen, rule, level = "break") => out.push({ screen, rule, level });
+    const walk = (ps = [], f) => ps.forEach((p) => {
+      f(p);
+      walk(p.parts, f);
+    });
+    const reach = /* @__PURE__ */ new Set();
+    const targets = (a) => (a ?? "").split(";").map((x) => x.trim().match(/^(push|sheet|dialog):([^{]+)$/)?.[2]).filter(Boolean);
+    for (const [id, s] of Object.entries(spec.screens)) {
+      const parts = [...s.hero ? [s.hero] : [], ...s.parts ?? []];
+      let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0;
+      if (s.kind === "talk") orbs = 1;
+      let busy = 0, words = 0, pens = 0, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
+      walk(parts, (p) => {
+        if (ORBS.has(p.c) || p.c === "Widget" && p.look === "orb") orbs++;
+        busy += BUSY[p.c]?.(p) ?? 0;
+        if (p.c === "Word" || p.c === "ThemeWord" || p.c === "EdgeText") words++;
+        if (p.c === "Pen") pens++;
+        if (p.c === "Anchor") anchors++;
+        if (p.c === "Button" && p.variant === "primary") primaries++;
+        if (p.c === "Mark") add(id, "Mark is the brand, never inside an app screen");
+        if (p.c === "Button" && p.variant === "danger" && !/delete|remove|unpair|cancel|leave|erase/i.test(p.label ?? "")) add(id, `Red only destroys: "${p.label}"`);
+        targets(p.on).forEach((t) => spec.screens[t] ? reach.add(t) : add(id, `"${p.on}" goes to a screen that does not exist`));
+        if (p.c === "Segmented" && !p.bind) add(id, "A Segmented with nothing behind it is a demo control", "warn");
+      });
+      targets(s.action?.on).concat(targets(s.second?.on), ...(s.actions ?? []).map((a) => targets(a.on))).forEach((t) => spec.screens[t] ? reach.add(t) : add(id, `action goes to "${t}", which does not exist`));
+      if (orbs > 1) add(id, `${orbs} orbs: one Iris per surface`);
+      if (busy > 5) add(id, `busy ${busy} of 5`);
+      if (words > 1) add(id, `${words} big words: one per screen`);
+      if (pens > 1) add(id, `${pens} pen marks: one per screen`);
+      if (anchors > 1) add(id, `${anchors} anchors: one per screen`);
+      if (primaries > 1) add(id, `${primaries} primary buttons: one action per screen`);
+      const heroAt = (s.parts ?? []).findIndex((p) => HEROES.has(p.c) && (p.c !== "Progress" || p.ring) && p.c !== "Stat" && p.c !== "Widget");
+      if (heroAt > 1) add(id, `${(s.parts ?? [])[heroAt].c} is a hero, but sits below other parts: move it to hero`, "warn");
+      const rows = (s.parts ?? []).flatMap((p) => p.c === "Group" ? p.parts ?? [] : [p]);
+      const dangerAt = rows.findIndex((p) => p.danger);
+      if (dangerAt >= 0 && rows.slice(dangerAt + 1).some((p) => p.c === "Row" && !p.danger)) add(id, "Danger is the last row, never above a normal one");
+      if ((s.kind ?? "page") === "page" && !s.lede && id === spec.start) add(id, "The first screen has no words of hers", "warn");
+    }
+    reach.add(spec.start);
+    spec.tabs?.forEach((t) => reach.add(t.to));
+    if (Object.values(spec.screens).some((s) => s.kind === "talk") && spec.tabs) {
+      for (const [id, s] of Object.entries(spec.screens)) if (s.kind === "talk") reach.add(id);
+    }
+    for (const id of Object.keys(spec.screens)) if (!reach.has(id)) add(id, "No way to reach this screen", "warn");
+    return out;
+  }
+  function costOf(s) {
+    const out = [];
+    const walk = (ps = []) => ps.forEach((p) => {
+      const c = BUSY[p.c]?.(p) ?? 0;
+      if (c) out.push([p.c + (p.look ? ", " + p.look : p.effect ? ", " + p.effect : ""), c]);
+      walk(p.parts);
+    });
+    walk([...s.hero ? [s.hero] : [], ...s.parts ?? []]);
+    return out;
+  }
+  function depthOf(spec) {
+    const seen = /* @__PURE__ */ new Set();
+    const go = (id) => {
+      if (seen.has(id)) return 0;
+      seen.add(id);
+      const s = spec.screens[id];
+      if (!s) return 0;
+      const ons = [];
+      const walk = (ps = []) => ps.forEach((p) => {
+        if (p.on) ons.push(p.on);
+        walk(p.parts);
+      });
+      walk([...s.hero ? [s.hero] : [], ...s.parts ?? []]);
+      [s.action?.on, s.second?.on, ...(s.actions ?? []).map((a) => a.on)].forEach((a) => a && ons.push(a));
+      let best = 0;
+      for (const a of ons) for (const m of a.matchAll(/(push|sheet|dialog):([\w-]+)/g)) best = Math.max(best, 1 + go(m[2]));
+      seen.delete(id);
+      return best;
+    };
+    return 1 + Math.max(go(spec.start), ...(spec.tabs ?? []).map((t) => go(t.to)));
+  }
+
+  // src/ds/ext.tsx
+  var h3 = react_shim_default.createElement;
   function houseButton(props, children) {
     const B = window.IrisUi?.Button;
-    if (B) return h2(B, props, children);
-    return h2("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
+    if (B) return h3(B, props, children);
+    return h3("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
   }
   var DS_BASE = (document.currentScript?.src ?? "").replace(/ext\.js(\?.*)?$/, "");
   function Mark({ size = 64, label = "Iris" }) {
     const px = Math.round(size / 0.7);
-    return h2(
+    return h3(
       "span",
       { className: "ix-mark", style: { width: size, height: size }, role: "img", "aria-label": label },
-      h2("img", {
+      h3("img", {
         src: `${DS_BASE}mark/iris-mark-512.png`,
         srcSet: `${DS_BASE}mark/iris-mark-128.png 128w, ${DS_BASE}mark/iris-mark-256.png 256w, ${DS_BASE}mark/iris-mark-512.png 512w`,
         sizes: `${px}px`,
@@ -49,7 +456,7 @@
       setOpen(false);
     }, []);
     useEffect(() => () => window.clearTimeout(timer.current), []);
-    return h2(
+    return h3(
       "span",
       {
         className: "ix-tip",
@@ -59,8 +466,8 @@
         onFocus: show,
         onBlur: hide
       },
-      h2("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : void 0 }, children),
-      h2("span", { className: "ix-tip-body", role: "tooltip", id }, label)
+      h3("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : void 0 }, children),
+      h3("span", { className: "ix-tip-body", role: "tooltip", id }, label)
     );
   }
   function Menu({
@@ -107,10 +514,10 @@
         setOpen(false);
       }
     };
-    return h2(
+    return h3(
       "span",
       { className: "ix-menu-host", ref: host },
-      trigger ? h2("span", { className: "ix-menu-trigger", onClick: () => setOpen((v) => !v), "aria-haspopup": "menu", "aria-expanded": open, tabIndex: 0, onKeyDown: (e) => e.key === "Enter" && setOpen((v) => !v) }, trigger) : houseButton(
+      trigger ? h3("span", { className: "ix-menu-trigger", onClick: () => setOpen((v) => !v), "aria-haspopup": "menu", "aria-expanded": open, tabIndex: 0, onKeyDown: (e) => e.key === "Enter" && setOpen((v) => !v) }, trigger) : houseButton(
         {
           variant: "glass",
           size: "sm",
@@ -118,9 +525,9 @@
           "aria-haspopup": "menu",
           "aria-expanded": open
         },
-        h2("span", { className: "ix-menu-trigger-inner" }, label, h2("span", { "aria-hidden": "true" }, "\u2304"))
+        h3("span", { className: "ix-menu-trigger-inner" }, label, h3("span", { "aria-hidden": "true" }, "\u2304"))
       ),
-      open ? h2(
+      open ? h3(
         "div",
         {
           className: "ix-menu",
@@ -131,9 +538,9 @@
         },
         (items ?? []).map((it, i) => {
           const kind = it.kind ?? "item";
-          if (kind === "sep") return h2("div", { className: "ix-menu-sep", key: i, role: "separator" });
-          if (kind === "label") return h2("div", { className: "ix-menu-label", key: i }, it.label);
-          return h2(
+          if (kind === "sep") return h3("div", { className: "ix-menu-sep", key: i, role: "separator" });
+          if (kind === "label") return h3("div", { className: "ix-menu-label", key: i }, it.label);
+          return h3(
             "button",
             {
               key: i,
@@ -149,15 +556,15 @@
               }
             },
             it.icon ?? null,
-            h2("span", null, it.label),
-            it.shortcut ? h2("span", { className: "ix-menu-key" }, it.shortcut) : null
+            h3("span", null, it.label),
+            it.shortcut ? h3("span", { className: "ix-menu-key" }, it.shortcut) : null
           );
         })
       ) : null
     );
   }
   function Stage({ children }) {
-    return h2("div", { className: "ix-stage" }, children);
+    return h3("div", { className: "ix-stage" }, children);
   }
   function Dialog({
     open,
@@ -175,10 +582,10 @@
       return () => document.removeEventListener("keydown", onKey);
     }, [open, onClose]);
     if (!open) return null;
-    return h2(
+    return h3(
       Stage,
       null,
-      h2(
+      h3(
         "div",
         {
           className: "ix-scrim",
@@ -187,12 +594,12 @@
           "aria-labelledby": id,
           onClick: (e) => e.target === e.currentTarget && onClose?.()
         },
-        h2(
+        h3(
           "div",
           { className: "ix-dialog" },
-          h2("h2", { id }, title),
-          body ? h2("p", null, body) : null,
-          h2(
+          h3("h2", { id }, title),
+          body ? h3("p", null, body) : null,
+          h3(
             "div",
             { className: "ix-dialog-actions" },
             actions.map(
@@ -229,19 +636,19 @@
       return () => document.removeEventListener("keydown", onKey);
     }, [open, onClose]);
     if (!open) return null;
-    return h2(
+    return h3(
       Stage,
       null,
-      h2(
+      h3(
         "div",
         { className: "ix-scrim", onClick: (e) => e.target === e.currentTarget && onClose?.() },
-        h2(
+        h3(
           "div",
           { className: "ix-sheet", "data-side": side === "end" ? "end" : "bottom", role: "dialog", "aria-modal": "true" },
-          side === "bottom" ? h2("div", { className: "ix-sheet-grip", "aria-hidden": "true" }) : null,
-          title ? h2("h2", { className: "ix-sheet-title" }, title) : null,
-          sub ? h2("p", { className: "ix-sheet-sub" }, sub) : null,
-          h2("div", { className: "ix-sheet-body" }, children)
+          side === "bottom" ? h3("div", { className: "ix-sheet-grip", "aria-hidden": "true" }) : null,
+          title ? h3("h2", { className: "ix-sheet-title" }, title) : null,
+          sub ? h3("p", { className: "ix-sheet-sub" }, sub) : null,
+          h3("div", { className: "ix-sheet-body" }, children)
         )
       )
     );
@@ -252,12 +659,12 @@
     action,
     onAction
   }) {
-    return h2(
+    return h3(
       "div",
       { className: "ix-snack", "data-tone": tone, role: "status", "aria-live": "polite" },
-      h2("span", { className: "ix-snack-dot", "aria-hidden": "true" }),
-      h2("span", { className: "ix-snack-text" }, text),
-      action ? h2("button", { type: "button", className: "ix-snack-action ix-hit", onClick: onAction }, action) : null
+      h3("span", { className: "ix-snack-dot", "aria-hidden": "true" }),
+      h3("span", { className: "ix-snack-text" }, text),
+      action ? h3("button", { type: "button", className: "ix-snack-action ix-hit", onClick: onAction }, action) : null
     );
   }
   function Badge({
@@ -268,11 +675,11 @@
     max = 99
   }) {
     const label = dot ? "" : String(Math.min(count ?? 0, max)) + ((count ?? 0) > max ? "+" : "");
-    return h2(
+    return h3(
       "span",
       { className: "ix-badge-host" },
       children,
-      h2(
+      h3(
         "span",
         {
           className: "ix-badge",
@@ -282,7 +689,7 @@
         },
         label
       ),
-      dot || !count ? null : h2("span", { className: "ix-visually-hidden" }, `${count} new`)
+      dot || !count ? null : h3("span", { className: "ix-visually-hidden" }, `${count} new`)
     );
   }
   function Slider({
@@ -299,16 +706,16 @@
     const now = value ?? inner;
     const pct = (now - min) / (max - min) * 100;
     const shown = format ? format(now) : `${now}${unit ? " " + unit : ""}`;
-    return h2(
+    return h3(
       "label",
       { className: "ix-slider" },
-      h2(
+      h3(
         "span",
         { className: "ix-slider-top" },
-        label ? h2("span", { className: "ix-slider-label" }, label) : h2("span", null),
-        h2("span", { className: "ix-slider-value" }, shown)
+        label ? h3("span", { className: "ix-slider-label" }, label) : h3("span", null),
+        h3("span", { className: "ix-slider-value" }, shown)
       ),
-      h2("input", {
+      h3("input", {
         type: "range",
         min,
         max,
@@ -333,11 +740,11 @@
     maxLength
   }) {
     const id = useId();
-    return h2(
+    return h3(
       "div",
       { className: "ix-field" },
-      label ? h2("label", { className: "ix-field-label", htmlFor: id }, label) : null,
-      h2("textarea", {
+      label ? h3("label", { className: "ix-field-label", htmlFor: id }, label) : null,
+      h3("textarea", {
         id,
         className: "ix-area",
         rows,
@@ -356,14 +763,14 @@
   }) {
     const id = useId();
     const list = options.map((o) => typeof o === "string" ? { value: o, label: o } : o);
-    return h2(
+    return h3(
       "div",
       { className: "ix-field" },
-      label ? h2("label", { className: "ix-field-label", htmlFor: id }, label) : null,
-      h2(
+      label ? h3("label", { className: "ix-field-label", htmlFor: id }, label) : null,
+      h3(
         "select",
         { id, className: "ix-select", value, onChange: (e) => onChange?.(e.target.value) },
-        list.map((o) => h2("option", { key: o.value, value: o.value }, o.label))
+        list.map((o) => h3("option", { key: o.value, value: o.value }, o.label))
       )
     );
   }
@@ -375,14 +782,14 @@
     children
   }) {
     const [focus, setFocus] = useState(false);
-    return h2(
+    return h3(
       "div",
       { className: "ix-search-field" },
-      h2(
+      h3(
         "div",
         { className: "ix-search", "data-focus": focus ? "1" : "0" },
-        h2("span", { className: "ix-search-glass", "aria-hidden": "true" }, "\u2315"),
-        h2("input", {
+        h3("span", { className: "ix-search-glass", "aria-hidden": "true" }, "\u2315"),
+        h3("input", {
           type: "search",
           value,
           placeholder,
@@ -391,8 +798,8 @@
           onBlur: () => setFocus(false),
           onChange: (e) => onChange?.(e.target.value)
         }),
-        busy ? h2("span", { className: "ix-spin", role: "status", "aria-label": "Searching" }) : null,
-        value ? h2(
+        busy ? h3("span", { className: "ix-spin", role: "status", "aria-label": "Searching" }) : null,
+        value ? h3(
           "button",
           {
             type: "button",
@@ -403,7 +810,7 @@
           "\xD7"
         ) : null
       ),
-      children ? h2("div", { className: "ix-results" }, children) : null
+      children ? h3("div", { className: "ix-results" }, children) : null
     );
   }
   function Tabs({
@@ -418,11 +825,11 @@
       const el = nodes[active];
       if (el) setInk({ left: el.offsetLeft, width: el.offsetWidth });
     }, [active, items.join("|")]);
-    return h2(
+    return h3(
       "div",
       { className: "ix-tabs", role: "tablist", ref: host },
       items.map(
-        (label, i) => h2(
+        (label, i) => h3(
           "button",
           {
             key: label,
@@ -440,15 +847,15 @@
           label
         )
       ),
-      h2("span", { className: "ix-tab-ink", "aria-hidden": "true", style: { transform: `translateX(${ink.left}px)`, width: ink.width + "px" } })
+      h3("span", { className: "ix-tab-ink", "aria-hidden": "true", style: { transform: `translateX(${ink.left}px)`, width: ink.width + "px" } })
     );
   }
   function Steps({ items, active = 0 }) {
-    return h2(
+    return h3(
       "ol",
       { className: "ix-steps" },
       items.map(
-        (label, i) => h2(
+        (label, i) => h3(
           "li",
           {
             key: label,
@@ -456,9 +863,9 @@
             "data-state": i < active ? "done" : i === active ? "now" : "next",
             "aria-current": i === active ? "step" : void 0
           },
-          h2("span", { className: "ix-step-dot" }, i < active ? "\u2713" : String(i + 1)),
-          h2("span", { className: "ix-step-label" }, label),
-          i < items.length - 1 ? h2("span", { className: "ix-step-line", "data-done": i < active ? "1" : "0" }) : null
+          h3("span", { className: "ix-step-dot" }, i < active ? "\u2713" : String(i + 1)),
+          h3("span", { className: "ix-step-label" }, label),
+          i < items.length - 1 ? h3("span", { className: "ix-step-line", "data-done": i < active ? "1" : "0" }) : null
         )
       )
     );
@@ -467,19 +874,21 @@
     title,
     line,
     action,
+    icon: icon2,
     children
   }) {
-    return h2(
+    const Icon = window.IrisUi?.Icon;
+    return h3(
       "div",
       { className: "ix-empty" },
-      h2("span", { className: "ix-empty-icon", "aria-hidden": "true" }, "\u25CB"),
-      h2("span", { className: "ix-empty-title" }, title),
-      line ? h2("span", { className: "ix-empty-line" }, line) : null,
-      action || children ? h2("div", { className: "ix-empty-actions" }, action ? houseButton({ variant: "glass", size: "sm", onClick: action.onClick }, action.label) : children) : null
+      icon2 && Icon ? h3("span", { className: "ix-empty-icon", "aria-hidden": "true" }, h3(Icon, { name: icon2, size: 22 })) : null,
+      h3("span", { className: "ix-empty-title" }, title),
+      line ? h3("span", { className: "ix-empty-line" }, line) : null,
+      action || children ? h3("div", { className: "ix-empty-actions" }, action ? houseButton({ variant: "glass", size: "sm", onClick: action.onClick }, action.label) : children) : null
     );
   }
   function Divider({ label, inset }) {
-    return h2("hr", { className: "ix-divider", "data-label": label ?? "", "data-inset": inset ? "1" : void 0 });
+    return h3("hr", { className: "ix-divider", "data-label": label ?? "", "data-inset": inset ? "1" : void 0 });
   }
   function Toolbar({
     items = [],
@@ -499,7 +908,7 @@
         nodes[Math.max(at - 1, 0)]?.focus();
       }
     };
-    return h2(
+    return h3(
       "div",
       {
         className: "ix-toolbar",
@@ -509,9 +918,9 @@
         ref: host,
         onKeyDown: onKey
       },
-      title ? h2("span", { className: "ix-toolbar-title" }, title) : null,
+      title ? h3("span", { className: "ix-toolbar-title" }, title) : null,
       items.map(
-        (it) => h2(
+        (it) => h3(
           "button",
           {
             key: it.label,
@@ -524,10 +933,10 @@
             onClick: it.onSelect
           },
           it.icon ?? null,
-          h2("span", null, it.label)
+          h3("span", null, it.label)
         )
       ),
-      trailing ? h2("span", { className: "ix-toolbar-trailing" }, trailing) : null
+      trailing ? h3("span", { className: "ix-toolbar-trailing" }, trailing) : null
     );
   }
   var DAYS = ["mo", "tu", "we", "th", "fr", "sa", "su"];
@@ -578,37 +987,37 @@
     };
     const todayIso = iso(today.getFullYear(), today.getMonth(), today.getDate());
     const cells = monthGrid(view.y, view.m);
-    return h2(
+    return h3(
       "div",
       { className: "ix-datepicker", role: "group", "aria-label": label ?? "Pick a day" },
-      h2(
+      h3(
         "div",
         { className: "ix-dp-head" },
-        h2(
+        h3(
           "button",
           { type: "button", className: "ix-dp-nav ix-hit", "aria-label": "Previous month", onClick: () => step(-1) },
           "\u2039"
         ),
-        h2("span", { className: "ix-dp-month" }, `${MONTHS[view.m]} ${view.y}`),
-        h2(
+        h3("span", { className: "ix-dp-month" }, `${MONTHS[view.m]} ${view.y}`),
+        h3(
           "button",
           { type: "button", className: "ix-dp-nav ix-hit", "aria-label": "Next month", onClick: () => step(1) },
           "\u203A"
         )
       ),
-      h2(
+      h3(
         "div",
         { className: "ix-dp-week", "aria-hidden": "true" },
-        DAYS.map((d) => h2("span", { key: d }, d))
+        DAYS.map((d) => h3("span", { key: d }, d))
       ),
-      h2(
+      h3(
         "div",
         { className: "ix-dp-grid", role: "grid" },
         cells.map((d, i) => {
-          if (d === null) return h2("span", { key: `e${i}`, className: "ix-dp-empty" });
+          if (d === null) return h3("span", { key: `e${i}`, className: "ix-dp-empty" });
           const day = iso(view.y, view.m, d);
           const off = min && day < min || max && day > max;
-          return h2(
+          return h3(
             "button",
             {
               key: day,
@@ -627,11 +1036,11 @@
           );
         })
       ),
-      showToday ? h2(
+      showToday ? h3(
         "div",
         { className: "ix-dp-foot" },
         houseButton({ variant: "glass", size: "sm", onClick: () => onChange?.(todayIso) }, "Today"),
-        h2("span", { className: "ix-dp-hint" }, value ? `Chosen: ${value}` : "No day chosen")
+        h3("span", { className: "ix-dp-hint" }, value ? `Chosen: ${value}` : "No day chosen")
       ) : null
     );
   }
@@ -646,19 +1055,19 @@
     const minutes = Array.from({ length: Math.ceil(60 / step) }, (_, i) => i * step);
     const two = (n) => String(n).padStart(2, "0");
     const set = (nh, nm) => onChange?.(`${two(nh)}:${two(nm)}`);
-    return h2(
+    return h3(
       "div",
       { className: "ix-timepicker", role: "group", "aria-label": label ?? "Pick a time" },
-      h2("span", { className: "ix-tp-value", "aria-live": "polite" }, `${two(hour)}:${two(minute)}`),
-      h2(
+      h3("span", { className: "ix-tp-value", "aria-live": "polite" }, `${two(hour)}:${two(minute)}`),
+      h3(
         "div",
         { className: "ix-tp-row" },
-        h2("span", { className: "ix-tp-label" }, "hour"),
-        h2(
+        h3("span", { className: "ix-tp-label" }, "hour"),
+        h3(
           "div",
           { className: "ix-tp-strip" },
           hours.map(
-            (x) => h2(
+            (x) => h3(
               "button",
               {
                 key: x,
@@ -673,15 +1082,15 @@
           )
         )
       ),
-      h2(
+      h3(
         "div",
         { className: "ix-tp-row" },
-        h2("span", { className: "ix-tp-label" }, "minute"),
-        h2(
+        h3("span", { className: "ix-tp-label" }, "minute"),
+        h3(
           "div",
           { className: "ix-tp-strip" },
           minutes.map(
-            (x) => h2(
+            (x) => h3(
               "button",
               {
                 key: x,
@@ -696,7 +1105,7 @@
           )
         )
       ),
-      h2(
+      h3(
         "div",
         { className: "ix-tp-foot" },
         houseButton(
@@ -710,7 +1119,7 @@
           },
           "Now"
         ),
-        h2("span", { className: "ix-dp-hint" }, step === 1 ? "every minute" : `every ${step} minutes`)
+        h3("span", { className: "ix-dp-hint" }, step === 1 ? "every minute" : `every ${step} minutes`)
       )
     );
   }
@@ -722,19 +1131,19 @@
     variant = "small",
     children
   }) {
-    return h2(
+    return h3(
       "header",
       { className: "ix-appbar", "data-variant": variant },
-      h2(
+      h3(
         "div",
         { className: "ix-appbar-row" },
-        leading ? h2("span", { className: "ix-appbar-leading" }, leading) : null,
-        variant === "small" ? h2("h2", { className: "ix-appbar-title" }, title) : h2("span", null),
-        h2("span", { className: "ix-appbar-actions" }, actions)
+        leading ? h3("span", { className: "ix-appbar-leading" }, leading) : null,
+        variant === "small" ? h3("div", { className: "ix-appbar-text" }, h3("h2", { className: "ix-appbar-title" }, title), sub ? h3("p", { className: "ix-appbar-sub" }, sub) : null) : h3("span", null),
+        h3("span", { className: "ix-appbar-actions" }, actions)
       ),
-      variant === "large" ? h2("h2", { className: "ix-appbar-large" }, title) : null,
-      sub ? h2("p", { className: "ix-appbar-sub" }, sub) : null,
-      children ? h2("div", { className: "ix-appbar-body" }, children) : null
+      variant === "large" ? h3("h2", { className: "ix-appbar-large" }, title) : null,
+      variant === "large" && sub ? h3("p", { className: "ix-appbar-sub" }, sub) : null,
+      children ? h3("div", { className: "ix-appbar-body" }, children) : null
     );
   }
   function NavRail({
@@ -750,17 +1159,17 @@
       setShrunk((v) => !v);
       onToggle?.();
     };
-    return h2(
+    return h3(
       "nav",
       { className: "ix-rail", "data-collapsed": now ? "1" : void 0, "aria-label": label },
-      h2(
+      h3(
         "ul",
         { className: "ix-rail-list" },
         items.map(
-          (it) => h2(
+          (it) => h3(
             "li",
             { key: it.label },
-            h2(
+            h3(
               "button",
               {
                 type: "button",
@@ -769,17 +1178,17 @@
                 "aria-label": now ? it.label : void 0,
                 onClick: it.onSelect
               },
-              h2("span", { className: "ix-rail-icon", "aria-hidden": "true" }, it.icon ?? "\u2022"),
-              now ? null : h2("span", { className: "ix-rail-label" }, it.label)
+              h3("span", { className: "ix-rail-icon", "aria-hidden": "true" }, it.icon ?? "\u2022"),
+              now ? null : h3("span", { className: "ix-rail-label" }, it.label)
             )
           )
         )
       ),
-      h2(
+      h3(
         "div",
         { className: "ix-rail-foot" },
         trailing ?? null,
-        h2(
+        h3(
           "button",
           {
             type: "button",
@@ -787,8 +1196,8 @@
             "aria-expanded": !now,
             onClick: toggle
           },
-          h2("span", { className: "ix-rail-icon", "aria-hidden": "true" }, now ? "\xBB" : "\xAB"),
-          now ? null : h2("span", { className: "ix-rail-label" }, "Collapse")
+          h3("span", { className: "ix-rail-icon", "aria-hidden": "true" }, now ? "\xBB" : "\xAB"),
+          now ? null : h3("span", { className: "ix-rail-label" }, "Collapse")
         )
       )
     );
@@ -800,21 +1209,21 @@
     variant = "primary",
     size = "md"
   }) {
-    return h2(
+    return h3(
       "span",
       { className: "ix-split" },
       houseButton({ variant, size, onClick: onSelect }, children),
-      h2(
+      h3(
         "span",
         { className: "ix-split-caret" },
-        h2(Menu, {
+        h3(Menu, {
           label: "",
           align: "end",
           items,
-          trigger: h2(
+          trigger: h3(
             "span",
             { className: "ix-split-btn", role: "button", tabIndex: 0, "aria-label": "More actions" },
-            h2("span", { "aria-hidden": "true" }, "\u2304")
+            h3("span", { "aria-hidden": "true" }, "\u2304")
           )
         })
       )
@@ -842,10 +1251,10 @@
       if (!el) return;
       el.scrollBy({ left: by * el.clientWidth, behavior: "smooth" });
     };
-    return h2(
+    return h3(
       "div",
       { className: "ix-carousel", role: "group", "aria-label": label },
-      h2(
+      h3(
         "div",
         {
           className: "ix-carousel-track",
@@ -854,22 +1263,22 @@
           style: { gap: `${gap}px`, scrollSnapType: `x mandatory`, scrollPaddingLeft: "0" }
         },
         slides.map(
-          (slide, i) => h2("div", { className: "ix-carousel-slide", key: i, style: { scrollSnapAlign: snap } }, slide)
+          (slide, i) => h3("div", { className: "ix-carousel-slide", key: i, style: { scrollSnapAlign: snap } }, slide)
         )
       ),
-      h2(
+      h3(
         "div",
         { className: "ix-carousel-foot" },
-        arrows ? h2(
+        arrows ? h3(
           "button",
           { type: "button", className: "ix-carousel-arrow ix-hit", "aria-label": "Previous", onClick: () => go(-1) },
           "\u2039"
         ) : null,
-        h2(
+        h3(
           "div",
           { className: "ix-carousel-dots" },
           slides.map(
-            (_, i) => h2("button", {
+            (_, i) => h3("button", {
               key: i,
               type: "button",
               className: "ix-carousel-dot",
@@ -883,7 +1292,7 @@
             })
           )
         ),
-        arrows ? h2("button", { type: "button", className: "ix-carousel-arrow ix-hit", "aria-label": "Next", onClick: () => go(1) }, "\u203A") : null
+        arrows ? h3("button", { type: "button", className: "ix-carousel-arrow ix-hit", "aria-label": "Next", onClick: () => go(1) }, "\u203A") : null
       )
     );
   }
@@ -900,15 +1309,15 @@
     const colours = design.PHASE_COLOURS ?? [];
     const phases = design.PHASES ?? [];
     const now = Math.max(0, Math.min(5, Math.round(step)));
-    return h2(
+    return h3(
       "span",
       { className: "ix-bubble", role: "img", "aria-label": `${title}, ${phases[now] ?? ""}`, style: { width: size, height: size } },
-      h2(
+      h3(
         "svg",
         { viewBox: "0 0 34 34", width: size, height: size, "aria-hidden": "true" },
-        h2("circle", { className: "ix-bubble-disc", cx: 17, cy: 17, r: 14 }),
+        h3("circle", { className: "ix-bubble-disc", cx: 17, cy: 17, r: 14 }),
         [0, 1, 2, 3, 4, 5].map(
-          (i) => h2("path", {
+          (i) => h3("path", {
             key: i,
             d: bubbleArc(i),
             pathLength: 1,
@@ -917,7 +1326,7 @@
             style: { "--arc": colours[i], animationDelay: `${i * 70}ms` }
           })
         ),
-        h2("text", { className: "ix-bubble-letter", x: 17, y: 17 }, title.slice(0, 1).toUpperCase())
+        h3("text", { className: "ix-bubble-letter", x: 17, y: 17 }, title.slice(0, 1).toUpperCase())
       )
     );
   }
@@ -938,13 +1347,13 @@
     const circles = items.map((c, i) => ({ c, i })).sort((a, b) => rank(a.c) - rank(b.c) || a.i - b.i).slice(0, 6).map((x) => x.c);
     if (!circles.length) return null;
     if (!open)
-      return h2(
+      return h3(
         "button",
         { type: "button", className: "ix-circles-edges ix-focus", onClick: () => setOpen(true), "aria-label": `${circles.length} conversations`, "aria-expanded": "false" },
-        circles.slice(0, 2).map((c, i) => h2("i", { key: c.id, "data-depth": i })),
-        h2("span", { className: "ix-circles-count" }, `+${circles.length}`)
+        circles.slice(0, 2).map((c, i) => h3("i", { key: c.id, "data-depth": i })),
+        h3("span", { className: "ix-circles-count" }, `+${circles.length}`)
       );
-    return h2(
+    return h3(
       "ul",
       {
         className: "ix-circles",
@@ -956,10 +1365,10 @@
       [...circles].reverse().map((c) => {
         const loops = c.loops ?? [];
         const you = waits(c);
-        return h2(
+        return h3(
           "li",
           { key: c.id },
-          h2(
+          h3(
             "button",
             {
               type: "button",
@@ -969,15 +1378,15 @@
                 onSelect && onSelect(c.id);
               }
             },
-            h2(
+            h3(
               "span",
               { className: "ix-circle-text" },
-              h2("span", { className: "ix-circle-title" }, c.title),
-              h2("span", { className: "ix-circle-line", "data-you": you ? "1" : void 0 }, c.line)
+              h3("span", { className: "ix-circle-title" }, c.title),
+              h3("span", { className: "ix-circle-line", "data-you": you ? "1" : void 0 }, c.line)
             ),
-            loops.length ? h2("span", { className: "ix-circle-loops" }, loops.slice(0, 3).map((l, i) => h2(LoopBubble, { key: i, title: l.title, step: l.step, size: 26 }))) : null,
-            loops.length > 3 ? h2("span", { className: "ix-circle-more" }, `+${loops.length - 3}`) : null,
-            (c.unread ?? 0) > 0 ? h2("span", { className: "ix-circle-unread" }, h2("span", { className: "ix-visually-hidden" }, "unread")) : null
+            loops.length ? h3("span", { className: "ix-circle-loops" }, loops.slice(0, 3).map((l, i) => h3(LoopBubble, { key: i, title: l.title, step: l.step, size: 26 }))) : null,
+            loops.length > 3 ? h3("span", { className: "ix-circle-more" }, `+${loops.length - 3}`) : null,
+            (c.unread ?? 0) > 0 ? h3("span", { className: "ix-circle-unread" }, h3("span", { className: "ix-visually-hidden" }, "unread")) : null
           )
         );
       })
@@ -996,8 +1405,8 @@
     return t * t * (3 - 2 * t);
   };
   var stillMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function canvasOf(w, h3) {
-    return Object.assign(document.createElement("canvas"), { width: w, height: h3 });
+  function canvasOf(w, h4) {
+    return Object.assign(document.createElement("canvas"), { width: w, height: h4 });
   }
   var PHOTO_WIDTH = 720;
   function grey(ctx, z) {
@@ -1056,8 +1465,8 @@
       i.src = src;
     });
   }
-  async function pairOf(el, src, depthSrc, ratio) {
-    if (!src) return sceneOf(el, PHOTO_WIDTH, Math.round(PHOTO_WIDTH / ratio));
+  async function pairOf(el, src, depthSrc, ratio2) {
+    if (!src) return sceneOf(el, PHOTO_WIDTH, Math.round(PHOTO_WIDTH / ratio2));
     const img = await load(src);
     const W = PHOTO_WIDTH, H = Math.round(W * img.height / img.width);
     const photo = canvasOf(W, H), depth = canvasOf(W, H);
@@ -1167,7 +1576,7 @@
     word = "",
     threshold = 0.5,
     topic,
-    ratio = 4 / 3,
+    ratio: ratio2 = 4 / 3,
     motion = "pointer"
   }) {
     const host = useRef(null);
@@ -1175,7 +1584,7 @@
       const el = host.current;
       if (!el) return;
       let gone = false;
-      pairOf(el, src, depth, ratio).then((pair) => {
+      pairOf(el, src, depth, ratio2).then((pair) => {
         if (gone) return;
         el.style.aspectRatio = `${pair.photo.width} / ${pair.photo.height}`;
         el.replaceChildren(...paintPhoto(el, pair, kind, word, Math.max(0.05, Math.min(0.9, threshold))));
@@ -1184,7 +1593,7 @@
       return () => {
         gone = true;
       };
-    }, [src, depth, kind, word, threshold, topic, ratio]);
+    }, [src, depth, kind, word, threshold, topic, ratio2]);
     useEffect(() => {
       const el = host.current;
       if (!el || kind !== "parallax" || stillMotion()) return;
@@ -1213,19 +1622,19 @@
         el.removeEventListener("pointerleave", leave);
       };
     }, [kind, motion]);
-    return h2("div", {
+    return h3("div", {
       ref: host,
       className: "ix-photo",
       "data-kind": kind,
       role: "img",
       "aria-label": word && kind === "back" ? `${alt}, with the word ${word}` : alt,
-      style: { ...topicVars(topic), aspectRatio: String(ratio) }
+      style: { ...topicVars(topic), aspectRatio: String(ratio2) }
     });
   }
   function edgeOf(W, H, R, IN) {
-    const w = W - 2 * IN, h3 = H - 2 * IN, r = Math.max(1e-3, Math.min(R - IN, w / 2, h3 / 2));
-    const arc = Math.PI * r / 2, x0 = IN, y0 = IN, x1 = IN + w, y1 = IN + h3;
-    const legs = [w / 2 - r, arc, h3 - 2 * r, arc, w - 2 * r, arc, h3 - 2 * r, arc, w / 2 - r];
+    const w = W - 2 * IN, h4 = H - 2 * IN, r = Math.max(1e-3, Math.min(R - IN, w / 2, h4 / 2));
+    const arc = Math.PI * r / 2, x0 = IN, y0 = IN, x1 = IN + w, y1 = IN + h4;
+    const legs = [w / 2 - r, arc, h4 - 2 * r, arc, w - 2 * r, arc, h4 - 2 * r, arc, w / 2 - r];
     const on = [
       (t) => [W / 2 + t, y0],
       (t) => [x1 - r + r * Math.cos(-Math.PI / 2 + t / r), y0 + r + r * Math.sin(-Math.PI / 2 + t / r)],
@@ -1343,9 +1752,9 @@
     },
     // Saving or sending: the rim zips closed from the top and opens again.
     zip(p, t) {
-      const f = t % 2.4 / 2.4, fill = f < 0.5 ? easeOut(f * 2) : 1 - easeOut((f - 0.5) * 2);
-      stretch(p, 0, fill * 0.5, p.violet, 2.6, 10);
-      stretch(p, 1, 1 - fill * 0.5, p.ice, 2.6, 10);
+      const f = t % 2.4 / 2.4, fill2 = f < 0.5 ? easeOut(f * 2) : 1 - easeOut((f - 0.5) * 2);
+      stretch(p, 0, fill2 * 0.5, p.violet, 2.6, 10);
+      stretch(p, 1, 1 - fill2 * 0.5, p.ice, 2.6, 10);
     }
   };
   function BorderPattern({
@@ -1390,11 +1799,11 @@
         cancelAnimationFrame(frame);
       };
     }, [pattern, radius]);
-    return h2(
+    return h3(
       "div",
       { ref: box, className: "ix-border", "data-pattern": pattern, style: radius != null ? { borderRadius: radius } : void 0 },
-      h2("canvas", { ref: paper, className: "ix-border-rim", "aria-hidden": "true" }),
-      label ? h2("span", { className: "ix-visually-hidden", role: "status" }, label) : null,
+      h3("canvas", { ref: paper, className: "ix-border-rim", "aria-hidden": "true" }),
+      label ? h3("span", { className: "ix-visually-hidden", role: "status" }, label) : null,
       children
     );
   }
@@ -1418,7 +1827,7 @@
     if (open) {
       const loops = open.loops ?? [];
       const lead = loops.find((l) => l.step === YOU) ?? loops[0];
-      return h2(
+      return h3(
         "section",
         {
           className: "ix-chat-open",
@@ -1426,46 +1835,46 @@
           "aria-label": open.title,
           onKeyDown: (e) => e.key === "Escape" && pick(null)
         },
-        circles.filter((c) => c !== open).slice(0, 2).map((c, i) => h2("i", { key: c.id, className: "ix-chat-peek", "data-depth": i, style: topicVars(c.topic) })),
-        h2(
+        circles.filter((c) => c !== open).slice(0, 2).map((c, i) => h3("i", { key: c.id, className: "ix-chat-peek", "data-depth": i, style: topicVars(c.topic) })),
+        h3(
           "div",
           { className: "ix-chat-sheet" },
-          h2(
+          h3(
             "div",
             { className: "ix-chat-head" },
-            lead ? h2(LoopBubble, { title: lead.title, step: lead.step, size: 28 }) : null,
-            h2(
+            lead ? h3(LoopBubble, { title: lead.title, step: lead.step, size: 28 }) : null,
+            h3(
               "span",
               { className: "ix-chat-text" },
-              open.eyebrow ? h2("span", { className: "ix-chat-eyebrow" }, open.eyebrow) : null,
-              h2("span", { className: "ix-chat-title" }, open.title)
+              open.eyebrow ? h3("span", { className: "ix-chat-eyebrow" }, open.eyebrow) : null,
+              h3("span", { className: "ix-chat-title" }, open.title)
             )
           ),
-          open.message ? h2("p", { className: "ix-chat-message" }, open.message) : null,
-          loops.length ? h2("span", { className: "ix-chat-section" }, "Loops") : null,
-          loops.length ? h2(
+          open.message ? h3("p", { className: "ix-chat-message" }, open.message) : null,
+          loops.length ? h3("span", { className: "ix-chat-section" }, "Loops") : null,
+          loops.length ? h3(
             "ul",
             { className: "ix-chat-loops" },
             loops.map(
-              (l, i) => h2(
+              (l, i) => h3(
                 "li",
                 { key: i, className: "ix-chat-loop", "data-you": l.step === YOU ? "1" : void 0 },
-                h2(LoopBubble, { title: l.title, step: l.step, size: 24 }),
-                h2(
+                h3(LoopBubble, { title: l.title, step: l.step, size: 24 }),
+                h3(
                   "span",
                   { className: "ix-chat-text" },
-                  h2("span", { className: "ix-chat-loop-title" }, l.title),
-                  h2(
+                  h3("span", { className: "ix-chat-loop-title" }, l.title),
+                  h3(
                     "span",
                     { className: "ix-chat-line" },
-                    h2("span", { className: "ix-chat-phase", style: { color: design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
+                    h3("span", { className: "ix-chat-phase", style: { color: design.PHASE_COLOURS?.[l.step ?? 0] } }, design.PHASES?.[l.step ?? 0] ?? ""),
                     l.line ? `, ${l.line}` : ""
                   )
                 )
               )
             )
           ) : null,
-          h2(
+          h3(
             "div",
             { className: "ix-chat-actions" },
             (open.actions ?? []).map(
@@ -1476,7 +1885,7 @@
         )
       );
     }
-    return h2(
+    return h3(
       "div",
       {
         className: "ix-chats",
@@ -1487,7 +1896,7 @@
       circles.map((c, i) => {
         const live = fanned || i === 0;
         const loops = c.loops ?? [];
-        return h2(
+        return h3(
           "button",
           {
             key: c.id,
@@ -1501,18 +1910,18 @@
             "aria-label": fanned || circles.length < 2 ? void 0 : `${c.title}, and ${circles.length - 1} more`,
             onClick: () => fanned ? pick(c.id) : setFanned(true)
           },
-          h2(
+          h3(
             "span",
             { className: "ix-chat-text" },
-            c.eyebrow ? h2("span", { className: "ix-chat-eyebrow" }, c.eyebrow) : null,
-            h2("span", { className: "ix-chat-title" }, c.title),
-            h2("span", { className: "ix-chat-line", "data-you": waits(c) ? "1" : void 0 }, c.line)
+            c.eyebrow ? h3("span", { className: "ix-chat-eyebrow" }, c.eyebrow) : null,
+            h3("span", { className: "ix-chat-title" }, c.title),
+            h3("span", { className: "ix-chat-line", "data-you": waits(c) ? "1" : void 0 }, c.line)
           ),
-          loops.length ? h2("span", { className: "ix-circle-loops" }, loops.slice(0, 3).map((l, j) => h2(LoopBubble, { key: j, title: l.title, step: l.step, size: 24 }))) : null,
-          loops.length > 3 ? h2("span", { className: "ix-circle-more" }, `+${loops.length - 3}`) : null
+          loops.length ? h3("span", { className: "ix-circle-loops" }, loops.slice(0, 3).map((l, j) => h3(LoopBubble, { key: j, title: l.title, step: l.step, size: 24 }))) : null,
+          loops.length > 3 ? h3("span", { className: "ix-circle-more" }, `+${loops.length - 3}`) : null
         );
       }),
-      !fanned && circles.length > 1 ? h2("span", { className: "ix-circles-count ix-chats-count", "aria-hidden": "true" }, `+${circles.length - 1}`) : null
+      !fanned && circles.length > 1 ? h3("span", { className: "ix-circles-count ix-chats-count", "aria-hidden": "true" }, `+${circles.length - 1}`) : null
     );
   }
   var EDGE_COLORS = {
@@ -1630,9 +2039,9 @@
         line(seg(0.5 + s0, 0.5 + k), color(j), stroke, 6, 1 - g * 0.6);
       });
     } else if (name === "zip") {
-      const f = phase % 1, fill = f < 0.5 ? easeOut(f * 2) : 1 - easeOut((f - 0.5) * 2);
-      line(seg(0.5 - fill * 0.5, 0.5), color(0), stroke * 0.85, 8);
-      line(seg(0.5, 0.5 + fill * 0.5), color(1), stroke * 0.85, 8);
+      const f = phase % 1, fill2 = f < 0.5 ? easeOut(f * 2) : 1 - easeOut((f - 0.5) * 2);
+      line(seg(0.5 - fill2 * 0.5, 0.5), color(0), stroke * 0.85, 8);
+      line(seg(0.5, 0.5 + fill2 * 0.5), color(1), stroke * 0.85, 8);
     } else if (name === "aurora") for (let i = 0; i < 96; i++) {
       const u = i / 96, g = 0.5 + 0.5 * Math.sin(u * Math.PI * 6 + phase * 1.3) * Math.cos(u * Math.PI * 2.3 - phase * 0.7);
       line(seg(u, u + 1 / 96 + 3e-3), mixColor(cols, g), stroke * (0.5 + 1.2 * g), 10 * g, 0.45 + 0.55 * g);
@@ -1686,7 +2095,7 @@
         io.disconnect();
       };
     }, [key]);
-    return h2("canvas", { ref, className: "ix-edge", "aria-hidden": "true", style: { width: width + pad * 2, height: ht + pad * 2, margin: -pad } });
+    return h3("canvas", { ref, className: "ix-edge", "aria-hidden": "true", style: { width: width + pad * 2, height: ht + pad * 2, margin: -pad } });
   }
   function EdgeText({ text, pattern = "comet", colors, size = 64, weight = 800, speed = 1 }) {
     const ref = useRef(null);
@@ -1698,7 +2107,7 @@
     const cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
     const t = { x: 0, y: size, fontSize: size, fontWeight: weight, style: { fontFamily: "var(--font-display)" } };
     const dur = `${1.3 / speed}s`;
-    return h2(
+    return h3(
       "svg",
       {
         className: `ix-edgetext ix-edgetext-${pattern}`,
@@ -1709,8 +2118,8 @@
         "aria-label": text,
         style: { "--u": `${size / 64}px`, filter: `drop-shadow(0 0 ${size / 16}px ${cols[0]}aa)` }
       },
-      h2("text", { ...t, ref, className: "ix-edgetext-tube" }, text),
-      cols.slice(0, 3).map((c, i) => h2("text", {
+      h3("text", { ...t, ref, className: "ix-edgetext-tube" }, text),
+      cols.slice(0, 3).map((c, i) => h3("text", {
         ...t,
         key: i,
         className: "ix-edgetext-light",
@@ -1730,11 +2139,11 @@
         if (on && !was.current) setPick(THINKING[Math.floor(Math.random() * THINKING.length)]);
         was.current = on;
       }, [on]);
-      return h2(
+      return h3(
         "span",
         { className: "ix-thinks" + (on ? " ix-thinks-on" : "") },
-        h2(Base, rest),
-        on ? h2("span", { className: "ix-thinks-edge" }, h2(Edge, { pattern: thinking ?? pick, width: Math.round(size * ring), stroke: Math.max(1.5, size / 48) })) : null
+        h3(Base, rest),
+        on ? h3("span", { className: "ix-thinks-edge" }, h3(Edge, { pattern: thinking ?? pick, width: Math.round(size * ring), stroke: Math.max(1.5, size / 48) })) : null
       );
     }, Base);
   }
@@ -1767,6 +2176,10 @@
     NavRail,
     SplitButton,
     Carousel,
+    IrisApp,
+    checkApp,
+    costOf,
+    depthOf,
     Mark,
     Edge,
     EdgeText,

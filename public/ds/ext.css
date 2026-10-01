@@ -1819,3 +1819,262 @@
 @keyframes ix-edgetext-zip { from { stroke-dasharray: 0 calc(var(--u) * 400); } to { stroke-dasharray: calc(var(--u) * 400) 0; } }
 @keyframes ix-edgetext-party { 50% { filter: hue-rotate(160deg); } }
 @media (prefers-reduced-motion: reduce) { .ix-edgetext-light { animation: none; } }
+
+/* ---------- Fixes to shipped parts, until they land in the release ---------- */
+
+/* A Row is its own card. Inside a Card (a group of settings) it drops its glass and the rows share one surface,
+   split by hairlines: one box, not a box of boxes. */
+.iris-card > .iris-row {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.iris-card > .iris-row + .iris-row {
+  box-shadow: inset 0 1px 0 var(--line);
+}
+.iris-card > .iris-row.iris-press:hover {
+  background: rgba(180, 225, 255, 0.04);
+}
+
+/* LoopScreen shipped as a 300px phone of its own. On a screen it is the screen: full width, no second frame. */
+.ia-app .iris-loop,
+.app .iris-loop {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0 22px 0 0;
+  overflow: visible;
+}
+
+/* AppBar: the sub line stands under the title, beside the back button. */
+.ix-appbar-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.ix-appbar-text .ix-appbar-sub {
+  margin: 0;
+}
+
+/* ---------- IrisApp: a whole app from a spec ---------- */
+
+.ia-app {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-text);
+}
+.ia-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 62px var(--gutter, 16px) 40px;
+  scrollbar-width: none;
+}
+.ia-scroll::-webkit-scrollbar {
+  display: none;
+}
+.ia-scroll.ia-has-tabs {
+  padding-bottom: 130px;
+}
+.ia-app[data-frame="window"] .ia-scroll {
+  padding-top: 24px;
+}
+.ia-screen.ia-in {
+  animation: ia-in var(--motion-base, 200ms) var(--ease-house, ease-out);
+}
+.ia-screen.ia-out {
+  animation: ia-out var(--motion-base, 200ms) var(--ease-house, ease-out);
+}
+@keyframes ia-in {
+  from { transform: translateX(28px); opacity: 0; }
+}
+@keyframes ia-out {
+  from { transform: translateX(-28px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ia-screen.ia-in,
+  .ia-screen.ia-out {
+    animation: none;
+  }
+}
+
+/* The page: header, her words, the hero, the content, the one action. One gap between them all. */
+.ia-screen > *,
+.ia-screen > .iris-topic > * {
+  margin-bottom: var(--gap, 12px);
+}
+.ia-screen .ix-appbar {
+  margin: -8px calc(-1 * var(--gutter, 16px)) 12px;
+  padding-left: 8px;
+  background: none;
+  backdrop-filter: none;
+}
+.ia-head {
+  margin-bottom: 4px;
+}
+.ia-eyebrow {
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label, var(--dim));
+  margin: 8px 0 6px;
+}
+.ia-eyebrow.ia-sub {
+  margin-top: 0;
+}
+.ia-title {
+  font: var(--text-page-title);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.ia-lede {
+  font: var(--text-body);
+  color: var(--dim);
+  line-height: 1.45;
+  margin: 6px 0 20px;
+}
+.ia-lede b {
+  color: var(--fg);
+  font-weight: 600;
+}
+.ia-hero {
+  display: grid;
+  justify-items: center;
+  margin: 4px 0 20px;
+}
+.ia-parts {
+  display: grid;
+  gap: var(--gap, 12px);
+}
+.ia-say {
+  font: var(--text-body);
+  color: var(--dim);
+  line-height: 1.45;
+  margin: 0;
+}
+.ia-say.ia-error {
+  color: var(--error);
+}
+.ia-label {
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label, var(--dim));
+  margin: 12px 0 -4px;
+}
+.ia-grid {
+  display: grid;
+  gap: var(--gap, 12px);
+}
+.ia-grid > * {
+  min-width: 0;
+}
+.ia-stack {
+  display: grid;
+  gap: 8px;
+}
+.ia-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ia-value {
+  color: var(--dim);
+  font: var(--text-body);
+}
+.ia-group {
+  overflow: hidden;
+}
+.ia-tap {
+  cursor: pointer;
+  transition: transform var(--motion-fast, 150ms) var(--ease-house, ease-out);
+}
+.ia-tap:active {
+  transform: scale(0.98);
+}
+.ia-action {
+  margin-top: 20px;
+}
+.ia-missing {
+  color: var(--error);
+  font: var(--text-sub);
+}
+.ia-tabbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+}
+.ia-snack {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 120px;
+  z-index: 40;
+}
+.ia-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+.ia-layer > * {
+  pointer-events: auto;
+}
+/* A dialog and a sheet cover the app they belong to: the Stage is the whole app here, without its demo box. */
+.ia-layer .ix-stage {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.ia-sheet-body {
+  display: grid;
+  gap: var(--gap, 12px);
+}
+
+/* Talking: her orb is the screen. No tab bar, so there is one orb. */
+.ia-talk {
+  min-height: 640px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 28px;
+  text-align: center;
+}
+.ia-talk-word {
+  font: var(--text-row-title);
+  color: var(--fg);
+  margin: 0;
+}
+.ia-talk-line {
+  max-width: 300px;
+  min-height: 3em;
+  margin: 0;
+}
+.ia-tapbtn {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  border-radius: var(--radius-card);
+  transition: transform var(--motion-fast, 150ms) var(--ease-house, ease-out);
+}
+.ia-tapbtn:active {
+  transform: scale(0.97);
+}
+.ia-tapbtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* A Word fills its line: in the centred hero it would otherwise shrink to nothing. */
+.ia-hero > .iris-word {
+  width: 100%;
+}

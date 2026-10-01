@@ -6,6 +6,7 @@
 // from window.IrisUi, so a screen mixes them with the shipped parts without a seam.
 
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
+import { IrisApp, checkApp, costOf, depthOf } from "./app";
 
 /** The house createElement: the bundle is a classic script, so the source takes React as a value. */
 const h = React.createElement as Any;
@@ -603,17 +604,21 @@ export function EmptyState({
   title,
   line,
   action,
+  icon,
   children,
 }: {
   title: string;
   line?: string;
   action?: { label: string; onClick?: () => void };
+  /** What this place holds, as a house icon name ("phone"). Never a circle: a circle reads as her orb. */
+  icon?: string;
   children?: Any;
 }) {
+  const Icon = (window as Any).IrisUi?.Icon;
   return h(
     "div",
     { className: "ix-empty" },
-    h("span", { className: "ix-empty-icon", "aria-hidden": "true" }, "○"),
+    icon && Icon ? h("span", { className: "ix-empty-icon", "aria-hidden": "true" }, h(Icon, { name: icon, size: 22 })) : null,
     h("span", { className: "ix-empty-title" }, title),
     line ? h("span", { className: "ix-empty-line" }, line) : null,
     action || children ? h("div", { className: "ix-empty-actions" }, action ? houseButton({ variant: "glass", size: "sm", onClick: action.onClick }, action.label) : children) : null,
@@ -936,11 +941,13 @@ export function AppBar({
       "div",
       { className: "ix-appbar-row" },
       leading ? h("span", { className: "ix-appbar-leading" }, leading) : null,
-      variant === "small" ? h("h2", { className: "ix-appbar-title" }, title) : h("span", null),
+      variant === "small"
+        ? h("div", { className: "ix-appbar-text" }, h("h2", { className: "ix-appbar-title" }, title), sub ? h("p", { className: "ix-appbar-sub" }, sub) : null)
+        : h("span", null),
       h("span", { className: "ix-appbar-actions" }, actions),
     ),
     variant === "large" ? h("h2", { className: "ix-appbar-large" }, title) : null,
-    sub ? h("p", { className: "ix-appbar-sub" }, sub) : null,
+    variant === "large" && sub ? h("p", { className: "ix-appbar-sub" }, sub) : null,
     children ? h("div", { className: "ix-appbar-body" }, children) : null,
   );
 }
@@ -2095,6 +2102,10 @@ const SHIPPED = {
   NavRail,
   SplitButton,
   Carousel,
+  IrisApp,
+  checkApp,
+  costOf,
+  depthOf,
   Mark,
   Edge,
   EdgeText,
