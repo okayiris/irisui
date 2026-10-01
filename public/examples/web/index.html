@@ -35,18 +35,24 @@
   const { PreviewI18nProvider, IrisApp, checkApp } = window.IrisUi;
 
   // The whole web app is one spec: IrisApp draws the NavRail, the pages, the sheets from the right and the dialogs.
-  const CALL = ["phone", "Moved the dentist to Wednesday 09:30", "14:10, called, 2 minutes", "t-dentist"];
-  const MARIO = ["phone", "Booked a table at Da Mario", "13:41, Saturday 20:00, six people", "t-mario"];
-  const FUNDA = ["globe", "Looked up houses on Funda", "13:52, read 12 pages, one step tried twice", "t-funda"];
-  const steps = (title, sub, items) => ({ title, eyebrow: sub, parts: [{ c: "Card", parts: [{ c: "CheckList", items }] }] });
+  // What Iris did: the house TableApp. Each row opens its steps in a sheet from the side.
+  const { CheckList, Card } = window.IrisUi;
+  const steps = (items) => h(Card, null, h(CheckList, { items }));
+  const TASKS = [
+    { id: "dentist", icon: "phone", tags: ["Calls"], title: "Moved the dentist to Wednesday 09:30", subtitle: "14:10, called, 2 minutes",
+      detail: steps([["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]]) },
+    { id: "funda", icon: "globe", tags: ["On the web"], title: "Looked up houses on Funda", subtitle: "13:52, read 12 pages, one step tried twice",
+      detail: steps([["13:50", "Opened Utrecht, 3 rooms"], ["13:51", "The page moved while she typed. Tried again, it worked."], ["13:52", "Saved 4 houses to your list"]]) },
+    { id: "mario", icon: "phone", tags: ["Calls"], title: "Booked a table at Da Mario", subtitle: "13:41, Saturday 20:00, six people",
+      detail: steps([["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]]) },
+  ];
 
   const WEB = {
     name: "Iris", start: "talk",
     rail: [{ label: "Talk", icon: "wave", to: "talk" }, { label: "Groceries", icon: "car", to: "groceries" },
            { label: "What Iris did", icon: "loop", to: "did" }, { label: "Subscription", icon: "person", to: "plan" }],
     state: { sent: [], draft: "", cake: "ask", items: ["Candles", "Balloons", "Lemonade", "Bread", "Milk", "Eggs"], done: [0, 4], add: "",
-             shop: "Albert Heijn", show: "All", q: "", awake: 1, next: "",
-             tasks: [CALL, FUNDA, MARIO].map(([icon, t, s, to]) => ({ icon, t, s, to, kind: icon === "phone" ? "Calls" : "On the web" })) },
+             shop: "Albert Heijn", awake: 1, next: "" },
     screens: {
       talk: { title: "Talk", status: { state: "idle" },
         lede: "**Alex**, the dentist moved to Wednesday 09:30. Saturday stays free for Sam's party.",
@@ -87,13 +93,7 @@
 
       did: { title: "What Iris did", status: { state: "idle" }, lede: "One line per task, not per click. Open a line for the steps.",
         parts: [
-          { c: "SearchField", bind: "q", placeholder: "Search what she did" },
-          { c: "Chips", bind: "show", items: ["All", "Calls", "On the web"] },
-          { c: "Group", if: "show==All", parts: [{ c: "Row", each: "tasks", filter: "q", icon: "{$.icon}", title: "{$.t}", subtitle: "{$.s}", on: "push:{$.to}" }] },
-          { c: "Group", unless: "show==All", parts: [{ c: "Row", each: "tasks", filter: "q", where: "kind=={show}", icon: "{$.icon}", title: "{$.t}", subtitle: "{$.s}", on: "push:{$.to}" }] }] },
-      "t-dentist": steps("Moved the dentist", "Called at 14:10", [["14:10", "Asked to move Tuesday"], ["14:11", "Wednesday 09:30 is free"], ["14:12", "Booked. Bring the old card"]]),
-      "t-mario": steps("Booked Da Mario", "Called at 13:40", [["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]]),
-      "t-funda": steps("Looked up houses", "On funda.nl at 13:50", [["13:50", "Opened Utrecht, 3 rooms"], ["13:51", "The page moved while she typed. Tried again, it worked."], ["13:52", "Saved 4 houses to your list"]]),
+          { c: "TableApp", title: "Today", noun: "tasks", placeholder: "Search what she did", filters: ["Calls", "On the web"], rows: TASKS }] },
 
       plan: { title: "Subscription", status: { state: "idle" }, lede: "You are on Pro, €12 a month, until 18 October. {next}",
         parts: [
@@ -117,10 +117,10 @@
   const RULES = {
     talk: ["Her presence top left: the StatusPill", "Her words as the lede, the talk under it", "Enter sends your line, she thinks, then answers; Talk to Iris opens her orb", "The question she asks has answers and Not now"],
     groceries: ["The ring is the count and moves when you tick", "Order opens a sheet from the right: pick the shop there", "Share says what happened"],
-    did: ["Search and chips filter the same rows", "Every row opens its steps, back in the app bar", "A task that failed once and then worked is not red"],
+    did: ["The house TableApp: search, chips and a count filter the same rows", "Every row opens its steps in a sheet from the side", "A task that failed once and then worked is not red"],
     plan: ["The plan you are on, once, in her words", "Every plan shows its price the same way", "Switching asks first: it is about money"],
   };
-  const TOP = { "t-dentist": "did", "t-mario": "did", "t-funda": "did", voice: "talk" };
+  const TOP = { voice: "talk" };
   const ALL = ["One spec, drawn by IrisApp with spec.rail: NavRail, pages, sheets from the right, dialogs.",
                "The house Icon has 14 names: Groceries uses car, Subscription person."];
 
