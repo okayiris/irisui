@@ -2099,6 +2099,18 @@ function thinksWith(Base: Any, ring: number, fallback: number) {
 const TalkOrbThinks = thinksWith((window as Any).IrisUi?.TalkOrb, 70 / 60, 66);
 const Orb3DThinks = thinksWith((window as Any).IrisUi?.Orb3D, 0.72, 220);
 
+// The shipped Orb3D shader declares its own round(); GLSL ES 3.00 already has one, so the compile fails and the
+// orb draws nothing. Until the release renames it, the source is renamed on its way to the GPU.
+for (const C of [(window as Any).WebGL2RenderingContext, (window as Any).WebGLRenderingContext]) {
+  const shaderSource = C?.prototype?.shaderSource;
+  if (!shaderSource || shaderSource.irisFixed) continue;
+  const fixed = function (this: Any, shader: Any, src: string) {
+    return shaderSource.call(this, shader, /float round\(float u\)/.test(src) ? src.replace(/\bround\(/g, "irisRound(") : src);
+  };
+  (fixed as Any).irisFixed = true;
+  C.prototype.shaderSource = fixed;
+}
+
 const SHIPPED = {
   Photo,
   BorderPattern,

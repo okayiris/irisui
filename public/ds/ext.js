@@ -2213,6 +2213,15 @@
   }
   var TalkOrbThinks = thinksWith(window.IrisUi?.TalkOrb, 70 / 60, 66);
   var Orb3DThinks = thinksWith(window.IrisUi?.Orb3D, 0.72, 220);
+  for (const C of [window.WebGL2RenderingContext, window.WebGLRenderingContext]) {
+    const shaderSource = C?.prototype?.shaderSource;
+    if (!shaderSource || shaderSource.irisFixed) continue;
+    const fixed = function(shader, src) {
+      return shaderSource.call(this, shader, /float round\(float u\)/.test(src) ? src.replace(/\bround\(/g, "irisRound(") : src);
+    };
+    fixed.irisFixed = true;
+    C.prototype.shaderSource = fixed;
+  }
   var SHIPPED = {
     Photo,
     BorderPattern,
