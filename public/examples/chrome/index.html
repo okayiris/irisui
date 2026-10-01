@@ -42,15 +42,8 @@
   .save .row { display: flex; gap: 8px; }
 
   /* The side panel: the house AppBar, a log, the field at the foot. */
-  .panel { width: 340px; flex: none; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
-  .live { display: flex; align-items: center; gap: 8px; margin: 12px 14px 0; padding: 8px 10px 8px 12px; border-radius: var(--radius-button); background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); font: var(--text-sub); }
-  .live .sp { flex: 1; }
-  .p-log { flex: 1; overflow: auto; padding: 14px; display: grid; align-content: start; gap: 14px; font: var(--text-body); }
-  .you { color: var(--accent); }
-  .steps { list-style: none; margin: 0; padding: 0 12px 10px 46px; display: grid; gap: 6px; font: var(--text-sub); color: var(--dim); }
-  .steps .now { color: var(--fg); }
-  .p-in { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
-  .p-in > :first-child { flex: 1; }
+  .panel { width: 340px; flex: none; border-left: 1px solid var(--line); position: relative; transform: translateZ(0); }
+  .panel .ia-scroll { padding: 16px 14px 24px; }
   .reopen { position: absolute; right: 16px; bottom: 16px; }
 
   @media (max-width: 760px) { .view { flex-direction: column; height: auto; } .panel { width: auto; border-left: 0; border-top: 1px solid var(--line); min-height: 420px; } .site { min-height: 380px; } .form { width: auto; margin: 24px; } }
@@ -68,7 +61,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect } = React;
-  const { Button, Orb, Menu, Icon, Field, AppBar, Card, Row, Snackbar } = window.IrisUi;
+  const { Button, Orb, Menu, Icon, Field, Card, Snackbar, IrisApp } = window.IrisUi;
 
   // The toolbar holds her one orb in Chrome. Click it: the menu for this site.
   function Browser({ host, tab, children, panel, menu }) {
@@ -132,41 +125,44 @@
   /* ------------------------------------------------------- Iris uses the browser */
 
   const STEPS = ["Read the page", "Searched for candles", "Added candles", "Added balloons"];
+  // The side panel is a small IrisApp. The page around it runs her steps; the app reports Stop and Close back (onState).
+  const panelSpec = (step, stopped, carry) => {
+    const busy = !stopped && step < 3;
+    return { name: "Iris", start: "task",
+      state: { sent: [], draft: "", paid: "ask", ...carry, stopped, closed: false },
+      screens: { task: { title: "Iris",
+        status: busy ? { state: "busy", label: "Using this tab" } : stopped ? { state: "idle", label: "Stopped. The page is yours again." } : { state: "idle" },
+        parts: [
+          { c: "Buttons", stack: false, parts: [
+            ...(busy ? [{ c: "Button", variant: "glass", size: "sm", label: "Stop", on: "set:stopped=true" }] : []),
+            { c: "Button", variant: "text", size: "sm", label: "Close", on: "set:closed=true" }] },
+          { c: "Group", parts: [{ c: "Row", icon: "person", title: "Order the party things on the list.", subtitle: "You" }] },
+          { c: "Label", text: `Filling the basket, ${Math.min(step + 1, 4)} of 4` },
+          { c: "Card", parts: [{ c: "CheckList", items: STEPS.slice(0, step + 1), done: STEPS.slice(0, step + 1).map((_, i) => i).filter((i) => i < step || !busy) }] },
+          ...(step >= 1 ? [{ c: "Text", text: "Could not type in the search once: the page moved. Tried again, it worked." }] : []),
+          ...(step >= 3 && !stopped ? [
+            { c: "Text", if: "paid==ask", text: "Two things are in the basket. Shall I pay with your Visa ending 4412? I ask your phone first." },
+            { c: "Buttons", if: "paid==ask", stack: false, parts: [
+              { c: "Button", variant: "glass", label: "Pay", on: "set:paid=yes;snack:Your phone said yes. Paid €8.40." },
+              { c: "Button", variant: "text", label: "Not now", on: "set:paid=no;snack:The basket stays as it is." }] },
+            { c: "Text", if: "paid==yes", text: "Paid €8.40 with your Visa. Delivery on Friday." }] : []),
+          { c: "Group", if: "sent!=", parts: [{ c: "Row", each: "sent", icon: "person", title: "{$.v}", subtitle: "You. Iris adds it to this task." }] },
+          { c: "Field", placeholder: "Type to Iris, Enter sends", bind: "draft", add: "sent" }],
+      } } };
+  };
   function Panel({ go }) {
     const [step, setStep] = useState(0);
-    const [open, setOpen] = useState(true);
     const [shown, setShown] = useState(true);
     const [stopped, setStopped] = useState(false);
-    const [paid, setPaid] = useState(null);
-    const [said, setSaid] = useState([]);
-    const [text, setText] = useState("");
     const [basket, setBasket] = useState([]);
+    const carry = React.useRef({});
     useEffect(() => { if (stopped || step >= 3) return; const t = setTimeout(() => setStep(step + 1), 1600); return () => clearTimeout(t); }, [step, stopped]);
     useEffect(() => { if (step >= 2 && !basket.includes("Candles, 12 pieces")) setBasket((b) => [...b, "Candles, 12 pieces"]);
                       if (step >= 3 && !basket.includes("Balloons, 20 pieces")) setBasket((b) => [...b, "Balloons, 20 pieces"]); }, [step]);
     const busy = !stopped && step < 3;
-    const panel = shown ? h("aside", { className: "panel", "aria-label": "Iris side panel" },
-      h(AppBar, { title: "Iris", actions: h(Button, { variant: "text", size: "sm", onClick: () => setShown(false) }, "Close") }),
-      busy ? h("div", { className: "live" }, h("span", { className: "sp" }, "Iris is using this tab"), h(Button, { variant: "glass", size: "sm", onClick: () => setStopped(true) }, "Stop"))
-        : stopped ? h("div", { className: "live" }, h("span", { className: "sp" }, "Iris stopped. The page is yours again.")) : null,
-      h("div", { className: "p-log", "aria-live": "polite" },
-        h("div", { className: "you" }, "Order the party things on the list."),
-        h(Card, { padding: 0 },
-          h(Row, { icon: busy ? h(Orb, { size: 22, state: "busy" }) : h(Icon, { name: "loop", size: 18 }), title: "Filling the basket",
-            trailing: h("span", { className: "filled" }, `${Math.min(step + 1, 4)} of 4`), chevron: true, onClick: () => setOpen(!open) }),
-          open ? h("ol", { className: "steps" },
-            STEPS.map((s, i) => i <= step ? h("li", { key: s, className: i === step && busy ? "now" : "" }, s) : null),
-            step >= 1 ? h("li", null, "Could not type in the search once: the page moved. Tried again, it worked.") : null) : null),
-        step >= 3 && !stopped ? (paid ? h("div", null, paid)
-          : h("div", { style: { display: "grid", gap: 10 } }, "Two things are in the basket. Shall I pay with your Visa ending 4412? I ask your phone first.",
-              h("div", { style: { display: "flex", gap: 8 } },
-                h(Button, { variant: "primary", size: "sm", onClick: () => setPaid("Your phone said yes. Paid €8.40, delivery on Friday.") }, "Pay"),
-                h(Button, { variant: "glass", size: "sm", onClick: () => setPaid("Fine. The basket stays as it is.") }, "Not now")))) : null,
-        said.map((m, i) => h("div", { key: i, className: m.you ? "you" : "" }, m.t))),
-      h("form", { className: "p-in", onSubmit: (e) => { e.preventDefault(); const t = text.trim(); if (!t) return; setText("");
-          setSaid((x) => [...x, { you: true, t }]); setTimeout(() => setSaid((x) => [...x, { t: "On it. I add it to this task." }]), 1200); } },
-        h(Field, { value: text, onChange: (e) => setText(e.target.value), placeholder: "Type to Iris", "aria-label": "Type to Iris" }),
-        h(Button, { variant: "glass", size: "sm", disabled: !text.trim() }, "Send"))) : null;
+    const spec = React.useMemo(() => panelSpec(step, stopped, carry.current), [step, stopped, shown]);
+    const onState = (st) => { const { stopped: s0, closed, ...rest } = st; carry.current = rest; if (s0 && !stopped) setStopped(true); if (closed) setShown(false); };
+    const panel = shown ? h("aside", { className: "panel", "aria-label": "Iris side panel" }, h(IrisApp, { key: `${step}-${stopped}-${shown}`, spec, frame: "window", onState })) : null;
     const target = busy && step >= 1 ? step - 1 : -1;
     const menu = [{ label: shown ? "Close the side panel" : "Open the side panel", onSelect: () => setShown(!shown) }];
     return h(Browser, { host: "shop.example.com/search?q=party", tab: "Party", panel, menu },
@@ -200,7 +196,7 @@
     stage: ({ scene, go }) => h(STAGES[scene.id], { go }),
     scenes: [
       { id: "panel", name: "Iris uses the browser",
-        ok: ["One orb in the panel: on the task she is running, and only while she runs it", "One line says Iris is using this tab, with Stop next to it", "Her hand: a ring on what she is about to press", "The slip says what happened and what she did next, in plain grey", "Paying asks first; Close hides the panel, the toolbar opens it again"],
+        ok: ["The panel is a small IrisApp: her StatusPill says busy only while she runs, Stop and Close report back", "One line says Iris is using this tab, with Stop next to it", "Her hand: a ring on what she is about to press", "The slip says what happened and what she did next, in plain grey", "Paying asks first; Close hides the panel, the toolbar opens it again"],
         ask: ["Show the step count, or only the current step?"] },
       { id: "login", name: "Fill a login",
         ok: ["The shield in the field opens the vault's menu: the vault fills it, not Iris", "Says after: nothing was shown to Iris"], ask: [] },
