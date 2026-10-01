@@ -1760,7 +1760,8 @@
     }
     const out = canvasOf(W, H), ctx = out.getContext("2d");
     if (kind === "duotone") {
-      const f = pixelsOf(photo), a = rgbOf(tokenOf(el, "--kd") || tokenOf(el, "--bg")), b = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
+      const f = pixelsOf(photo), b = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
+      const a = b.map((v) => Math.round(v * 0.16 + 7 * 0.84));
       for (let i = 0; i < f.data.length; i += 4) {
         const L = smooth(0.05, 0.95, (0.2126 * f.data[i] + 0.7152 * f.data[i + 1] + 0.0722 * f.data[i + 2]) / 255);
         for (let c = 0; c < 3; c++) f.data[i + c] = a[c] + (b[c] - a[c]) * L;

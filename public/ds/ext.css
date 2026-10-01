@@ -2947,3 +2947,19 @@ textarea.ix-textarea {
   :root:not([data-mode="dark"]) .iris-check .done .box { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 }
 :root[data-mode="light"] .iris-check .done .box { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+/* ---------- light: an app has a ground, not a white sheet ----------
+ * Dark has its glow; light gets a wash of the app's own colour from the top, a faint second one at the foot, and
+ * cards that sit on it with a soft shadow in that colour. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) .ia-app { background:
+    radial-gradient(130% 55% at 50% -6%, color-mix(in srgb, var(--k, var(--accent)) 24%, transparent), transparent 70%),
+    radial-gradient(90% 45% at 100% 105%, color-mix(in srgb, var(--k, var(--accent)) 12%, transparent), transparent 70%),
+    color-mix(in srgb, var(--k, var(--accent)) 5%, #f2f4f7); }
+  :root:not([data-mode="dark"]) .ia-app .iris-card:not(.iris-row) { background: linear-gradient(165deg, color-mix(in srgb, var(--k, var(--accent)) 9%, #ffffff), #ffffff 65%); box-shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 12px 28px -14px color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }
+}
+:root[data-mode="light"] .ia-app { background:
+  radial-gradient(130% 55% at 50% -6%, color-mix(in srgb, var(--k, var(--accent)) 24%, transparent), transparent 70%),
+  radial-gradient(90% 45% at 100% 105%, color-mix(in srgb, var(--k, var(--accent)) 12%, transparent), transparent 70%),
+  color-mix(in srgb, var(--k, var(--accent)) 5%, #f2f4f7); }
+:root[data-mode="light"] .ia-app .iris-card:not(.iris-row) { background: linear-gradient(165deg, color-mix(in srgb, var(--k, var(--accent)) 9%, #ffffff), #ffffff 65%); box-shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 12px 28px -14px color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }
