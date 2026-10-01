@@ -120,7 +120,7 @@
         parts: [{ c: "Card", parts: [{ c: "CheckList", items: [["13:40", "Asked for six on Saturday"], ["13:41", "20:00 is free, inside"]] }] }] },
       retry: { kind: "sheet", title: "Call Coolblue again", lede: "About the washing machine that did not come.",
         parts: [{ c: "Chips", bind: "retry", items: ["16:00", "18:00", "Tomorrow 09:00"] }],
-        action: { label: "Call again", on: "close;snack:Done. She calls Coolblue at the time you picked." } },
+        action: { label: "Call at {retry}", on: "close;snack:She calls Coolblue at {retry}." } },
       vault: { title: "Vault", lede: "What Iris may use, locked with Touch ID.",
         parts: [{ c: "Group", parts: [
           { c: "Row", icon: "shield", title: "Albert Heijn", subtitle: "Used for the grocery order, 30 September", on: "push:ah" },
