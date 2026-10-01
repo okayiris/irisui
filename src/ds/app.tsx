@@ -28,7 +28,7 @@ export type Screen = {
   topic?: string;
   hero?: Part;
   parts?: Part[];
-  action?: { label: string; on?: Act; danger?: boolean };
+  action?: { label: string; on?: Act; danger?: boolean; if?: string }; // if: only while the condition holds (a flow's last step)
   second?: { label: string; on?: Act };
   actions?: { label: string; on?: Act; danger?: boolean }[]; // dialog
   body?: string; // dialog
@@ -361,7 +361,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
         h("div", { className: "ia-sheet-body" }, (sheet.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx })),
           sheet.action || sheet.actions ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true },
             // The one primary first, then the rest as glass: action is the primary, actions[] the others.
-            [...(sheet.action ? [{ ...sheet.action, primary: true }] : []), ...(sheet.actions ?? [])].map((a: Any, i: number) =>
+            [...(sheet.action && (!sheet.action.if || test(sheet.action.if, state)) ? [{ ...sheet.action, primary: true }] : []), ...(sheet.actions ?? [])].map((a: Any, i: number) =>
               h(I.Button, { key: i, variant: a.danger ? "danger" : a.primary ? "primary" : "glass", size: a.primary ? "lg" : "md", topic: spec.topic, onClick: () => run(a.on ?? "close") }, fill(a.label, state))))) : null))) : null,
       dialog ? h(I.Dialog, { open: true, onClose: () => run("close"), title: fill(dialog.title, state), body: fill(dialog.body, state),
           actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on!), 0) })) }) : null));
