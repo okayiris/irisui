@@ -123,16 +123,11 @@
       doing: { title: a.scope === "store" ? "Sam's party" : "Groceries", eyebrow: "Iris is on it",
         lede: a.why ? `**Alex**, ${a.why[0].toLowerCase() + a.why.slice(1)}. I need the vault for one step.` : "**Alex**, I need the vault for one step.",
         parts: [{ c: "Group", parts: [{ c: "Row", icon: "shield", title: a.title, subtitle: "Waits on you", on: "sheet:ask" }] }] },
-      ask: { kind: "sheet", title: a.title, lede: SCOPE[a.scope],
-        parts: [
-          { c: "Group", parts: [
-            { c: "Row", title: a.who, subtitle: "From " + a.from },
-            { c: "Row", title: a.why ?? "Why: " + NOT_SAID, subtitle: a.what ?? "What it does: " + NOT_SAID }] },
-          ...(a.why ? [] : [{ c: "Text", text: "Nobody said why. Ask Iris first, or say no." }]),
-          { c: "Buttons", parts: [
-            { c: "Button", variant: "primary", size: "lg", label: yes(a), on: `close;snack:${a.scope === "store" ? "Saved" : "Allowed once"}. Face ID confirmed.` },
-            ...(a.scope === "use" && a.why ? [{ c: "Button", variant: "glass", label: "Always for this site", on: "close;snack:Allowed for this site. Face ID confirmed." }] : []),
-            { c: "Button", variant: "text", label: "No", on: "close;snack:Nothing was shared. Iris is told no." }] }] },
+      ask: { kind: "sheet", title: "Iris vault",
+        parts: [{ c: "VaultAsk", title: a.title, who: a.who, from: a.from, why: a.why ?? undefined, does: a.what ?? undefined, scope: a.scope,
+          onAllow: `close;snack:${a.scope === "store" ? "Saved" : "Allowed once"}. Face ID confirmed.`,
+          ...(a.scope === "use" && a.why ? { onAlways: "close;snack:Allowed for this site. Face ID confirmed." } : {}),
+          onDeny: "close;snack:Nothing was shared. Iris is told no." }] },
     },
   });
 
@@ -282,7 +277,7 @@
     stage: Stage,
     scenes: [
       { id: "use", name: "Use one login",
-        ok: ["One device at a time: the switch shows the same question on each", "The same lines on every device: who, from, why, what it does, how far", "On the phone a real IrisApp: the question is a sheet over what Iris is doing", "The Mac asks with the house VaultAsk, Touch ID instead of Face ID"],
+        ok: ["One device at a time: the switch shows the same question on each", "The same lines on every device: who, from, why, what it does, how far", "On the phone a real IrisApp: the house VaultAsk in a sheet over what Iris is doing", "The Mac asks with the house VaultAsk, Touch ID instead of Face ID"],
         ask: ["'Always for this site': how long is always?"].concat(FOUND) },
       { id: "names", name: "Only the names",
         ok: ["Says plainly that no value leaves the vault"], ask: ["Does reading names need Face ID at all?"] },
