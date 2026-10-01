@@ -2726,3 +2726,28 @@ textarea.ix-textarea {
 .ia-win .ia-bento {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+/* Picture: a photo in an app. Rounded like a card, its caption on a soft shade at the foot. */
+.ia-pic {
+  position: relative;
+  margin: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  background: var(--glass);
+}
+.ia-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ia-pic figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 14px 12px;
+  font: var(--text-sub);
+  color: var(--fg);
+  background: linear-gradient(transparent, rgba(7, 9, 12, 0.85));
+}

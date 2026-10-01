@@ -95,6 +95,13 @@
         return h2("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
       case "Tap":
         return h2("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
+      case "Picture":
+        return h2(
+          "figure",
+          { className: "ia-pic" + (props.wide ? " ia-pic-wide" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } },
+          h2("img", { src: props.src, alt: props.alt ?? "", loading: "lazy", decoding: "async" }),
+          props.caption ? h2("figcaption", null, props.caption) : null
+        );
       case "Rail":
         return h2(
           "div",
