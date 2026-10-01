@@ -148,7 +148,8 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       let trailing = props.trailing;
       if (b) trailing = h(I.Toggle, { on: !!val, onChange: (x: boolean) => set(b, x) });
       // A value that asks something of you (awaiting signature, overdue, missing) takes the accent; the rest stays dim.
-      else if (props.value != null) trailing = h("span", { className: "ia-value" + (/await|missing|overdue|due|sign|wait|open|late/i.test(String(props.value)) ? " ia-act" : "") }, props.value);
+      // Numbers, times and amounts in the mono house font; a value that asks for action in the accent.
+      else if (props.value != null) trailing = h("span", { className: "ia-value" + (/await|missing|overdue|sign|waits|late/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
       const ic = p.icon && typeof p.icon === "object" ? h(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : undefined;
       return h(I.Row, { ...props, icon: ic, trailing, chevron: props.chevron ?? (!!act && !b),
         onClick: act ?? (b ? () => set(b, !val) : undefined) });
@@ -233,7 +234,10 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
     ? h(I.Button, { variant: "icon", label: "Back", onClick: () => ctx.run("back"),
         icon: h("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, icon("chevron", 18)) })
     : null;
-  const top = s.top ? h(I.Button, { variant: "glass", size: "sm", icon: s.top.icon ? icon(s.top.icon, 14) : undefined, onClick: () => s.top!.on && ctx.run(s.top!.on) }, fill(s.top.label, ctx.state)) : null;
+  // An action with an icon is a quiet icon button (its label is its name for a screen reader): it never competes with her pill.
+  const top = s.top ? (s.top.icon
+    ? h(I.Button, { variant: "icon", label: fill(s.top.label, ctx.state), icon: icon(s.top.icon, 18), onClick: () => s.top!.on && ctx.run(s.top!.on) })
+    : h(I.Button, { variant: "glass", size: "sm", onClick: () => s.top!.on && ctx.run(s.top!.on) }, fill(s.top.label, ctx.state))) : null;
   const body = h(React.Fragment, null,
     // One header everywhere: one level down the app bar holds only the way back (and its one action); the title stands
     // large under it, as on the first screen, so every screen has the same hierarchy.
