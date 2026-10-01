@@ -40,6 +40,7 @@ export type AppSpec = {
   topic?: string;
   start: string;
   tabs?: { label: string; icon: string; to: string }[];
+  rail?: { label: string; icon: string; to: string }[]; // a window: a NavRail on the left instead of a tab bar
   state?: Record<string, Any>;
   screens: Record<string, Screen>;
 };
@@ -296,7 +297,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
       else if (verb === "back") {
         if (layer.dialog || layer.sheet) setLayer((l) => (l.dialog ? { sheet: l.sheet } : {}));
         else { setDir("out"); setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)); }
-      } else if (verb === "tab") { setLayer({}); setDir(""); setStack([spec.tabs![Number(arg)].to]); }
+      } else if (verb === "tab") { setLayer({}); setDir(""); setStack([(spec.tabs ?? spec.rail)![Number(arg)].to]); }
       else if (verb === "toggle") setState((s) => ({ ...s, [arg]: !s[arg] }));
       else if (verb === "inc") { const [k, max] = arg.split("/"); setState((s) => ({ ...s, [k]: Math.min(Number(max ?? Infinity), (Number(s[k]) || 0) + 1) })); }
       else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v })); }
@@ -309,9 +310,13 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
   const talking = s.kind === "talk";
   const tabOf = (sid: string) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
   const activeTab = Math.max(0, ...stack.map(tabOf).filter((i) => i >= 0).slice(0, 1));
+  const railAt = spec.rail ? Math.max(0, spec.rail.findIndex((r) => stack.includes(r.to))) : -1;
+  const wide = !!spec.rail || frame === "window";
   const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
 
-  return h("div", { className: "ia-app", "data-frame": frame },
+  return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame },
+    spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
+      ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
     h("main", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
       h("div", { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : "") },
         talking ? h(Talk, { s, ctx }) : h(Page, { s, ctx, depth: stack.length - 1 }))),
@@ -321,7 +326,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
       : null,
     snack ? h("div", { className: "ia-snack" }, h(I.Snackbar, { text: snack, tone: "ok" })) : null,
     h("div", { className: "ia-layer" },
-      sheet ? h(I.Sheet, { open: true, onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
+      sheet ? h(I.Sheet, { open: true, side: wide ? "end" : "bottom", onClose: () => setLayer({}), title: fill(sheet.title, state), sub: fill(sheet.lede, state) },
         h("div", { className: "ia-sheet-body" }, (sheet.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx })),
           sheet.action || sheet.actions ? h("div", { className: "ia-action" }, h(I.ButtonGroup, { stack: true },
             // The one primary first, then the rest as glass: action is the primary, actions[] the others.
@@ -379,6 +384,7 @@ export function checkApp(spec: AppSpec): Finding[] {
   }
   reach.add(spec.start);
   spec.tabs?.forEach((t) => reach.add(t.to));
+  spec.rail?.forEach((t) => reach.add(t.to));
   if (Object.values(spec.screens).some((s) => s.kind === "talk") && spec.tabs) for (const [id, s] of Object.entries(spec.screens)) if (s.kind === "talk") reach.add(id);
   for (const id of Object.keys(spec.screens)) if (!reach.has(id)) add(id, "No way to reach this screen", "warn");
   return out;
