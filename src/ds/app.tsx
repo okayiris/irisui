@@ -130,6 +130,10 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       return h("div", { className: "ia-grid", style: { gridTemplateColumns: `repeat(${props.cols ?? 2}, minmax(0, 1fr))` } }, kids);
     case "Tap": // makes a part that is a picture (a Widget) open something
       return h("button", { type: "button", className: "ia-tapbtn", onClick: act, "aria-label": props.label }, kids);
+    case "Picture": // a photo as content: rounded, the caption over its lower edge, never a word drawn on it
+      return h("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } },
+        h("img", { src: props.src, alt: props.alt ?? "", loading: "lazy", decoding: "async" }),
+        props.caption ? h("figcaption", null, props.caption) : null);
     case "Rail": // a row you swipe sideways: tiles at their own width, the next one peeks in
       return h("div", { className: "ia-rail", role: "group", "aria-label": props.label ?? "More" },
         (p.parts ?? []).map((q, i) => h("div", { key: i, className: "ia-rail-item", style: { width: q.w ?? props.w ?? 160 } }, h(Part, { p: q, ctx, item }))));
