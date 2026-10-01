@@ -149,7 +149,8 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       if (b) trailing = h(I.Toggle, { on: !!val, onChange: (x: boolean) => set(b, x) });
       // A value that asks something of you (awaiting signature, overdue, missing) takes the accent; the rest stays dim.
       // Numbers, times and amounts in the mono house font; a value that asks for action in the accent.
-      else if (props.value != null) trailing = h("span", { className: "ia-value" + (/await|missing|overdue|sign|waits|late/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
+      // pill: a status as a small tinted pill, so a list of states scans at a glance.
+      else if (props.value != null) trailing = h("span", { className: "ia-value" + (props.pill ? " ia-pill" : "") + (/await|missing|overdue|sign|waits|late/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
       const ic = p.icon && typeof p.icon === "object" ? h(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : undefined;
       return h(I.Row, { ...props, icon: ic, trailing, chevron: props.chevron ?? (!!act && !b),
         onClick: act ?? (b ? () => set(b, !val) : undefined) });
@@ -347,7 +348,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
 
   // One accent per app: the app's topic colour becomes its accent, so the tab bar, chips, links and focus all speak it.
   const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
-  const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2] } : undefined;
+  const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2], "--k-button": `oklch(from ${tk[0]} .82 .12 h)` } : undefined;
   return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, "data-theme": (spec as Any).theme, style: tint },
     spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
       ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
