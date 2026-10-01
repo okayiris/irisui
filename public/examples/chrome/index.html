@@ -13,71 +13,47 @@
 <link rel="stylesheet" href="../shared.css">
 <link rel="icon" href="../../favicon.svg">
 <style>
-  /* A browser window. The site in it stays dark too, so the whole example reads as one night. */
-  .browser { border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: #0e1116; }
-  .tabs { display: flex; gap: 6px; padding: 8px 10px 0; background: #161a21; }
+  /* A browser window, in the house colours. The site in it is someone else's: plain, no Iris parts. */
+  .browser { border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: var(--bg); }
+  .tabs { display: flex; gap: 6px; padding: 8px 10px 0; background: var(--glass); }
   .tabs span { padding: 7px 14px; border-radius: 9px 9px 0 0; font: var(--text-sub); color: var(--dim); }
-  .tabs span.on { background: #0e1116; color: var(--fg); }
-  .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #0e1116; border-bottom: 1px solid var(--line); }
-  .url { flex: 1; height: 30px; border-radius: 15px; background: #161a21; display: flex; align-items: center; padding: 0 14px; font: var(--text-sub); color: var(--dim); }
-  .ext { all: unset; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; position: relative; }
-  .ext:hover, .ext[aria-expanded="true"] { background: var(--glass); }
-  .ext:focus-visible { outline: 2px solid var(--accent); }
-  .view { display: flex; height: 520px; }
-  .site { flex: 1; position: relative; background: #12161c; color: var(--fg); font-family: -apple-system, system-ui, sans-serif; overflow: hidden; }
+  .tabs span.on { background: var(--bg); color: var(--fg); }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .url { flex: 1; height: 30px; border-radius: var(--radius-pill); background: var(--glass); display: flex; align-items: center; padding: 0 14px; font: var(--text-sub); color: var(--dim); }
+  .ext { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+  .ext:hover { background: var(--glass); }
+  .view { display: flex; height: 460px; }
+  .site { flex: 1; position: relative; overflow: hidden; color: var(--fg); font-family: var(--font-text); }
   .site header { display: flex; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--line); font-weight: 700; }
-  .form { width: 320px; margin: 40px auto; display: grid; gap: 12px; }
-  .form h2 { margin: 0 0 6px; font-size: 22px; }
-  .form label { display: grid; gap: 5px; font-size: 13px; color: var(--dim); }
-  .inp { position: relative; }
-  .inp input { width: 100%; height: 40px; border-radius: 8px; border: 1px solid var(--edge); padding: 0 40px 0 12px; font: 15px -apple-system, system-ui, sans-serif; background: #0b0e13; color: var(--fg); }
-  .inp input:focus-visible { outline: 2px solid var(--accent); }
-  .fill { all: unset; cursor: pointer; position: absolute; right: 7px; top: 7px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #1b2029; }
-  .fill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .site .go { height: 42px; border: 0; border-radius: 8px; background: #e9f1f5; color: #0b0e13; font: 600 15px -apple-system, system-ui, sans-serif; }
-  .filled { font-size: 12px; color: var(--ok); }
-
-  /* What Iris draws on a page: her own glass, a step lighter than the site. */
-  .drop { position: absolute; z-index: 5; width: 320px; padding: 6px; border-radius: 12px; background: #0c1016; color: var(--fg);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px var(--edge); font-family: var(--font-text); animation: rise var(--motion-base) var(--ease-house); }
-  .drop button { all: unset; cursor: pointer; display: grid; gap: 2px; width: 100%; box-sizing: border-box; padding: 9px 10px; border-radius: 8px; }
-  .drop button:hover, .drop button:focus-visible { background: var(--accent-soft, rgba(125, 211, 252, .12)); }
-  .drop small { color: var(--dim); font: var(--text-sub); }
-  .drop .foot { display: flex; align-items: center; gap: 6px; padding: 8px 10px 4px; border-top: 1px solid var(--line); margin-top: 4px; font: var(--text-sub); color: var(--label); }
-  .save { position: absolute; right: 12px; top: 8px; z-index: 5; width: 320px; padding: 16px; border-radius: 14px; background: #0c1016; color: var(--fg);
-          font-family: var(--font-text); box-shadow: 0 12px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px var(--edge); animation: rise var(--motion-base) var(--ease-house); }
-  .save h3 { font: 600 16px var(--font-display); margin: 0 0 4px; }
+  .site header span:last-child { font-weight: 400; font: var(--text-body); color: var(--dim); }
+  .form { width: 320px; margin: 36px auto; display: grid; gap: 12px; }
+  .form h2 { margin: 0 0 6px; font: var(--text-page-title); }
+  .form label { display: grid; gap: 5px; font: var(--text-sub); color: var(--dim); }
+  .inp { position: relative; display: flex; gap: 6px; align-items: center; }
+  .inp > :first-child { flex: 1; }
+  .filled { font: var(--text-sub); color: var(--dim); margin: 0; }
+  .shop { padding: 22px 24px; display: grid; gap: 10px; }
+  .prod { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-button); padding: 10px 14px; font: var(--text-body); }
+  /* Her hand on the page: a ring on the thing she is about to press. */
+  .hand { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-pill); }
+  .save { position: absolute; right: 12px; top: 8px; z-index: 5; width: 320px; animation: rise var(--motion-base) var(--ease-house); }
+  .save h3 { font: var(--text-row-title); font-weight: 600; margin: 0 0 4px; }
   .save p { color: var(--dim); font: var(--text-body); margin: 0 0 12px; }
   .save .row { display: flex; gap: 8px; }
 
-  /* Her hand on the page: a ring on the thing she is about to press. */
-  .hand { outline: 2px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 0 7px rgba(125, 211, 252, .18); border-radius: 8px; transition: outline-color var(--motion-fast); }
-  .shop { padding: 22px 24px; display: grid; gap: 10px; }
-  .prod { display: flex; justify-content: space-between; align-items: center; background: #181d25; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
-  .prod button { border: 0; border-radius: 7px; padding: 7px 12px; background: #e9f1f5; color: #0b0e13; font: 600 13px -apple-system, system-ui, sans-serif; }
-
-  /* The side panel. */
-  .panel { width: 330px; flex: none; border-left: 1px solid var(--line); display: flex; flex-direction: column; background: var(--bg); }
-  .p-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
-  .p-head b { font: 600 15px var(--font-display); flex: 1; }
-  .live { display: flex; align-items: center; gap: 8px; margin: 12px 14px 0; padding: 9px 11px; border-radius: 10px; background: var(--accent-soft, rgba(125, 211, 252, .12)); font: var(--text-sub); color: var(--fg); }
-  .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex: none; }
+  /* The side panel: the house AppBar, a log, the field at the foot. */
+  .panel { width: 340px; flex: none; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+  .live { display: flex; align-items: center; gap: 8px; margin: 12px 14px 0; padding: 8px 10px 8px 12px; border-radius: var(--radius-button); background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); font: var(--text-sub); }
   .live .sp { flex: 1; }
   .p-log { flex: 1; overflow: auto; padding: 14px; display: grid; align-content: start; gap: 14px; font: var(--text-body); }
   .you { color: var(--accent); }
-  .task { border-radius: 12px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
-  .task > button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 10px 12px; }
-  .task > button:focus-visible { outline: 2px solid var(--accent); border-radius: 12px; }
-  .task .t { flex: 1; }
-  .task small { font: var(--text-value); color: var(--label); }
-  .steps { list-style: none; margin: 0; padding: 0 12px 10px 34px; display: grid; gap: 6px; font: var(--text-sub); color: var(--dim); }
+  .steps { list-style: none; margin: 0; padding: 0 12px 10px 46px; display: grid; gap: 6px; font: var(--text-sub); color: var(--dim); }
   .steps .now { color: var(--fg); }
-  .steps .bad { color: var(--error); }
   .p-in { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
-  .p-in input { flex: 1; height: 38px; border-radius: 19px; background: var(--glass); border: 1px solid var(--edge); color: var(--fg); padding: 0 14px; font: var(--text-body); }
-  .p-in input:focus-visible { outline: 2px solid var(--accent); }
+  .p-in > :first-child { flex: 1; }
+  .reopen { position: absolute; right: 16px; bottom: 16px; }
 
-  @media (max-width: 760px) { .view { flex-direction: column; height: auto; } .panel { width: auto; border-left: 0; border-top: 1px solid var(--line); min-height: 420px; } .site { min-height: 420px; } .form { width: auto; margin: 24px; } }
+  @media (max-width: 760px) { .view { flex-direction: column; height: auto; } .panel { width: auto; border-left: 0; border-top: 1px solid var(--line); min-height: 420px; } .site { min-height: 380px; } .form { width: auto; margin: 24px; } }
 </style>
 </head>
 <body data-platform="chrome">
@@ -92,125 +68,150 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect } = React;
-  const { Button, Orb } = window.IrisUi;
-  const Ring = ({ size = 16 }) => h(Orb, { size });
+  const { Button, Orb, Menu, Icon, Field, AppBar, Card, Row, Snackbar } = window.IrisUi;
 
-  function Browser({ host, tab, children, panel, popup, onExt }) {
+  // The toolbar holds her one orb in Chrome. Click it: the menu for this site.
+  function Browser({ host, tab, children, panel, menu }) {
     return h("main", { className: "browser", "aria-label": "Chrome" },
       h("div", { className: "tabs", "aria-hidden": "true" }, h("span", { className: "on" }, tab), h("span", null, "Iris")),
       h("div", { className: "bar" },
         h("div", { className: "url" }, host),
-        h("button", { className: "ext", "aria-label": "Iris", "aria-expanded": !!popup, onClick: onExt }, h(Ring, { size: 18 }))),
-      h("div", { className: "view" }, h("div", { className: "site" }, children, popup), panel));
+        h(Menu, { label: "Iris", align: "end", trigger: h("span", { className: "ext" }, h(Orb, { size: 18 })), items: menu ?? [] })),
+      h("div", { className: "view" }, h("div", { className: "site" }, children), panel));
   }
+  // The vault button in a field: a shield, the vault's sign. Not an orb: the vault fills it, not Iris.
+  const vault = (label, items) => h(Menu, { label, align: "end", items, trigger: h("span", { className: "ext" }, h(Icon, { name: "shield", size: 16 })) });
 
   /* ------------------------------------------------------------ fill a login */
 
   function Login() {
-    const [open, setOpen] = useState(false);
-    const [filled, setFilled] = useState(false);
-    return h(Browser, { host: "shop.example.com/sign-in", tab: "Sign in" },
-      h("header", null, h("span", null, "Shop"), h("span", { style: { fontWeight: 400, fontSize: 14 } }, "Help")),
-      h("form", { className: "form", onSubmit: (e) => e.preventDefault() },
+    const [who, setWho] = useState(null);
+    const [signed, setSigned] = useState(false);
+    const fill = (w) => ({ label: w, shortcut: w === "alex@example.com" ? "Used today" : "From Sam", onSelect: () => setWho(w) });
+    const logins = [{ kind: "label", label: "From your vault, for shop.example.com" }, fill("alex@example.com"), fill("sam@example.com")];
+    return h(Browser, { host: "shop.example.com/sign-in", tab: "Sign in", menu: logins },
+      h("header", null, h("span", null, "Shop"), h("span", null, "Help")),
+      signed ? h("div", { className: "form" }, h("h2", null, "Welcome back"), h("p", { className: "filled" }, `Signed in as ${who}.`))
+      : h("form", { className: "form", onSubmit: (e) => { e.preventDefault(); if (who) setSigned(true); } },
         h("h2", null, "Sign in"),
-        h("label", null, "Email", h("div", { className: "inp" },
-          h("input", { value: filled ? "alex@example.com" : "", readOnly: true, "aria-label": "Email" }),
-          h("button", { type: "button", className: "fill", "aria-label": "Fill in with Iris", "aria-expanded": open, onClick: () => setOpen(!open) }, h(Ring, null)))),
-        h("label", null, "Password", h("div", { className: "inp" }, h("input", { type: "password", value: filled ? "correct-horse" : "", readOnly: true, "aria-label": "Password" }))),
-        filled ? h("p", { className: "filled", role: "status" }, "Filled in from your vault. Nothing was shown to Iris.") : null,
-        h("button", { className: "go" }, "Sign in")),
-      open ? h("div", { className: "drop", style: { left: "calc(50% - 160px)", top: 196 }, role: "listbox", "aria-label": "Logins for shop.example.com" },
-        h("button", { role: "option", onClick: () => { setFilled(true); setOpen(false); } }, h("span", null, "alex@example.com"), h("small", null, "Last used by Iris today, 14:10")),
-        h("button", { role: "option", onClick: () => { setFilled(true); setOpen(false); } }, h("span", null, "sam@example.com"), h("small", null, "Shared with you by Sam")),
-        h("div", { className: "foot" }, h(Ring, { size: 12 }), "From your vault, for shop.example.com")) : null);
+        h("label", null, "Email", h("div", { className: "inp" }, h(Field, { value: who ?? "", readOnly: true, "aria-label": "Email" }), vault("Fill in from your vault", logins))),
+        h("label", null, "Password", h("div", { className: "inp" }, h(Field, { type: "password", value: who ? "correct-horse" : "", readOnly: true, "aria-label": "Password" }))),
+        who ? h("p", { className: "filled", role: "status" }, "Filled in from your vault. Nothing was shown to Iris.") : null,
+        h(Button, { variant: "glass", disabled: !who }, "Sign in")));
   }
 
   function Code() {
     const [filled, setFilled] = useState(false);
-    return h(Browser, { host: "shop.example.com/verify", tab: "Verify" },
-      h("header", null, h("span", null, "Shop")),
+    const [left, setLeft] = useState(21);
+    useEffect(() => { if (filled || left <= 0) return; const t = setTimeout(() => setLeft(left - 1), 1000); return () => clearTimeout(t); }, [left, filled]);
+    const code = left > 0 ? "482 913" : "730 118";
+    const items = [{ kind: "label", label: "From your vault" }, { label: `Fill in ${code}`, shortcut: `${left > 0 ? left : 30} s left`, onSelect: () => setFilled(true) }];
+    return h(Browser, { host: "shop.example.com/verify", tab: "Verify", menu: items },
+      h("header", null, h("span", null, "Shop"), h("span", null, "Help")),
       h("div", { className: "form" },
         h("h2", null, "Enter the code"),
-        h("label", null, "6-digit code", h("div", { className: "inp" }, h("input", { value: filled ? "482 913" : "", readOnly: true, "aria-label": "Code" }))),
-        filled ? h("p", { className: "filled", role: "status" }, "Filled in from your vault.") : null,
-        h("button", { className: "go" }, "Verify")),
-      filled ? null : h("div", { className: "drop", style: { left: "calc(50% - 160px)", top: 176 } },
-        h("button", { onClick: () => setFilled(true) }, h("span", null, "Fill in 482 913"), h("small", null, "The code for shop.example.com, 21 seconds left"))));
+        h("label", null, "6-digit code", h("div", { className: "inp" }, h(Field, { value: filled ? code : "", readOnly: true, "aria-label": "Code" }), vault("Fill in the code", items))),
+        filled ? h("p", { className: "filled", role: "status" }, "Filled in from your vault.") : h("p", { className: "filled" }, `The code for this site holds ${left > 0 ? left + " more seconds" : "a new 30 seconds"}.`),
+        h(Button, { variant: "glass", disabled: !filled }, "Verify")));
   }
 
   function Save() {
     const [done, setDone] = useState(null);
     return h(Browser, { host: "da-mario.example/account", tab: "Account made" },
-      h("header", null, h("span", null, "Pizzeria Da Mario")),
-      h("div", { className: "form" }, h("h2", null, "Welcome, Alex"), h("p", { style: { color: "var(--dim)", margin: 0 } }, "Your account is ready. Book a table below.")),
-      done ? h("div", { className: "save", role: "status" }, h("h3", null, done === "save" ? "Saved in your vault" : "Not saved"),
-          h("p", { style: { margin: 0 } }, done === "save" ? "Iris can sign in here next time. Face ID confirmed." : "Chrome will not ask again for this site."))
-        : h("div", { className: "save", role: "dialog", "aria-label": "Save password" },
-            h("h3", null, "Save this password?"),
-            h("p", null, "For da-mario.example. It goes into your vault, so Iris can book here without asking you to type."),
-            h("div", { className: "row" }, h(Button, { variant: "primary", size: "sm", onClick: () => setDone("save") }, "Save"), h(Button, { variant: "glass", size: "sm", onClick: () => setDone("no") }, "Not now"))));
+      h("header", null, h("span", null, "Pizzeria Da Mario"), h("span", null, "Book")),
+      h("div", { className: "form" }, h("h2", null, "Welcome, Alex"), h("p", { className: "filled" }, "Your account is ready.")),
+      h("div", { className: "save" }, h(Card, null,
+        done ? h("div", { role: "status" }, h("h3", null, done === "save" ? "Saved in your vault" : "Not saved"),
+            h("p", { style: { margin: 0 } }, done === "save" ? "Iris can sign in here next time. Face ID confirmed." : "Chrome will not ask again for this site."))
+          : h("div", { role: "dialog", "aria-label": "Save password" },
+              h("h3", null, "Save this password?"),
+              h("p", null, "For da-mario.example. It goes into your vault, so Iris can book here without asking you to type."),
+              h("div", { className: "row" }, h(Button, { variant: "primary", size: "sm", onClick: () => setDone("save") }, "Save"), h(Button, { variant: "glass", size: "sm", onClick: () => setDone("no") }, "Not now"))))));
   }
 
   /* ------------------------------------------------------- Iris uses the browser */
 
-  function Panel() {
+  const STEPS = ["Read the page", "Searched for candles", "Added candles", "Added balloons"];
+  function Panel({ go }) {
     const [step, setStep] = useState(0);
     const [open, setOpen] = useState(true);
+    const [shown, setShown] = useState(true);
     const [stopped, setStopped] = useState(false);
+    const [paid, setPaid] = useState(null);
+    const [said, setSaid] = useState([]);
+    const [text, setText] = useState("");
+    const [basket, setBasket] = useState([]);
     useEffect(() => { if (stopped || step >= 3) return; const t = setTimeout(() => setStep(step + 1), 1600); return () => clearTimeout(t); }, [step, stopped]);
-    const steps = ["Read the page", "Searched for candles", "Added candles", "Added balloons"];
-    const panel = h("aside", { className: "panel", "aria-label": "Iris side panel" },
-      h("div", { className: "p-head" }, h(Ring, { size: 18 }), h("b", null, "Iris"), h(Button, { variant: "text", size: "sm" }, "Close")),
-      stopped ? h("div", { className: "live" }, h("i", { style: { background: "var(--label)" } }), h("span", { className: "sp" }, "Iris stopped. The page is yours again."))
-        : h("div", { className: "live" }, h("i"), h("span", { className: "sp" }, "Iris is using this tab"), h(Button, { variant: "glass", size: "sm", onClick: () => setStopped(true) }, "Stop")),
-      h("div", { className: "p-log" },
+    useEffect(() => { if (step >= 2 && !basket.includes("Candles, 12 pieces")) setBasket((b) => [...b, "Candles, 12 pieces"]);
+                      if (step >= 3 && !basket.includes("Balloons, 20 pieces")) setBasket((b) => [...b, "Balloons, 20 pieces"]); }, [step]);
+    const busy = !stopped && step < 3;
+    const panel = shown ? h("aside", { className: "panel", "aria-label": "Iris side panel" },
+      h(AppBar, { title: "Iris", actions: h(Button, { variant: "text", size: "sm", onClick: () => setShown(false) }, "Close") }),
+      busy ? h("div", { className: "live" }, h("span", { className: "sp" }, "Iris is using this tab"), h(Button, { variant: "glass", size: "sm", onClick: () => setStopped(true) }, "Stop"))
+        : stopped ? h("div", { className: "live" }, h("span", { className: "sp" }, "Iris stopped. The page is yours again.")) : null,
+      h("div", { className: "p-log", "aria-live": "polite" },
         h("div", { className: "you" }, "Order the party things on the list."),
-        h("div", { className: "task" },
-          h("button", { "aria-expanded": open, onClick: () => setOpen(!open) },
-            h(Orb, { size: 22, state: stopped || step >= 3 ? "idle" : "busy" }),
-            h("span", { className: "t" }, "Filling the basket"), h("small", null, `${Math.min(step + 1, 4)} of 4`)),
+        h(Card, { padding: 0 },
+          h(Row, { icon: busy ? h(Orb, { size: 22, state: "busy" }) : h(Icon, { name: "loop", size: 18 }), title: "Filling the basket",
+            trailing: h("span", { className: "filled" }, `${Math.min(step + 1, 4)} of 4`), chevron: true, onClick: () => setOpen(!open) }),
           open ? h("ol", { className: "steps" },
-            steps.map((s, i) => i <= step ? h("li", { key: s, className: i === step && !stopped ? "now" : "" }, s) : null),
-            h("li", { className: "bad" }, "Could not type in the search once: the page moved. Tried again, it worked.")) : null),
-        step >= 3 ? h("div", null, "Two things are in the basket. Shall I pay with your Visa ending 4412? I will ask your phone first.") : null),
-      h("form", { className: "p-in", onSubmit: (e) => e.preventDefault() }, h("input", { placeholder: "Type to Iris", "aria-label": "Type to Iris" }), h(Button, { variant: "primary", size: "sm" }, "Send")));
-    const target = stopped ? -1 : step >= 2 ? step - 2 : -1;
-    return h(Browser, { host: "shop.example.com/search?q=party", tab: "Party", panel },
-      h("header", null, h("span", null, "Shop"), h("span", { style: { fontWeight: 400, fontSize: 14 } }, step >= 3 ? "Basket (2)" : step >= 2 ? "Basket (1)" : "Basket")),
+            STEPS.map((s, i) => i <= step ? h("li", { key: s, className: i === step && busy ? "now" : "" }, s) : null),
+            step >= 1 ? h("li", null, "Could not type in the search once: the page moved. Tried again, it worked.") : null) : null),
+        step >= 3 && !stopped ? (paid ? h("div", null, paid)
+          : h("div", { style: { display: "grid", gap: 10 } }, "Two things are in the basket. Shall I pay with your Visa ending 4412? I ask your phone first.",
+              h("div", { style: { display: "flex", gap: 8 } },
+                h(Button, { variant: "primary", size: "sm", onClick: () => setPaid("Your phone said yes. Paid €8.40, delivery on Friday.") }, "Pay"),
+                h(Button, { variant: "glass", size: "sm", onClick: () => setPaid("Fine. The basket stays as it is.") }, "Not now")))) : null,
+        said.map((m, i) => h("div", { key: i, className: m.you ? "you" : "" }, m.t))),
+      h("form", { className: "p-in", onSubmit: (e) => { e.preventDefault(); const t = text.trim(); if (!t) return; setText("");
+          setSaid((x) => [...x, { you: true, t }]); setTimeout(() => setSaid((x) => [...x, { t: "On it. I add it to this task." }]), 1200); } },
+        h(Field, { value: text, onChange: (e) => setText(e.target.value), placeholder: "Type to Iris", "aria-label": "Type to Iris" }),
+        h(Button, { variant: "glass", size: "sm", disabled: !text.trim() }, "Send"))) : null;
+    const target = busy && step >= 1 ? step - 1 : -1;
+    const menu = [{ label: shown ? "Close the side panel" : "Open the side panel", onSelect: () => setShown(!shown) }];
+    return h(Browser, { host: "shop.example.com/search?q=party", tab: "Party", panel, menu },
+      h("header", null, h("span", null, "Shop"), h("span", null, `Basket (${basket.length})`)),
       h("div", { className: "shop" }, ["Candles, 12 pieces", "Balloons, 20 pieces", "Paper plates"].map((p, i) =>
-        h("div", { key: p, className: "prod" }, h("span", null, p), h("button", { className: i === target ? "hand" : "" }, "Add")))));
+        h("div", { key: p, className: "prod" }, h("span", null, p),
+          h("span", { className: i === target ? "hand" : "" }, h(Button, { variant: "glass", size: "sm", disabled: basket.includes(p),
+            onClick: () => setBasket((b) => [...b, p]) }, basket.includes(p) ? "In basket" : "Add"))))),
+      shown ? null : h("div", { className: "reopen" }, h(Button, { variant: "glass", size: "sm", onClick: () => setShown(true) }, "Open Iris")));
   }
 
-  function Popup() {
-    const [open, setOpen] = useState(true);
-    const pop = open ? h("div", { className: "drop", style: { right: 12, top: 8 }, role: "dialog", "aria-label": "Iris for this site" },
-      h("div", { style: { padding: "6px 10px", font: "var(--text-sub)", color: "var(--label)" } }, "shop.example.com"),
-      h("button", null, h("span", null, "alex@example.com"), h("small", null, "Login")),
-      h("button", null, h("span", null, "Visa ending 4412"), h("small", null, "Card")),
-      h("button", null, h("span", null, "Talk to Iris"), h("small", null, "Opens the side panel"))) : null;
-    return h(Browser, { host: "shop.example.com", tab: "Shop", popup: pop, onExt: () => setOpen(!open) },
-      h("header", null, h("span", null, "Shop")), h("div", { className: "shop" }, h("div", { className: "prod" }, h("span", null, "Welcome back"))));
+  // The toolbar menu: only what belongs to this site. Talk to Iris opens the side panel scene.
+  function Popup({ go }) {
+    const [snack, setSnack] = useState(null);
+    const items = [
+      { kind: "label", label: "shop.example.com" },
+      { label: "alex@example.com", shortcut: "Login", onSelect: () => setSnack("Signed in as alex@example.com, from your vault.") },
+      { label: "Visa ending 4412", shortcut: "Card", onSelect: () => setSnack("Card filled in. Your phone confirmed it.") },
+      { kind: "sep" },
+      { label: "Talk to Iris", shortcut: "Side panel", onSelect: () => go("panel") },
+    ];
+    return h(Browser, { host: "shop.example.com", tab: "Shop", menu: items },
+      h("header", null, h("span", null, "Shop"), h("span", null, "Basket (0)")),
+      h("div", { className: "shop" }, h("div", { className: "prod" }, h("span", null, "Welcome back. Click the orb in the toolbar."))),
+      snack ? h("div", { style: { position: "absolute", left: 16, right: 16, bottom: 16 } }, h(Snackbar, { text: snack, tone: "ok" })) : null);
   }
 
   const STAGES = { login: Login, code: Code, save: Save, panel: Panel, popup: Popup };
   window.exampleScenes({
     title: "Chrome",
-    stage: ({ scene }) => h(STAGES[scene.id]),
+    stage: ({ scene, go }) => h(STAGES[scene.id], { go }),
     scenes: [
       { id: "panel", name: "Iris uses the browser",
-        ok: ["One line says Iris is using this tab, with Stop next to it", "Steps fold into one task, not a line per click", "Her hand: a ring on what she is about to press", "The slip says what happened and what she did next", "Paying asks the phone first"],
-        ask: ["Does her ring on the page need the accent, or the topic colour?", "Show the step count, or only the current step?"] },
+        ok: ["One orb in the panel: on the task she is running, and only while she runs it", "One line says Iris is using this tab, with Stop next to it", "Her hand: a ring on what she is about to press", "The slip says what happened and what she did next, in plain grey", "Paying asks first; Close hides the panel, the toolbar opens it again"],
+        ask: ["Show the step count, or only the current step?"] },
       { id: "login", name: "Fill a login",
-        ok: ["Her ring sits in the field, where the hand already is", "Says after: nothing was shown to Iris", "Iris follows the browser: light when it is light, dark when it is dark. These examples show dark."],
-        ask: [] },
+        ok: ["The shield in the field opens the vault's menu: the vault fills it, not Iris", "Says after: nothing was shown to Iris"], ask: [] },
       { id: "code", name: "2FA code",
-        ok: ["Shows how long the code still holds"], ask: [] },
+        ok: ["The countdown is real, a new code comes after it"], ask: [] },
       { id: "save", name: "Save a password",
         ok: ["Says what saving is for: Iris can book here next time"], ask: ["Ask for Face ID on save, or only on use?"] },
       { id: "popup", name: "Toolbar menu",
-        ok: ["Only what belongs to this site"], ask: [] },
+        ok: ["The house Menu, from her orb in the toolbar", "Only what belongs to this site", "Talk to Iris opens the side panel"], ask: [] },
     ],
-    all: { label: "Whole extension", items: ["The screenshot's log had 30 lines of 'Iris reads the page': one line per task instead?", "Revoke in the panel's first line was a purple link. Stop as a button instead?"] },
+    all: { label: "Whole extension", items: ["Her orb lives in the toolbar, top right: Chrome decides where extensions go, not the Meaning table.", "The side panel stays a panel next to the page, not a Sheet: Iris and the page are both in use."] },
   });
 })();
 </script>
