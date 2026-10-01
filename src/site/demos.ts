@@ -11,6 +11,7 @@ const CSS = (ds: string) => `<link rel="stylesheet" href="${ds}/tokens.css">
 <link rel="stylesheet" href="${ds}/ext.css">
 <link rel="stylesheet" href="${ds}/extra.css">
 <link rel="stylesheet" href="${ds}/placeholder.css">
+<link rel="stylesheet" href="${ds.replace(/\/ds$/, "")}/demos.css">
 <link rel="icon" href="/favicon.svg">
 <style>html,body{margin:0;background:var(--bg)}body{font-family:var(--font-text)}
 /* A frame is as narrow as a phone: nothing a preview sets in pixels may push past it. */
@@ -24,6 +25,26 @@ const LIBS = (ds: string) => `<script src="${ds}/vendor/react.js"></script>
 <script src="${ds}/bundle.js"></script>
 <script src="${ds}/ext.js"></script>`;
 
+/**
+ * Last resort for a release preview drawn at a fixed width wider than a phone (the Cover is 960px): scale it down
+ * to the frame instead of cutting it off. ponytail: zoom shrinks the text too; a preview that reflows is better,
+ * and the release should ship one.
+ */
+const FIT = `<script>
+(() => {
+  const fit = () => {
+    for (const el of document.body.children) {
+      if (el.tagName === "SCRIPT") continue;
+      el.style.zoom = "";
+      const W = document.documentElement.clientWidth, w = el.scrollWidth, L = Math.max(0, el.getBoundingClientRect().left);
+      if (w + 2 * L > W + 1) el.style.zoom = String((W - 2 * L) / w);
+    }
+  };
+  addEventListener("load", () => setTimeout(fit, 300));
+  addEventListener("resize", fit);
+})();
+</script>`;
+
 const shell = (ds: string, body: string) => `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,6 +54,7 @@ ${CSS(ds)}
 </head><body>
 ${LIBS(ds)}
 ${body}
+${FIT}
 </body></html>`;
 
 /** A preview that pulls a face from Google Fonts gets it from /ds/extra.css instead: one origin, no third party. */
@@ -112,10 +134,10 @@ export function demoFrame(c: Component, only?: { variant: Variant; index: number
   const root = document.getElementById(${JSON.stringify(id)}) ?? document.body.firstElementChild;
   if (!root) return;
   const cells = Array.from(root.children);
-  if (cells.length < 2) return;
+  if (!cells.length) return;
   const label = ${JSON.stringify(only.variant.label)};
   const text = (el) => (el.textContent || "").replace(/\\s+/g, " ").trim();
-  const keep = cells.find((el) => text(el).startsWith(label)) ?? cells[${only.index}];
+  const keep = cells.find((el) => text(el).startsWith(label)) ?? cells[${only.index}] ?? cells[0];
   for (const el of cells) if (el !== keep) el.remove();
   // The page already names the variant above the frame; the preview's own small caps caption goes.
   const cap = keep.firstElementChild;

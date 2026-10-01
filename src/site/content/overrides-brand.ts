@@ -315,6 +315,12 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
   },
 
   pen: {
+    demos: [
+      { label: "Circle", code: `() => h("p", { style: { fontSize: 17, margin: "12px 0" } }, "The dentist moved you to ", h(Pen, { kind: "circle" }, "14:00"), " on Tuesday.")` },
+      { label: "Underline", code: `() => h("p", { style: { fontSize: 17, margin: "12px 0" } }, "Pay ", h(Pen, { kind: "underline" }, "before Friday"), ", or the fine doubles.")` },
+      { label: "Check", code: `() => h("p", { style: { fontSize: 17, margin: "12px 0", paddingLeft: 24 } }, h(Pen, { kind: "check" }, "Bins out"), " for this week.")` },
+      { label: "Strike", code: `() => h("p", { style: { fontSize: 17, margin: "12px 0" } }, "Milk, ", h(Pen, { kind: "strike" }, "bread"), ", apples.")` },
+    ],
     when: "One mark on one piece of text, where a hand would have circled, underlined or ticked it.",
     parts: [
       { name: "kind", what: "circle, check, strike, underline, mark, arrow, bracket, box, spotlight, pulse, star, number" },
@@ -375,6 +381,13 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
   },
 
   word: {
+    demos: [
+      { label: "Gradient, a loop done", code: `() => h(Word, { text: "Done", effect: "gradient", topic: "loop", level: 0.6, height: 100 })` },
+      { label: "Fill, how far the list is", code: `() => h(Word, { text: "3 / 8", effect: "fill", topic: "groceries", level: 0.6, height: 100 })` },
+      { label: "Wave, a parcel on the way", code: `() => h(Word, { text: "On the way", effect: "wave", topic: "parcel", level: 0.6, height: 100 })` },
+      { label: "Outline, the weather", code: `() => h(Word, { text: "Rain", effect: "outline", topic: "weather", level: 0.6, height: 100 })` },
+      { label: "Stamp, delivered", code: `() => h(Word, { text: "Delivered", effect: "stamp", topic: "parcel", level: 0.6, height: 100 })` },
+    ],
     when: "One big word for a moment: a done moment, a number, a name.",
     parts: [
       { name: "effect", what: "gradient, pop, wave, shine, neon, echo, fill, split, lanes, tiles, stretch, outline, long-shadow, stamp" },
