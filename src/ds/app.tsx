@@ -161,7 +161,9 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       return h("div", { className: "ia-stack" }, kids);
     case "Row": {
       let trailing = props.trailing;
-      if (b) trailing = h(I.Toggle, { on: !!val, onChange: (x: boolean) => set(b, x) });
+      // Bound: the row flips the key, and the switch only shows it. A tap on the switch reaches the row too, so a
+      // second set here would flip it straight back where updates are not batched (preact).
+      if (b) trailing = h(I.Toggle, { on: !!val });
       // A value that asks something of you (awaiting signature, overdue, missing) takes the accent; the rest stays dim.
       // Numbers, times and amounts in the mono house font; a value that asks for action in the accent.
       // pill: a status as a small tinted pill, so a list of states scans at a glance.
