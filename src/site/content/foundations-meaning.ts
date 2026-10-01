@@ -247,7 +247,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
               ["How sure she is", "the evidence in words: 4 of the last 4 times; beside it a neutral arc showing that count, never the orb ring or its gradient", "a percentage on its own"],
               ["A score you gave (how it goes, how much it matters)", "your number, plain; she points at the gap between the two, in words", "green for good, red for bad"],
               ["A feeling", "the word you picked", "a colour or a face for a mood; red only ever means destroy"],
-              ["Who does it", "her orb on what she carries, a name on what someone else carries, nothing on your own", "violet or the ring gradient as the fill of her share"],
+              ["Who does it", "a StatusPill \"Iris\" on what she carries, a name on what someone else carries, nothing on your own", "violet or the ring gradient as the fill of her share"],
               ["Her advice", "the word Advice on one option, and why, in words", "that option already selected: the person taps"],
               ["A question she asks on her own (how are you, is this still important)", "a card with the question, one-tap answers and Not now; at most three a day, never at a client or in a focus block", "a Dialog; a question with no way past it"],
               ["A private area (sexuality, faith)", "off until the person opens it", "a question from her about it"],
@@ -273,7 +273,7 @@ export const FOUNDATIONS_MEANING: Record<string, Doc> = {
           {
             kind: "p",
             text:
-              "A team room is Iris working as several roles at once (Keeper, Scout, Maker, Checker, Designer). The room is her; the members are her roles. So they may carry her orb, under these rules.",
+              "A team room is Iris working as several roles at once (Keeper, Scout, Maker, Checker, Designer). The room is her; the members are her roles. So the room shows her one orb in the app bar, and each role a StatusPill, under these rules.",
           },
           {
             kind: "ul",
