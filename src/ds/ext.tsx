@@ -1759,7 +1759,7 @@ export function BorderPattern({
       const c = cv.getContext("2d") as CanvasRenderingContext2D;
       c.scale(dpr, dpr);
       const R = radius ?? (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0);
-      pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--phase-you") };
+      pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--wait") };
     };
     const paint = (ms: number) => {
       if (pen) {
@@ -2350,7 +2350,7 @@ export function TableApp({
   );
 }
 
-// Three topic colours of the release broke the colour rules: mail was violet (violet means on and the ring), sport
+// Five topic colours of the release broke the colour rules: mail was violet (violet means on and the ring), sport
 // was red (red means destructive), tasks magenta (the ring's colour). The release keeps its topics in one table on
 // IrisUi.design; the colours are changed in place, so every part that asks for a topic later gets the new ones.
 // Each accent stays above 7:1 on --bg.
@@ -2358,6 +2358,10 @@ const TOPIC_FIX: Record<string, string[]> = {
   mail: ["#94a3b8", "#cbd5e1", "#121821"],
   sport: ["#fb923c", "#fdba74", "#26140a"],
   tasks: ["#2dd4bf", "#99f6e4", "#05211f"],
+  // explain was violet, party magenta. Explain is a cool soft yellow, kept apart from --wait (#fde68a) so a topic
+  // never reads as waiting; party is coral pink, short of red.
+  explain: ["#ede98a", "#fef9c3", "#1c1b08"],
+  party: ["#fdab9f", "#fed7cf", "#2a1210"],
 };
 {
   const topics = (window as Any).IrisUi?.design?.TOPIC;

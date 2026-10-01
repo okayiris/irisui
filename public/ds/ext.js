@@ -188,6 +188,7 @@
           extra.onPress = act;
           extra.onAction = act;
         }
+        for (const [k, v] of Object.entries(props)) if (/^on[A-Z]/.test(k) && typeof v === "string") extra[k] = () => run(v);
         if (p.c === "EmptyState" && props.action) extra.action = { label: props.action, onClick: act };
         if (p.c === "LoopScreen") {
           extra.onDone = act ?? (() => run("back"));
@@ -1867,7 +1868,7 @@
         const c = cv.getContext("2d");
         c.scale(dpr, dpr);
         const R = radius ?? (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0);
-        pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--phase-you") };
+        pen = { c, ...edgeOf(W, H, R, 3), violet: tokenOf(el, "--violet"), ice: tokenOf(el, "--accent"), you: tokenOf(el, "--wait") };
       };
       const paint = (ms) => {
         if (pen) {
@@ -2403,7 +2404,11 @@
   var TOPIC_FIX = {
     mail: ["#94a3b8", "#cbd5e1", "#121821"],
     sport: ["#fb923c", "#fdba74", "#26140a"],
-    tasks: ["#2dd4bf", "#99f6e4", "#05211f"]
+    tasks: ["#2dd4bf", "#99f6e4", "#05211f"],
+    // explain was violet, party magenta. Explain is a cool soft yellow, kept apart from --wait (#fde68a) so a topic
+    // never reads as waiting; party is coral pink, short of red.
+    explain: ["#ede98a", "#fef9c3", "#1c1b08"],
+    party: ["#fdab9f", "#fed7cf", "#2a1210"]
   };
   {
     const topics = window.IrisUi?.design?.TOPIC;

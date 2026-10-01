@@ -99,8 +99,8 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
               ["home", "#fde68a", "#fbbf24", "#1f1a0e"],
               ["music", "#c4b5fd", "#8b5cf6", "#161433"],
               ["loop", "#7dd3fc", "#4ade80", "#08183a"],
-              ["explain", "#a78bfa", "#7dd3fc", "#18123c"],
-              ["party", "#f0abfc", "#8b5cf6", "#2c0b26"],
+              ["explain", "#ede98a", "#fef9c3", "#1c1b08"],
+              ["party", "#fdab9f", "#fed7cf", "#2a1210"],
             ],
           },
           {

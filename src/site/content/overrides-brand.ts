@@ -212,7 +212,7 @@ export const OVERRIDES_BRAND: Record<string, Override> = {
       { do: "Use --k for what matters.", dont: "Never use a topic colour for body text on bg, and never use --k2 as text." },
     ],
     specs: [
-      { label: "k", value: "groceries #4ade80, agenda #7dd3fc, mail #94a3b8, parcel #fbbf24, weather #38bdf8, tasks #2dd4bf, sport #fb923c, money #a7f3d0, travel #2ee6d6, health #2ee6d6, home #fde68a, music #c4b5fd, loop #7dd3fc, explain #a78bfa, party #f0abfc" },
+      { label: "k", value: "groceries #4ade80, agenda #7dd3fc, mail #94a3b8, parcel #fbbf24, weather #38bdf8, tasks #2dd4bf, sport #fb923c, money #a7f3d0, travel #2ee6d6, health #2ee6d6, home #fde68a, music #c4b5fd, loop #7dd3fc, explain #ede98a, party #fdab9f" },
       { label: "k2", value: "decoration only, never text on its own" },
       { label: "contrast", value: "every accent reads on its own ground and on bg at 6:1 or more; fg and dim read on every ground" },
       { label: "layout", value: "Topic renders display: contents, so it never changes layout" },
