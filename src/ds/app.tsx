@@ -192,6 +192,8 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       if (!C) return h("p", { className: "ia-missing" }, `No part ${p.c}`);
       const extra: Any = {};
       if (act) { extra.onClick = act; extra.onPress = act; extra.onAction = act; }
+      // Any other onSomething given as an action string (VaultAsk's onAllow, onDeny, onAlways) runs it.
+      for (const [k, v] of Object.entries(props)) if (/^on[A-Z]/.test(k) && typeof v === "string") extra[k] = () => run(v);
       if (p.c === "EmptyState" && props.action) extra.action = { label: props.action, onClick: act };
       if (p.c === "LoopScreen") { extra.onDone = act ?? (() => run("back")); extra.onLoops = () => run("back"); }
       if ((p.c === "ChatStack" || p.c === "CircleStack") && p.on) extra.onSelect = (id: string) => id && run(fill(p.on ?? "", state, { id }) || `push:${id}`);
