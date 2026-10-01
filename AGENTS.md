@@ -32,8 +32,10 @@ never write a raw value where a token exists.
 2. Every control answers the hand: hover, active, `:focus-visible` with the focus ring (`--focus-ring`).
 3. Motion through `--motion-fast`/`--motion-base`/`--motion-slow` and `--ease-house`, and respect
    `prefers-reduced-motion`.
-4. Dark only. Near-black, glass, one accent (`--accent`), violet only for on and the ring, red only for
-   destructive.
+4. Light and dark, following the system (`prefers-color-scheme`); `data-mode="light"` or `"dark"` on `<html>`
+   overrides it. A calm ground (soft near-white or near-black), glass, one accent (`--accent`), violet only for on
+   and the ring, red only for destructive. A fixed colour needs both halves: `light-dark(light, dark)` in CSS,
+   `isLight()` in a part's script.
 5. Labels take `--label` (7.6:1), never `--faint` (3.6:1) — the gate measures this.
 6. Sentence case. No emoji, no exclamation marks, no em dashes.
 7. Take the house `Button` from `window.IrisUi` instead of making one.

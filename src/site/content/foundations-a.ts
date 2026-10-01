@@ -9,7 +9,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
     id: "colour",
     label: "Colour",
     lede:
-      "Iris is near-black, frosted glass and one ice-blue accent. Colour carries meaning here, it is never decoration.",
+      "Iris is a calm ground, near-black or soft near-white as the system is, frosted glass and one ice-blue accent. Colour carries meaning here, it is never decoration.",
     sections: [
       {
         title: "The palette",
@@ -17,26 +17,26 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
           {
             kind: "p",
             text:
-              "Fourteen tokens hold every colour on every surface. A value that is not on this table is not a colour in this system. Read the token by name, never type a hex.",
+              "Fourteen tokens hold every colour on every surface, each with a dark and a light value. A value that is not on this table is not a colour in this system. Read the token by name, never type a hex.",
           },
           {
             kind: "table",
-            head: ["Token", "Value", "What it is for"],
+            head: ["Token", "Dark", "Light", "What it is for"],
             rows: [
-              ["--bg", "#07090c", "Page background of every surface. Never grey, never white."],
-              ["--fg", "#e8f2f7", "Titles and primary text on --bg."],
-              ["--dim", "#8fa3b0", "The line under a title, secondary text."],
-              ["--faint", "#5a6b78", "Chevrons, section labels, version line. Not for body text."],
-              ["--line", "#1b2430", "Dividers."],
-              ["--accent", "#7dd3fc", "Ice blue: what is active, a tab, a link, an action pill."],
-              ["--accent-ink", "#07171f", "Text on an accent fill."],
-              ["--violet", "#8b5cf6", "Only for on (toggles) and the ring."],
-              ["--violet-light", "#a78bfa", "Hover and edges of violet things."],
-              ["--error", "#f87171", "Destructive only, such as Delete account."],
-              ["--ok", "#4ade80", "Done."],
-              ["--wait", "#fde68a", "Waiting."],
-              ["--glass", "rgba(180, 225, 255, .07)", "Fill of every card."],
-              ["--edge", "rgba(190, 230, 255, .14)", "The 1px stroke of every card."],
+              ["--bg", "#07090c", "#f4f7f9", "Page background of every surface. Never grey, never white."],
+              ["--fg", "#e8f2f7", "#0d1a22", "Titles and primary text on --bg."],
+              ["--dim", "#8fa3b0", "#4a5c68", "The line under a title, secondary text."],
+              ["--faint", "#5a6b78", "#8696a1", "Chevrons, section labels, version line. Not for body text."],
+              ["--line", "#1b2430", "#dde4ea", "Dividers."],
+              ["--accent", "#7dd3fc", "#0369a1", "Ice blue: what is active, a tab, a link, an action pill."],
+              ["--accent-ink", "#07171f", "#ffffff", "Text on an accent fill."],
+              ["--violet", "#8b5cf6", "#6d28d9", "Only for on (toggles) and the ring."],
+              ["--violet-light", "#a78bfa", "#7c3aed", "Hover and edges of violet things."],
+              ["--error", "#f87171", "#b91c1c", "Destructive only, such as Delete account."],
+              ["--ok", "#4ade80", "#15803d", "Done."],
+              ["--wait", "#fde68a", "#a16207", "Waiting."],
+              ["--glass", "rgba(180, 225, 255, .07)", "rgba(255, 255, 255, .78)", "Fill of every card."],
+              ["--edge", "rgba(190, 230, 255, .14)", "rgba(16, 48, 72, .13)", "The 1px stroke of every card."],
             ],
           },
           {
@@ -62,7 +62,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
             kind: "note",
             tone: "rule",
             text:
-              "The page background is --bg #07090c. It is never grey and never white. There is no light theme, on any surface, with one exception: mail.",
+              "Iris is light or dark as the system is; data-mode=\"light\" or \"dark\" on <html> overrides it. The page background is --bg: #07090c in dark, the soft near-white #f4f7f9 in light. It is never grey and never pure white.",
           },
         ],
       },
@@ -84,23 +84,23 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
           },
           {
             kind: "table",
-            head: ["Topic", "Accent --topic-*", "Second tint", "Ground"],
+            head: ["Topic", "Accent --topic-*", "Second tint", "Ground", "Light: accent, tint, ground"],
             rows: [
-              ["groceries", "#4ade80", "#38bdf8", "#04241f"],
-              ["agenda", "#7dd3fc", "#e8f2f7", "#08183a"],
-              ["mail", "#94a3b8", "#cbd5e1", "#121821"],
-              ["parcel", "#fbbf24", "#fde68a", "#221a0e"],
-              ["weather", "#38bdf8", "#e8f2f7", "#081a34"],
-              ["tasks", "#2dd4bf", "#99f6e4", "#05211f"],
-              ["sport", "#fb923c", "#fdba74", "#26140a"],
-              ["money", "#a7f3d0", "#4ade80", "#062016"],
-              ["travel", "#2ee6d6", "#7dd3fc", "#052331"],
-              ["health", "#2ee6d6", "#7dd3fc", "#052331"],
-              ["home", "#fde68a", "#fbbf24", "#1f1a0e"],
-              ["music", "#c4b5fd", "#8b5cf6", "#161433"],
-              ["loop", "#7dd3fc", "#4ade80", "#08183a"],
-              ["explain", "#ede98a", "#fef9c3", "#1c1b08"],
-              ["party", "#fdab9f", "#fed7cf", "#2a1210"],
+              ["groceries", "#4ade80", "#38bdf8", "#04241f", "#15803d #0369a1 #eef9f2"],
+              ["agenda", "#7dd3fc", "#e8f2f7", "#08183a", "#0369a1 #334155 #eaf4fa"],
+              ["mail", "#94a3b8", "#cbd5e1", "#121821", "#475569 #556274 #f3f5f8"],
+              ["parcel", "#fbbf24", "#fde68a", "#221a0e", "#a14a07 #92600a #fdf6ea"],
+              ["weather", "#38bdf8", "#e8f2f7", "#081a34", "#075985 #334155 #e9f2f9"],
+              ["tasks", "#2dd4bf", "#99f6e4", "#05211f", "#0f766e #115e59 #e8f7f5"],
+              ["sport", "#fb923c", "#fdba74", "#26140a", "#b93c0b #9a3412 #fdf1ea"],
+              ["money", "#a7f3d0", "#4ade80", "#062016", "#047857 #166534 #ecf8f2"],
+              ["travel", "#2ee6d6", "#7dd3fc", "#052331", "#0e7490 #0369a1 #ebf7f9"],
+              ["health", "#2ee6d6", "#7dd3fc", "#052331", "#0e7490 #0369a1 #ebf7f9"],
+              ["home", "#fde68a", "#fbbf24", "#1f1a0e", "#8a5a1c #8a5a0a #faf4ea"],
+              ["music", "#c4b5fd", "#8b5cf6", "#161433", "#6d28d9 #7c3aed #f3effc"],
+              ["loop", "#7dd3fc", "#4ade80", "#08183a", "#0369a1 #166534 #eaf4fa"],
+              ["explain", "#ede98a", "#fef9c3", "#1c1b08", "#65651a #4d4d12 #f8f7e4"],
+              ["party", "#fdab9f", "#fed7cf", "#2a1210", "#a83d62 #9d3a5c #fdf0f4"],
             ],
           },
           {
@@ -133,14 +133,14 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
           },
           {
             kind: "table",
-            head: ["Phase token", "Value", "When"],
+            head: ["Phase token", "Dark", "Light", "When"],
             rows: [
-              ["phase-recognised", "#a78bfa", "The loop has seen the thing."],
-              ["phase-planned", "#7dd3fc", "It is on the plan."],
-              ["phase-busy", "#2ee6d6", "Work is running."],
-              ["phase-you", "#f0abfc", "The turn is with the person."],
-              ["phase-check", "#fbbf24", "It is being checked."],
-              ["phase-done", "#4ade80", "It is finished."],
+              ["phase-recognised", "#a78bfa", "#6d28d9", "The loop has seen the thing."],
+              ["phase-planned", "#7dd3fc", "#0369a1", "It is on the plan."],
+              ["phase-busy", "#2ee6d6", "#0f766e", "Work is running."],
+              ["phase-you", "#f0abfc", "#a21caf", "The turn is with the person."],
+              ["phase-check", "#fbbf24", "#b45309", "It is being checked."],
+              ["phase-done", "#4ade80", "#15803d", "It is finished."],
             ],
           },
           {
@@ -163,7 +163,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
             kind: "ul",
             items: [
               "A grey page. Every page is --bg.",
-              "A light page. Iris is dark everywhere, except mail, where a mailbox is a white page.",
+              "A fixed dark or light value where a token exists. The page follows the mode; a part that keeps its dark colours on a light page is an island.",
               "A brand gradient used as a UI accent: not a button fill, not a header, not a bar.",
               "A second accent next to ice blue on one surface.",
               "Red for anything that is not destructive.",
@@ -193,7 +193,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
             rows: [
               ["Body and small text on its background", "4.5:1", "--fg, --dim and every topic accent as text"],
               ["Large text and graphics", "3:1", "Icons, strokes, the ring, a chart line"],
-              ["A topic accent on its own ground, and on the page background", "6:1", "every one of the fifteen accents clears it: the closest sits at 6.48:1 on its ground"],
+              ["A topic accent on its own ground, and on the page background", "6:1", "in dark every one of the fifteen accents clears it: the closest sits at 6.48:1 on its ground. In light they hold 4.5:1 (the closest, groceries, 4.65:1 on the page), short of 6:1: still open"],
             ],
           },
           {
@@ -206,12 +206,12 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
             kind: "note",
             tone: "warn",
             text:
-              "--faint is #5a6b78, which is 3.5:1 on --bg. It is not for body text, not for a value the person must read, and never for a label that explains what the person is looking at.",
+              "--faint is #5a6b78 in dark (3.5:1 on --bg) and #8696a1 in light (2.8:1). It is not for body text, not for a value the person must read, and never for a label that explains what the person is looking at.",
           },
           {
             kind: "p",
             text:
-              "One part lifts itself: a Word lightens its letters until they hold 4.5:1 on their ground, so a deep theme stop never sinks into the background.",
+              "One part lifts itself: a Word lightens its letters until they hold 4.5:1 on their ground, so a deep theme stop never sinks into the background. On a light page the drawing is turned over (lightness inverted, hue kept), so the same letters read dark.",
           },
         ],
       },
@@ -230,7 +230,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
               "No palette. One value per token",
               "Fourteen base tokens plus 15 topics",
               "Three numbers, checked by hand on every pair",
-              "One dark theme. Mail is the only light surface",
+              "Two modes, light and dark, one value of each token per mode, following the system",
             ],
           },
           {
@@ -448,7 +448,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
           {
             kind: "p",
             text:
-              "Every surface in Iris is one card. The recipe does not vary by screen size, and it does not have a dark and a light version.",
+              "Every surface in Iris is one card. The recipe does not vary by screen size or mode: in light, --glass is white and --edge is ink, the recipe stays the same.",
           },
           {
             kind: "code",
@@ -578,7 +578,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
           {
             kind: "p",
             text:
-              "Four things do the work a shadow does elsewhere. They are subtle on purpose, because the page is dark and a black shadow would show nothing anyway.",
+              "Four things do the work a shadow does elsewhere. They are subtle on purpose: on the dark page a black shadow would show nothing, and on the light page --elev-2 adds only a soft ink shadow.",
           },
           {
             kind: "table",
@@ -679,7 +679,7 @@ export const FOUNDATIONS_A: Record<string, Doc> = {
           {
             kind: "p",
             text:
-              "Iris draws its scrims dark: --scrim is rgba(4, 6, 9, .62) over the page, and the pen spotlight is a 9999px ring of rgba(7, 9, 12, .72) that dims everything around one marked row inside its card.",
+              "Iris draws its scrims in the page's own ink: --scrim is rgba(4, 6, 9, .62) over a dark page and rgba(20, 32, 44, .32) over a light one, and the pen spotlight is a 9999px ring of the page colour (rgba(7, 9, 12, .72), in light rgba(244, 247, 249, .78)) that dims everything around one marked row inside its card.",
           },
           {
             kind: "note",

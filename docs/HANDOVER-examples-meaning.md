@@ -74,7 +74,7 @@ These live in `src/ds/ext.tsx` and `ext.css` as overrides on top of the release 
 
 - **Dialog Stage:** the Dialog's stage fix, which is not settled.
 - **One Anchor per screen:** is it always exactly one, including screens that are not built for one person?
-- **"Dark only" vs system:** AGENTS.md says dark only, but the decision for Iris is to follow the system's light or dark. One of the two has to change.
+- **"Dark only" vs system:** answered 01-10. Iris has light and dark, follows the system, and `data-mode` on `<html>` overrides it (the site's header switch stores it). AGENTS.md rule 4 and the Colour chapter say so.
 - **Orb3D** does not render in headless browsers (no WebGL). Check it by eye in a real browser.
 
 ## State of git
