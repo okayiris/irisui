@@ -269,6 +269,13 @@
   gap: 8px;
 }
 
+/* The panel takes focus when it opens so a reader hears its title; the ring belongs to the control Tab reaches
+   next, not to the whole panel. */
+.ix-dialog:focus,
+.ix-sheet:focus {
+  outline: none;
+}
+
 .ix-sheet {
   position: absolute;
   left: 0;
