@@ -2685,3 +2685,37 @@
   background: linear-gradient(to bottom, transparent, var(--bg));
   pointer-events: none;
 }
+/* A note field grows with what you type; the browser's resize grip does not belong on glass. */
+.ix-textarea textarea,
+textarea.ix-textarea {
+  resize: none;
+}
+/* The fact her pen marks stays whole on its line, with room for the stroke round it. */
+.ia-mark {
+  white-space: nowrap;
+  display: inline-block;
+  margin: 0 3px;
+}
+.ia-value.ia-pill {
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--k, var(--accent)) 12%, transparent);
+  color: color-mix(in srgb, var(--fg) 80%, transparent);
+}
+.ia-value.ia-pill.ia-act {
+  background: color-mix(in srgb, var(--k, var(--accent)) 26%, transparent);
+  color: var(--k, var(--accent));
+}
+/* A tall tile in a bento stands two rows high and its siblings stack beside it. */
+.ia-bento-item .iris-w-tall {
+  height: 100%;
+  min-height: 352px;
+}
+.ia-bento {
+  grid-auto-rows: minmax(0, auto);
+}
+.ia-value.ia-num {
+  color: var(--fg);
+  font-weight: 600;
+}

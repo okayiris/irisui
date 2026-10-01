@@ -117,7 +117,7 @@
       case "Row": {
         let trailing = props.trailing;
         if (b) trailing = h2(I.Toggle, { on: !!val, onChange: (x) => set(b, x) });
-        else if (props.value != null) trailing = h2("span", { className: "ia-value" + (/await|missing|overdue|sign|waits|late/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
+        else if (props.value != null) trailing = h2("span", { className: "ia-value" + (props.pill ? " ia-pill" : "") + (/await|missing|overdue|sign|waits|late|draft|pending|review/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
         const ic = p.icon && typeof p.icon === "object" ? h2(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : void 0;
         return h2(I.Row, {
           ...props,
@@ -272,7 +272,7 @@
   function Lede({ text, mark }) {
     const I = UI();
     const bits = String(text).split(/(\*\*.+?\*\*|==.+?==)/g).filter(Boolean);
-    return h2("p", { className: "ia-lede" }, bits.map((b, i) => b.startsWith("**") ? h2("b", { key: i }, b.slice(2, -2)) : b.startsWith("==") ? mark && I.Pen ? h2(I.Pen, { key: i, kind: mark.kind ?? "underline", look: mark.look ?? "clean" }, b.slice(2, -2)) : h2("b", { key: i }, b.slice(2, -2)) : b));
+    return h2("p", { className: "ia-lede" }, bits.map((b, i) => b.startsWith("**") ? h2("b", { key: i }, b.slice(2, -2)) : b.startsWith("==") ? mark && I.Pen ? h2("span", { key: i, className: "ia-mark" }, h2(I.Pen, { kind: mark.kind ?? "underline", look: mark.look ?? "clean" }, b.slice(2, -2))) : h2("b", { key: i }, b.slice(2, -2)) : b));
   }
   var TALK = ["listening", "thinking", "talking"];
   function Talk({ s, ctx }) {
@@ -380,10 +380,10 @@
     const wide = !!spec.rail || frame === "window";
     const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
     const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
-    const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2] } : void 0;
+    const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2], "--k-button": `oklch(from ${tk[0]} .82 .12 h)` } : void 0;
     return h2(
       "div",
-      { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, style: tint },
+      { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, "data-theme": spec.theme, style: tint },
       spec.rail ? h2("div", { className: "ia-rail-col" }, h2(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) => ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
       spec.backdrop ? h2("div", { className: "ia-backdrop", "aria-hidden": "true" }, h2(Part, { p: spec.backdrop, ctx })) : null,
       h2(
@@ -422,13 +422,13 @@
             )) : null
           )
         )) : null,
-        dialog ? h2(I.Dialog, {
+        dialog ? h2(spec.topic ? I.Topic : react_shim_default.Fragment, spec.topic ? { name: spec.topic } : null, h2(I.Dialog, {
           open: true,
           onClose: () => run("close"),
           title: fill(dialog.title, state),
           body: fill(dialog.body, state),
           actions: (dialog.actions ?? [{ label: "OK" }]).map((a) => ({ label: a.label, danger: a.danger, onClick: () => a.on && setTimeout(() => run(a.on), 0) }))
-        }) : null
+        })) : null
       )
     );
   }
@@ -446,7 +446,7 @@
       let orbs = spec.tabs && s.kind !== "talk" && s.kind !== "sheet" && s.kind !== "dialog" ? 1 : 0;
       if (s.kind === "talk") orbs = 1;
       if (s.status) orbs++;
-      let busy = s.mark && /==.+==/.test(s.lede ?? "") ? BUSY.Pen({ c: "Pen", look: s.mark.look }) : 0, markPen = s.mark && /==.+==/.test(s.lede ?? "") ? 1 : 0, words = 0, pens = markPen, anchors = 0, primaries = s.action && !s.action.danger ? 1 : 0;
+      let busy = s.mark && /==.+==/.test(s.lede ?? "") ? BUSY.Pen({ c: "Pen", look: s.mark.look }) : 0, markPen = s.mark && /==.+==/.test(s.lede ?? "") ? 1 : 0, words = 0, pens = markPen, anchors = 0, primaries = s.action && !s.action.danger && !s.action.if ? 1 : 0;
       walk(parts, (p) => {
         if (ORBS.has(p.c) || p.c === "Widget" && p.look === "orb") orbs++;
         busy += BUSY[p.c]?.(p) ?? (Number(p.busy) || 0);
@@ -459,7 +459,7 @@
         targets(p.on).forEach((t) => spec.screens[t] ? reach.add(t) : add(id, `"${p.on}" goes to a screen that does not exist`));
         if (p.c === "Segmented" && !p.bind) add(id, "A Segmented with nothing behind it is a demo control", "warn");
       });
-      targets(s.action?.on).concat(targets(s.second?.on), ...(s.actions ?? []).map((a) => targets(a.on))).forEach((t) => spec.screens[t] ? reach.add(t) : add(id, `action goes to "${t}", which does not exist`));
+      targets(s.action?.on).concat(targets(s.second?.on), targets(s.top?.on), ...(s.actions ?? []).map((a) => targets(a.on))).forEach((t) => spec.screens[t] ? reach.add(t) : add(id, `action goes to "${t}", which does not exist`));
       if (orbs > 1) add(id, `${orbs} orbs: one Iris per surface`);
       if (busy > 5) add(id, `busy ${busy} of 5`);
       if (words > 1) add(id, `${words} big words: one per screen`);
