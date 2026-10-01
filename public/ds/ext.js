@@ -2350,9 +2350,13 @@
     noun = "items",
     actions,
     empty,
-    topic
+    topic,
+    onOpen
   }) {
     const UI2 = window.IrisUi ?? {};
+    const host = useRef(null);
+    const [app, setApp] = useState(null);
+    useEffect(() => setApp(host.current?.closest(".ia-app") ?? null), []);
     const [q, setQ] = useState("");
     const [filter, setFilter] = useState("All");
     const [open, setOpen] = useState(null);
@@ -2361,7 +2365,7 @@
     const chips = filters.length ? ["All", ...filters] : [];
     return h3(
       "div",
-      { className: "ix-table" },
+      { className: "ix-table", ref: host },
       h3(AppBar, {
         title,
         actions: h3(
@@ -2384,17 +2388,15 @@
               title: row.title,
               subtitle: row.subtitle,
               icon: row.icon && UI2.Icon ? h3(UI2.Icon, { name: row.icon }) : void 0,
-              chevron: !!row.detail,
-              onClick: row.detail ? () => setOpen(i) : void 0
+              chevron: !!(onOpen || row.detail),
+              onClick: onOpen ? () => onOpen(row) : row.detail ? () => setOpen(i) : void 0
             })
           )
         ) : h3("p", { className: "ix-table-empty" }, q ? `Nothing in ${title.toLowerCase()} matches \u201C${q}\u201D.` : empty ?? "Nothing here yet."),
         h3("p", { className: "ix-table-count", "aria-live": "polite" }, `${shown.length} of ${rows.length} ${noun}`)
       ),
-      it ? h3(
-        "div",
-        { className: "ia-layer" },
-        h3(Sheet, { open: true, side: "end", title: it.title, sub: it.subtitle, onClose: () => setOpen(null) }, it.detail)
+      it ? ((layer) => app && window.ReactDOM?.createPortal ? window.ReactDOM.createPortal(layer, app) : layer)(
+        h3("div", { className: "ia-layer" }, h3(Sheet, { open: true, side: "end", title: it.title, sub: it.subtitle, onClose: () => setOpen(null) }, it.detail))
       ) : null
     );
   }

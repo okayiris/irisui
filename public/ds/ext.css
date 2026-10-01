@@ -2519,7 +2519,8 @@
 }
 
 .ix-table-search {
-  flex: 1 1 auto;
+  /* a fixed basis: typing (and the clear button) never makes the field grow */
+  flex: 0 1 240px;
   min-width: 0;
   max-width: 240px;
 }
@@ -2554,4 +2555,18 @@
   position: absolute;
   top: 0;
   right: 0;
+}
+
+/* In an IrisApp screen the page already has its gutter: the TableApp's bar and body line up with it. */
+.ia-screen .ix-table .ix-appbar {
+  margin: 0 0 4px;
+  padding: 8px 0 10px;
+}
+.ia-screen .ix-table-body {
+  padding: 12px 0 16px;
+}
+
+/* A step in a detail wraps instead of losing its end. */
+.ix-sheet .iris-check .txt {
+  white-space: normal;
 }

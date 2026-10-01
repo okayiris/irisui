@@ -2277,6 +2277,7 @@ export function TableApp({
   actions,
   empty,
   topic,
+  onOpen,
 }: {
   title: string;
   rows?: TableRow[];
@@ -2288,8 +2289,14 @@ export function TableApp({
   actions?: Any;
   empty?: string;
   topic?: string;
+  /** Opens a row yourself (your own screen, your own sheet). Without it a row with detail opens the Sheet. */
+  onOpen?: (row: TableRow) => void;
 }) {
   const UI = (window as Any).IrisUi ?? {};
+  const host = useRef<Any>(null);
+  // Inside an IrisApp the sheet covers the whole window, not just this list: it goes into the app's own box.
+  const [app, setApp] = useState<Any>(null);
+  useEffect(() => setApp(host.current?.closest(".ia-app") ?? null), []);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState<number | null>(null);
@@ -2301,7 +2308,7 @@ export function TableApp({
   const chips = filters.length ? ["All", ...filters] : [];
   return h(
     "div",
-    { className: "ix-table" },
+    { className: "ix-table", ref: host },
     h(AppBar, {
       title,
       actions: h(
@@ -2327,8 +2334,8 @@ export function TableApp({
                 title: row.title,
                 subtitle: row.subtitle,
                 icon: row.icon && UI.Icon ? h(UI.Icon, { name: row.icon }) : undefined,
-                chevron: !!row.detail,
-                onClick: row.detail ? () => setOpen(i) : undefined,
+                chevron: !!(onOpen || row.detail),
+                onClick: onOpen ? () => onOpen(row) : row.detail ? () => setOpen(i) : undefined,
               }),
             ),
           )
@@ -2336,10 +2343,8 @@ export function TableApp({
       h("p", { className: "ix-table-count", "aria-live": "polite" }, `${shown.length} of ${rows.length} ${noun}`),
     ),
     it
-      ? h(
-          "div",
-          { className: "ia-layer" },
-          h(Sheet, { open: true, side: "end", title: it.title, sub: it.subtitle, onClose: () => setOpen(null) }, it.detail),
+      ? ((layer: Any) => (app && (window as Any).ReactDOM?.createPortal ? (window as Any).ReactDOM.createPortal(layer, app) : layer))(
+          h("div", { className: "ia-layer" }, h(Sheet, { open: true, side: "end", title: it.title, sub: it.subtitle, onClose: () => setOpen(null) }, it.detail)),
         )
       : null,
   );
