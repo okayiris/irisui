@@ -19,6 +19,7 @@
     if (B) return h2(B, props, children);
     return h2("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
   }
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   function Tooltip({ label, children, delay = 320 }) {
     const [open, setOpen] = useState(false);
     const timer = useRef(null);
@@ -32,6 +33,18 @@
       setOpen(false);
     }, []);
     useEffect(() => () => window.clearTimeout(timer.current), []);
+    useEffect(() => {
+      if (!open) return;
+      const onKey = (e) => e.key === "Escape" && hide();
+      document.addEventListener("keydown", onKey);
+      return () => document.removeEventListener("keydown", onKey);
+    }, [open, hide]);
+    const anchor = useRef(null);
+    useEffect(() => {
+      const target = anchor.current?.querySelector(FOCUSABLE) ?? anchor.current;
+      target?.setAttribute("aria-describedby", id);
+      return () => target?.removeAttribute("aria-describedby");
+    }, [id, children]);
     return h2(
       "span",
       {
@@ -42,7 +55,7 @@
         onFocus: show,
         onBlur: hide
       },
-      h2("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : void 0 }, children),
+      h2("span", { className: "ix-tip-anchor", ref: anchor }, children),
       h2("span", { className: "ix-tip-body", role: "tooltip", id }, label)
     );
   }
@@ -142,7 +155,6 @@
   function Stage({ children }) {
     return h2("div", { className: "ix-stage" }, children);
   }
-  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   function useModalFocus(open, panel, onClose) {
     const close = useRef(onClose);
     close.current = onClose;

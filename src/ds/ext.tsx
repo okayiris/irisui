@@ -19,6 +19,10 @@ function houseButton(props: Any, children: Any): Any {
   return h("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
 }
 
+/** What can take focus inside a part: where a tooltip's description goes, and where a modal keeps Tab. */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /* ---------------------------------------------------------------- Tooltip */
 
 export function Tooltip({ label, children, delay = 320 }: { label: string; children: Any; delay?: number }) {
@@ -35,6 +39,21 @@ export function Tooltip({ label, children, delay = 320 }: { label: string; child
     setOpen(false);
   }, []);
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && hide();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, hide]);
+
+  // The description belongs on the thing that takes focus, so it is read when that thing is reached. It is set
+  // in the DOM because a part such as the house Button does not pass unknown props down to its element.
+  const anchor = useRef<Any>(null);
+  useEffect(() => {
+    const target = anchor.current?.querySelector(FOCUSABLE) ?? anchor.current;
+    target?.setAttribute("aria-describedby", id);
+    return () => target?.removeAttribute("aria-describedby");
+  }, [id, children]);
 
   return h(
     "span",
@@ -46,7 +65,7 @@ export function Tooltip({ label, children, delay = 320 }: { label: string; child
       onFocus: show,
       onBlur: hide,
     },
-    h("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : undefined }, children),
+    h("span", { className: "ix-tip-anchor", ref: anchor }, children),
     h("span", { className: "ix-tip-body", role: "tooltip", id }, label),
   );
 }
@@ -179,9 +198,6 @@ export function Menu({
 function Stage({ children }: { children: Any }) {
   return h("div", { className: "ix-stage" }, children);
 }
-
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /** What a modal owes the keyboard: focus moves in when it opens, Tab stays inside, Escape closes, and focus goes
  *  back where it came from. Focus only moves when the document already has it, so a modal that is open on load
