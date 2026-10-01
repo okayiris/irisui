@@ -13,95 +13,76 @@
 <link rel="stylesheet" href="../shared.css">
 <link rel="icon" href="../../favicon.svg">
 <style>
-  .three { display: grid; grid-template-columns: 290px 1fr; gap: 22px; align-items: start; }
-  .three .right { display: grid; gap: 22px; }
-  .cap { font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 8px; }
+  .stage { display: grid; gap: 14px; }
+  .switch { display: flex; justify-content: center; }
+  .cap { font: var(--text-label); color: var(--label); margin: 0; text-align: center; }
 
-  /* The phone: the question as a sheet. */
-  .mini-phone { width: 290px; height: 600px; border-radius: 42px; position: relative; overflow: hidden; background: #0b0e13;
-                box-shadow: 0 0 0 1px var(--edge), 0 0 0 8px #0d1015, 0 0 0 9px var(--edge); }
-  .mini-phone .behind { position: absolute; inset: 0; padding: 60px 16px; opacity: .35; }
-  .sheet { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 16px 22px; border-radius: 26px 26px 0 0;
-           background: rgba(16, 20, 27, .96); box-shadow: inset 0 1px 0 var(--edge); animation: rise var(--motion-slow) var(--ease-house); }
-  .grip { width: 38px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 14px; }
+  /* The phone: a small IrisApp, the question as its sheet. */
+  .phone-wrap { display: grid; justify-items: center; }
+  .mini-phone { width: 320px; height: 680px; border-radius: 44px; position: relative; overflow: hidden; transform: translateZ(0);
+                box-shadow: 0 0 0 1px var(--edge), 0 0 0 8px var(--glass), 0 0 0 9px var(--edge); }
+  .mini-phone .ia-scroll { padding-top: 44px; }
 
-  /* The Mac: a window with Touch ID. */
-  .mac { border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--edge);
-         background: radial-gradient(420px 260px at 20% 20%, rgba(56, 189, 248, .22), transparent 70%), linear-gradient(to bottom left, #291f52, #0a0d1f);
-         padding: 26px; display: grid; place-items: center; }
-  .win { width: 100%; max-width: 440px; border-radius: 14px; background: rgba(12, 16, 22, .92); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 20px 50px rgba(0, 0, 0, .4);
-         backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); animation: rise var(--motion-base) var(--ease-house); }
-  .win-top { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 12px; }
-  .win-top i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, .16); }
-  .win-body { padding: 4px 20px 20px; }
-  .touch { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; margin: 4px auto 8px;
-           box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent); }
-
-  /* Chrome: the toolbar popup. */
-  .chrome { border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: #0e1116; }
-  .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #161a21; }
-  .url { flex: 1; height: 28px; border-radius: 14px; background: #0b0e13; display: flex; align-items: center; padding: 0 12px; font: var(--text-sub); color: var(--dim); }
-  .ext { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--accent-line, rgba(125,211,252,.45)); }
-  .page { position: relative; height: 230px; padding: 18px; }
-  .popup { position: absolute; right: 12px; top: 6px; width: 300px; padding: 14px; border-radius: 14px; background: rgba(16, 20, 27, .97);
-           box-shadow: inset 0 0 0 1px var(--edge), 0 12px 30px rgba(0, 0, 0, .45); animation: rise var(--motion-base) var(--ease-house); }
+  /* The Mac and Chrome: a desk in the house colours. */
+  .desk { border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 0 0 1px var(--edge); padding: 32px 24px; display: grid; place-items: center; min-height: 520px;
+          background: radial-gradient(60% 50% at 20% 20%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+                      radial-gradient(55% 50% at 84% 80%, color-mix(in srgb, var(--violet) 18%, transparent), transparent 70%), var(--bg); }
+  .win { width: 100%; max-width: 460px; border-radius: var(--radius-card); background: var(--bg); box-shadow: 0 0 0 1px var(--edge); overflow: hidden;
+         animation: rise var(--motion-base) var(--ease-house); }
+  .win-top { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 12px; border-bottom: 1px solid var(--line); font: var(--text-sub); color: var(--dim); }
+  .win-top i { width: 11px; height: 11px; border-radius: 50%; background: var(--line); }
+  .win-top span { flex: 1; text-align: center; margin-right: 40px; }
+  .win-body { padding: 18px 20px 20px; display: grid; gap: 14px; }
+  .btns { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  .done { font: var(--text-body); color: var(--dim); margin: 0; }
 
   /* The question itself: the same lines on every surface. */
-  .q-title { font: 600 17px var(--font-display); margin: 0 0 12px; line-height: 1.3; }
-  .facts { display: grid; gap: 8px; margin: 0 0 12px; }
+  .q-title { font: var(--text-row-title); font-weight: 600; margin: 0; line-height: 1.3; }
+  .facts { display: grid; gap: 8px; margin: 0; }
   .fact { display: grid; grid-template-columns: 58px 1fr; gap: 10px; font: var(--text-body); line-height: 1.35; }
-  .fact dt { font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--label); padding-top: 3px; }
+  .fact dt { font: var(--text-label); color: var(--label); padding-top: 3px; }
   .fact dd { margin: 0; }
   .fact dd.unknown { color: var(--wait); }
-  .scope { font: var(--text-sub); color: var(--dim); margin: 0 0 14px; padding: 8px 10px; border-radius: 10px; background: var(--glass); }
-  .shot { height: 64px; border-radius: 10px; margin: 0 0 12px; background: #12161c; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); padding: 8px 10px; font: 11px var(--font-text); display: grid; gap: 4px; }
-  .shot b { font-size: 12px; }
-  .shot span { display: block; height: 10px; border-radius: 3px; background: var(--line); width: 70%; }
-  .btns { display: grid; gap: 8px; }
-  .wait { display: flex; align-items: center; gap: 8px; font: var(--text-sub); color: var(--dim); margin-top: 10px; }
-  .wait i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.4s ease infinite; }
-  @keyframes pulse { 50% { opacity: .3; } }
+  .scope { font: var(--text-sub); color: var(--dim); margin: 0; padding: 8px 10px; border-radius: var(--radius-button); background: var(--glass); }
 
-  /* The vault itself. */
-  .vault { display: grid; grid-template-columns: 170px 1fr; min-height: 420px; }
-  .vault nav { border-right: 1px solid var(--line); padding: 8px; display: grid; align-content: start; gap: 2px; }
-  .vault nav button { all: unset; cursor: pointer; padding: 7px 10px; border-radius: 8px; color: var(--dim); font: var(--text-body); display: flex; justify-content: space-between; }
-  .vault nav button[aria-current="true"] { background: var(--glass); color: var(--fg); }
-  .vault nav button:focus-visible { outline: 2px solid var(--accent); }
-  .vault nav small { font: var(--text-value); color: var(--label); }
-  .vault .items { padding: 8px 16px; }
-  .item { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .item b { font-weight: 500; }
-  .item small { color: var(--dim); font: var(--text-sub); grid-column: 1; }
-  .item .dots { font: var(--text-value); color: var(--label); grid-row: 1 / 3; grid-column: 2; align-self: center; }
+  /* Chrome: the site behind, the extension's popup on top. */
+  .browser { width: 100%; max-width: 720px; border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 0 0 1px var(--edge); background: var(--bg); }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .url { flex: 1; height: 28px; border-radius: var(--radius-pill); background: var(--glass); display: flex; align-items: center; padding: 0 12px; font: var(--text-sub); color: var(--dim); }
+  .page { position: relative; min-height: 360px; padding: 24px; }
+  .site { width: 260px; display: grid; gap: 10px; opacity: .5; }
+  .site h3 { margin: 0; font: var(--text-page-title); }
+  .popup { position: absolute; right: 12px; top: 8px; width: 320px; animation: rise var(--motion-base) var(--ease-house); }
+  .popup .win-body { padding: 14px; }
 
   /* The PIN: Face ID or Touch ID comes first, this is the way in when they cannot. */
-  .lock-stage { border-radius: 14px; padding: 40px 20px; display: grid; place-items: center; box-shadow: 0 0 0 1px var(--edge);
-                background: radial-gradient(420px 260px at 20% 20%, rgba(56, 189, 248, .16), transparent 70%), linear-gradient(to bottom left, #1d1840, #0a0d1f); }
-  .lock { width: 100%; max-width: 420px; padding: 32px 24px 26px; border-radius: 22px; text-align: center; display: grid; justify-items: center; gap: 12px;
-          background: rgba(10, 13, 18, .94); box-shadow: inset 0 0 0 1px rgba(190, 230, 255, .14), 0 20px 50px rgba(0, 0, 0, .4); }
-  .lock h2 { margin: 4px 0 0; font: 600 20px var(--font-display); }
+  .lock { width: 100%; max-width: 420px; padding: 32px 24px 26px; border-radius: var(--radius-card); text-align: center; display: grid; justify-items: center; gap: 12px;
+          background: var(--bg); box-shadow: 0 0 0 1px var(--edge); }
+  .lock h2 { margin: 4px 0 0; font: var(--text-page-title); }
   .lock .ask { margin: 0; font: var(--text-body); color: var(--dim); max-width: 320px; }
   .lock .ask b { color: var(--fg); font-weight: 500; }
   .pins { position: relative; display: flex; gap: 8px; margin: 8px 0 2px; cursor: text; }
   .pins.shake { animation: shake .3s var(--ease-house); }
   @keyframes shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
-  .pin { width: 44px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge);
+  .pin { width: 44px; height: 52px; border-radius: var(--radius-button); display: grid; place-items: center; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge);
          font: 600 22px var(--font-mono); transition: box-shadow var(--motion-fast) var(--ease-house); }
   .pin.at { box-shadow: inset 0 0 0 2px var(--accent); }
-  .pin.bad { box-shadow: inset 0 0 0 2px var(--error); }
   .pin.ok { box-shadow: inset 0 0 0 2px var(--ok); }
   .pins input { position: absolute; inset: 0; opacity: 0; font-size: 16px; }
-  .pins:focus-within .pin.at { box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 4px var(--accent-soft, rgba(125, 211, 252, .12)); }
-  .lock .msg { min-height: 20px; margin: 0; font: var(--text-body); }
-  .lock .msg.bad { color: var(--error); }
+  .lock .msg { min-height: 20px; margin: 0; font: var(--text-body); color: var(--dim); }
   .lock .msg.ok { color: var(--ok); }
-  .lock .under { display: flex; gap: 14px; align-items: center; font: var(--text-body); color: var(--dim); }
-  .lock .under button { all: unset; cursor: pointer; border-radius: 6px; }
-  .lock .under button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .lock .under .link { color: var(--accent); }
-  .lock .under .eye { display: inline-flex; align-items: center; gap: 6px; }
-  @media (max-width: 760px) { .three { grid-template-columns: 1fr; } .vault { grid-template-columns: 1fr; } .vault nav { border-right: 0; } }
+  .under { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
+
+  /* The vault itself: a window with the NavRail, the app bar with search and Add. */
+  .vault { position: relative; width: 100%; max-width: 880px; display: grid; grid-template-columns: auto minmax(0, 1fr); height: 480px;
+           border-radius: var(--radius-card); overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--edge); }
+  .vault > .ix-rail { height: 100%; border: 0; border-right: 1px solid var(--line); border-radius: 0; }
+  .vault .main { display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; }
+  .vault .ix-appbar-row { flex-wrap: wrap; }
+  .vault .list { overflow: auto; padding: 16px 20px; display: grid; gap: 12px; align-content: start; }
+  .vault .snack { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; z-index: 50; }
+  .sheet-body { display: grid; gap: 14px; }
+  @media (max-width: 760px) { .vault { grid-template-columns: 1fr; height: auto; min-height: 480px; } .vault > .ix-rail { display: none; } .desk { padding: 16px 8px; } }
 </style>
 </head>
 <body data-platform="vault">
@@ -115,8 +96,8 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { useState } = React;
-  const { Button, Orb, Skeleton, Mark } = window.IrisUi;
+  const { useState, useEffect } = React;
+  const { Button, Mark, Segmented, IrisApp, checkApp, Card, Row, NavRail, AppBar, SearchField, Sheet, Snackbar, Toggle, Field, Icon, Dialog } = window.IrisUi;
 
   // The fields src/vault-ask.ts sends; every surface renders the same ones, in the same order.
   const SCOPE = {
@@ -127,71 +108,78 @@
   const NOT_SAID = "the asker did not say";
   const ASKS = {
     use: { title: "Iris wants your shop.example.com login", who: "Iris, your assistant", from: "Chrome on this Mac, shop.example.com",
-           why: "You asked her to order the groceries for Saturday", what: "Fills in your password on shop.example.com", scope: "use", shot: true },
+           why: "You asked her to order the groceries for Saturday", what: "Fills in your password on shop.example.com", scope: "use" },
     names: { title: "Iris wants to see which logins you have", who: "Iris, your assistant", from: "Her own house",
              why: "You asked which shops she can order from", what: "Reads the list of names", scope: "names" },
     store: { title: "Save the new da-mario.example password?", who: "The Chrome extension", from: "Chrome on this Mac, da-mario.example",
              why: "You made an account to book the table for Sam's party", what: "Stores it, so Iris can sign in next time", scope: "store" },
     blind: { title: "Iris wants a card", who: "Iris, your assistant", from: "Her own house", why: null, what: null, scope: "use" },
   };
+  const yes = (a) => (a.scope === "store" ? "Save with Face ID" : "Allow once with Face ID");
+
+  // The phone: a real screen behind (what Iris is doing), the question as the sheet on top of it.
+  const phoneSpec = (a) => ({
+    name: "Vault", start: "doing",
+    screens: {
+      doing: { title: a.scope === "store" ? "Sam's party" : "Groceries", eyebrow: "Iris is on it",
+        lede: a.why ? `**Alex**, ${a.why[0].toLowerCase() + a.why.slice(1)}. I need the vault for one step.` : "**Alex**, I need the vault for one step.",
+        parts: [{ c: "Group", parts: [{ c: "Row", icon: "shield", title: a.title, subtitle: "Waits on you", on: "sheet:ask" }] }] },
+      ask: { kind: "sheet", title: a.title, lede: SCOPE[a.scope],
+        parts: [
+          { c: "Group", parts: [
+            { c: "Row", title: a.who, subtitle: "From " + a.from },
+            { c: "Row", title: a.why ?? "Why: " + NOT_SAID, subtitle: a.what ?? "What it does: " + NOT_SAID }] },
+          ...(a.why ? [] : [{ c: "Text", text: "Nobody said why. Ask Iris first, or say no." }]),
+          { c: "Buttons", parts: [
+            { c: "Button", variant: "primary", size: "lg", label: yes(a), on: `close;snack:${a.scope === "store" ? "Saved" : "Allowed once"}. Face ID confirmed.` },
+            ...(a.scope === "use" && a.why ? [{ c: "Button", variant: "glass", label: "Always for this site", on: "close;snack:Allowed for this site. Face ID confirmed." }] : []),
+            { c: "Button", variant: "text", label: "No", on: "close;snack:Nothing was shared. Iris is told no." }] }] },
+    },
+  });
 
   const Facts = ({ a }) => h(React.Fragment, null,
     h("p", { className: "q-title" }, a.title),
-    a.shot ? h("div", { className: "shot", "aria-label": "What Iris sees now" }, h("b", null, "shop.example.com  Sign in"), h("span"), h("span", { style: { width: "45%" } })) : null,
     h("dl", { className: "facts" },
       [["Who", a.who], ["From", a.from], ["Why", a.why], ["Does", a.what]].map(([k, v]) =>
         h("div", { key: k, className: "fact" }, h("dt", null, k), h("dd", { className: v ? "" : "unknown" }, v ?? NOT_SAID)))),
     h("p", { className: "scope" }, SCOPE[a.scope]));
 
-  function Phone({ a }) {
+  function Mac({ a }) {
     const [said, setSaid] = useState(null);
-    return h("div", null, h("p", { className: "cap" }, "iPhone and Android"),
-      h("div", { className: "mini-phone" },
-        h("div", { className: "behind", "aria-hidden": "true" }, h(Skeleton, { height: 18, width: "60%" }), h("div", { style: { height: 12 } }), h(Skeleton, { height: 140 })),
-        h("div", { className: "sheet", role: "dialog", "aria-label": a.title },
-          h("div", { className: "grip" }),
-          h("div", { style: { display: "flex", justifyContent: "center", marginBottom: 8 } }, h(Orb, { size: 34 })),
-          h(Facts, { a }),
-          said ? h("p", { className: "scope", role: "status", style: { color: said === "No" ? "var(--dim)" : "var(--ok)" } }, said === "No" ? "Nothing was shared. Iris is told no." : `${said}. Face ID confirmed.`)
-            : h("div", { className: "btns" },
-                h(Button, { variant: "primary", onClick: () => setSaid(a.scope === "store" ? "Saved" : "Allowed once") }, a.scope === "store" ? "Save with Face ID" : "Allow once with Face ID"),
-                a.scope === "use" && a.why ? h(Button, { variant: "glass", onClick: () => setSaid("Allowed for this site") }, "Always for this site") : null,
-                h(Button, { variant: "text", onClick: () => setSaid("No") }, "No")))));
+    return h("div", { className: "desk" }, h("div", { className: "win", role: "dialog", "aria-label": a.title },
+      h("div", { className: "win-top" }, h("i"), h("i"), h("i"), h("span", null, "Iris vault")),
+      h("div", { className: "win-body" }, h(Facts, { a }),
+        said ? h("p", { className: "done", role: "status" }, said)
+          : h("div", { className: "btns" },
+              h(Button, { variant: "glass", onClick: () => setSaid("Nothing was shared. Iris is told no.") }, "Cancel"),
+              h(Button, { variant: "primary", onClick: () => setSaid("Touch ID confirmed. The phone's question closed by itself.") }, a.scope === "store" ? "Save with Touch ID" : "Allow with Touch ID")))));
   }
 
-  const Mac = ({ a }) => h("div", null, h("p", { className: "cap" }, "Mac"),
-    h("div", { className: "mac" }, h("div", { className: "win", role: "dialog", "aria-label": a.title },
-      h("div", { className: "win-top", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
-      h("div", { className: "win-body" }, h(Facts, { a }),
-        h("div", { className: "touch", "aria-hidden": "true" }, h("svg", { width: 28, height: 28, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" },
-          h("path", { d: "M12 11v3M8.5 8.5a5 5 0 0 1 8.5 3.5v2M7 12v1a5 5 0 0 0 2 4M17 16a5 5 0 0 1-1 2M5 9a8 8 0 0 1 14 0M19 13v1" }))),
-        h("p", { style: { textAlign: "center", color: "var(--dim)", font: "var(--text-sub)", margin: "0 0 12px" } }, "Touch ID to allow"),
-        h(Button, { variant: "glass" }, "Cancel")))));
-
-  const Chrome = ({ a }) => h("div", null, h("p", { className: "cap" }, "Chrome"),
-    h("div", { className: "chrome" },
-      h("div", { className: "bar" }, h("div", { className: "url" }, a.from.split(", ")[1] ?? "okayiris.com"), h("div", { className: "ext", "aria-hidden": "true" }, h(Orb, { size: 16 }))),
+  function Chrome({ a }) {
+    const [gone, setGone] = useState(false);
+    const host = a.from.split(", ")[1] ?? "okayiris.com";
+    return h("div", { className: "desk" }, h("div", { className: "browser" },
+      h("div", { className: "bar" }, h("div", { className: "url" }, host)),
       h("div", { className: "page" },
-        h(Skeleton, { height: 16, width: "40%" }), h("div", { style: { height: 10 } }), h(Skeleton, { height: 36, width: "55%" }), h("div", { style: { height: 8 } }), h(Skeleton, { height: 36, width: "55%" }),
-        h("div", { className: "popup", role: "dialog", "aria-label": "Iris in Chrome" },
-          h("p", { className: "q-title", style: { fontSize: 15 } }, a.title),
-          h("p", { className: "scope", style: { margin: 0 } }, SCOPE[a.scope]),
-          h("div", { className: "wait" }, h("i", { "aria-hidden": "true" }), "Waiting for your phone or Touch ID")))));
+        h("div", { className: "site", "aria-hidden": "true" }, h("h3", null, "Sign in"), h(Field, { value: "alex@example.com", readOnly: true, tabIndex: -1 }), h(Field, { type: "password", value: "", readOnly: true, tabIndex: -1 })),
+        h("div", { className: "popup win", role: "dialog", "aria-label": "Iris in Chrome" }, h("div", { className: "win-body" },
+          h("p", { className: "q-title" }, a.title),
+          h("p", { className: "scope" }, SCOPE[a.scope]),
+          gone ? h("p", { className: "done", role: "status" }, "Cancelled. Nothing was shared.")
+            : h(React.Fragment, null,
+                h("p", { className: "done" }, "Answer on your phone or with Touch ID."),
+                h("div", { className: "btns" }, h(Button, { variant: "text", size: "sm", onClick: () => setGone(true) }, "Cancel"))))))));
+  }
 
-  const ITEMS = {
-    Logins: [["shop.example.com", "alex@example.com", "Used by Iris today, 14:10"], ["da-mario.example", "alex@example.com", "Saved today"], ["bank.example", "alex", "Iris may only read the name"]],
-    Cards: [["Visa ending 4412", "Alex", "Used once, 12 September"]],
-    "2FA codes": [["shop.example.com", "6 digits, every 30 s", "Filled in by Chrome today"]],
-    Notes: [["Wi-Fi at home", "", "Never shared"]],
-  };
-  function Vault() {
-    const [group, setGroup] = useState("Logins");
-    return h("div", null, h("p", { className: "cap" }, "The vault, on the Mac"),
-      h("div", { className: "chrome vault" },
-        h("nav", { "aria-label": "Vault groups" }, Object.keys(ITEMS).map((g) =>
-          h("button", { key: g, "aria-current": g === group ? "true" : "false", onClick: () => setGroup(g) }, g, h("small", null, ITEMS[g].length)))),
-        h("div", { className: "items" }, ITEMS[group].map(([t, u, s]) =>
-          h("div", { key: t + s, className: "item" }, h("b", null, t), h("span", { className: "dots", "aria-label": "hidden" }, "••••••"), h("small", null, [u, s].filter(Boolean).join(" · ")))))));
+  function Ask({ id }) {
+    const a = ASKS[id];
+    const [dev, setDev] = useState(0);
+    const spec = React.useMemo(() => phoneSpec(a), [id]);
+    return h("main", { className: "stage" },
+      h("div", { className: "switch" }, h(Segmented, { items: ["Phone", "Mac", "Chrome"], active: dev, onSelect: setDev })),
+      dev === 0 ? h("div", { className: "phone-wrap" }, h("div", { className: "mini-phone" }, h(IrisApp, { key: id, spec, start: ["doing", "ask"] })))
+        : dev === 1 ? h(Mac, { key: id, a }) : h(Chrome, { key: id, a }),
+      h("p", { className: "cap" }, "All three ask at the same time. The first answer wins, the others close."));
   }
 
   /* ------------------------------------------------------------------- PIN */
@@ -204,6 +192,7 @@
     const [show, setShow] = useState(false);
     const [state, setState] = useState(null);      // null | "bad" | "ok"
     const [shake, setShake] = useState(false);
+    const [forgot, setForgot] = useState(false);
     const done = (v) => {
       if (step === "choose") { setFirst(v); setStep("repeat"); setValue(""); return; }
       const good = step === "repeat" ? v === first : v === "123456";
@@ -218,62 +207,109 @@
       if (v.length === 6) done(v);
     };
     const title = { enter: "Enter your PIN", choose: "Choose a PIN of 6 digits", repeat: "Once more, to be sure" }[step];
-    const msg = state === "ok" ? (mode === "choose" ? "Your PIN is set." : "The vault is open, on this Mac and in Chrome.")
+    const msg = forgot ? "Open Iris on your phone: You, Vault, New PIN. Face ID confirms it is you."
+      : state === "ok" ? (mode === "choose" ? "Your PIN is set." : "The vault is open, on this Mac and in Chrome.")
       : state === "bad" ? (step === "choose" && mode === "choose" ? "The two did not match. Choose again." : "Wrong PIN. Try again.") : "";
-    return h("div", { className: "lock-stage" }, h("div", { className: "lock", role: "dialog", "aria-label": title },
+    return h("main", { className: "desk" }, h("div", { className: "lock", role: "dialog", "aria-label": title },
       h(Mark, { size: 64 }),
       h("h2", null, "Iris"),
       h("p", { className: "ask" }, title),
       h("label", { className: "pins" + (shake ? " shake" : "") },
         Array.from({ length: 6 }, (_, i) => h("span", { key: i, "aria-hidden": "true",
-          className: "pin" + (state === "ok" ? " ok" : state === "bad" ? " bad" : i === Math.min(value.length, 5) ? " at" : "") },
+          className: "pin" + (state === "ok" ? " ok" : state !== "bad" && i === Math.min(value.length, 5) ? " at" : "") },
           value[i] ? (show ? value[i] : "•") : "")),
         h("input", { autoFocus: true, inputMode: "numeric", autoComplete: mode === "choose" ? "new-password" : "current-password",
                      "aria-label": title, value, onChange: type, disabled: state === "ok" })),
-      h("p", { className: "msg " + (state ?? ""), role: "status" }, msg),
+      h("p", { className: "msg" + (state === "ok" ? " ok" : ""), role: "status" }, msg),
       mode === "enter" ? h("p", { className: "ask" }, h("b", null, "Chrome"), " wants the vault: fills in your password on shop.example.com.") : null,
       h("div", { className: "under" },
-        h("button", { className: "eye", onClick: () => setShow(!show), "aria-pressed": show },
-          h("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true" },
-            h("path", { d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" }), h("circle", { cx: 12, cy: 12, r: 3 }),
-            show ? h("path", { d: "M3 3l18 18" }) : null),
-          show ? "Hide" : "Show"),
-        mode === "enter" ? h(React.Fragment, null, h("span", { "aria-hidden": "true" }, "·"), h("button", { className: "link" }, "Forgot your PIN?")) : null),
-      ));
+        h(Button, { variant: "text", size: "sm", onClick: () => setShow(!show) }, show ? "Hide digits" : "Show digits"),
+        mode === "enter" ? h(Button, { variant: "text", size: "sm", onClick: () => setForgot(true) }, "Forgot your PIN?") : null)));
   }
 
-  const Stage = ({ scene }) => scene.id === "pin" ? h("main", null, h(Pin, { mode: "enter" }))
-    : scene.id === "choose" ? h("main", null, h(Pin, { mode: "choose" }))
-    : scene.id === "vault" ? h("main", null, h(Vault))
-    : h("main", { className: "three" }, h(Phone, { a: ASKS[scene.id] }), h("div", { className: "right" }, h(Mac, { a: ASKS[scene.id] }), h(Chrome, { a: ASKS[scene.id] })));
+  /* ------------------------------------------------------------------ vault */
+
+  const START = {
+    Logins: [{ t: "shop.example.com", u: "alex@example.com", s: "Used by Iris today, 14:10", on: true }, { t: "da-mario.example", u: "alex@example.com", s: "Saved today", on: true },
+             { t: "bank.example", u: "alex", s: "Iris may only read the name", on: false }],
+    Cards: [{ t: "Visa ending 4412", u: "Alex", s: "Used once, 12 September", on: true }],
+    "2FA codes": [{ t: "shop.example.com", u: "6 digits, every 30 s", s: "Filled in by Chrome today", on: true }],
+    Notes: [{ t: "Wi-Fi at home", u: "", s: "Never shared", on: false }],
+  };
+  const ICON = { Logins: "person", Cards: "shield", "2FA codes": "phone", Notes: "globe" };
+  function Vault() {
+    const [items, setItems] = useState(START);
+    const [group, setGroup] = useState("Logins");
+    const [q, setQ] = useState("");
+    const [open, setOpen] = useState(null);     // index in the group, or "new"
+    const [draft, setDraft] = useState({ t: "", u: "" });
+    const [snack, setSnack] = useState(null);
+    const [confirm, setConfirm] = useState(false);
+    useEffect(() => { if (!snack) return; const t = setTimeout(() => setSnack(null), 3200); return () => clearTimeout(t); }, [snack]);
+    const list = items[group].map((it, i) => ({ ...it, i })).filter((it) => (it.t + it.u).toLowerCase().includes(q.toLowerCase()));
+    const it = typeof open === "number" ? items[group][open] : null;
+    const setIt = (patch) => setItems({ ...items, [group]: items[group].map((x, i) => (i === open ? { ...x, ...patch } : x)) });
+    return h("main", { className: "desk" }, h("div", { className: "vault" },
+      h(NavRail, { label: "Vault", items: Object.keys(items).map((g) => ({ label: `${g} (${items[g].length})`, icon: h(Icon, { name: ICON[g], size: 18 }), active: g === group, onSelect: () => { setGroup(g); setQ(""); } })) }),
+      h("div", { className: "main" },
+        h(AppBar, { title: group, actions: h(React.Fragment, null,
+          h("div", { style: { width: 200 } }, h(SearchField, { value: q, onChange: setQ, placeholder: `Search ${group.toLowerCase()}` })),
+          h(Button, { variant: "primary", size: "sm", onClick: () => { setDraft({ t: "", u: "" }); setOpen("new"); } }, "Add")) }),
+        h("div", { className: "list" },
+          list.length ? h(Card, { padding: 4 }, list.map((x) => h(Row, { key: x.t + x.i, title: x.t, subtitle: [x.u, x.s].filter(Boolean).join(", "), chevron: true, onClick: () => setOpen(x.i) })))
+            : h("p", { className: "done" }, q ? `Nothing in ${group.toLowerCase()} matches "${q}".` : "Nothing here yet."),
+          h("p", { className: "done" }, "Values stay hidden. Iris sees names, never what is behind them."))),
+      snack ? h("div", { className: "snack" }, h(Snackbar, { text: snack, tone: "ok" })) : null,
+      h("div", { className: "ia-layer" },
+        it ? h(Sheet, { open: true, side: "end", title: it.t, sub: it.s, onClose: () => setOpen(null) }, h("div", { className: "sheet-body" },
+          h(Card, { padding: 4 },
+            it.u ? h(Row, { title: it.u, subtitle: "Name" }) : null,
+            h(Row, { title: "••••••••", subtitle: "Value", trailing: h(Button, { variant: "glass", size: "sm", onClick: () => setSnack("Copied after Touch ID. Clears in 30 seconds.") }, "Copy") }),
+            h(Row, { title: "Iris may use it", subtitle: "Touch ID each time", trailing: h(Toggle, { on: it.on, onChange: (v) => setIt({ on: v }) }) })),
+          h(Button, { variant: "danger", onClick: () => setConfirm(true) }, "Remove from the vault"))) : null,
+        it && confirm ? h(Dialog, { open: true, onClose: () => setConfirm(false), title: `Remove ${it.t}?`, body: "Iris can no longer use it, on any device. This cannot be undone.",
+          actions: [{ label: "Remove", danger: true, onClick: () => { setItems({ ...items, [group]: items[group].filter((_, i) => i !== open) }); setOpen(null); setSnack(`${it.t} is removed from the vault.`); } }, { label: "Keep it" }] }) : null,
+        open === "new" ? h(Sheet, { open: true, side: "end", title: `Add to ${group.toLowerCase()}`, sub: "It goes into your vault. Iris sees only the name.", onClose: () => setOpen(null) },
+          h("form", { className: "sheet-body", onSubmit: (e) => { e.preventDefault(); if (!draft.t.trim()) return;
+              setItems({ ...items, [group]: [...items[group], { t: draft.t.trim(), u: draft.u.trim(), s: "Added just now", on: false }] }); setOpen(null); setSnack(`${draft.t.trim()} is in the vault.`); } },
+            h(Field, { autoFocus: true, placeholder: "Name, for example shop.example.com", "aria-label": "Name", value: draft.t, onChange: (e) => setDraft({ ...draft, t: e.target.value }) }),
+            h(Field, { placeholder: "User or detail", "aria-label": "User", value: draft.u, onChange: (e) => setDraft({ ...draft, u: e.target.value }) }),
+            h(Button, { variant: "primary", size: "lg", disabled: !draft.t.trim() }, "Add"))) : null)));
+  }
+
+  const FOUND = Object.keys(ASKS).flatMap((k) => checkApp(phoneSpec(ASKS[k])).map((f) => `${k}: ${f.screen}: ${f.rule}`));
+  const Stage = ({ scene }) => scene.id === "pin" ? h(Pin, { mode: "enter" })
+    : scene.id === "choose" ? h(Pin, { mode: "choose" })
+    : scene.id === "vault" ? h(Vault)
+    : h(Ask, { id: scene.id });
 
   window.exampleScenes({
     title: "Vault",
     stage: Stage,
     scenes: [
       { id: "use", name: "Use one login",
-        ok: ["Phone and Mac ask at the same time. The first answer wins, the other closes.", "The same five lines on every device: who, from, why, what it does, how far", "A picture of the page she is on", "Names only, never a value, in the question"],
-        ask: ["'Always for this site': how long is always?"] },
+        ok: ["One device at a time: the switch shows the same question on each", "The same lines on every device: who, from, why, what it does, how far", "On the phone a real IrisApp: the question is a sheet over what Iris is doing", "The Mac: one primary on the right, Cancel next to it"],
+        ask: ["'Always for this site': how long is always?"].concat(FOUND) },
       { id: "names", name: "Only the names",
         ok: ["Says plainly that no value leaves the vault"], ask: ["Does reading names need Face ID at all?"] },
       { id: "store", name: "Save a new one",
-        ok: ["The extension asks, not Iris: 'who' says so"], ask: [] },
+        ok: ["The extension asks, not Iris: 'who' says so"] },
       { id: "blind", name: "Nobody said why",
-        ok: ["What nobody said shows as 'the asker did not say', in amber"],
+        ok: ["What nobody said reads 'the asker did not say'", "No 'Always' when there is no reason"],
         ask: ["No 'why': may she still ask, or does the vault refuse on its own?"] },
       { sep: "Unlock" },
       { id: "pin", name: "Unlock with PIN",
-        ok: ["Face ID or Touch ID first, the PIN only when they cannot", "Six digits open by themselves: no OK button", "A wrong PIN shakes once, short, and clears", "Who wants the vault and why stands under the PIN", "Open on the Mac means open in Chrome too"],
-        ask: [], note: "Type 123456 to open. Anything else shakes." },
+        ok: ["Face ID or Touch ID first, the PIN only when they cannot", "Six digits open by themselves: no OK button", "A wrong PIN shakes once and clears, in plain words, not red", "Forgot says how to get a new one"],
+        note: "Type 123456 to open. Anything else shakes." },
       { id: "choose", name: "Choose a PIN",
         ok: ["Twice, the title says which time", "Two that do not match start over, with one line why"],
-        ask: [], note: "Type any six digits, then the same six again." },
+        note: "Type any six digits, then the same six again." },
       { sep: "Vault" },
       { id: "vault", name: "The vault itself",
-        ok: ["Each item says when Iris last used it", "Values stay dots"],
-        ask: ["Where does the vault live on the phone: under You, or its own tab?"] },
+        ok: ["The house NavRail, search top right, Add as the one action", "Every item opens: copy after Touch ID, the toggle, remove last", "Remove is the only red, and asks first"],
+        ask: ["Where does the vault live on the phone: under You, or its own tab?", "The house Icon has no card, key or note: Cards use shield, codes phone, notes globe."] },
     ],
-    all: { label: "Whole vault", items: ["Real brands in the question (a bank, a shop) or always the site's own name?"] },
+    all: { label: "Whole vault", items: ["Real brands in the question (a bank, a shop) or always the site's own name?", "There is no Touch ID or Face ID glyph in the house Icon: the words say it."] },
   });
 })();
 </script>
