@@ -44,6 +44,7 @@ export type AppSpec = {
   start: string;
   tabs?: { label: string; icon: string; to: string }[];
   rail?: { label: string; icon: string; to: string }[]; // a window: a NavRail on the left instead of a tab bar
+  backdrop?: Part; // the app's theme as a quiet layer behind every screen (a lab ambience), never in front of content
   state?: Record<string, Any>;
   screens: Record<string, Screen>;
 };
@@ -233,14 +234,18 @@ function Page({ s, ctx, depth }: { s: Screen; ctx: Any; depth: number }) {
     : null;
   const top = s.top ? h(I.Button, { variant: "glass", size: "sm", icon: s.top.icon ? icon(s.top.icon, 14) : undefined, onClick: () => s.top!.on && ctx.run(s.top!.on) }, fill(s.top.label, ctx.state)) : null;
   const body = h(React.Fragment, null,
+    // One header everywhere: one level down the app bar holds only the way back (and its one action); the title stands
+    // large under it, as on the first screen, so every screen has the same hierarchy.
     depth > 0
-      ? h(I.AppBar, { title: s.bare ? "" : fill(s.title, ctx.state), leading: back, actions: top })
+      ? h(React.Fragment, null, h(I.AppBar, { title: "", leading: back, actions: top }),
+          s.bare ? null : h("header", { className: "ia-head ia-head-deep" },
+            s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
+            h("h1", { className: "ia-title" }, fill(s.title, ctx.state))))
       : h("header", { className: "ia-head" + (top ? " ia-head-top" : "") },
           top ? h("div", { className: "ia-top" }, top) : null,
           s.status ? h("div", { className: "ia-status" }, h(I.StatusPill, s.status)) : null,
           s.eyebrow ? h("p", { className: "ia-eyebrow" }, fill(s.eyebrow, ctx.state)) : null,
           h("h1", { className: "ia-title" }, fill(s.title, ctx.state))),
-    depth > 0 && s.eyebrow ? h("p", { className: "ia-eyebrow ia-sub" }, fill(s.eyebrow, ctx.state)) : null,
     s.lede ? h(Lede, { text: fill(s.lede, ctx.state), mark: s.mark }) : null,
     s.hero ? h("div", { className: "ia-hero" }, h(Part, { p: s.hero, ctx })) : null,
     h("div", { className: "ia-parts" }, (s.parts ?? []).map((p, i) => h(Part, { key: i, p, ctx }))),
@@ -335,9 +340,13 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
   const wide = !!spec.rail || frame === "window";
   const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
 
-  return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame },
+  // One accent per app: the app's topic colour becomes its accent, so the tab bar, chips, links and focus all speak it.
+  const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
+  const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2] } : undefined;
+  return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, style: tint },
     spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
       ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
+    spec.backdrop ? h("div", { className: "ia-backdrop", "aria-hidden": "true" }, h(Part, { p: spec.backdrop, ctx })) : null,
     h("main", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
       h("div", { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : "") },
         talking ? h(Talk, { s, ctx }) : h(Page, { s, ctx, depth: stack.length - 1 }))),
