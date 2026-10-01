@@ -169,7 +169,7 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       return h(I.SearchField, { ...props, value: val ?? "", onChange: (x: string) => set(b, x) });
     case "Field": // with add: "items", Enter puts the text on that list
       return h("form", { className: "ia-field", onSubmit: (e: Any) => { e.preventDefault(); const t = (val ?? "").trim(); if (!t) return;
-          if (p.add) set(p.add, [...(get(state, p.add) ?? []), t]); set(b, ""); } },
+          if (p.add) set(p.add, [...(get(state, p.add) ?? []), t]); set(b, ""); if (p.on) run(fill(p.on, { ...state, [b!]: t })); } },
         h(I.Field, { ...props, "aria-label": props.placeholder, value: val ?? "", onChange: (e: Any) => set(b, e.target.value) }));
     case "CheckList": {
       const items = props.items ?? [];
@@ -309,7 +309,7 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
       else if (verb === "toggle") setState((s) => ({ ...s, [arg]: !s[arg] }));
       else if (verb === "later") { const [ms, ...a] = arg.split(":"); const next = a.join(":").replace(/,/g, ";"); setTimeout(() => run(next), Number(ms) || 1000); }
       else if (verb === "inc") { const [k, max] = arg.split("/"); setState((s) => ({ ...s, [k]: Math.min(Number(max ?? Infinity), (Number(s[k]) || 0) + 1) })); }
-      else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : isNaN(+v) ? v : +v })); }
+      else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : v === "" || isNaN(+v) ? v : +v })); }
       else if (verb === "snack") setSnack(fill(arg, state));
       else if (verb === "talk") { const t = Object.keys(spec.screens).find((id) => spec.screens[id].kind === "talk"); if (t) { setLayer({}); setStack((s) => [...s, t]); } }
     }
