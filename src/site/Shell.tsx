@@ -34,6 +34,14 @@ function NavLink({ href, path, children, hint }: { href: string; path: string; c
   );
 }
 
+/**
+ * Light or dark: the system's choice unless the visitor picked one (localStorage "iris-mode"), set as data-mode on
+ * <html> before the first paint. The frames on the page are the same origin, so they hear the change through the
+ * storage event and follow (demos.ts and examples/nav.js carry the same lines).
+ */
+export const MODE_INIT = `(()=>{const d=document.documentElement,set=(m)=>{if(m==="light"||m==="dark")d.dataset.mode=m;else delete d.dataset.mode};try{set(localStorage.getItem("iris-mode"))}catch(e){}addEventListener("storage",(e)=>{if(e.key==="iris-mode")set(e.newValue)})})()`;
+const MODE_PICK = `(()=>{const d=document.documentElement,bs=[...document.querySelectorAll("[data-mode-set]")],show=()=>bs.forEach((b)=>b.setAttribute("aria-pressed",String((d.dataset.mode||"")===b.dataset.modeSet)));bs.forEach((b)=>b.addEventListener("click",()=>{const m=b.dataset.modeSet;try{m?localStorage.setItem("iris-mode",m):localStorage.removeItem("iris-mode")}catch(e){}if(m)d.dataset.mode=m;else delete d.dataset.mode;show()}));show()})()`;
+
 /** A chapter title can carry Markdown code ticks from the chapter's own heading; never show them as text. */
 const plain = (s: string) => s.replace(/`/g, "");
 
@@ -56,9 +64,11 @@ export function Shell({ title, description, path, headings = [], components, chi
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${CANONICAL}${path}`} />
-        <meta name="color-scheme" content="dark" />
+        <meta name="color-scheme" content="light dark" />
+        <script dangerouslySetInnerHTML={{ __html: MODE_INIT }} />
         <link rel="stylesheet" href="/site.css" />
         <link rel="stylesheet" href="/ds/tokens.css" />
+        <link rel="stylesheet" href="/ds/ext.css" />
         <link rel="icon" href="/favicon.svg" />
         <script type="module" src="/site.js"></script>
       </head>
@@ -104,6 +114,18 @@ export function Shell({ title, description, path, headings = [], components, chi
             <a className="ghost-link" href={SITE.repo} rel="noopener">
               GitHub
             </a>
+            <div className="mode" role="group" aria-label="Colour mode">
+              <button type="button" data-mode-set="" aria-pressed="true" title="Follow the system">
+                Auto
+              </button>
+              <button type="button" data-mode-set="light" aria-pressed="false">
+                Light
+              </button>
+              <button type="button" data-mode-set="dark" aria-pressed="false">
+                Dark
+              </button>
+            </div>
+            <script dangerouslySetInnerHTML={{ __html: MODE_PICK }} />
           </div>
         </header>
 

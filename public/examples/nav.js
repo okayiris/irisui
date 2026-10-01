@@ -1,3 +1,11 @@
+// Light or dark: the system's, unless the visitor picked one on the site (localStorage "iris-mode"; Shell.tsx).
+(() => {
+  const d = document.documentElement;
+  const set = (m) => (m === "light" || m === "dark" ? (d.dataset.mode = m) : delete d.dataset.mode);
+  try { set(localStorage.getItem("iris-mode")); } catch { /* no storage: follow the system */ }
+  addEventListener("storage", (e) => e.key === "iris-mode" && set(e.newValue));
+})();
+
 // The one bar on top of every example: the four places Iris lives, the same day of the same person on each.
 (() => {
   const here = document.body.dataset.platform;

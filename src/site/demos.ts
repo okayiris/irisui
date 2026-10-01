@@ -5,6 +5,7 @@
 import type { Component, Variant } from "./parse";
 import { rewriteBlobs } from "./blobs";
 import { BASE } from "./base";
+import { MODE_INIT } from "./Shell";
 
 const CSS = (ds: string) => `<link rel="stylesheet" href="${ds}/tokens.css">
 <link rel="stylesheet" href="${ds}/bundle.css">
@@ -48,7 +49,8 @@ const FIT = `<script>
 const shell = (ds: string, body: string) => `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light dark">
+<script>${MODE_INIT}</script>
 <title>Iris UI preview</title>
 ${CSS(ds)}
 </head><body>

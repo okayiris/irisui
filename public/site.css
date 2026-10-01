@@ -17,7 +17,6 @@
 }
 
 html {
-  color-scheme: dark;
   scroll-behavior: smooth;
   scroll-padding-top: 84px;
 }
@@ -57,21 +56,21 @@ pre {
 
 code {
   font-size: 0.88em;
-  background: rgba(180, 225, 255, 0.07);
+  background: light-dark(rgba(16, 48, 72, 0.07), rgba(180, 225, 255, 0.07));
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
   border-radius: 6px;
   padding: 1px 5px;
 }
 
 pre.code {
-  background: #0a0e13;
+  background: light-dark(#eef3f6, #0a0e13);
   border: 1px solid var(--line, #1b2430);
   border-radius: 12px;
   padding: 14px 16px;
   overflow: auto;
   font-size: 12.5px;
   line-height: 1.6;
-  color: #cfe6f2;
+  color: light-dark(#1b3342, #cfe6f2);
 }
 
 pre.code code {
@@ -108,7 +107,7 @@ pre.code code {
   gap: 16px;
   height: 60px;
   padding: 0 20px;
-  background: rgba(7, 9, 12, 0.86);
+  background: light-dark(rgba(244, 247, 249, 0.86), rgba(7, 9, 12, 0.86));
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line, #1b2430);
 }
@@ -163,6 +162,41 @@ pre.code code {
   color: var(--fg);
 }
 
+/* Light, dark, or what the system says: one small segmented control, stored per browser. */
+.mode {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line, #1b2430);
+  border-radius: 999px;
+}
+
+.mode button {
+  all: unset;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--dim, #8fa3b0);
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.mode button:hover {
+  color: var(--fg);
+}
+
+.mode button[aria-pressed="true"] {
+  background: var(--glass);
+  box-shadow: inset 0 0 0 1px var(--edge);
+  color: var(--fg);
+}
+
+.mode button:focus-visible {
+  outline: 2px solid var(--accent, #7dd3fc);
+  outline-offset: 2px;
+}
+
 .menu-btn {
   display: none;
   width: 34px;
@@ -193,7 +227,7 @@ pre.code code {
 .search input {
   width: 280px;
   height: 34px;
-  background: rgba(180, 225, 255, 0.05);
+  background: light-dark(rgba(16, 48, 72, 0.05), rgba(180, 225, 255, 0.05));
   border: 1px solid var(--line, #1b2430);
   border-radius: 999px;
   color: var(--fg);
@@ -204,13 +238,13 @@ pre.code code {
 }
 
 .search input:hover {
-  background: rgba(180, 225, 255, 0.08);
+  background: light-dark(rgba(16, 48, 72, 0.08), rgba(180, 225, 255, 0.08));
 }
 
 .search input:focus {
   outline: none;
   border-color: var(--accent, #7dd3fc);
-  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.16);
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.16));
 }
 
 .search kbd {
@@ -230,11 +264,11 @@ pre.code code {
   width: min(420px, 88vw);
   max-height: 60vh;
   overflow: auto;
-  background: #0b0f15;
+  background: light-dark(#ffffff, #0b0f15);
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
   border-radius: 14px;
   padding: 6px;
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 22px 60px light-dark(rgba(16, 40, 60, 0.18), rgba(0, 0, 0, 0.6));
 }
 
 .search-hit {
@@ -245,7 +279,7 @@ pre.code code {
 
 .search-hit:hover,
 .search-hit.is-active {
-  background: rgba(180, 225, 255, 0.08);
+  background: light-dark(rgba(16, 48, 72, 0.08), rgba(180, 225, 255, 0.08));
 }
 
 .search-hit b {
@@ -316,12 +350,12 @@ pre.code code {
 }
 
 .nav-link:hover {
-  background: rgba(180, 225, 255, 0.06);
+  background: light-dark(rgba(16, 48, 72, 0.06), rgba(180, 225, 255, 0.06));
   color: var(--fg);
 }
 
 .nav-link.is-here {
-  background: rgba(125, 211, 252, 0.1);
+  background: light-dark(rgba(3, 105, 161, 0.1), rgba(125, 211, 252, 0.1));
   color: var(--fg);
   box-shadow: inset 2px 0 0 var(--accent, #7dd3fc);
 }
@@ -479,12 +513,12 @@ hr {
 
 .btn-ghost {
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
-  background: var(--glass, rgba(180, 225, 255, 0.07));
+  background: var(--glass, light-dark(rgba(16, 48, 72, 0.07), rgba(180, 225, 255, 0.07)));
   color: var(--fg);
 }
 
 .btn-ghost:hover {
-  background: rgba(180, 225, 255, 0.13);
+  background: light-dark(rgba(16, 48, 72, 0.13), rgba(180, 225, 255, 0.13));
   color: var(--fg);
 }
 
@@ -515,14 +549,14 @@ input:focus-visible {
   display: block;
   padding: 16px 18px;
   border-radius: 18px;
-  background: var(--glass, rgba(180, 225, 255, 0.07));
+  background: var(--glass, light-dark(rgba(16, 48, 72, 0.07), rgba(180, 225, 255, 0.07)));
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
   transition: transform var(--fast) var(--ease), border-color var(--fast) var(--ease);
 }
 
 .card:hover {
   transform: translateY(-2px);
-  border-color: rgba(125, 211, 252, 0.4);
+  border-color: light-dark(rgba(3, 105, 161, 0.4), rgba(125, 211, 252, 0.4));
   color: inherit;
 }
 
@@ -543,7 +577,7 @@ input:focus-visible {
   border: 1px solid var(--line, #1b2430);
   border-radius: 14px;
   padding: 12px 14px;
-  background: rgba(180, 225, 255, 0.03);
+  background: light-dark(rgba(16, 48, 72, 0.03), rgba(180, 225, 255, 0.03));
 }
 
 .rule p {
@@ -593,7 +627,7 @@ input:focus-visible {
   padding: 12px 14px;
   font-size: 14px;
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
-  background: rgba(180, 225, 255, 0.05);
+  background: light-dark(rgba(16, 48, 72, 0.05), rgba(180, 225, 255, 0.05));
 }
 
 .note-tag {
@@ -602,7 +636,7 @@ input:focus-visible {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent, #7dd3fc);
-  border: 1px solid rgba(125, 211, 252, 0.4);
+  border: 1px solid light-dark(rgba(3, 105, 161, 0.4), rgba(125, 211, 252, 0.4));
   border-radius: 6px;
   padding: 2px 7px;
   margin-top: 2px;
@@ -646,7 +680,7 @@ th {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--dim, #8fa3b0);
-  background: rgba(180, 225, 255, 0.04);
+  background: light-dark(rgba(16, 48, 72, 0.04), rgba(180, 225, 255, 0.04));
   white-space: nowrap;
 }
 
@@ -680,7 +714,7 @@ td code {
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
   border-radius: 18px;
   overflow: hidden;
-  background: #05070a;
+  background: light-dark(#eef2f5, #05070a);
 }
 
 .demo figcaption {
@@ -690,7 +724,7 @@ td code {
   gap: 12px;
   padding: 9px 14px;
   border-bottom: 1px solid var(--line, #1b2430);
-  background: rgba(180, 225, 255, 0.04);
+  background: light-dark(rgba(16, 48, 72, 0.04), rgba(180, 225, 255, 0.04));
 }
 
 .demo-label {
@@ -716,7 +750,7 @@ td code {
 .demo-code-btn:hover,
 .demo-code-btn[aria-pressed="true"] {
   color: var(--accent, #7dd3fc);
-  border-color: rgba(125, 211, 252, 0.5);
+  border-color: light-dark(rgba(3, 105, 161, 0.5), rgba(125, 211, 252, 0.5));
 }
 
 .demo-frame {
@@ -755,7 +789,7 @@ td code {
 
 .prose p,
 .prose li {
-  color: #cfdbe3;
+  color: light-dark(#26343d, #cfdbe3);
 }
 
 .prose strong {
@@ -778,7 +812,7 @@ td code {
   padding: 10px 12px;
   border: 1px solid var(--line, #1b2430);
   border-radius: 12px;
-  background: rgba(180, 225, 255, 0.03);
+  background: light-dark(rgba(16, 48, 72, 0.03), rgba(180, 225, 255, 0.03));
 }
 
 .swatch-chip {
@@ -819,7 +853,7 @@ td code {
   padding: 5px 12px;
   border-radius: 999px;
   border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
-  background: var(--glass, rgba(180, 225, 255, 0.07));
+  background: var(--glass, light-dark(rgba(16, 48, 72, 0.07), rgba(180, 225, 255, 0.07)));
   font-size: 13px;
 }
 
@@ -886,7 +920,7 @@ td code {
     position: fixed;
     inset: 60px 0 0 0;
     max-height: none;
-    background: #080b0f;
+    background: light-dark(#eff3f6, #080b0f);
     padding: 16px 20px 60px;
     z-index: 25;
   }
@@ -904,6 +938,27 @@ td code {
   }
 }
 
+@media (max-width: 640px) {
+  .chip-version,
+  .search kbd {
+    display: none;
+  }
+  .top-left,
+  .top-right {
+    gap: 8px;
+  }
+  .logo-word {
+    white-space: nowrap;
+  }
+  .search input {
+    width: 96px;
+  }
+  .mode button {
+    padding: 6px 6px;
+    font-size: 11px;
+  }
+}
+
 /* ---- what a part looks like: the menu peek and the gallery ------------------ */
 /* A demo frame drawn at 640 wide, shown at half: a picture, not a page to use. */
 .peek {
@@ -914,7 +969,7 @@ td code {
   background: var(--bg, #07090c);
   border: 1px solid var(--edge);
   border-radius: 14px;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 18px 48px light-dark(rgba(16, 40, 60, 0.18), rgba(0, 0, 0, 0.6));
   pointer-events: none;
 }
 /* Drawn at 640 x 480; site.js zooms it onto what the demo draws. */
