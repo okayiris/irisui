@@ -2110,7 +2110,8 @@
   outline-offset: 3px;
 }
 /* A Word fills its line: in the centred hero it would otherwise shrink to nothing. */
-.ia-hero > .iris-word {
+.ia-hero > .iris-word,
+.ia-hero > .ix-word {
   width: 100%;
 }
 .ia-hero > .ia-grid {
@@ -2346,6 +2347,10 @@
 .ix-word .iris-word {
   border-radius: 0;
   overflow: visible;
+}
+/* The wrapper is as wide as the Word would have been: in a centring grid it would otherwise shrink to nothing. */
+.ix-word {
+  width: 100%;
 }
 
 /* ---------- MacPill ---------- */
