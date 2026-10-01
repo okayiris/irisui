@@ -314,6 +314,7 @@
     const [snack, setSnack] = useState(null);
     const [dir, setDir] = useState("");
     const scroller = useRef(null);
+    const [drag, setDrag] = useState(0);
     useEffect(() => {
       setStack(first);
       setLayer(layers());
@@ -379,6 +380,51 @@
       }
     };
     const ctx = { state, set, run, topic: spec.topic };
+    const findTabs = (ps = []) => {
+      for (const p of ps) {
+        if ((p.c === "Tabs" || p.c === "Segmented") && p.bind) return p;
+        const q = findTabs(p.parts);
+        if (q) return q;
+      }
+      return null;
+    };
+    const swipe = useRef(null);
+    const onDown = (e) => {
+      if (e.target.closest?.(".ia-rail, .ia-pages-track, .ix-carousel-track, input, textarea, select, .ix-sheet")) return;
+      swipe.current = { x: e.clientX, y: e.clientY, on: false, w: e.currentTarget.clientWidth || 390 };
+    };
+    const onMove = (e) => {
+      const sw = swipe.current;
+      if (!sw) return;
+      const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+      if (!sw.on && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.5) sw.on = true;
+      if (sw.on) setDrag(Math.max(-1, Math.min(1, -dx / sw.w)));
+    };
+    const onUp = (e) => {
+      const sw = swipe.current;
+      swipe.current = null;
+      if (!sw?.on) return;
+      const dx = e.clientX - sw.x, dir2 = dx < -60 ? 1 : dx > 60 ? -1 : 0;
+      setDrag(0);
+      if (!dir2) return;
+      const sc = spec.screens[stack[stack.length - 1]];
+      const own = findTabs([...sc.hero ? [sc.hero] : [], ...sc.parts ?? []]);
+      if (own) {
+        const n = (own.items ?? []).length, cur = Number(state[own.bind]) || 0;
+        set(own.bind, Math.max(0, Math.min(n - 1, cur + dir2)));
+        return;
+      }
+      const tabs = spec.tabs ?? spec.rail;
+      if (tabs && stack.length === 1) {
+        const i = tabs.findIndex((t) => t.to === stack[0]);
+        const j = i + dir2;
+        if (i >= 0 && j >= 0 && j < tabs.length) {
+          setDir(dir2 > 0 ? "in" : "out");
+          setStack([tabs[j].to]);
+          setLayer({});
+        }
+      }
+    };
     const id = stack[stack.length - 1], s = spec.screens[id];
     const talking = s.kind === "talk";
     const tabOf = (sid) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
@@ -395,10 +441,22 @@
       spec.backdrop ? h2("div", { className: "ia-backdrop", "aria-hidden": "true" }, h2(Part, { p: spec.backdrop, ctx })) : null,
       h2(
         "main",
-        { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title },
+        {
+          ref: scroller,
+          className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""),
+          "aria-label": s.title,
+          onPointerDown: onDown,
+          onPointerMove: onMove,
+          onPointerUp: onUp,
+          onPointerCancel: () => {
+            swipe.current = null;
+            setDrag(0);
+          },
+          style: drag ? { touchAction: "pan-y" } : { touchAction: "pan-y" }
+        },
         h2(
           "div",
-          { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : "") },
+          { key: id + stack.length, className: "ia-screen" + (dir ? " ia-" + dir : ""), style: drag ? { transform: `translateX(${-drag * 40}px)`, opacity: 1 - Math.abs(drag) * 0.25 } : void 0 },
           talking ? h2(Talk, { s, ctx }) : h2(Page, { s, ctx, depth: stack.length - 1 })
         )
       ),
@@ -406,6 +464,7 @@
         tabs: spec.tabs.map((t) => t.label),
         icons: spec.tabs.map((t) => t.icon),
         active: activeTab,
+        progress: stack.length === 1 && !findTabs(s.parts) ? drag : 0,
         talk: "rest",
         onSelect: (i) => run(`tab:${i}`),
         onTalk: () => run("talk")
@@ -2082,6 +2141,7 @@
     heartbeat: ["#F43F5E", "#FDA4AF"],
     aurora: ["#22D3EE", "#34D399", "#A78BFA"]
   };
+  var edgeColors = (pattern) => (EDGE_COLORS[pattern] ?? EDGE_COLORS.comet).map((c) => c === "#ffffff" && isLight() ? "#0369a1" : c);
   var THINKING = ["comet", "zip", "orbit", "sparks", "flow", "party"];
   var hexRgb = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
   var mixColor = (cs, t) => {
@@ -2220,7 +2280,7 @@
       const ctx = c.getContext("2d");
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, pad * dpr, pad * dpr);
-      const P = edgePath(shape, width, ht, radius, stroke, path), cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
+      const P = edgePath(shape, width, ht, radius, stroke, path), cols = colors?.length ? colors : edgeColors(pattern);
       const still = matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now();
       let raf = 0, seen = true;
       const frame = (ms) => {
@@ -2250,7 +2310,7 @@
       const b = ref.current?.getBBox();
       if (b) setBox([b.x - 8, b.y - 8, b.width + 16, b.height + 16]);
     }, [text, size, weight]);
-    const cols = colors?.length ? colors : EDGE_COLORS[pattern] ?? EDGE_COLORS.comet;
+    const cols = colors?.length ? colors : edgeColors(pattern);
     const t = { x: 0, y: size, fontSize: size, fontWeight: weight, style: { fontFamily: "var(--font-display)" } };
     const dur = `${1.3 / speed}s`;
     return h3(
@@ -2472,6 +2532,58 @@
     const topics = window.IrisUi?.design?.TOPIC;
     if (topics) {
       for (const [name, colours] of Object.entries(TOPIC_FIX)) if (topics[name]) topics[name].splice(0, 3, ...colours);
+    }
+  }
+  var TOPIC_LIGHT = {
+    groceries: ["#15803d", "#0369a1", "#eef9f2"],
+    agenda: ["#0369a1", "#334155", "#eaf4fa"],
+    mail: ["#475569", "#556274", "#f3f5f8"],
+    parcel: ["#a14a07", "#92600a", "#fdf6ea"],
+    weather: ["#075985", "#334155", "#e9f2f9"],
+    tasks: ["#0f766e", "#115e59", "#e8f7f5"],
+    sport: ["#b93c0b", "#9a3412", "#fdf1ea"],
+    money: ["#047857", "#166534", "#ecf8f2"],
+    travel: ["#0e7490", "#0369a1", "#ebf7f9"],
+    health: ["#0e7490", "#0369a1", "#ebf7f9"],
+    home: ["#8a5a1c", "#8a5a0a", "#faf4ea"],
+    music: ["#6d28d9", "#7c3aed", "#f3effc"],
+    loop: ["#0369a1", "#166534", "#eaf4fa"],
+    explain: ["#65651a", "#4d4d12", "#f8f7e4"],
+    party: ["#a83d62", "#9d3a5c", "#fdf0f4"]
+  };
+  var PHASE_LIGHT = ["#6d28d9", "#0369a1", "#0f766e", "#a21caf", "#b45309", "#15803d"];
+  var isLight = () => typeof document !== "undefined" && getComputedStyle(document.documentElement).colorScheme === "light";
+  {
+    const design = window.IrisUi?.design;
+    const topics = design?.TOPIC, phases = design?.PHASE_COLOURS;
+    if (topics) {
+      const dark = {};
+      for (const name of Object.keys(TOPIC_LIGHT)) if (topics[name]) dark[name] = topics[name].slice(0, 3);
+      const darkPhases = phases ? phases.slice() : [];
+      let now = false;
+      const apply = () => {
+        const light = isLight();
+        if (light === now) return;
+        now = light;
+        const from = light ? dark : TOPIC_LIGHT, to = light ? TOPIC_LIGHT : dark;
+        const phaseFrom = light ? darkPhases : PHASE_LIGHT, phaseTo = light ? PHASE_LIGHT : darkPhases;
+        for (const name of Object.keys(dark)) topics[name].splice(0, 3, ...to[name]);
+        if (phases) phases.splice(0, darkPhases.length, ...phaseTo);
+        for (const el of Array.from(document.querySelectorAll('[style*="--k"], [style*="--phase"]'))) {
+          const s = el.style, k = s.getPropertyValue("--k").trim(), kd = s.getPropertyValue("--kd").trim();
+          const name = k && Object.keys(dark).find((n) => from[n][0] === k && from[n][2] === kd);
+          if (name) {
+            ["--k", "--k2", "--kd"].forEach((p, i2) => s.setProperty(p, to[name][i2]));
+            const button = s.getPropertyValue("--k-button");
+            if (button) s.setProperty("--k-button", button.replace(k, to[name][0]));
+          }
+          const i = phaseFrom.indexOf(s.getPropertyValue("--phase").trim());
+          if (i >= 0) s.setProperty("--phase", phaseTo[i]);
+        }
+      };
+      apply();
+      matchMedia("(prefers-color-scheme: light)").addEventListener("change", apply);
+      new MutationObserver(apply).observe(document.documentElement, { attributes: true, attributeFilter: ["data-mode"] });
     }
   }
   var BaseWord = window.IrisUi?.Word;

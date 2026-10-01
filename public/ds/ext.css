@@ -1,10 +1,12 @@
 /* Additions to the design system: the parts and values Iris was missing beyond the core.
  *
- * Same house as the rest: near-black, glass, one accent, quiet type, everything answers the hand. Every value
- * here is a token; where a token did not exist yet, it is defined in the "values the system did not have"
- * block below and is meant to move into tokens.css when this ships into the artifact.
+ * Same house as the rest: a calm ground (near-black in dark, soft near-white in light), glass, one accent, quiet
+ * type, everything answers the hand. Every value here is a token; where a token did not exist yet, it is defined in
+ * the "values the system did not have" block below and is meant to move into tokens.css when this ships into the
+ * artifact.
  *
- * Nothing in this file overrides bundle.css: it only adds. */
+ * This file adds to bundle.css. The one place it restates release rules is the light block at the end: parts the
+ * release painted with fixed dark values get a light half there. */
 
 /* ---------- values the system did not have ---------- */
 
@@ -58,6 +60,76 @@
     --motion-base: 0.001s;
     --motion-slow: 0.001s;
   }
+}
+
+/* ---------- light ----------
+ * Iris has a light and a dark mode. She follows the system (prefers-color-scheme); data-mode="light" or "dark" on
+ * <html> overrides it. Dark is the release's own values; light is the same house on a soft near-white: glass is
+ * white, the edge is ink, one accent (ice blue darkened to 5.5:1), violet only for on and her ring, red only
+ * destructive. The two selectors below are the only place the switch is made: the token block is repeated once
+ * for each, and `color-scheme` follows, so the parts' own light-dark() values (at the end of this file) and the
+ * browser's scrollbars and form controls go with it. */
+
+:root {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) {
+    color-scheme: light;
+    --bg: #f4f7f9;
+    --fg: #0d1a22;
+    --dim: #4a5c68;
+    --faint: #8696a1;
+    --label: #4a5c68;
+    --line: #dde4ea;
+    --accent: #0369a1;
+    --accent-ink: #ffffff;
+    --violet: #6d28d9;
+    --violet-light: #7c3aed;
+    --error: #b91c1c;
+    --ok: #15803d;
+    --wait: #a16207;
+    --glass: rgba(255, 255, 255, 0.78);
+    --edge: rgba(16, 48, 72, 0.13);
+    --state-hover: rgba(3, 105, 161, 0.06);
+    --state-press: rgba(3, 105, 161, 0.11);
+    --state-selected: rgba(3, 105, 161, 0.1);
+    --elev-1: inset 0 0 0 1px var(--edge), 0 1px 2px rgba(16, 40, 60, 0.06);
+    --elev-2: inset 0 0 0 1px var(--edge), 0 12px 32px rgba(16, 40, 60, 0.16);
+    --sheet-bg: rgba(250, 252, 253, 0.95);
+    --scrim: rgba(20, 32, 44, 0.32);
+    --bubble-disc: #e6edf2;
+    --phase-you: #a21caf;
+  }
+}
+
+:root[data-mode="light"] {
+  color-scheme: light;
+  --bg: #f4f7f9;
+  --fg: #0d1a22;
+  --dim: #4a5c68;
+  --faint: #8696a1;
+  --label: #4a5c68;
+  --line: #dde4ea;
+  --accent: #0369a1;
+  --accent-ink: #ffffff;
+  --violet: #6d28d9;
+  --violet-light: #7c3aed;
+  --error: #b91c1c;
+  --ok: #15803d;
+  --wait: #a16207;
+  --glass: rgba(255, 255, 255, 0.78);
+  --edge: rgba(16, 48, 72, 0.13);
+  --state-hover: rgba(3, 105, 161, 0.06);
+  --state-press: rgba(3, 105, 161, 0.11);
+  --state-selected: rgba(3, 105, 161, 0.1);
+  --elev-1: inset 0 0 0 1px var(--edge), 0 1px 2px rgba(16, 40, 60, 0.06);
+  --elev-2: inset 0 0 0 1px var(--edge), 0 12px 32px rgba(16, 40, 60, 0.16);
+  --sheet-bg: rgba(250, 252, 253, 0.95);
+  --scrim: rgba(20, 32, 44, 0.32);
+  --bubble-disc: #e6edf2;
+  --phase-you: #a21caf;
 }
 
 /* ---------- a shared press/hover answer ---------- */
@@ -423,7 +495,7 @@
 
 .ix-badge[data-tone="error"] {
   background: var(--error);
-  color: #21090a;
+  color: light-dark(#ffffff, #21090a);
 }
 
 .ix-badge[data-dot="1"] {
@@ -556,7 +628,7 @@
 .ix-select:focus {
   outline: none;
   border-color: var(--k, var(--accent));
-  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.14);
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.14));
 }
 
 .ix-select {
@@ -589,7 +661,7 @@
 
 .ix-search[data-focus="1"] {
   border-color: var(--k, var(--accent));
-  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.14);
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.14));
 }
 
 .ix-search input {
@@ -727,7 +799,7 @@
 .ix-step[data-state="now"] .ix-step-dot {
   border-color: var(--k, var(--accent));
   color: var(--fg);
-  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.14);
+  box-shadow: 0 0 0 3px light-dark(rgba(3, 105, 161, 0.16), rgba(125, 211, 252, 0.14));
 }
 
 .ix-step-label {
@@ -940,7 +1012,7 @@
 .ix-toolbar-btn[data-active="1"] {
   background: var(--state-selected);
   color: var(--fg);
-  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.45);
+  box-shadow: inset 0 0 0 1px light-dark(rgba(3, 105, 161, 0.45), rgba(125, 211, 252, 0.45));
 }
 
 .ix-toolbar-btn[data-danger="1"] {
@@ -1133,7 +1205,7 @@
 /* ---------- AppBar ---------- */
 
 .ix-appbar {
-  background: rgba(7, 9, 12, 0.82);
+  background: light-dark(rgba(244, 247, 249, 0.82), rgba(7, 9, 12, 0.82));
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
   padding: 8px 12px 10px;
@@ -1833,7 +1905,7 @@
    size in 64px steps, so the dashes keep their look at any size. */
 .ix-edgetext { display: block; overflow: visible; }
 .ix-edgetext text { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.ix-edgetext-tube { stroke: rgba(190, 230, 255, .14); stroke-width: calc(var(--u) * 1.5); }
+.ix-edgetext-tube { stroke: light-dark(rgba(16, 48, 72, .14), rgba(190, 230, 255, .14)); stroke-width: calc(var(--u) * 1.5); }
 .ix-edgetext-light { stroke-width: calc(var(--u) * 2.5); animation: ix-edgetext-run 1.3s linear infinite; }
 .ix-edgetext-comet .ix-edgetext-light { stroke-dasharray: calc(var(--u) * 40) calc(var(--u) * 160); }
 .ix-edgetext-sparks .ix-edgetext-light { stroke-dasharray: 0 calc(var(--u) * 14); stroke-width: calc(var(--u) * 4); animation-name: ix-edgetext-drift, ix-edgetext-twinkle; }
@@ -1868,7 +1940,7 @@
   box-shadow: inset 0 1px 0 var(--line);
 }
 .iris-card > .iris-row.iris-press:hover {
-  background: rgba(180, 225, 255, 0.04);
+  background: light-dark(rgba(3, 105, 161, 0.04), rgba(180, 225, 255, 0.04));
 }
 
 /* LoopScreen shipped as a 300px phone of its own. On a screen it is the screen: full width, no second frame. */
@@ -2751,3 +2823,101 @@ textarea.ix-textarea {
   color: var(--fg);
   background: linear-gradient(transparent, rgba(7, 9, 12, 0.85));
 }
+
+/* ---------- light: the release's own fixed colours ----------
+ * bundle.css draws some parts with fixed dark values instead of tokens. Each is restated here with light-dark(light,
+ * dark): the dark half is the release's value unchanged, the light half follows `color-scheme` (set at the top).
+ * Goes upstream into the release as tokens. */
+
+.iris-row-icon { color: light-dark(rgba(13, 26, 34, .72), rgba(232, 242, 247, .8)); }
+.iris-toggle { background: light-dark(rgba(90, 106, 120, .3), rgba(120, 130, 145, .45)); }
+.iris-toggle i { box-shadow: 0 2px 6px light-dark(rgba(16, 40, 60, .22), rgba(0, 0, 0, .3)); }
+
+/* Primary: light ink on a dark fill in light, as it is dark ink on a light fill in dark. A topic's button keeps its
+   hue, taken down to a lightness that carries white text (7:1). */
+.iris-btn-primary {
+  background: light-dark(oklch(from var(--k-button, var(--fg)) min(l, .45) c h), var(--k-button, #e9f1f5));
+  color: light-dark(#ffffff, #07090c);
+}
+.iris-btn-primary[aria-busy="true"] {
+  background: light-dark(color-mix(in srgb, oklch(from var(--k-button, var(--fg)) min(l, .45) c h) 70%, #ffffff),
+    color-mix(in srgb, var(--k-button, #e9f1f5) 70%, #0e1218));
+}
+.iris-btn-accent {
+  background: light-dark(rgba(3, 105, 161, .12), rgba(125, 211, 252, .28));
+  border-color: light-dark(rgba(3, 105, 161, .45), rgba(125, 211, 252, .55));
+  box-shadow: 0 0 14px light-dark(rgba(3, 105, 161, .12), rgba(125, 211, 252, .25));
+}
+:is(.iris-topic, .iris-btngroup) .iris-btn-glass {
+  background: color-mix(in srgb, var(--k, var(--accent)) 8%, light-dark(#ffffff, #12161d));
+  box-shadow: inset 0 0 0 1px light-dark(rgba(16, 48, 72, .13), rgba(255, 255, 255, .08));
+}
+:is(.iris-topic, .iris-btngroup) .iris-btn-glass:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#ffffff, #12161d));
+}
+.iris-btn-icon-only { background: light-dark(rgba(16, 48, 72, .07), #1a2029); }
+:is(.iris-topic, .iris-btngroup) .iris-btn-off:disabled { background: light-dark(#e4eaee, #151a21); color: light-dark(#6b7a85, #56606d); }
+
+.iris-orb .echo { border-color: light-dark(rgba(3, 105, 161, .5), rgba(125, 211, 252, .55)); }
+.iris-tabbar-glass { background: light-dark(rgba(255, 255, 255, .78), rgba(20, 26, 34, .72)); box-shadow: inset 0 0 0 1px light-dark(var(--edge), transparent); }
+.iris-tab.on .iris-tab-icon { filter: drop-shadow(0 0 9px light-dark(rgba(3, 105, 161, .3), rgba(125, 211, 252, .75))); }
+
+/* Her talk orb: the disc is the page's ground, lit violet at the centre, in both modes. */
+.iris-talkorb-disc {
+  background: radial-gradient(circle, rgba(139, 92, 246, .16) 0%, light-dark(rgba(255, 255, 255, .96), rgba(17, 21, 27, .96)) 62%);
+  box-shadow: inset 0 0 0 1px light-dark(rgba(16, 48, 72, .12), rgba(190, 230, 255, .12)), 0 0 calc(var(--s) * .3) rgba(139, 92, 246, .2);
+}
+.iris-talkorb-away .iris-talkorb-disc { box-shadow: inset 0 0 0 1px light-dark(rgba(16, 48, 72, .12), rgba(190, 230, 255, .12)); }
+.iris-talkorb-muted-mic { color: light-dark(rgba(13, 26, 34, .85), rgba(232, 242, 247, .9)); }
+.iris-talkorb-echo, .iris-orb3d-echo {
+  border-color: light-dark(rgba(3, 105, 161, .55), rgba(125, 211, 252, .7));
+  box-shadow: 0 0 4px light-dark(rgba(3, 105, 161, .25), rgba(125, 211, 252, .4));
+}
+
+.iris-skeleton {
+  background: linear-gradient(100deg, light-dark(rgba(16, 48, 72, .05), rgba(255, 255, 255, .05)) 30%,
+      light-dark(rgba(16, 48, 72, .1), rgba(255, 255, 255, .13)) 50%, light-dark(rgba(16, 48, 72, .05), rgba(255, 255, 255, .05)) 70%)
+    0 0 / 300% 100%;
+}
+
+/* Widget and pattern: the ground is the topic's --kd (light in light, see TOPIC_LIGHT in ext.tsx), lifted to white. */
+.iris-widget {
+  --iris-track: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#e3e9ee, #1a2027));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--kd, light-dark(#eaf4fa, #08183a)) 70%, light-dark(#ffffff, #0c0f14)), light-dark(#fbfcfd, #090b0f));
+  border-color: color-mix(in srgb, var(--k, var(--accent)) light-dark(22%, 16%), light-dark(#dde4ea, #1a2027));
+}
+.iris-look-pattern, .iris-pattern { background: var(--kd, light-dark(#eaf4fa, #08183a)); }
+.iris-pattern { border-color: color-mix(in srgb, var(--k, var(--accent)) 16%, light-dark(#dde4ea, #1a2027)); }
+.iris-wpanel, .iris-pattern-panel { background: color-mix(in srgb, var(--kd, light-dark(#eaf4fa, #08183a)) 72%, transparent); }
+.iris-wvalue {
+  background: linear-gradient(180deg, light-dark(var(--k, var(--accent)), color-mix(in srgb, var(--k, var(--accent)) 45%, white)),
+    light-dark(color-mix(in srgb, var(--k, var(--accent)) 75%, black), var(--k, var(--accent))));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.iris-rows li { border-top-color: light-dark(var(--line), #1a212b); }
+.iris-rows.tick li::before, .iris-check .box { border-color: light-dark(#7b8a95, #4a5361); }
+.iris-pen-spot::before { box-shadow: 0 0 0 9999px light-dark(rgba(244, 247, 249, .78), rgba(7, 9, 12, .72)); }
+.iris-dot i { background: color-mix(in srgb, var(--k, light-dark(#8696a1, #5a6b78)) 30%, light-dark(#d5dde3, #2a313b)); }
+.iris-chip.on { color: var(--kd, light-dark(#ffffff, #07171f)); }
+.iris-bar { background: color-mix(in srgb, var(--k, var(--accent)) 18%, light-dark(#e3e9ee, #0b0f0d)); }
+.iris-phase-label.now { color: light-dark(var(--fg), #fff); }
+.iris-gradient { background: linear-gradient(180deg, light-dark(var(--fg), #e8f2f7), var(--phase, var(--accent))); -webkit-background-clip: text; background-clip: text; }
+.iris-loop { border-color: light-dark(var(--line), #1f2630); }
+.iris-nowcard { background: linear-gradient(160deg, light-dark(#ffffff, #111a24), light-dark(#eef3f6, #0a0e14)); border-color: light-dark(var(--line), #1f2b36); }
+.iris-nowcard-text { color: light-dark(var(--dim), #c3cbd6); }
+.iris-nowcard-dots i { background: light-dark(#d5dde3, #243040); }
+
+/* Lettering drawn on a canvas (Word, ThemeWord): the release lightens it to read on a dark ground. On a light page
+   the drawing is turned over, lightness inverted and the hue put back, so the same letters read dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) .ix-word canvas { filter: invert(1) hue-rotate(180deg); }
+}
+:root[data-mode="light"] .ix-word canvas { filter: invert(1) hue-rotate(180deg); }
+
+/* The tick in a done Check is drawn in the page's ink on the topic colour; light topics are dark, so it turns white. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-mode="dark"]) .iris-check .done .box { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+}
+:root[data-mode="light"] .iris-check .done .box { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.2l2.6 2.6L12 5.4' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
