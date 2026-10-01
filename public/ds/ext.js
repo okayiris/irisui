@@ -134,7 +134,7 @@
         return h2("div", { className: "ia-stack" }, kids);
       case "Row": {
         let trailing = props.trailing;
-        if (b) trailing = h2(I.Toggle, { on: !!val, onChange: (x) => set(b, x) });
+        if (b) trailing = h2(I.Toggle, { on: !!val });
         else if (props.value != null) trailing = h2("span", { className: "ia-value" + (props.pill ? " ia-pill" : "") + (/await|missing|overdue|sign|waits|late|draft|pending|review/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
         const ic = p.icon && typeof p.icon === "object" ? h2(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : void 0;
         return h2(I.Row, {
