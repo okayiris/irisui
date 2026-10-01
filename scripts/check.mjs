@@ -367,6 +367,88 @@ const toggled = await page.evaluate(() => {
 });
 if (toggled !== "shown") failures.push(`code toggle: ${toggled}`);
 
+// The added parts answer the keyboard: a modal takes focus, keeps Tab inside, closes on Escape and gives focus
+// back; tabs move focus with the selection; a tooltip describes the control it sits on and closes on Escape.
+const kbd = (name, msg) => failures.push(`keyboard, ${name}: ${msg}`);
+const inside = (sel) => page.evaluate((s) => !!document.activeElement?.closest(s), sel);
+
+for (const [part, sel] of [["dialog", ".ix-dialog"], ["sheet", ".ix-sheet"]]) {
+  await page.goto(`${BASE}/demos/${part}/0.html`, { waitUntil: "load" });
+  await page.waitForTimeout(300);
+  const named = await page.evaluate((s) => {
+    const d = document.querySelector(s);
+    const by = d?.getAttribute("aria-labelledby");
+    return (by && document.getElementById(by)?.textContent?.trim()) || d?.getAttribute("aria-label") || "";
+  }, sel);
+  if (!named) kbd(part, "the panel has no name");
+  if (!(await inside(sel))) kbd(part, "focus did not move into the panel when it opened");
+  for (let i = 0; i < 6; i++) await page.keyboard.press(i % 2 ? "Shift+Tab" : "Tab");
+  for (let i = 0; i < 6; i++) await page.keyboard.press("Tab");
+  if (!(await inside(sel))) kbd(part, "Tab left the panel");
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+  if (await page.evaluate((s) => !!document.querySelector(s), sel)) kbd(part, "Escape did not close it");
+}
+
+// Focus goes back to what opened the modal.
+await page.goto(`${BASE}/demos/dialog/1.html`, { waitUntil: "load" });
+await page.waitForTimeout(300);
+await page.keyboard.press("Escape");
+await page.evaluate(() => {
+  const R = window.React;
+  const host = document.createElement("div");
+  document.body.append(host);
+  function Opener() {
+    const [open, setOpen] = R.useState(false);
+    return R.createElement("div", null,
+      R.createElement("button", { id: "kbd-opener", onClick: () => setOpen(true) }, "Open"),
+      R.createElement(window.IrisUi.Dialog, { open, onClose: () => setOpen(false), title: "Check", actions: [{ label: "Done" }] }));
+  }
+  window.ReactDOM.createRoot(host).render(R.createElement(Opener));
+});
+await page.waitForTimeout(200);
+await page.focus("#kbd-opener");
+await page.keyboard.press("Enter");
+await page.waitForTimeout(200);
+await page.keyboard.press("Escape");
+await page.waitForTimeout(200);
+if ((await page.evaluate(() => document.activeElement?.id)) !== "kbd-opener") kbd("dialog", "focus did not go back to the opener");
+
+// A modal that is open when its frame loads does not take the focus away from the page.
+await page.goto(`${BASE}/components/dialog`, { waitUntil: "load" });
+await page.evaluate(() => document.querySelectorAll("iframe").forEach((f) => f.scrollIntoView()));
+await page.waitForTimeout(800);
+if ((await page.evaluate(() => document.activeElement?.tagName)) === "IFRAME") kbd("dialog", "a frame took the page's focus");
+
+await page.goto(`${BASE}/demos/tabs/0.html`, { waitUntil: "load" });
+await page.waitForTimeout(300);
+await page.focus('[role="tab"][aria-selected="true"]');
+for (const [key, want] of [["ArrowRight", 1], ["End", -1], ["Home", 0]]) {
+  await page.keyboard.press(key);
+  const at = await page.evaluate(() => {
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    return { focus: tabs.indexOf(document.activeElement), selected: tabs.findIndex((t) => t.getAttribute("aria-selected") === "true"), n: tabs.length };
+  });
+  const expect = want < 0 ? at.n - 1 : want;
+  if (at.focus !== expect || at.selected !== expect) kbd("tabs", `${key} put focus on ${at.focus} and selection on ${at.selected}, not ${expect}`);
+}
+
+await page.goto(`${BASE}/demos/tooltip/0.html`, { waitUntil: "load" });
+await page.waitForTimeout(300);
+await page.keyboard.press("Tab");
+await page.waitForTimeout(500);
+const tip = await page.evaluate(() => {
+  const a = document.activeElement;
+  const by = a?.getAttribute("aria-describedby");
+  const body = by && document.getElementById(by);
+  return { described: body?.getAttribute("role") === "tooltip" && !!body.textContent?.trim(), open: a?.closest(".ix-tip")?.dataset.open };
+});
+if (!tip.described) kbd("tooltip", "the focused control is not described by the tooltip");
+if (tip.open !== "1") kbd("tooltip", "focus did not show it");
+await page.keyboard.press("Escape");
+await page.waitForTimeout(100);
+if ((await page.evaluate(() => document.querySelector(".ix-tip")?.dataset.open)) !== "0") kbd("tooltip", "Escape did not close it");
+
 for (const asset of ASSETS) {
   // BASE already carries the mount path when it is a deployed copy; the asset paths are site-relative.
   const url = `${BASE}${asset}`;

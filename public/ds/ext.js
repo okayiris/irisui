@@ -19,6 +19,7 @@
     if (B) return h2(B, props, children);
     return h2("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
   }
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   function Tooltip({ label, children, delay = 320 }) {
     const [open, setOpen] = useState(false);
     const timer = useRef(null);
@@ -32,6 +33,18 @@
       setOpen(false);
     }, []);
     useEffect(() => () => window.clearTimeout(timer.current), []);
+    useEffect(() => {
+      if (!open) return;
+      const onKey = (e) => e.key === "Escape" && hide();
+      document.addEventListener("keydown", onKey);
+      return () => document.removeEventListener("keydown", onKey);
+    }, [open, hide]);
+    const anchor = useRef(null);
+    useEffect(() => {
+      const target = anchor.current?.querySelector(FOCUSABLE) ?? anchor.current;
+      target?.setAttribute("aria-describedby", id);
+      return () => target?.removeAttribute("aria-describedby");
+    }, [id, children]);
     return h2(
       "span",
       {
@@ -42,7 +55,7 @@
         onFocus: show,
         onBlur: hide
       },
-      h2("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : void 0 }, children),
+      h2("span", { className: "ix-tip-anchor", ref: anchor }, children),
       h2("span", { className: "ix-tip-body", role: "tooltip", id }, label)
     );
   }
@@ -142,6 +155,42 @@
   function Stage({ children }) {
     return h2("div", { className: "ix-stage" }, children);
   }
+  function useModalFocus(open, panel, onClose) {
+    const close = useRef(onClose);
+    close.current = onClose;
+    useEffect(() => {
+      if (!open) return;
+      const before = document.activeElement;
+      if (document.hasFocus()) panel.current?.focus({ preventScroll: true });
+      const onKey = (e) => {
+        if (e.key === "Escape") {
+          close.current?.();
+        } else if (e.key === "Tab" && panel.current) {
+          const nodes = Array.from(panel.current.querySelectorAll(FOCUSABLE));
+          const first = nodes[0] ?? panel.current;
+          const last = nodes[nodes.length - 1] ?? panel.current;
+          const at = document.activeElement;
+          if (!panel.current.contains(at)) {
+            e.preventDefault();
+            first.focus();
+          } else if (e.shiftKey && (at === first || at === panel.current)) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && at === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      };
+      document.addEventListener("keydown", onKey);
+      return () => {
+        document.removeEventListener("keydown", onKey);
+        const now = document.activeElement;
+        const lost = !now || now === document.body || panel.current?.contains(now);
+        if (lost && before?.isConnected && before !== document.body) before.focus({ preventScroll: true });
+      };
+    }, [open]);
+  }
   function Dialog({
     open,
     onClose,
@@ -151,28 +200,25 @@
     danger
   }) {
     const id = useId();
-    useEffect(() => {
-      if (!open) return;
-      const onKey = (e) => e.key === "Escape" && onClose?.();
-      document.addEventListener("keydown", onKey);
-      return () => document.removeEventListener("keydown", onKey);
-    }, [open, onClose]);
+    const panel = useRef(null);
+    useModalFocus(open, panel, onClose);
     if (!open) return null;
     return h2(
       Stage,
       null,
       h2(
         "div",
-        {
-          className: "ix-scrim",
-          role: "dialog",
-          "aria-modal": "true",
-          "aria-labelledby": id,
-          onClick: (e) => e.target === e.currentTarget && onClose?.()
-        },
+        { className: "ix-scrim", onClick: (e) => e.target === e.currentTarget && onClose?.() },
         h2(
           "div",
-          { className: "ix-dialog" },
+          {
+            className: "ix-dialog",
+            role: "dialog",
+            "aria-modal": "true",
+            "aria-labelledby": id,
+            tabIndex: -1,
+            ref: panel
+          },
           h2("h2", { id }, title),
           body ? h2("p", null, body) : null,
           h2(
@@ -205,12 +251,9 @@
     side = "bottom",
     children
   }) {
-    useEffect(() => {
-      if (!open) return;
-      const onKey = (e) => e.key === "Escape" && onClose?.();
-      document.addEventListener("keydown", onKey);
-      return () => document.removeEventListener("keydown", onKey);
-    }, [open, onClose]);
+    const id = useId();
+    const panel = useRef(null);
+    useModalFocus(open, panel, onClose);
     if (!open) return null;
     return h2(
       Stage,
@@ -220,9 +263,18 @@
         { className: "ix-scrim", onClick: (e) => e.target === e.currentTarget && onClose?.() },
         h2(
           "div",
-          { className: "ix-sheet", "data-side": side === "end" ? "end" : "bottom", role: "dialog", "aria-modal": "true" },
+          {
+            className: "ix-sheet",
+            "data-side": side === "end" ? "end" : "bottom",
+            role: "dialog",
+            "aria-modal": "true",
+            "aria-labelledby": title ? id : void 0,
+            "aria-label": title ? void 0 : sub,
+            tabIndex: -1,
+            ref: panel
+          },
           side === "bottom" ? h2("div", { className: "ix-sheet-grip", "aria-hidden": "true" }) : null,
-          title ? h2("h2", { className: "ix-sheet-title" }, title) : null,
+          title ? h2("h2", { className: "ix-sheet-title", id }, title) : null,
           sub ? h2("p", { className: "ix-sheet-sub" }, sub) : null,
           h2("div", { className: "ix-sheet-body" }, children)
         )
@@ -408,7 +460,7 @@
         (label, i) => h2(
           "button",
           {
-            key: label,
+            key: i,
             type: "button",
             role: "tab",
             className: "ix-tab",
@@ -416,8 +468,11 @@
             tabIndex: i === active ? 0 : -1,
             onClick: () => onSelect?.(i),
             onKeyDown: (e) => {
-              if (e.key === "ArrowRight") onSelect?.(Math.min(i + 1, items.length - 1));
-              if (e.key === "ArrowLeft") onSelect?.(Math.max(i - 1, 0));
+              const to = e.key === "ArrowRight" ? Math.min(i + 1, items.length - 1) : e.key === "ArrowLeft" ? Math.max(i - 1, 0) : e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : -1;
+              if (to < 0) return;
+              e.preventDefault();
+              onSelect?.(to);
+              host.current?.querySelectorAll(".ix-tab")[to]?.focus();
             }
           },
           label

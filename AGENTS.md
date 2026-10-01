@@ -52,7 +52,8 @@ The gate is not a formality. It fails on a console error, a failed request, a si
 a jumped heading level, a missing title or `lang`, a missing landmark, an untitled frame, an image without alt,
 a control without an accessible name, a positive tabindex, a link that lands on no file, a frame that did not
 mount, a credential in a published file, and a colour pair below its contrast floor. It also drives the site:
-`/` focuses search, a query returns hits that exist, Escape closes the panel, the code button opens the code.
+`/` focuses search, a query returns hits that exist, Escape closes the panel, the code button opens the code. And it drives the added parts by keyboard: a modal takes focus, keeps Tab inside, closes on Escape and gives
+focus back; tabs move focus with the selection; a tooltip describes its control and closes on Escape.
 
 ## Publishing
 

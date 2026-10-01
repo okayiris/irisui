@@ -154,7 +154,7 @@ const SPECS: Spec[] = [
       },
       {
         label: "On a word",
-        code: `() => h("div", { style: { paddingTop: 60, fontSize: 15 } }, "The vault is ", h(Tooltip, { label: "Only your iPhone can open it" }, h("span", { style: { borderBottom: "1px dashed var(--edge)", cursor: "help" } }, "sealed")), " on this device.")`,
+        code: `() => h("div", { style: { paddingTop: 60, fontSize: 15 } }, "The vault is ", h(Tooltip, { label: "Only your iPhone can open it" }, h("span", { tabIndex: 0, style: { borderBottom: "1px dashed var(--edge)", cursor: "help" } }, "sealed")), " on this device.")`,
       },
     ],
   },

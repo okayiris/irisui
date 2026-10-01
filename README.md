@@ -38,7 +38,10 @@ Chromium, then
 - every frame drew something and none says it failed to mount,
 - every file a page cannot work without answers (the stylesheets, the scripts, the fonts, the frames, the API),
 - and it works: `/` focuses search, a word finds hits that exist, Escape closes the panel, the code button
-  opens the code.
+  opens the code,
+- and the added parts answer the keyboard: Dialog and Sheet take focus, keep Tab inside, close on Escape and
+  give focus back, without taking it from the page when a frame opens one on load; Tabs move focus with the
+  selection; a Tooltip describes the control it sits on and closes on Escape.
 
 It also refuses to publish a credential: every text file in `dist/` is scanned for key and token shapes, and a
 hit fails the gate. And it measures contrast: the token pairs this site and the added parts put words in are

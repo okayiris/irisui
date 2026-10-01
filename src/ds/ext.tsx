@@ -19,6 +19,10 @@ function houseButton(props: Any, children: Any): Any {
   return h("button", { type: "button", className: "ix-hit ix-menu-trigger", ...props }, children);
 }
 
+/** What can take focus inside a part: where a tooltip's description goes, and where a modal keeps Tab. */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /* ---------------------------------------------------------------- Tooltip */
 
 export function Tooltip({ label, children, delay = 320 }: { label: string; children: Any; delay?: number }) {
@@ -35,6 +39,21 @@ export function Tooltip({ label, children, delay = 320 }: { label: string; child
     setOpen(false);
   }, []);
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && hide();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, hide]);
+
+  // The description belongs on the thing that takes focus, so it is read when that thing is reached. It is set
+  // in the DOM because a part such as the house Button does not pass unknown props down to its element.
+  const anchor = useRef<Any>(null);
+  useEffect(() => {
+    const target = anchor.current?.querySelector(FOCUSABLE) ?? anchor.current;
+    target?.setAttribute("aria-describedby", id);
+    return () => target?.removeAttribute("aria-describedby");
+  }, [id, children]);
 
   return h(
     "span",
@@ -46,7 +65,7 @@ export function Tooltip({ label, children, delay = 320 }: { label: string; child
       onFocus: show,
       onBlur: hide,
     },
-    h("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : undefined }, children),
+    h("span", { className: "ix-tip-anchor", ref: anchor }, children),
     h("span", { className: "ix-tip-body", role: "tooltip", id }, label),
   );
 }
@@ -180,6 +199,48 @@ function Stage({ children }: { children: Any }) {
   return h("div", { className: "ix-stage" }, children);
 }
 
+/** What a modal owes the keyboard: focus moves in when it opens, Tab stays inside, Escape closes, and focus goes
+ *  back where it came from. Focus only moves when the document already has it, so a modal that is open on load
+ *  in a frame does not take the focus away from the page around it. */
+function useModalFocus(open: boolean, panel: Any, onClose?: () => void) {
+  const close = useRef(onClose);
+  close.current = onClose;
+
+  useEffect(() => {
+    if (!open) return;
+    const before = document.activeElement as Any;
+    if (document.hasFocus()) panel.current?.focus({ preventScroll: true });
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        close.current?.();
+      } else if (e.key === "Tab" && panel.current) {
+        const nodes = Array.from(panel.current.querySelectorAll(FOCUSABLE)) as Any[];
+        const first = nodes[0] ?? panel.current;
+        const last = nodes[nodes.length - 1] ?? panel.current;
+        const at = document.activeElement;
+        if (!panel.current.contains(at)) {
+          e.preventDefault();
+          first.focus();
+        } else if (e.shiftKey && (at === first || at === panel.current)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && at === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      const now = document.activeElement;
+      const lost = !now || now === document.body || panel.current?.contains(now);
+      if (lost && before?.isConnected && before !== document.body) before.focus({ preventScroll: true });
+    };
+  }, [open]);
+}
+
 export function Dialog({
   open,
   onClose,
@@ -196,12 +257,8 @@ export function Dialog({
   danger?: boolean;
 }) {
   const id = useId();
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose?.();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  const panel = useRef<Any>(null);
+  useModalFocus(open, panel, onClose);
 
   if (!open) return null;
   return h(
@@ -209,16 +266,17 @@ export function Dialog({
     null,
     h(
       "div",
-      {
-        className: "ix-scrim",
-        role: "dialog",
-        "aria-modal": "true",
-        "aria-labelledby": id,
-        onClick: (e: Any) => e.target === e.currentTarget && onClose?.(),
-      },
+      { className: "ix-scrim", onClick: (e: Any) => e.target === e.currentTarget && onClose?.() },
       h(
         "div",
-        { className: "ix-dialog" },
+        {
+          className: "ix-dialog",
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-labelledby": id,
+          tabIndex: -1,
+          ref: panel,
+        },
         h("h2", { id }, title),
         body ? h("p", null, body) : null,
         h(
@@ -259,12 +317,9 @@ export function Sheet({
   side?: "bottom" | "end";
   children?: Any;
 }) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose?.();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  const id = useId();
+  const panel = useRef<Any>(null);
+  useModalFocus(open, panel, onClose);
 
   if (!open) return null;
   return h(
@@ -275,9 +330,18 @@ export function Sheet({
       { className: "ix-scrim", onClick: (e: Any) => e.target === e.currentTarget && onClose?.() },
       h(
         "div",
-        { className: "ix-sheet", "data-side": side === "end" ? "end" : "bottom", role: "dialog", "aria-modal": "true" },
+        {
+          className: "ix-sheet",
+          "data-side": side === "end" ? "end" : "bottom",
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-labelledby": title ? id : undefined,
+          "aria-label": title ? undefined : sub,
+          tabIndex: -1,
+          ref: panel,
+        },
         side === "bottom" ? h("div", { className: "ix-sheet-grip", "aria-hidden": "true" }) : null,
-        title ? h("h2", { className: "ix-sheet-title" }, title) : null,
+        title ? h("h2", { className: "ix-sheet-title", id }, title) : null,
         sub ? h("p", { className: "ix-sheet-sub" }, sub) : null,
         h("div", { className: "ix-sheet-body" }, children),
       ),
@@ -527,7 +591,7 @@ export function Tabs({
       h(
         "button",
         {
-          key: label,
+          key: i,
           type: "button",
           role: "tab",
           className: "ix-tab",
@@ -535,8 +599,16 @@ export function Tabs({
           tabIndex: i === active ? 0 : -1,
           onClick: () => onSelect?.(i),
           onKeyDown: (e: Any) => {
-            if (e.key === "ArrowRight") onSelect?.(Math.min(i + 1, items.length - 1));
-            if (e.key === "ArrowLeft") onSelect?.(Math.max(i - 1, 0));
+            const to =
+              e.key === "ArrowRight" ? Math.min(i + 1, items.length - 1)
+              : e.key === "ArrowLeft" ? Math.max(i - 1, 0)
+              : e.key === "Home" ? 0
+              : e.key === "End" ? items.length - 1
+              : -1;
+            if (to < 0) return;
+            e.preventDefault();
+            onSelect?.(to);
+            (host.current?.querySelectorAll(".ix-tab")[to] as Any)?.focus();
           },
         },
         label,
