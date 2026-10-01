@@ -26,19 +26,8 @@
              background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); white-space: nowrap; overflow: hidden; }
   .menubar .sp { flex: 1; }
 
-  /* The pill, as the MacPill card describes it: only the orb, a bar of buttons grows out from behind it. */
-  .mp { position: absolute; left: 50%; bottom: 100px; width: 0; height: 0; }
-  .mp-bar { position: absolute; top: -22px; height: 44px; border-radius: var(--radius-pill); display: flex; align-items: center; padding: 0 4px;
-            background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            transition: transform var(--motion-base) var(--ease-house), opacity var(--motion-fast) var(--ease-house), filter var(--motion-base) var(--ease-house); }
-  .mp-bar.closed { transform: scaleX(.3) scaleY(.8); opacity: 0; filter: blur(6px); pointer-events: none; }
-  .mp-side { display: flex; gap: 2px; }
-  .mp-gap { width: 68px; flex: none; }
-  .mp-side .on button { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
-  .mp-orb { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; }
-  .mp-work { position: absolute; left: -35px; top: -35px; width: 70px; height: 70px; }
-  .mp-above { position: absolute; left: -260px; width: 520px; top: -76px; text-align: center; font: var(--text-sub); color: var(--fg); }
-  .mp-under { position: absolute; left: -220px; width: 440px; top: 38px; display: grid; justify-items: center; gap: 6px; text-align: center; font: var(--text-sub); color: var(--label); }
+  /* The house MacPill, low in the middle of the desk. */
+  .mp { position: absolute; left: 0; right: 0; bottom: 40px; display: flex; justify-content: center; }
 
   /* A panel opens above the pill. */
   .panel { position: absolute; left: 50%; bottom: 196px; translate: -50% 0; width: 380px; height: 380px; border-radius: var(--radius-card); overflow: hidden;
@@ -95,8 +84,7 @@
 (() => {
   const h = React.createElement;
   const { useState, useEffect, useRef } = React;
-  const { PreviewI18nProvider, TalkOrb, Card, Row, Icon, Segmented, NavRail, Button, Field, Tooltip, Badge, Edge, Slider,
-          IrisApp, checkApp } = window.IrisUi;
+  const { PreviewI18nProvider, MacPill, Icon, Button, Field, IrisApp, checkApp } = window.IrisUi;
   const I = (name, size = 16) => h(Icon, { name, size });
   const hhmm = () => new Date().toTimeString().slice(0, 5);
 
@@ -212,7 +200,7 @@
 
   const SCENES = [
     { id: "rest", name: "At rest", orb: "rest", badge: 2,
-      ok: ["Only the orb: the bar grows out when the mouse rests on it", "The badge counts what is new, in the accent", "Click the orb and she listens: the TalkOrb only ever starts talking"] },
+      ok: ["Only the orb: the bar grows out when the mouse rests on it", "The badge counts what is new, in the accent", "Click the orb and she listens; the mic in the bar does the same, again to send"] },
     { id: "chats", name: "Chats", orb: "rest", panel: "chats",
       ok: ["The panel opens above the pill", "The same talk as the phone and the web", "Send shows your line, that she thinks, then her answer", "One way to talk by voice: the pill. The chat bar only types."] },
     { id: "calls", name: "Calls", orb: "rest", panel: "calls",
@@ -238,21 +226,19 @@
       ok: ["Says why, and what brings her back", "Try now does it at once"] },
   ];
   const real = SCENES.filter((s) => s.id);
-  const ALL = ["MacPill is a recipe in the release, not a component: this pill is composed from TalkOrb, Button, Tooltip and Badge.",
+  const ALL = ["The pill is the house MacPill: this page only runs her states and the panels.",
                "The house Icon has no chat bubble, no gear and no screen: Chats uses wave, Settings person, Screens external.",
                "The NavRail always shows Collapse, also in a settings window."];
 
   /* -------------------------------------------------------------------- pill */
 
+  // The pill is the house MacPill; this page only runs her states and the panels.
   function Pill({ scene, panel, setPanel }) {
-    const [mouse, setMouse] = useState(false);
-    const [out, setOut] = useState(false);
     const [orb, setOrb] = useState(scene.orb);
     const [label, setLabel] = useState(scene.label);
     const [words, setWords] = useState(scene.words);
     const [badge, setBadge] = useState(scene.badge ?? 0);
     const timers = useRef([]);
-    useEffect(() => { const t = setTimeout(() => setOut(mouse), mouse ? 180 : 700); return () => clearTimeout(t); }, [mouse]);
     useEffect(() => () => timers.current.forEach(clearTimeout), []);
     const later = (ms, f) => timers.current.push(setTimeout(f, ms));
     const stop = () => { timers.current.forEach(clearTimeout); timers.current = []; setOrb("rest"); setLabel(undefined); setWords(undefined); };
@@ -264,26 +250,16 @@
     };
     const listen = () => { stop(); setOrb("listening"); setLabel("Listening"); };
     const press = () => { if (orb === "listening") answer(); else if (orb === "rest") { listen(); later(1800, answer); } else stop(); };
-    const open = !!panel || out || orb === "listening";
-    const l = 2 * 38, r = 3 * 38, width = 8 + l + 68 + r;
-    const B = (k, tip, icon, extra) => h("span", { key: k, className: panel === k ? "on" : "" },
-      h(Tooltip, { label: tip }, h(Button, { variant: "icon", label: tip, icon: I(icon, 16), ...extra })));
-    const toggle = (k) => ({ onClick: () => { setPanel(panel === k ? null : k); if (k === "chats") setBadge(0); } });
-    const orbEl = h(TalkOrb, { state: orb, size: 60, onPress: press });
-    return h("div", { className: "mp", onMouseEnter: () => setMouse(true), onMouseLeave: () => setMouse(false) },
-      words ? h("div", { className: "mp-above", "aria-live": "polite" }, "“" + words + "”") : null,
-      h("div", { className: "mp-bar" + (open ? "" : " closed"), style: { left: -width / 2 + (r - l) / 2, width } },
-        h("div", { className: "mp-side", style: { width: l, justifyContent: "flex-end" } }, B("calls", "Calls", "phone", toggle("calls")), B("chats", "Chats", "wave", toggle("chats"))),
-        h("div", { className: "mp-gap" }),
-        h("div", { className: "mp-side", style: { width: r } }, B("vault", "Vault", "shield", toggle("vault")), B("settings", "Settings", "person", toggle("settings")),
-          h("span", { key: "mic", onPointerDown: listen, onPointerUp: answer, onKeyDown: (e) => e.key === " " && !e.repeat && listen(), onKeyUp: (e) => e.key === " " && answer() },
-            h(Tooltip, { label: "Talk while held" }, h(Button, { variant: "icon", label: "Talk while held", icon: I("mic", 16) }))))),
-      scene.working && orb === "rest" ? h("div", { className: "mp-work" }, h(Edge, { pattern: "comet", shape: "ring", width: 70, stroke: 2 })) : null,
-      h("div", { className: "mp-orb" }, badge ? h(Badge, { count: badge }, orbEl) : orbEl),
-      label || (scene.working && orb === "rest") ? h("div", { className: "mp-under", role: "status" },
-        h("span", null, label ?? scene.label),
-        orb === "muted" ? h(Button, { variant: "text", size: "sm", onClick: stop }, "Turn sound on") : null,
-        orb === "away" ? h(Button, { variant: "glass", size: "sm", onClick: () => { setLabel("Connecting"); later(900, stop); } }, "Try now") : null) : null);
+    const act = (key, label, icon) => ({ key, label, icon, active: panel === key, onSelect: () => { setPanel(panel === key ? null : key); if (key === "chats") setBadge(0); } });
+    const working = scene.working && orb === "rest";
+    return h("div", { className: "mp" }, h(MacPill, {
+      state: orb, onPress: press, open: !!panel || undefined, badge, words, working,
+      status: label ?? (working ? scene.label : undefined),
+      left: [act("calls", "Calls", "phone"), act("chats", "Chats", "wave")],
+      right: [act("vault", "Vault", "shield"), act("settings", "Settings", "person"),
+              { key: "mic", label: orb === "listening" ? "Done talking" : "Talk", icon: "mic", active: orb === "listening", onSelect: () => (orb === "listening" ? answer() : listen()) }],
+      back: orb === "muted" ? { label: "Turn sound on", onClick: stop, variant: "text" }
+          : orb === "away" ? { label: "Try now", variant: "glass", onClick: () => { setLabel("Connecting"); later(900, stop); } } : undefined }));
   }
 
   function Spot({ onClose, onSend }) {
