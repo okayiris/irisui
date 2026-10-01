@@ -56,8 +56,10 @@
             { c: "Row", icon: "phone", title: "Called the dentist, 2 minutes", subtitle: "Iris, 14:03" },
             { c: "Row", title: "Done, Alex. Wednesday at 09:30. The candles are still on your list.", subtitle: "Iris, 14:05" },
             { c: "Row", each: "sent", icon: "person", title: "{$.v}", subtitle: "You, just now" }] },
-          { c: "Text", if: "sent", text: "Iris: on it, Alex. You can follow it under What Iris did." },
-          { c: "Field", placeholder: "Type to Iris, Enter sends", bind: "draft", add: "sent" },
+          { c: "Text", if: "thinking==yes", text: "Iris is thinking." },
+          { c: "Text", if: "answered==yes", text: "Iris: on it, Alex. Follow \u201c{last}\u201d under What Iris did." },
+          { c: "Field", placeholder: "Type to Iris, Enter sends", bind: "draft", add: "sent",
+            on: "set:last={draft};set:answered=;set:thinking=yes;later:1500:set:thinking=,set:answered=yes" },
           { c: "BorderPattern", pattern: "stream", label: "Waits on you", if: "cake==ask", parts: [{ c: "Card", parts: [
             { c: "Text", text: "Which cake for Sam? I put it on the grocery list." },
             { c: "Buttons", stack: false, parts: [
@@ -113,14 +115,13 @@
   const FOUND = checkApp(WEB);
 
   const RULES = {
-    talk: ["Her presence top left: the StatusPill", "Her words as the lede, the talk under it", "Enter sends your line; Talk to Iris opens her orb", "The question she asks has answers and Not now"],
+    talk: ["Her presence top left: the StatusPill", "Her words as the lede, the talk under it", "Enter sends your line, she thinks, then answers; Talk to Iris opens her orb", "The question she asks has answers and Not now"],
     groceries: ["The ring is the count and moves when you tick", "Order opens a sheet from the right: pick the shop there", "Share says what happened"],
     did: ["Search and chips filter the same rows", "Every row opens its steps, back in the app bar", "A task that failed once and then worked is not red"],
     plan: ["The plan you are on, once, in her words", "Every plan shows its price the same way", "Switching asks first: it is about money"],
   };
   const TOP = { "t-dentist": "did", "t-mario": "did", "t-funda": "did", voice: "talk" };
   const ALL = ["One spec, drawn by IrisApp with spec.rail: NavRail, pages, sheets from the right, dialogs.",
-               "A Field cannot run an action after Enter yet: her answer to a sent line comes at once, not after a wait.",
                "The house Icon has 14 names: Groceries uses car, Subscription person."];
 
   function App() {
