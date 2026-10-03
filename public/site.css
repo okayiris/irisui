@@ -1040,3 +1040,75 @@ td code {
   border-radius: 14px;
   background: var(--bg);
 }
+
+/* ---------- Iris Labs Pro: the email field next to its button ---------- */
+.buy label {
+  display: block;
+  color: var(--label, var(--fg));
+  font-size: 13px;
+}
+
+.buy input[type="email"] {
+  height: 40px;
+  min-width: min(100%, 280px);
+  flex: 1 1 240px;
+  padding: 0 16px;
+  border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
+  border-radius: 999px;
+  background: var(--glass, light-dark(rgba(16, 48, 72, 0.07), rgba(180, 225, 255, 0.07)));
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+}
+
+.buy button.btn-primary {
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.buy + .foot-dim {
+  margin-top: 16px;
+}
+
+/* Iris Labs Pro: the designs as pictures, a swipeable row. --s scales a 390px phone down. */
+.reel {
+  --s: 0.8;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 2px 12px;
+}
+
+.reel:focus-visible {
+  outline: 2px solid var(--accent, #7dd3fc);
+  outline-offset: 2px;
+}
+
+.ph {
+  flex: none;
+  margin: 0;
+  scroll-snap-align: start;
+  width: calc(390px * var(--s));
+}
+
+.ph img {
+  display: block;
+  width: calc(390px * var(--s));
+  height: auto;
+  border: 1px solid var(--edge, rgba(190, 230, 255, 0.14));
+  border-radius: 28px;
+}
+
+.ph figcaption {
+  margin-top: 8px;
+  color: var(--dim, #8fa3b0);
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .reel {
+    --s: 0.7;
+  }
+}

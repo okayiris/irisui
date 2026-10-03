@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Iris Labs Pro demo</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg">
+<link rel="stylesheet" href="../ds/tokens.css">
+<link rel="stylesheet" href="../ds/bundle.css">
+<link rel="stylesheet" href="../ds/ext.css">
+<link rel="stylesheet" href="../ds/extra.css">
+<link rel="stylesheet" href="iris-labs.css">
+<style>
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font-family: var(--font-text); overflow: hidden; }
+  #host { height: 100%; overflow: auto; }
+  #host > .L { min-height: 100%; }
+</style>
+</head>
+<body>
+<main id="host" aria-label="Iris Labs Pro demo"></main>
+<script src="../ds/vendor/react.js"></script>
+<script src="../ds/vendor/react-dom.js"></script>
+<script src="../ds/bundle.js"></script>
+<script src="../ds/ext.js"></script>
+<script src="iris-labs.js"></script>
+<script>
+// Drawn live with iris-labs from a spec the design lab made (samples.json). ?d=salon-0|booking|app-0
+(async () => {
+  const d = document.documentElement, host = document.getElementById("host");
+  const mode = () => { try { const m = localStorage.getItem("iris-mode"); if (m === "light" || m === "dark") d.dataset.mode = m; else delete d.dataset.mode; } catch (e) {} };
+  mode(); addEventListener("storage", () => { mode(); draw(); });
+  const L = window.IrisLabs, id = new URLSearchParams(location.search).get("d") || "salon-0";
+  const samples = await (await fetch("samples.json")).json();
+  const scheme = () => d.dataset.mode || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  async function draw() {
+    const [kind, n] = id.split("-"), i = Number(n) || 0;
+    if (kind === "salon") {
+      const spec = structuredClone(samples.salon[i].spec);
+      spec.taste = { ...(spec.taste || {}), prefs: { ...(spec.taste?.prefs || {}), mode: spec.taste?.prefs?.mode || scheme() } };
+      await L.renderDesign(spec, host, { surface: "phone" });
+    } else if (kind === "booking") {
+      const look = L.houseLook("knipsalon-noor", { mood: "Valentine", style: "pastel" });
+      const t = (k, f) => f;
+      const days = { "2026-10-08": ["09:00", "09:30", "10:00"], "2026-10-09": ["10:00", "11:30"] };
+      const spec = L.bookingApp({ kind: "customer", t, locale: "en", look, data: { name: "Knipsalon Noor", people: [{ id: "noor", name: "Noor" }, { id: "mo", name: "Mo" }],
+        treatments: [{ id: "cut", name: "Cut", minutes: 30, price: "35" }, { id: "colour", name: "Colour", minutes: 90, price: "85" }, { id: "wash", name: "Wash and style", minutes: 45, price: "42" }], days, pick: { summary: "Cut" } } });
+      L.renderApp(spec, host, { frame: "phone" });
+    } else {
+      L.renderApp(structuredClone(samples.apps[i].spec), host, { frame: "phone" });
+    }
+    document.documentElement.dataset.drawn = "1";
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

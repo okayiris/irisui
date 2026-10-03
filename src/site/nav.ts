@@ -76,5 +76,6 @@ export const RESOURCES: { id: string; label: string; blurb: string }[] = [
   { id: "tokens", label: "Tokens", blurb: "Every value, with a picker's eye." },
   { id: "bundle", label: "Install and bundle", blurb: "bundle.js, bundle.css, index.d.ts." },
   { id: "changelog", label: "Release notes", blurb: "What changed, and when." },
+  { id: "labs-pro", label: "Iris Labs Pro", blurb: "The design labs for your own projects, 99 euro a year." },
   { id: "contribute", label: "Contribute", blurb: "Add a part, change a token, ship a release." },
 ];

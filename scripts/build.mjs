@@ -5,7 +5,7 @@
 //
 // No client framework: the pages are HTML, and the only script in the browser is /site.js.
 
-import { renameSync, rmSync, existsSync, mkdirSync } from "node:fs";
+import { renameSync, rmSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
 import esbuild from "esbuild";
@@ -42,6 +42,12 @@ const fresh = join(ROOT, ".build/dist");
 const live = join(ROOT, "dist");
 const old = join(ROOT, ".build/dist-old");
 const stats = mod.build(fresh);
+// Iris Labs Pro is paid: only pictures of its designs may be on the site, never the package (scripts/labs-pro-samples.mjs).
+const leaked = readdirSync(fresh, { recursive: true }).filter((f) => /(^|[\\/])(iris-labs|bundle-labs)[^\\/]*\.js$/.test(String(f)));
+if (leaked.length) {
+  console.error(`irisui: the paid iris-labs package is in the build (${leaked.join(", ")}). Take it out; only pictures of its designs are published.`);
+  process.exit(1);
+}
 swapIntoPlace(fresh, live, old);
 
 /** Two renames, so the served directory is never gone. */

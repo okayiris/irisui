@@ -12,6 +12,7 @@ import { FOUNDATIONS, GROUPS, PATTERNS, RESOURCES, SITE, groupOf } from "./nav";
 import { loadTokens, ROOT, type Component } from "./parse";
 import { demoFrame, previewFrame } from "./demos";
 import { LAB } from "./lab";
+import { labsProPages } from "./labs-pro";
 import { BASE, CANONICAL, rewriteBase, rewriteBaseText, url } from "./base";
 import type { Heading } from "./markdown";
 
@@ -314,6 +315,8 @@ function collectPages(): Page[] {
       md: ch.body,
     });
   }
+
+  pages.push(...labsProPages());
 
   // These two are rendered by their own functions, under their own address.
   const RENDERED_ELSEWHERE = new Set(["llms", "tokens"]);
