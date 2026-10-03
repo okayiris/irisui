@@ -1486,6 +1486,14 @@ function placeWord(word: string, font: (px: number) => string, alpha: Float32Arr
   return best;
 }
 
+/** Is this element drawn in a light scheme: the document's mode, or a design that carries its own (data-scheme). */
+function lightAround(el: HTMLElement): boolean {
+  const own = el.closest("[data-scheme]")?.getAttribute("data-scheme");
+  if (own) return own === "light";
+  const mode = document.documentElement.dataset.mode;
+  return mode ? mode === "light" : Boolean(window.matchMedia?.("(prefers-color-scheme: light)").matches);
+}
+
 function paintPhoto(el: HTMLElement, pair: Pair, kind: string, word: string, threshold: number): HTMLCanvasElement[] {
   const { photo } = pair, W = photo.width, H = photo.height;
   if (kind === "parallax") {
@@ -1498,11 +1506,17 @@ function paintPhoto(el: HTMLElement, pair: Pair, kind: string, word: string, thr
   }
   const out = canvasOf(W, H), ctx = out.getContext("2d") as CanvasRenderingContext2D;
   if (kind === "duotone") {
-    const f = pixelsOf(photo), b = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
-    // The dark end is the accent sunk to near black in both modes: a photo stays a photo, never a pastel print in light.
-    const a = b.map((v) => Math.round(v * 0.16 + 7 * 0.84));
+    const f = pixelsOf(photo), k = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
+    // Dark: the accent sunk to near black at the shadow end, the accent itself at the light end. Light: the same photo
+    // as a light print, the shadows a deep accent and the highlights paper. The owner, on a light app: the dark prints
+    // were "still too dark", the darkest things on a light screen.
+    const light = lightAround(el);
+    const a = light ? k.map((v) => Math.round(v * 0.6)) : k.map((v) => Math.round(v * 0.16 + 7 * 0.84));
+    const b = light ? k.map((v) => Math.round(v + (255 - v) * 0.9)) : k;
     for (let i = 0; i < f.data.length; i += 4) {
-      const L = smooth(0.05, 0.95, (0.2126 * f.data[i] + 0.7152 * f.data[i + 1] + 0.0722 * f.data[i + 2]) / 255);
+      const L0 = smooth(0.05, 0.95, (0.2126 * f.data[i] + 0.7152 * f.data[i + 1] + 0.0722 * f.data[i + 2]) / 255);
+      // Most of the house's photos are evening pictures: in light their shadows are lifted, or the print stays a dark slab.
+      const L = light ? Math.pow(L0, 0.45) : L0;
       for (let c = 0; c < 3; c++) f.data[i + c] = a[c] + (b[c] - a[c]) * L;
     }
     ctx.putImageData(f, 0, 0);

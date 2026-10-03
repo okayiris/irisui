@@ -2845,6 +2845,11 @@ textarea.ix-textarea {
 .ia-pic-side .ia-pic-words { position: static; background: none; padding: 16px; color: var(--fg); }
 .ia-pic-side .ia-pic-eyebrow { color: var(--k, var(--accent)); }
 .ia-pic-side .ia-pic-title { font-size: 19px; }
+/* Light: the caption sits on a light shade with dark ink, the way the photo itself is a light print there. */
+:root[data-mode="light"] .ia-pic figcaption { color: var(--fg); background: linear-gradient(transparent, color-mix(in srgb, var(--bg) 88%, transparent)); }
+:root[data-mode="light"] .ia-pic-over .ia-pic-words { background: linear-gradient(transparent, color-mix(in srgb, var(--bg) 62%, transparent) 40%, color-mix(in srgb, var(--bg) 94%, transparent)); }
+:root[data-mode="light"] .ia-pic-eyebrow { color: color-mix(in srgb, var(--k, var(--accent)) 70%, #000); }
+:root[data-mode="light"] .ia-pic-side .ia-pic-words { background: none; }
 
 /* ---------- light: the release's own fixed colours ----------
  * bundle.css draws some parts with fixed dark values instead of tokens. Each is restated here with light-dark(light,
