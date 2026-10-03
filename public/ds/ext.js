@@ -312,7 +312,7 @@
       h2(I.Button, { variant: "glass", onClick: () => ctx.run("back") }, "Close")
     );
   }
-  function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }) {
+  function IrisApp({ spec, start, onNavigate, onState, onAction, frame = "phone" }) {
     const I = UI();
     const path = (Array.isArray(start) ? start : [start ?? spec.start]).filter((id2) => spec.screens[id2]);
     const pages = path.filter((id2) => !["sheet", "dialog"].includes(spec.screens[id2].kind ?? "page"));
@@ -387,6 +387,12 @@
             setLayer({});
             setStack((s2) => [...s2, t]);
           }
+        } else if (onAction) {
+          const answer = onAction(verb, arg, state);
+          if (typeof answer === "string") run(answer);
+          else if (answer && typeof answer.then === "function") answer.then((next) => {
+            if (next) run(next);
+          });
         }
       }
     };
@@ -1191,7 +1197,10 @@
     min,
     max,
     label,
-    showToday = true
+    showToday = true,
+    isDisabled,
+    block,
+    locale
   }) {
     const today = /* @__PURE__ */ new Date();
     const selected = value ? /* @__PURE__ */ new Date(`${value}T00:00:00Z`) : null;
@@ -1208,7 +1217,7 @@
     const cells = monthGrid(view.y, view.m);
     return h3(
       "div",
-      { className: "ix-datepicker", role: "group", "aria-label": label ?? "Pick a day" },
+      { className: "ix-datepicker", role: "group", "aria-label": label ?? "Pick a day", "data-block": block ? "1" : void 0 },
       h3(
         "div",
         { className: "ix-dp-head" },
@@ -1217,7 +1226,7 @@
           { type: "button", className: "ix-dp-nav ix-hit", "aria-label": "Previous month", onClick: () => step(-1) },
           "\u2039"
         ),
-        h3("span", { className: "ix-dp-month" }, `${MONTHS[view.m]} ${view.y}`),
+        h3("span", { className: "ix-dp-month" }, locale ? new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(view.y, view.m, 1))) : `${MONTHS[view.m]} ${view.y}`),
         h3(
           "button",
           { type: "button", className: "ix-dp-nav ix-hit", "aria-label": "Next month", onClick: () => step(1) },
@@ -1227,7 +1236,8 @@
       h3(
         "div",
         { className: "ix-dp-week", "aria-hidden": "true" },
-        DAYS.map((d) => h3("span", { key: d }, d))
+        // 2024-01-01 was a Monday: seven days from there give the week in the visitor's language.
+        DAYS.map((d, i) => h3("span", { key: d }, locale ? new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1 + i))).slice(0, 2).toLowerCase() : d))
       ),
       h3(
         "div",
@@ -1235,7 +1245,7 @@
         cells.map((d, i) => {
           if (d === null) return h3("span", { key: `e${i}`, className: "ix-dp-empty" });
           const day = iso(view.y, view.m, d);
-          const off = min && day < min || max && day > max;
+          const off = min && day < min || max && day > max || isDisabled?.(day);
           return h3(
             "button",
             {

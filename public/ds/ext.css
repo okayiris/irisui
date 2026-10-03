@@ -1044,6 +1044,10 @@
   border-radius: var(--radius-card);
 }
 
+.ix-datepicker[data-block="1"] {
+  max-width: none;
+}
+
 .ix-dp-head {
   display: flex;
   align-items: center;
@@ -1205,7 +1209,8 @@
 /* ---------- AppBar ---------- */
 
 .ix-appbar {
-  background: light-dark(rgba(244, 247, 249, 0.82), rgba(7, 9, 12, 0.82));
+  /* The ground's own colour, mostly: a page whose ground carries a wash (a design's --bg) shows it through the bar. */
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
   padding: 8px 12px 10px;
@@ -2963,3 +2968,97 @@ textarea.ix-textarea {
   radial-gradient(90% 45% at 100% 105%, color-mix(in srgb, var(--k, var(--accent)) 12%, transparent), transparent 70%),
   color-mix(in srgb, var(--k, var(--accent)) 5%, #f2f4f7); }
 :root[data-mode="light"] .ia-app .iris-card:not(.iris-row) { background: linear-gradient(165deg, color-mix(in srgb, var(--k, var(--accent)) 9%, #ffffff), #ffffff 65%); box-shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 12px 28px -14px color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }
+
+/* ---------------------------------------------------------------------- Directions
+
+   A direction is a look the parts already follow: every part takes its surface, edge, radius, type and accent from the
+   variables below (the release's .iris-card is `background: var(--glass); border: 1px solid var(--edge); border-radius:
+   var(--radius-card)`), so a direction changes the variables and the whole page follows. Five of them, from the calm
+   house look to looks that are not calm at all, and each works in light and dark.
+
+   `data-style` sits on the page or app element (the design spec's `style`, src/design/spec.js). Calm is the default and
+   changes nothing; the others are counted on from it. A direction never breaks the colour floors: contrast stays the
+   kit's own, and a direction that wants a flat ground takes its ink from --fg. */
+
+[data-style="calm"] { --dir-shadow: var(--elev-1); }
+
+/* Solid: flat opaque surfaces, a firm edge, small corners, display type that carries. No glass, no blur. */
+[data-style="solid"] {
+  --glass: light-dark(#ffffff, #14161c);
+  --edge: light-dark(#101418, #e6ecf5);
+  --radius-card: 6px;
+  --radius-button: 8px;
+  --radius-pill: 6px;
+  --elev-1: none;
+  --elev-2: 4px 4px 0 light-dark(#101418, #e6ecf5);
+  --font-display: var(--font-text);
+  --dir-ink-shadow: none;
+}
+[data-style="solid"] .iris-card, [data-style="solid"] .iris-btn, [data-style="solid"] .iris-chip {
+  border-width: 1.5px;
+}
+[data-style="solid"] .iris-card { box-shadow: var(--elev-2); }
+[data-style="solid"] .iris-btn { box-shadow: 2px 2px 0 var(--edge); }
+
+/* Editorial: paper ground, hairline rules, tight corners, a serif for the display, quiet accents. */
+[data-style="editorial"] {
+  --bg: light-dark(#f9f7f5, #0d0f12);
+  --fg: light-dark(#3e2b1e, #f2ece6);
+  --dim: light-dark(#6b5b4c, #b3a89d);
+  --line: light-dark(#e9e3dd, #23262b);
+  --glass: light-dark(#ffffff, #14171b);
+  --edge: light-dark(#e9e3dd, #262a30);
+  --accent: light-dark(#4b3e8f, #c9c3f2);
+  --accent-ink: light-dark(#ffffff, #14171b);
+  --radius-card: 3px;
+  --radius-button: 4px;
+  --radius-pill: 4px;
+  --font-display: "New York", ui-serif, Georgia, "Iowan Old Style", serif;
+  --elev-1: inset 0 0 0 1px var(--edge);
+}
+[data-style="editorial"] .iris-card { box-shadow: none; border-bottom-width: 2px; }
+[data-style="editorial"] .iris-row-title { font-size: 18px; }
+[data-style="editorial"] .iris-row-sub { font-style: italic; }
+
+/* Pastel: a cheerful ground, white cards, generous corners, pastel fills for chips and badges. */
+[data-style="pastel"] {
+  --bg: light-dark(#f2e8ff, #16121f);
+  --glass: light-dark(#ffffff, #221c2f);
+  --edge: light-dark(#e3d6f7, #3a3150);
+  --radius-card: 22px;
+  --radius-button: 999px;
+  --radius-pill: 999px;
+  --accent: light-dark(#6d28d9, #c4b5fd);
+  --accent-ink: light-dark(#ffffff, #1b1430);
+  --elev-1: 0 2px 10px -6px light-dark(rgba(76, 29, 149, .35), rgba(0, 0, 0, .6));
+}
+[data-style="pastel"] .iris-chip, [data-style="pastel"] .ix-badge {
+  background: color-mix(in srgb, var(--accent) 18%, light-dark(#ffffff, #221c2f));
+  color: var(--fg);
+}
+/* Touch: a page for fingers asks for the 44px target (data-touch on the page or any container); the kit stays compact otherwise. */
+[data-touch] .iris-chip { height: 44px; justify-content: center; }
+[data-touch] .iris-btn { min-height: 44px; }
+[data-touch] .ix-dp-day { height: 44px; }
+[data-touch] .ix-dp-nav { width: 44px; height: 44px; }
+
+/* A chosen chip stays the filled one: the pastel rest colour must not paint over `.on` (same weight, later in the file). */
+[data-style="pastel"] .iris-chip.on { background: var(--accent); color: var(--accent-ink); }
+[data-style="pastel"] .iris-card { box-shadow: var(--elev-1); }
+
+/* Terminal: mono everywhere, thin rules, square corners, no glass, the accent as a mark. */
+[data-style="terminal"] {
+  --font-text: var(--font-mono);
+  --font-display: var(--font-mono);
+  --glass: transparent;
+  --edge: light-dark(#c8ced6, #2c3138);
+  --radius-card: 0;
+  --radius-button: 0;
+  --radius-pill: 0;
+  --elev-1: none;
+  --elev-2: none;
+}
+[data-style="terminal"] .iris-card { border-style: dashed; }
+[data-style="terminal"] .iris-row-title { font-size: 15px; }
+[data-style="terminal"] .iris-row-title::before { content: "> "; color: var(--accent); }
+[data-style="terminal"] .iris-btn { border-style: dashed; }
