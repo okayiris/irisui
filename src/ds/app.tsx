@@ -142,8 +142,8 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
             props.text ? h("span", { className: "ia-pic-text" }, props.text) : null)
         : props.caption ? h("figcaption", null, props.caption) : null;
       if (props.side) return h("figure", { className: "ia-pic ia-pic-side" + (props.flip ? " ia-pic-flip" : "") },
-        h("div", { className: "ia-pic-img", style: { aspectRatio: props.ratio ?? 1 } }, img), words);
-      return h("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : "") + (props.title ? " ia-pic-over" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } }, img, words);
+        h("div", { className: "ia-pic-img", style: { aspectRatio: String(props.ratio ?? 1) } }, img), words);
+      return h("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : "") + (props.title ? " ia-pic-over" : ""), style: { aspectRatio: String(props.ratio ?? 16 / 10) } }, img, words);
     }
     case "Rail": // a row you swipe sideways: tiles at their own width, the next one peeks in
       return h("div", { className: "ia-rail", role: "group", "aria-label": props.label ?? "More" },
@@ -182,7 +182,7 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       return h(I.Chip, { ...props, on: b ? val === props.value : props.on, onClick: b ? () => set(b, props.value) : act }, props.label);
     case "Chips":
       return h("div", { className: "ia-chips" }, (props.items ?? []).map((l: string, i: number) =>
-        h(I.Chip, { key: l, topic: props.topic, on: val === l, onClick: () => set(b, l) }, l)));
+        h(I.Chip, { key: l, topic: props.topic, on: val === l, onClick: () => { set(b, l); if (p.on) run(fill(p.on, { ...state, [b!]: l })); } }, l)));   // with on: a tap is the choice and the next step
     case "Segmented": case "Tabs": case "Steps":
       return h(I[p.c], { ...props, active: b ? val : props.active, onSelect: b ? (i: number) => set(b, i) : undefined });
     case "Slider": case "Select": case "TextArea": case "DatePicker": case "TimePicker":
