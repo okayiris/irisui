@@ -764,7 +764,12 @@ export function DatePicker({
   max,
   label,
   showToday = true,
+  isDisabled,
+  block,
+  locale,
 }: {
+  /** The language of the month and the week days ("nl"); without it they are English. */
+  locale?: string;
   value?: string;
   onChange?: (day: string) => void;
   year?: number;
@@ -773,6 +778,10 @@ export function DatePicker({
   max?: string;
   label?: string;
   showToday?: boolean;
+  /** A day ("2026-10-01") that cannot be picked: a closed day, a day with nothing free. Drawn like a day outside min/max. */
+  isDisabled?: (day: string) => boolean;
+  /** Fill the column instead of stopping at the calendar's own width (a booking page). */
+  block?: boolean;
 }) {
   const today = new Date();
   const selected = value ? new Date(`${value}T00:00:00Z`) : null;
@@ -792,7 +801,7 @@ export function DatePicker({
 
   return h(
     "div",
-    { className: "ix-datepicker", role: "group", "aria-label": label ?? "Pick a day" },
+    { className: "ix-datepicker", role: "group", "aria-label": label ?? "Pick a day", "data-block": block ? "1" : undefined },
     h(
       "div",
       { className: "ix-dp-head" },
@@ -801,7 +810,9 @@ export function DatePicker({
         { type: "button", className: "ix-dp-nav ix-hit", "aria-label": "Previous month", onClick: () => step(-1) },
         "‹",
       ),
-      h("span", { className: "ix-dp-month" }, `${MONTHS[view.m]} ${view.y}`),
+      h("span", { className: "ix-dp-month" }, locale
+        ? new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(view.y, view.m, 1)))
+        : `${MONTHS[view.m]} ${view.y}`),
       h(
         "button",
         { type: "button", className: "ix-dp-nav ix-hit", "aria-label": "Next month", onClick: () => step(1) },
@@ -811,7 +822,10 @@ export function DatePicker({
     h(
       "div",
       { className: "ix-dp-week", "aria-hidden": "true" },
-      DAYS.map((d) => h("span", { key: d }, d)),
+      // 2024-01-01 was a Monday: seven days from there give the week in the visitor's language.
+      DAYS.map((d, i) => h("span", { key: d }, locale
+        ? new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1 + i))).slice(0, 2).toLowerCase()
+        : d)),
     ),
     h(
       "div",
@@ -819,7 +833,7 @@ export function DatePicker({
       cells.map((d, i) => {
         if (d === null) return h("span", { key: `e${i}`, className: "ix-dp-empty" });
         const day = iso(view.y, view.m, d);
-        const off = (min && day < min) || (max && day > max);
+        const off = (min && day < min) || (max && day > max) || isDisabled?.(day);
         return h(
           "button",
           {

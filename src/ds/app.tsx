@@ -311,7 +311,11 @@ function Talk({ s, ctx }: { s: Screen; ctx: Any }) {
 
 /* --------------------------------------------------------------------- app */
 
-export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: { spec: AppSpec; start?: string | string[]; onNavigate?: (id: string) => void; onState?: (state: Record<string, Any>) => void; frame?: "phone" | "window" }) {
+export function IrisApp({ spec, start, onNavigate, onState, onAction, frame = "phone" }: {
+  spec: AppSpec; start?: string | string[]; onNavigate?: (id: string) => void; onState?: (state: Record<string, Any>) => void; frame?: "phone" | "window";
+  /** A verb the app does not know ("act:book"): the host does it and may answer with more actions ("close;push:done"), also later (a promise). */
+  onAction?: (verb: string, arg: string, state: Record<string, Any>) => string | void | Promise<string | void>;
+}) {
   const I = UI();
   const path = (Array.isArray(start) ? start : [start ?? spec.start]).filter((id) => spec.screens[id]);
   const pages = path.filter((id) => !["sheet", "dialog"].includes(spec.screens[id].kind ?? "page"));
@@ -353,6 +357,13 @@ export function IrisApp({ spec, start, onNavigate, onState, frame = "phone" }: {
       else if (verb === "set") { const [k, v] = arg.split("="); setState((s) => ({ ...s, [k]: v === "true" ? true : v === "false" ? false : v === "" || isNaN(+v) ? v : +v })); }
       else if (verb === "snack") setSnack(fill(arg, state));
       else if (verb === "talk") { const t = Object.keys(spec.screens).find((id) => spec.screens[id].kind === "talk"); if (t) { setLayer({}); setStack((s) => [...s, t]); } }
+      else if (onAction) {
+        // Another verb is the host's. What it answers runs here (an answer that comes later too), so a booking can say
+        // "close;push:done" once the plugin has said yes, or "snack:That time was just taken".
+        const answer = onAction(verb, arg, state);
+        if (typeof answer === "string") run(answer);
+        else if (answer && typeof (answer as Promise<unknown>).then === "function") (answer as Promise<string | void>).then((next) => { if (next) run(next); });
+      }
     }
   };
   const ctx = { state, set, run, topic: spec.topic };

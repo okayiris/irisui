@@ -152,6 +152,26 @@ export const RESOURCE_DOCS_EXT: Record<string, Doc> = {
     lede: "What v33 adds, what v32 is, what changed in it, and what this project added on top of the release.",
     sections: [
       {
+        title: "Release v34.1",
+        blocks: [
+          {
+            kind: "p",
+            text: "v34.1 is this project's release of 3 october 2026. The package is version 34.1.0: everything in it is new and optional, so a page built on 34.0 draws the same.",
+          },
+          {
+            kind: "table",
+            head: ["what", "in v34.1"],
+            rows: [
+              ["DatePicker", "isDisabled(day) draws a day that cannot be picked like a day outside min/max, block fills the column, locale (\"nl\") names the month and the week days in the visitor's language."],
+              ["IrisApp onAction", "a verb the app does not know (act:book) goes to the host, which may answer with more actions (close;push:done), also later from a promise."],
+              ["Directions", "data-style on a page or app: calm (the default), solid, editorial, pastel or terminal. Each changes the variables only, so every part follows. A chosen chip stays the filled one in pastel. The block comes from the design lab (Ringlab), which dresses apps with it; bookings and iris-labs wear it."],
+              ["Touch", "data-touch on a page or container gives chips, buttons and calendar days the 44px target; without it the kit stays compact."],
+              ["AppBar", "the bar takes the ground's own --bg, so a page whose ground carries a wash shows it through the bar."],
+            ],
+          },
+        ],
+      },
+      {
         title: "Release v34",
         blocks: [
           {
