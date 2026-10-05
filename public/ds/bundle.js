@@ -31,9 +31,11 @@
   // A frosted card: the one surface of the app. Radius 18, --glass fill, 1px --edge stroke, padding 14.
   // topic: the card stands on its topic's ground, the same still fade as a Widget (no motion, no busy cost), so a
   // grid of cards can carry colour per category without a moving pattern in every one.
-  function Card({ children, className, style, padding = 14, topic }) {
+  // onClick: a tappable card (IrisApp's Card with on) is a button, for the keyboard too.
+  function Card({ children, className, style, padding = 14, topic, onClick }) {
     const d = topic && window.IrisUi && window.IrisUi.design;
-    return h("div", { className: cx("iris-card", d && "iris-card-topic", className), style: { padding, ...(d ? d.topicStyle(topic) : null), ...style } }, children);
+    const tap = onClick ? { onClick, role: "button", tabIndex: 0, onKeyDown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(e); } } } : null;
+    return h("div", { className: cx("iris-card", d && "iris-card-topic", className), style: { padding, ...(d ? d.topicStyle(topic) : null), ...style }, ...tap }, children);
   }
 
   // A settings row on the "You" page: icon, title, a grey line under it, and something on the right
