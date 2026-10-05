@@ -4,10 +4,9 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "On an icon button": () => h("div", { style: { paddingTop: 60 } }, h(Tooltip, { label: "Unpair this device" }, h(Button, { variant: "icon", label: "Speaker", icon: h(Icon, { name: "speaker", size: 18 }) }))),
-    "On a word": () => h("div", { style: { paddingTop: 60, fontSize: 15 } }, "The vault is ", h(Tooltip, { label: "Only your iPhone can open it" }, h("span", { style: { borderBottom: "1px dashed var(--edge)", cursor: "help" } }, "sealed")), " on this device."),
+    "On an icon button": () => h("div", { style: { paddingTop: 60 } }, h(Tooltip, { label: "Read it out", open: true }, h(Button, { variant: "icon", label: "Read it out", icon: h(Icon, { name: "speaker", size: 18 }) }))),
   };
 })();
 

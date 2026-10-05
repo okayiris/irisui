@@ -1,0 +1,30 @@
+<!-- @dsCard group="App layouts" height=520 -->
+<!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
+  window.__dsPreview = {
+    "What Iris did": () => h(TableApp, { title: "What Iris did", noun: "tasks", filters: ["Calls", "On the web"], rows: [
+    { title: "Moved the dentist", subtitle: "Called at 14:10", icon: "phone", tags: ["Calls"], detail: h(Card, { padding: 0 }, h(Row, { title: "Asked to move Tuesday", subtitle: "14:10" }), h(Row, { title: "Wednesday 09:30 is free", subtitle: "14:11" }), h(Row, { title: "Booked. Bring the old card", subtitle: "14:12" })) },
+    { title: "Looked up houses", subtitle: "On funda.nl at 13:50", icon: "globe", tags: ["On the web"], detail: h(Card, { padding: 0 }, h(Row, { title: "Opened Utrecht, 3 rooms", subtitle: "13:50" }), h(Row, { title: "Saved 4 houses to your list", subtitle: "13:52" })) },
+    { title: "Booked Da Mario", subtitle: "Called at 13:40", icon: "phone", tags: ["Calls"], detail: h(Card, { padding: 0 }, h(Row, { title: "Asked for six on Saturday", subtitle: "13:40" }), h(Row, { title: "20:00 is free, inside", subtitle: "13:41" })) },
+  ] }),
+    "The vault": () => h(TableApp, { title: "Logins", noun: "logins", placeholder: "Search logins", actions: h(Button, { variant: "primary", size: "sm" }, "Add"), rows: [
+    { title: "shop.example.com", subtitle: "alex@example.com, used today", detail: h(Card, { padding: 0 }, h(Row, { title: "alex@example.com", subtitle: "Name" }), h(Row, { title: "Iris may use it", subtitle: "Touch ID each time", trailing: h(Toggle, { on: true, label: "Iris may use it" }) })) },
+    { title: "da-mario.example", subtitle: "alex@example.com, added Saturday", detail: h(Card, { padding: 0 }, h(Row, { title: "Iris may use it", subtitle: "Touch ID each time", trailing: h(Toggle, { label: "Iris may use it" }) })) },
+  ] }),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

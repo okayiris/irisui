@@ -4,16 +4,14 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "Small, with actions": () => h("div", { style: { border: "1px solid var(--line)", borderRadius: 18, overflow: "hidden" } },
-    h(AppBar, { title: "Loops", leading: h(Button, { variant: "icon", label: "Back", icon: h(Icon, { name: "chevron", size: 18 }) }),
-      actions: [ h(Button, { key: "a", variant: "icon", label: "Search", icon: h(Icon, { name: "sparkles", size: 18 }) }),
-                 h(Button, { key: "b", variant: "icon", label: "Settings", icon: h(Icon, { name: "person", size: 18 }) }) ] }),
-    h("div", { style: { padding: 16, fontSize: 14, color: "var(--dim)" } }, "The screens below live under this bar.")),
-    "Large, the title of a screen": () => h("div", { style: { border: "1px solid var(--line)", borderRadius: 18, overflow: "hidden" } },
-    h(AppBar, { variant: "large", title: "This week", sub: "Six loops, two waiting on you",
-      actions: h(Button, { variant: "icon", label: "New", icon: h(Icon, { name: "sparkles", size: 18 }) }) })),
+    "Small, with actions": () => h("div", null,
+    h(AppBar, { title: "Bins", sub: "A loop, every Tuesday", leading: h(Button, { variant: "icon", label: "Back", icon: h("span", { style: { display: "inline-flex", transform: "scaleX(-1)" } }, h(Icon, { name: "chevron", size: 18 })) }),
+      actions: h(Button, { variant: "icon", label: "Talk about this loop", icon: h(Icon, { name: "mic", size: 18 }) }) }),
+    h(Card, { style: { margin: 16 } }, h(Row, { title: "Next time", subtitle: "Tuesday 6 Oct, out by 8" }), h(Row, { title: "Who", subtitle: "You, she reminds you at 7" }))),
+    "Large, the title of a screen": () => h(AppBar, { variant: "large", title: "This week", sub: "Six loops, two waiting on you",
+      actions: h(Button, { variant: "icon", label: "New loop", icon: h(Icon, { name: "sparkles", size: 18 }) }) }),
   };
 })();
 

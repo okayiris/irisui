@@ -4,12 +4,12 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "Count, dot and a capped count": () => h("div", { style: { display: "flex", gap: 30, alignItems: "center", paddingTop: 8 } },
-    h(Badge, { count: 3 }, h(Button, { variant: "icon", label: "Loops", icon: h(Icon, { name: "loop", size: 18 }) })),
-    h(Badge, { dot: true }, h("span", { style: { fontSize: 15 } }, "Camera")),
-    h(Badge, { count: 128, max: 99, tone: "violet" }, h("span", { style: { fontSize: 15 } }, "Mail"))),
+    h(Badge, { count: 3 }, h(Button, { variant: "icon", label: "Loops, 3 new", icon: h(Icon, { name: "loop", size: 18 }) })),
+    h(Badge, { dot: true }, h(Button, { variant: "icon", label: "Camera, something new", icon: h(Icon, { name: "camera", size: 18 }) })),
+    h(Badge, { count: 128, max: 99 }, h(Button, { variant: "icon", label: "Calls, 128 missed", icon: h(Icon, { name: "phone", size: 18 }) }))),
   };
 })();
 

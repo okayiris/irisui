@@ -158,6 +158,27 @@
       "preview": "components/Carousel/preview.html"
     },
     {
+      "name": "Mark",
+      "group": "Brand",
+      "summary": "Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.",
+      "reads": "components/Mark/README.md",
+      "preview": "components/Mark/preview.html"
+    },
+    {
+      "name": "Edge",
+      "group": "Brand",
+      "summary": "The apps' light patterns along an edge: round her orb while she thinks, along a screen while it reloads. The TalkOrb and the Orb3D think with it.",
+      "reads": "components/Edge/README.md",
+      "preview": "components/Edge/preview.html"
+    },
+    {
+      "name": "EdgeText",
+      "group": "Brand",
+      "summary": "A word as a neon sign: the Edge light runs along the outline of every letter. SVG and CSS only.",
+      "reads": "components/EdgeText/README.md",
+      "preview": "components/EdgeText/preview.html"
+    },
+    {
       "name": "Divider",
       "group": "Surfaces",
       "summary": "A hairline that groups what is above it from what is below.",
@@ -198,6 +219,48 @@
       "summary": "Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.",
       "reads": "components/ChatStack/README.md",
       "preview": "components/ChatStack/preview.html"
+    },
+    {
+      "name": "MacPill",
+      "group": "Brand",
+      "summary": "Iris on the Mac desktop: her orb, a bar of buttons that grows out from behind it, her words above and one state line under it.",
+      "reads": "components/MacPill/README.md",
+      "preview": "components/MacPill/preview.html"
+    },
+    {
+      "name": "VaultAsk",
+      "group": "Overlays",
+      "summary": "The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches, then allow or no.",
+      "reads": "components/VaultAsk/README.md",
+      "preview": "components/VaultAsk/preview.html"
+    },
+    {
+      "name": "TableApp",
+      "group": "App layouts",
+      "summary": "A list you search, filter and open: search in the AppBar, filter chips, the rows on one Card, a count line, a row that opens a Sheet.",
+      "reads": "components/TableApp/README.md",
+      "preview": "components/TableApp/preview.html"
+    },
+    {
+      "name": "Gauge",
+      "group": "App layouts",
+      "summary": "The release's Stat with a meter under it: one number, its word, and how full it is.",
+      "reads": "components/Gauge/README.md",
+      "preview": "components/Gauge/preview.html"
+    },
+    {
+      "name": "Bars",
+      "group": "Feedback",
+      "summary": "Rows that say which one is the biggest: a name, a bar, the number, biggest first.",
+      "reads": "components/Bars/README.md",
+      "preview": "components/Bars/preview.html"
+    },
+    {
+      "name": "Days",
+      "group": "Feedback",
+      "summary": "One column per day, oldest left, the last one bright: a count over a fortnight.",
+      "reads": "components/Days/README.md",
+      "preview": "components/Days/preview.html"
     }
   ]
 }

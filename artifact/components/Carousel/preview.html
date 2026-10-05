@@ -4,14 +4,14 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "Three cards": () => h(Carousel, { label: "What is waiting" }, [
-    h(Card, { key: 1, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Tandarts"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Dinsdag 14:00, bevestigen")),
-    h(Card, { key: 2, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Pakket"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Komt vandaag tussen 13 en 15")),
-    h(Card, { key: 3, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Aannemer"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Offerte vergelijken")),
+    h(Card, { key: 1, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Dentist"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Tuesday 14:00, confirm it")),
+    h(Card, { key: 2, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Parcel"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Arrives today between 13 and 15")),
+    h(Card, { key: 3, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, "Contractor"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Compare the quotes")),
   ]),
-    "With arrows": () => h(Carousel, { arrows: true, label: "This week" }, [0, 1, 2].map((i) => h(Card, { key: i, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, ["Maandag", "Dinsdag", "Woensdag"][i]), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Three things, one waiting on you")))),
+    "With arrows": () => h(Carousel, { arrows: true, label: "This week" }, [0, 1, 2].map((i) => h(Card, { key: i, style: { padding: 16 } }, h("div", { style: { fontSize: 17 } }, ["Monday", "Tuesday", "Wednesday"][i]), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "Three things, one waiting on you")))),
   };
 })();
 

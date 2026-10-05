@@ -55,6 +55,9 @@ export function Tooltip({ label, children, delay = 320, open: shown }: { label: 
   /** `open` holds the tooltip out, for a screenshot or a guide; without it hover and focus decide. */
   const open = shown ?? hovered;
   const timer = useRef<Any>(null);
+  const host = useRef<Any>(null);
+  const body = useRef<Any>(null);
+  const [pos, setPos] = useState<{ x: number; y: number; above: boolean } | null>(null);
   const id = useId();
 
   const show = useCallback(() => {
@@ -65,36 +68,56 @@ export function Tooltip({ label, children, delay = 320, open: shown }: { label: 
     window.clearTimeout(timer.current);
     setOpen(false);
   }, []);
+  /**
+   * Where the card hangs. It is placed fixed from the anchor's own rectangle, so a list that scrolls - a table
+   * with `overflow: auto`, a lane, a sheet - cannot clip it, and it flips above the anchor when there is no room
+   * below. The measuring happens while it is still invisible, so it never shows at the wrong place first.
+   */
+  const place = useCallback(() => {
+    const a = host.current?.getBoundingClientRect(), b = body.current?.getBoundingClientRect();
+    if (!a || !b) return;
+    const above = a.top > b.height + 12;
+    setPos({
+      x: Math.max(8, Math.min(a.left + a.width / 2 - b.width / 2, window.innerWidth - b.width - 8)),
+      y: above ? a.top - b.height - 8 : a.bottom + 8,
+      above,
+    });
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    place();
+    // Escape closes it, the same as the hand leaving: a card that follows a row must not stay behind.
+    const onKey = (e: Any) => e.key === "Escape" && setOpen(false);
+    const onMove = () => place();
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onMove, true);
+    window.addEventListener("resize", onMove);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onMove, true);
+      window.removeEventListener("resize", onMove);
+    };
+  }, [open, place]);
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   return h(
     "span",
     {
       className: "ix-tip",
-      "data-open": open ? "1" : "0",
+      "data-open": open && pos ? "1" : "0",
       onMouseEnter: show,
       onMouseLeave: hide,
       onFocus: show,
       onBlur: hide,
     },
-    h("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : undefined }, children),
-    h("span", { className: "ix-tip-body", role: "tooltip", id }, label),
+    h("span", { className: "ix-tip-anchor", ref: host, "aria-describedby": open ? id : undefined }, children),
+    h(
+      "span",
+      { className: "ix-tip-body", ref: body, role: "tooltip", id, "data-above": pos?.above ? "1" : undefined, style: pos ? { left: pos.x, top: pos.y } : undefined },
+      label,
+    ),
   );
 }
-
-/* ------------------------------------------------------------------- Menu */
-
-export type MenuItem = {
-  label?: string;
-  icon?: Any;
-  shortcut?: string;
-  checked?: boolean;
-  danger?: boolean;
-  disabled?: boolean;
-  onSelect?: () => void;
-  /** "label" is a group heading, "sep" a separator: neither is focusable. */
-  kind?: "item" | "label" | "sep";
-};
 
 export function Menu({
   items,
@@ -2584,6 +2607,151 @@ function Toggle({ on = false, onChange, label, disabled }: { on?: boolean; onCha
   );
 }
 
+/* --------------------------------------------------------------------- Row */
+
+const BaseRow = (window as Any).IrisUi?.Row;
+
+/**
+ * The release's Row draws a `div` with the click handler on it, and a keyboard cannot reach that: no tab, no
+ * Enter, no role. Where the row opens something (\`onClick\`), the additions hand back the same row inside a real
+ * button, so it is the one control it looks like. Nothing else changes: the row keeps its own look inside.
+ */
+export function Row(props: Any) {
+  if (!BaseRow) return null;
+  const { onClick, ...rest } = props ?? {};
+  if (!onClick) return h(BaseRow, rest);
+  return h("button", { type: "button", className: "ix-row-btn", onClick }, h(BaseRow, rest));
+}
+
+/* ------------------------------------------------------------------ Gauge */
+
+const BaseStat = (window as Any).IrisUi?.Stat;
+const BaseProgress = (window as Any).IrisUi?.Progress;
+
+/** The three levels of a number that can fill up, in the status colours only: never colour without the word. */
+const TONE: Record<string, string> = { ok: "var(--ok)", wait: "var(--wait)", error: "var(--error)" };
+
+/**
+ * The release's Stat with a meter under it: one number, its word, and how full it is. Without `progress` it is the
+ * Stat itself, so a page can put both kinds in one grid without a seam. `unit` rides beside the number, `note` is
+ * one quiet line under the word, `lines` are the marks a value is measured against (0..1), and `tone` colours the
+ * number and the meter when the number is a limit that is filling up.
+ */
+export function Gauge({
+  value,
+  label,
+  unit,
+  note,
+  progress,
+  lines,
+  tone,
+  topic,
+}: {
+  value: Any;
+  label: string;
+  unit?: string;
+  note?: string;
+  /** 0..1: how full it is. Without it this is the release's Stat. */
+  progress?: number;
+  /** Where the lines are, 0..1 each: the mark a value is measured against. */
+  lines?: number[];
+  tone?: "ok" | "wait" | "error";
+  topic?: string;
+}) {
+  if (progress == null && !unit && !note && !tone && !lines?.length) return h(BaseStat ?? "div", { value, label, topic });
+  const kleur = tone ? TONE[tone] : "var(--accent)";
+  const v = Math.max(0, Math.min(1, progress ?? 0));
+  return h(
+    "div",
+    { className: "iris-stat ix-gauge", style: { ...(topicVars(topic) ?? {}), "--ix-tone": kleur } },
+    h("div", { className: "ix-gauge-head" }, h("b", null, value), unit ? h("span", { className: "ix-gauge-unit" }, unit) : null),
+    h("span", { className: "ix-gauge-label" }, label),
+    progress != null
+      ? h(
+          "span",
+          { className: "ix-gauge-bar" },
+          BaseProgress
+            ? h(BaseProgress, { value: v })
+            : h("span", { className: "iris-bar" }, h("i", { style: { width: `${v * 100}%` } })),
+          ...(lines ?? []).map((l) => h("i", { className: "ix-gauge-line", style: { left: `${Math.max(0, Math.min(1, l)) * 100}%` } })),
+        )
+      : null,
+    note ? h("span", { className: "ix-gauge-note" }, note) : null,
+  );
+}
+
+/* ------------------------------------------------------------------- Bars */
+
+/**
+ * Rows that say which one is the biggest: a name, a bar, the number. One series in the accent, sorted by the
+ * caller, and a value that is over the line takes its tone. `href` makes the name a link, `title` is the line a
+ * hover shows when the number needs saying.
+ */
+export function Bars({
+  rows = [],
+  format = String,
+  max,
+  empty = "Nothing here yet.",
+}: {
+  rows?: { label: string; value: number; href?: string; tone?: "ok" | "wait" | "error"; title?: string }[];
+  format?: (value: number) => string;
+  /** The value a full bar means; without it the biggest row is the full bar. */
+  max?: number;
+  empty?: string;
+}) {
+  if (!rows.length) return h("p", { className: "ix-bars-empty" }, empty);
+  const top = max ?? Math.max(1, ...rows.map((r) => r.value));
+  return h(
+    "div",
+    { className: "ix-bars" },
+    rows.map((r) =>
+      h(
+        "div",
+        { className: "ix-bars-row", key: r.label, title: r.title },
+        h("span", { className: "ix-bars-name" }, r.href ? h("a", { href: r.href }, r.label) : r.label),
+        h(
+          "span",
+          { className: "ix-bars-track", style: r.tone ? { "--k": TONE[r.tone] } : undefined },
+          BaseProgress
+            ? h(BaseProgress, { value: top > 0 ? r.value / top : 0 })
+            : h("span", { className: "iris-bar" }, h("i", { style: { width: `${top > 0 ? (r.value / top) * 100 : 0}%` } })),
+        ),
+        h("span", { className: "ix-bars-value" }, format(r.value)),
+      ),
+    ),
+  );
+}
+
+/* ------------------------------------------------------------------- Days */
+
+/**
+ * One column per day, oldest first, the newest one bright: a count over a fortnight. `days` carries the label
+ * under the column and the line a hover shows. The height is the chart's, the bars fill it.
+ */
+export function Days({
+  days = [],
+  format = String,
+  height = 90,
+}: {
+  days?: { label: string; value: number; title?: string }[];
+  format?: (value: number) => string;
+  height?: number;
+}) {
+  const top = Math.max(1, ...days.map((d) => d.value));
+  return h(
+    "div",
+    { className: "ix-days", style: { height } },
+    days.map((d, i) =>
+      h(
+        "span",
+        { className: "ix-days-col", key: d.label, title: d.title ?? `${d.label}: ${format(d.value)}`, "data-now": i === days.length - 1 ? "1" : undefined },
+        h("span", { className: "ix-days-bar" }, h("i", { style: { height: `${d.value ? Math.max(8, (d.value / top) * 100) : 2}%` } })),
+        h("span", { className: "ix-days-label" }, d.label),
+      ),
+    ),
+  );
+}
+
 // The shipped Orb3D shader declares its own round(); GLSL ES 3.00 already has one, so the compile fails and the
 // orb draws nothing. Until the release renames it, the source is renamed on its way to the GPU.
 for (const C of [(window as Any).WebGL2RenderingContext, (window as Any).WebGLRenderingContext]) {
@@ -2635,6 +2803,10 @@ const SHIPPED = {
   MacPill,
   VaultAsk,
   TableApp,
+  ...(BaseRow ? { Row } : {}),
+  Gauge,
+  Bars,
+  Days,
   ...(BaseWord ? { Word } : {}),
   ...(BaseIcon ? { Icon } : {}),
   ...(BaseThemeWord && BaseWord ? { ThemeWord } : {}),

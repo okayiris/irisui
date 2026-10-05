@@ -4,13 +4,12 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "Unpair, a destructive decision": () => { const [open, setOpen] = React.useState(true);
-  return h("div", null, h(Dialog, { open, onClose: () => setOpen(false), title: "Unpair this device?",
+  return h(Dialog, { open, onClose: () => setOpen(false), title: "Unpair this device?",
     body: "She stops listening and talking here. Everything she stored stays in your vault.",
-    actions: [ { label: "Unpair", variant: "danger" }, { label: "Keep it" } ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, open ? "Waiting on you" : "Closed")); },
+    actions: [ { label: "Keep it" }, { label: "Unpair", variant: "danger" } ] }); },
     "A waiting question": () => { const [open, setOpen] = React.useState(true);
   return h(Dialog, { open, onClose: () => setOpen(false), title: "Send this to Alex?",
     body: "The list for Saturday, with the two things you added.",

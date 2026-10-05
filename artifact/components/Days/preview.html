@@ -1,0 +1,26 @@
+<!-- @dsCard group="Feedback" height=220 -->
+<!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
+  window.__dsPreview = {
+    "A fortnight": () => h(Card, null, h(SectionLabel, null, "Alerts, per day"), h(Days, { format: (v) => v + (v === 1 ? " alert" : " alerts"), days: [
+    { label: "20", value: 0 }, { label: "21", value: 2 }, { label: "22", value: 0 }, { label: "23", value: 1 },
+    { label: "24", value: 4 }, { label: "25", value: 0 }, { label: "26", value: 3 }, { label: "27", value: 1 },
+    { label: "28", value: 0 }, { label: "29", value: 0 }, { label: "30", value: 2 }, { label: "01", value: 5 },
+  ] })),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

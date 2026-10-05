@@ -130,7 +130,15 @@ Voorbeeldpagina's web, Mac, Chrome, TV en vault herbouwd na een harde audit (51 
 `nav.js`: de balk loopt nu van rand tot rand, ook op de labs.
 Commits 9da954c, 7dfe009, 2c20b89, ea205b8, c4d0280, eb72709.
 Aanvulling: het Mac-voorbeeld toont "Call at {retry}" weer ingevuld, nu `IrisApp` sheet-tekst en snacks invult (commit eb8a684, `public/examples/mac/index.html`).
-Open: `MacPill`, `DashboardApp`, `TableApp` e.d. bestaan niet als component. Android-punten zitten in `index.html` en zijn niet aangeraakt.
+Aanvulling: web-app, Mac-instellingen en Chrome-zijpaneel draaien nu helemaal op `IrisApp` (`spec.rail` = NavRail links, sheets van rechts, `onState`). Commits 103acb6 (`public/examples/web/index.html`), 2353e9a (mac), f3c684e (chrome). Eén spec in plaats van handwerk, `checkApp` toetst ze live. Screenshot: ![Web op IrisApp](.playwright/screenshots/werklog/2026-10-01-web-op-irisapp.png)
+Aanvulling: commit 4ede6ad (`public/examples/web/index.html`, `public/examples/chrome/index.html`). Zoeken op "What Iris did" is terug (`IrisApp` each + filter/where uit 83ce3e1). In het Chrome-zijpaneel staat Stop (daarna Close) rechtsboven als top-actie. Verstuurde berichten: een bericht geeft eerst "Iris is thinking." en na 1,5 s haar antwoord, via Field `on` + `later:` in `IrisApp` (commit a33830c, `public/examples/web/index.html`). Screenshot: ![Web zoeken](.playwright/screenshots/werklog/2026-10-01-web-zoeken.png)
+Aanvulling: de voorbeelden gebruiken nu de nieuwe echte componenten (9f55cea) in plaats van eigen nabouw. Mac f762e7d: pill is `MacPill`. Web 258504e: What Iris did is `TableApp`. Vault 6e28b60: Mac vraagt met `VaultAsk`, kluisvenster is NavRail + `TableApp` met Add. Chrome 9157789: wachtwoord bewaren is `VaultAsk`. Screenshot: ![Vault met TableApp](.playwright/screenshots/werklog/2026-10-01-vault-tableapp.png)
+Opgelost in 38f1015 (componentfix, nagekeken op web en vault): `TableApp` knipte de titel, het zoekveld stak uit en de sheet bedekte niet het hele venster. Stappen lopen nu door op een volgende regel.
+Aanvulling: de vault op de telefoon vraagt nu met de house `VaultAsk` in zijn `IrisApp`-sheet (commit 0b6ef2d, `public/examples/vault/index.html`). Kon doordat `IrisApp` in 935dfdf elke `onX`-prop als actie-tekst begrijpt. Screenshot: ![Vault telefoon met VaultAsk](.playwright/screenshots/werklog/2026-10-01-vault-telefoon-vaultask.png)
+Gecontroleerd: party (koraal, 0981c54) op telefoon Neon, Chats en TV-foto leest goed. `Explain` komt in geen voorbeeld voor.
+Opgelost in c1c0e7d (componentfix, nagekeken, canvas weer 358px breed): het grote woord "Party" op Neon tekende niets sinds 74d4791 (`Word` kreeg een `.ix-word`-omhulsel dat in de hero 0 breed werd).
+Open: TV-foto is nog de `Photo`-placeholder (de kleur leest goed, maar er is geen echte foto met dieptekaart in de repo).
+Aanvulling Android (`public/examples/index.html`, commit 54047b2): statusbalk toont "5G", een batterijvorm en "80%" in plaats van losse tekens. De tabbalk staat op Android op een dichte strook met de gesture-balk erin, ruim 10px vrij van de labels en de orb. Terug op detailschermen werkte al via `IrisApp`. Screenshot: ![Android-statusbalk](.playwright/screenshots/werklog/2026-10-01-android-statusbalk.png)
 
 **Waarom**
 Meaning-regels afdwingen: een orb per oppervlak, rood alleen voor verwijderen, violet alleen voor aan en haar ring, haar aanwezigheid linksboven, een primaire actie. Elke knop doet iets echts, demo-knoppen staan niet meer in de app.
@@ -153,3 +161,148 @@ Demo's liepen over op 390 breed, frames hadden vaste hoogtes, demo-knoppen deden
 
 **Bestanden**
 `public/site.js`, `public/demos.css`, `src/site/{demos,content,overrides-core,overrides-brand,ext-components}.ts`, `src/ds/ext.tsx`, `src/ds/ext.css`.
+
+## 2026-10-01 IrisApp als venster
+
+**Wat**
+`spec.rail` geeft een NavRail links, de pagina ernaast (max 760 breed), sheets schuiven van rechts in en dialogen staan gecentreerd. `tab:i` schakelt de rail. Commit c3f0d3f.
+Joris koos ook: topic-kleuren verschuiven, Word zonder doos, MacPill, TableApp en VaultAsk als echte componenten (agents bezig).
+Commit 178e249 (`src/ds/app.tsx`): een tekstveld voert na Enter zijn actie uit, met de verstuurde tekst erbij. `set:key=` zet een lege tekst in plaats van 0. Zo kan het web-voorbeeld na versturen een antwoord krijgen; de voorbeeldagent zette zoeken en Stop/Close terug in 4ede6ad.
+Commit 935dfdf (`src/ds/app.tsx`): elke `onIets`-prop met een actietekst wordt in IrisApp een echte handler. Zo kan VaultAsk (onAllow/onDeny/onAlways) binnen een app-spec acties uitvoeren; de vault op de telefoon kon daardoor niet op VaultAsk. Joris koos ook: explain wordt zachtgeel, party koraalroze (componentagent bezig).
+Commit 83ce3e1: lijsten filteren op zoektekst of veld (`each` + `filter`/`where`), `later:ms:actie` voert een actie na een wachttijd uit, `top:` zet één actie rechtsboven in de kop, een lege lijst telt als onwaar.
+
+**Waarom**
+Web, Mac-instellingen, vault en Chrome bouwden dezelfde schil vier keer. Joris koos voor een vensterschil.
+De voorbeeldagent zette web (103acb6), Mac-instellingen (2353e9a) en het Chrome-paneel (f3c684e) volledig op het venster en verloor daarbij zoeken, het antwoord na versturen en een knop boven de vouw. Dat is nu terug. Android-fixes: 54047b2.
+
+**Bestanden**
+`src/ds/app.tsx`, `src/ds/ext.css` (`.ia-win`).
+
+![IrisUI](.playwright/screenshots/werklog/2026-10-01-irisapp-window.png)
+
+## 2026-10-01 Keuzes van de eigenaar uitgevoerd: topic-kleuren en drie nieuwe componenten
+
+**Wat**
+Topic-kleuren aangepast: mail blauwgrijs, sport oranje, tasks teal. Violet blijft alleen voor aan en de ring, rood alleen voor vernietigend. Word heeft geen getint vlak meer achter het woord (74d4791).
+Drie nieuwe componenten, elk met eigen pagina, uitleg en werkende demo (9f55cea): MacPill (orb, uitschuivende balk, statusregel met de weg terug, badge), VaultAsk (wie, vanaf waar, waarom, wat het doet, hoe ver het reikt, toestaan of nee), TableApp (zoeken, filterknoppen, rijen, telregel, rij opent zijpaneel).
+Commit 78e1956: de eigenaar besliste dat het magenta voor "wacht op jou" in ChatStack en CircleStack blijft. Een fasekleur mag buiten de ring staan als hij een fase van een loop aangeeft (vastgelegd in `src/site/content/foundations-meaning.ts`). De omzetting naar de wachtkleur is teruggedraaid in `src/ds/ext.css` en `src/ds/ext.tsx`.
+Widget: het vinkje voor "klaar" krijgt de kleur van het topic in plaats van violet. De kop "MONDAY" in WidgetPagesApp is gedimd in plaats van rood (`public/demos.css`).
+De tabel "Which Iris, how big" is documentatie, dus meerdere orbs naast elkaar mogen daar. Eén zin hierover in `src/site/ext-docs.ts`.
+Commit 0981c54: de eigenaar besloot ook explain en party om te kleuren. explain gaat van violet naar koel, zacht geel (#ede98a), duidelijk anders dan de wachtkleur zodat een topic nooit leest als "wacht". party gaat van magenta naar koraalroze (#fdab9f), net niet rood. Contrast boven 9:1 op de achtergrond en op de eigen ondergrond. BorderPattern "wacht op jou" gebruikt nu de wachtkleur in plaats van magenta.
+TableApp in een IrisApp-venster (38f1015): examplesfix zag vier fouten op de webpagina "What Iris did".
+- De titel was afgeknipt ("oday"): de AppBar kreeg de negatieve marge van het scherm. Hij lijnt nu uit met de rand van het scherm.
+- Het zoekveld groeide tijdens het typen. Het heeft nu een vaste breedte van 240px.
+- Het detailpaneel opent nu vanaf de zijkant van het hele venster, niet alleen boven de lijst. Nieuwe prop `onOpen(row)` laat een pagina een rij zelf openen.
+- Een lange stap in een detail loopt door op de volgende regel in plaats van af te breken met "...".
+Commit c1c0e7d: het neon-woord "Party" op het Neon-scherm van de voorbeeld-app was leeg. Word had eerder een omhulsel gekregen (om het getinte vlak weg te halen). In een rooster dat de inhoud centreert kromp dat omhulsel tot 0px breed, dus het woord kon niet tekenen. Het omhulsel neemt nu altijd de volle breedte, overal waar een Word in zo'n rooster staat (`src/ds/ext.css`).
+
+**Waarom**
+Vervolg op de audit: de topic-kleuren botsten met de kleurregels. De eigenaar koos de verschuiving, Word zonder doos en de drie componenten.
+
+**Bestanden**
+`src/ds/ext.tsx`, `src/ds/ext.css`, `src/site/ext-components.ts`, `src/site/ext-docs.ts`, `src/site/content.ts`, `src/site/content/overrides-apps.ts`, `src/site/content/foundations-a.ts`, `src/site/content/foundations-meaning.ts`, `src/site/content/overrides-brand.ts`, `public/demos.css`.
+
+Stand: alle agents klaar, alles lokaal gecommit, niets gepusht. Het neon-woord "Party" op het telefoonvoorbeeld bleef leeg sinds Word een wrapper kreeg (74d4791); opgelost in c1c0e7d en nagekeken op screenshot: het woord staat er in koraal, zonder doos. Eerder open, nu opgelost (zie blok "Frost F5 en home in warm zand"): eigen kleur voor het home-topic en welke Frost (F1-F6 in Ringlab) naar het weerscherm gaat.
+
+## 2026-10-01 Frost F5 en home in warm zand
+
+**Wat**
+Commit b296186 (`src/ds/ext.tsx`, `src/ds/ext.css`): ThemeWord "frozen" is nu Ringlabs F5. IJsvarens groeien vanuit de onderhoeken naar een schoon ijswit woord, zonder doos. Een tik laat ze opnieuw groeien.
+Het home-topic is warm zand (#e6c79c) in plaats van het wachtgeel.
+
+**Waarom**
+Joris koos vanochtend F5 uit de zes nieuwe Frost-varianten. Geel moet alleen nog "wachten" betekenen. De open vragen over Frost en home-kleur in eerdere blokken van vandaag zijn hiermee opgelost.
+
+**Bestanden**
+`src/ds/ext.tsx`, `src/ds/ext.css`.
+
+![IrisUI](.playwright/screenshots/werklog/2026-10-01-frost-f5.png)
+
+## 2026-10-01 Dev-server herlaadde zichzelf eindeloos
+
+**Wat**
+`scripts/dev.mjs` (poort 4173) herlaadde de browser elke ~3 seconden. De watcher negeert nu `public/ds/ext.(js|css)`. Wijzigingen in `src/ds/ext.*` triggeren nog gewoon een rebuild. Server herstart, 10s op `/__dev` geluisterd: geen builds meer.
+
+**Waarom**
+`scripts/build-ext.mjs` schrijft `public/ds/ext.js` en `public/ds/ext.css`, en `public/` werd bewaakt. Elke build triggerde dus de volgende.
+
+**Bestanden**
+`scripts/dev.mjs`.
+
+## 2026-10-01 Zijmenu blijft staan bij klikken
+
+**Wat**
+`.side` sprong bij elke klik op een menulink terug naar boven (elke link is een volledige paginalading). `public/site.js` slaat nu `scrollTop` van `.side` op in `sessionStorage` (`irisui:side`) bij `pagehide` en zet hem bij laden terug. Getest in Chrome op `http://localhost:4173/components/select`: menu op 900px, klik op Select, nieuwe pagina staat op 900px met Select gemarkeerd.
+
+**Waarom**
+Volledige paginalading start altijd bovenaan, dus het menu verloor zijn plek.
+
+**Bestanden**
+`public/site.js`.
+
+## 2026-10-01 Buurregels in Meaning en een Picture-onderdeel
+
+**Wat**
+Meaning krijgt de sectie "Neighbours": N1 een 'nu' per scherm, N2 een woord herhaalt zijn lijst niet, N3 een drukke tegel per rij, N4 rustige buren voor de theme-widget, N5 patroon alleen achter een paneel, N6 een getal zegt wat het telt. `checkApp` toetst ze (commit 2bd687d).
+IrisApp krijgt het onderdeel Picture: een foto als inhoud met bijschrift.
+
+**Waarom**
+Regels voor wat naast elkaar mag, uit het Ringlab-werk, horen in het ontwerpsysteem. Foto's als inhoud ontbraken.
+
+**Bestanden**
+`src/site/content/foundations-meaning.ts`, `src/ds/app.tsx`, `src/ds/ext.css`.
+
+## 2026-10-01 Vegen tussen tabbladen
+
+**Wat**
+In IrisApp wissel je met horizontaal vegen van tabblad: eerst de eigen Tabs van het scherm (Today/All), anders de tabbalk op een tab-hoofdscherm. De pil van de tabbalk volgt de vinger (TabBar progress). Vegen dat begint in een rail, pagina's, carousel, veld of sheet blijft daar (commit f749f22). Getest: Today -> Calls -> Camera en terug.
+
+**Waarom**
+Joris merkte dat tabs nog niet met gebaren werkten.
+
+**Bestanden**
+`src/ds/app.tsx`.
+
+## 2026-10-01 Light en dark mode voor Iris
+
+**Wat**
+Iris heeft light en dark: volgt `prefers-color-scheme`, `data-mode="light|dark"` op `<html>` overrulet (besluit Joris, was "dark only"). Light tokens en `light-dark()`-helften voor de vaste donkere kleuren van de release in `src/ds/ext.css`. Lichte topic- en fasekleuren (`TOPIC_LIGHT`, >= 4.5:1) in `src/ds/ext.tsx`, wisselen live mee.
+Site: Auto/Light/Dark-schakelaar in de header (`Shell.tsx`, localStorage `iris-mode`); `site.css`, `demos.css`, demo-frames en examples volgen mee.
+Gate (`scripts/check.mjs`) meet contrast in de browser in light en dark; lokale Ringlab-pagina's (`/lab/*`, theme-lab) overgeslagen omdat ze hangen.
+Docs: AGENTS.md regel 4, `docs/HANDOVER-examples-meaning.md`, Colour-hoofdstuk met beide waarden.
+Commits: e43ba5e, b1cebf7, 6093c65, d6d708a, 8adcf46.
+Open: PhaseRing-track en device-mockups van de release blijven donker; topic-accenten in light halen 4.5:1, niet de 6:1 huisnorm.
+
+**Waarom**
+Joris wilde een lichte variant naast de donkere. De gate moest die ook bewaken, anders kruipt slecht contrast erin.
+
+**Bestanden**
+`src/ds/ext.css`, `src/ds/ext.tsx`, `src/site/Shell.tsx`, `src/site/site.css`, `src/site/demos.css`, `scripts/check.mjs`, `AGENTS.md`, `docs/HANDOVER-examples-meaning.md`, `src/site/content/foundations-a.ts`.
+
+## 2026-10-01 Release v33
+
+**Wat**
+IrisUI v33 gepubliceerd naar https://okayiris.github.io/irisui/ (gh-pages), gebouwd uit een schone worktree zonder Ringlab-modules (`IRISUI_INTERNAL` leeg); tag v33 lokaal. Versie 33.0.0, release notes "Release v33" (`src/site/content/resources.ts`, `nav.ts`, `package.json`, README).
+Gate eerst 14 fouten, opgelost: dode links naar labs (Labs-link uit de publieke voorbeeldbalk, `public/examples/nav.js`), dubbele h1/main (IrisApp is nu een section met h2-titel in `src/ds/app.tsx`, root van overzicht en web is main), orbmaten (chrome 16, tv TalkOrb). Meaning en `site.css` noemen geen Ringlab meer.
+Gate: 118 pagina's en 160 demo-frames schoon; live site toont v33 en geen Ringlab.
+Commits: 6301ecd, 8886d40, bd9e6fa, d94b6eb, 91b48e9.
+Niet gedaan: main niet naar GitHub gepusht, npm-pakket `@okayiris/ui` niet gepubliceerd (was nooit); ongecommitte wijzigingen van een andere sessie (`public/site.js`, `scripts/dev.mjs`) niet meegenomen.
+
+**Waarom**
+Joris: "Kan je de ui kit even release, v+1 ... je moet niet de lab releasen, die blijft alleen van ons."
+
+**Bestanden**
+`src/site/content/resources.ts`, `src/site/content/nav.ts`, `package.json`, `README.md`, `public/examples/nav.js`, `src/ds/app.tsx`, `src/site/site.css`.
+
+## 2026-10-01 Release v34: Card met topic
+
+**Wat**
+- `Card` krijgt `topic`: stille onderwerp-ondergrond zoals een Widget, eerste label in de onderwerpkleur, geen beweging of drukte. `IrisApp` geeft `topic` door. Docs, preview en types bijgewerkt, release-notes "Release v34".
+- Check groen (118 pagina's, 161 demo's). Commit 000464a, tag v34. Site gepubliceerd vanuit schone worktree op v34: okayiris.github.io/irisui, geen Ringlab.
+- Pakket `iris-ui` 34.0.0 in de pluginwinkel; testhuis tthc8 bijgewerkt.
+
+**Waarom**
+- De Plugins-kaarten in de app misten een categoriekleur. Regel van Joris: een ontbrekend onderdeel bouwen we direct in de kit.
+
+**Bestanden**
+- `Card`-component, `src/ds/app.tsx`, docs, preview, types, `src/site/content/resources.ts`, `package.json`.

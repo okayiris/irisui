@@ -240,6 +240,20 @@
     a.addEventListener("blur", hide);
   }
 
+  // ---- the menu stays where you left it -----------------------------------------
+  // Every link is a full page load, which puts the menu back at its top. Keep its scroll across pages.
+  const side = q(".side");
+  if (side) {
+    try {
+      side.scrollTop = Number(sessionStorage.getItem("irisui:side") || 0);
+    } catch {}
+    addEventListener("pagehide", () => {
+      try {
+        sessionStorage.setItem("irisui:side", String(side.scrollTop));
+      } catch {}
+    });
+  }
+
   // ---- the rail marks where you are -------------------------------------------
   const railLinks = qa(".rail-link");
   if (railLinks.length && "IntersectionObserver" in window) {

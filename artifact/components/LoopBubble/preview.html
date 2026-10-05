@@ -4,10 +4,10 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "Every phase": () => h("div", { style: { display: "flex", gap: 14, alignItems: "center", paddingTop: 8 } },
-    ["Recognised", "Planned", "Busy", "You", "Check", "Done"].map((t, i) => h(LoopBubble, { key: t, title: t, step: i }))),
+    "Every phase": () => h("div", { style: { display: "flex", flexWrap: "wrap", gap: 16, paddingTop: 8 } },
+    ["Recognised", "Planned", "Busy", "You", "Check", "Done"].map((t, i) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 6, fontSize: 12, color: "var(--label)" } }, h(LoopBubble, { title: t, step: i }), t))),
   };
 })();
 

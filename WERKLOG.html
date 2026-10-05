@@ -70,215 +70,210 @@
 <body>
 <h1>Werklog</h1>
 <p class="intro">Een overzicht van wat er is gedaan, in gewone taal.</p>
-
 <article>
-<h2>2026-10-01 Fouten in de onderdelen uit de strenge controle opgelost</h2>
+<h2>2026-10-01 Release v34: kaarten met onderwerpkleur</h2>
 <h3>Wat</h3>
-<p>Een strenge controle van het ontwerpsysteem vond een reeks fouten in de
-losse onderdelen. Die zijn opgelost. De voorbeelden lopen op een telefoon en op
-een groot scherm niet meer over de rand. De kaders passen zich aan de hoogte van
-hun inhoud aan. De bol (Orb3D) wordt weer getekend. De aan/uit-schakelaar
-werkt zelf en heeft een naam. De knop met een uitklapdeel is nu een
-geheel. De scheidingslijn laat zijn tekst zien. De datum- en tijdkiezer passen
-op een telefoon. De losse testregels onder onderdelen ("Chosen: ...") zijn weg
-en knoppen in de voorbeelden doen nu iets. Een pagina kan nu ook een eigen
-voorbeeld tonen in plaats van het standaardplaatje.</p>
+<p>Kaarten kunnen nu een rustige achtergrond in de kleur van hun onderwerp krijgen, zoals widgets al hadden. Er beweegt niets en het blijft rustig. De app-schermen geven dit door.</p>
+<p>Alle controles slagen (118 pagina's en 161 voorbeelden). De site is opnieuw gepubliceerd als versie 34, zonder het interne lab. Het pakket in de winkel en het testhuis zijn bijgewerkt.</p>
 <h3>Waarom</h3>
-<p>Voorbeelden zaten te breed of te hoog in hun kader, knoppen deden niets,
-er stonden testregels in beeld en regels over kleur en tekst werden
-overtreden.</p>
-<h3>Nog te beslissen</h3>
-<p>Vier smaakvragen voor Joris: de kleuren per onderwerp (mail paars, sport
-rood, taken magenta), het doosje om Word, de kwaliteit van ThemeWord en de
-magenta kleur voor "jij" in ChatStack.</p>
-</article>
-
-<article>
-<h2>2026-10-01 Voorbeeldpagina's gebouwd met de echte onderdelen</h2>
-<h3>Wat</h3>
-<p>De voorbeeldpagina's voor web, Mac, Chrome, tv en de kluis zijn opnieuw
-opgebouwd. Eerst zat er veel in dat alleen leek op de echte onderdelen. Nu
-gebruiken ze de echte: de zijbalk, de bovenbalk, het statuslabeltje, menu's,
-uitschuifpanelen, vensters, lijstrijen en het zoekveld. De schermen die op een
-paneel of telefoon lijken (Mac-gesprekken en kluis, tv-schermkeuze, kluis op
-telefoon) worden getekend vanuit een korte beschrijving. De balk bovenin loopt
-nu ook op de proefpagina's van rand tot rand.</p>
-<p>De lege plekken in meldingen en knoppen (zoals "Bel om {retry}") zijn
-inmiddels ingevuld, ook in het Mac-voorbeeld. Nog niet af: enkele onderdelen
-uit het ontwerp bestaan nog niet als bouwsteen. De Android-punten zijn niet aangeraakt.</p>
-<h3>Waarom</h3>
-<p>Een strenge controle vond 51 punten. De vaste ontwerpregels moesten
-daarin echt gelden: een bol per scherm, rood alleen om iets te verwijderen,
-paars alleen voor aan en haar ring, haar aanwezigheid linksboven en een
-hoofdactie per scherm. Elke knop doet iets echts. Knoppen die er alleen voor
-de demo zaten zijn weg.</p>
-<p><img src=".playwright/screenshots/werklog/2026-10-01-voorbeelden-echte-componenten.png" alt="De webversie van het voorbeeld met de echte onderdelen" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
-</article>
-
-<article>
-<h2>2026-10-01 Een hele app uit een korte beschrijving</h2>
-<h3>Wat</h3>
-<p>Het ontwerpsysteem kan nu een complete app tekenen uit een korte
-beschrijving, met de echte bouwstenen. Er zijn schermen die je opent en weer
-sluit, uitschuifpanelen en meldingen in meerdere lagen, en onderdelen waar je
-doorheen veegt. Een ingebouwde controle toetst de ontwerpregels automatisch.</p>
-<p>De telefoonvoorbeelden zijn opnieuw opgebouwd op deze manier. Alles is
-aanklikbaar en bij elk scherm staat direct of het de regels haalt. Ook zijn
-een paar bouwstenen verbeterd: rijen in een kaart hebben geen eigen
-glanslaag meer, een enkele lus heeft geen dubbele rand meer en een lege
-staat toont geen nep-bol meer. Later is ook de invulling van teksten
-verbeterd: in meldingen en knoppen stond soms nog een lege plek (zoals
-"Bel om {retry}") en die wordt nu met de echte waarde gevuld. Op een breed
-scherm staat de melding rechtsonder. Daarna kreeg de app twee extra
-mogelijkheden: hij kan de pagina eromheen laten weten in welke toestand hij zit,
-en een uitschuifpaneel kan na de hoofdknop nog meer knoppen krijgen. Dat was
-nodig voor de voorbeeldpagina's van web, Mac, Chrome, tv en de kluis.</p>
-<h3>Waarom</h3>
-<p>De voorbeelden en de indelingsmaker stonden stil, terwijl de bouwstenen
-verder waren. Joris wees acht fouten aan, zoals twee bollen op een scherm,
-vakken in vakken en schakelaars die er alleen voor de demo zaten.</p>
-</article>
-
-<article>
-<h2>2026-10-01 Regels voor hoe Iris UI aanvoelt bij aanraken</h2>
-<h3>Wat</h3>
-<p>Er is een nieuwe pagina "Interaction" in het ontwerpsysteem. Die legt vast
-hoe de app reageert als je iets aanraakt: hoe een knop voelt als je hem indrukt,
-hoe dingen openen en weer sluiten, hoe je over een rij veegt, wat er gebeurt
-als een lijst verandert en hoe een klaar-moment voelt. Ook staat erin wanneer
-de telefoon trilt (iPhone en Android) en dat veerkracht alleen mag waar een
-vinger loslaat. Verder geldt: zuinig met beweging. Op de pagina over beweging
-staat die ene uitzondering nu ook. Daarnaast is een fout op de hele site
-hersteld: tekst tussen bepaalde aanhalingstekens (backticks) verscheen
-letterlijk in beeld en wordt nu netjes als code getoond. Nog niet gepubliceerd.</p>
-<h3>Waarom</h3>
-<p>Joris vroeg om deze regels. Een controle van de kleine bewegingen in de
-iPhone- en Android-app van vandaag liet zien waar ze uiteenliepen. Nu staat er
-op een plek wat de bedoeling is.</p>
-<p><img src=".playwright/screenshots/werklog/2026-10-01-interaction.png" alt="De nieuwe pagina Interaction in het ontwerpsysteem" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
-</article>
-
-<article>
-<h2>2026-10-01 Voorbeelden aangevuld met alle bouwstenen</h2>
-<h3>Wat</h3>
-<p>Van de bouwstenen van het ontwerpsysteem misten er 31 in de voorbeeldschermen.
-Nu komt elke bouwsteen minstens een keer voor in een echt scherm. Op de
-telefoon zijn er schermen bij voor weer, lussen, een enkele lus, chats en een
-herinnering instellen. Op de webversie, de Mac en de tv zijn onder meer
-knoppen, tabbladen, zoekvelden, menu's, tooltips, een zijbalk en een
-fotoscherm toegevoegd. Twee dingen zijn bewust weggelaten: een onderdeel dat
-niet in het pakket zit en twee demo-pagina's die alleen voor de uitleg dienen.
-De controle op de voorbeelden is schoon. Er staan nog 111 meldingen open over
-ingesloten pagina's zonder titel, maar die komen uit ander werk. Nog niet
-gepubliceerd.</p>
-<h3>Waarom</h3>
-<p>De voorbeelden zijn de test voor het systeem. Wat nergens in een echt
-scherm voorkwam, was ook nooit echt uitgeprobeerd.</p>
-<p><img src=".playwright/screenshots/werklog/2026-10-01-examples-aangevuld.png" alt="Een van de nieuwe voorbeeldschermen" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
-</article>
-
-<article>
-<h2>2026-09-30 Foto met diepte, bewegende randen en gestapelde chats</h2>
-<h3>Wat</h3>
-<p>Drie nieuwe bouwstenen voor het ontwerpsysteem. Een foto waarbij een woord
-achter de persoon staat en alles lichtjes meebeweegt als je kijkt of beweegt.
-Acht randen die zachtjes bewegen. En chats die als gestapelde kaartjes in de
-kleur van hun onderwerp liggen: tik erop en ze waaieren uit, tik nog eens en
-het gesprek opent. Ze volgen de vaste kleuren en stijl, zijn met toetsenbord
-te bedienen en staan stil voor wie geen beweging wil. Er is geen echte foto
-bij: de foto-bouwsteen tekent zelf een neutrale voorbeeldscène. Alle controles
-slagen.</p>
-<h3>Waarom</h3>
-<p>Dit waren losse proefjes. Nu zijn het echte onderdelen met een eigen
-pagina, die overal hetzelfde werken.</p>
-<p><img src=".playwright/screenshots/werklog/2026-09-30-photo-border-chatstack.png" alt="De pagina van de gestapelde chats" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
-</article>
-
-<article>
-<h2>2026-09-30 Voorbeelden voor telefoon, Android, Mac en web</h2>
-<h3>Wat</h3>
-<p>De voorbeeldpagina is uitgebreid. Loops bestaat niet meer in Iris: die
-schermen zijn weg en het tweede tabblad heet nu Calls. Er is een scherm bij
-met neon-effecten. Nieuw zijn ook een voorbeeld van de webversie (praatpagina,
-abonnementspagina, boodschappen en een overzicht van wat Iris heeft gedaan,
-een regel per taak), een Android-versie en een Mac-versie met een klein
-zwevend paneel op het bureaublad en een typveld om snel iets te zoeken.
-Bovenaan staat overal dezelfde balk om tussen iPhone, Android, Mac en web te
-wisselen, en overal draait dezelfde dag van Alex. De abonnementspagina is
-overzichtelijker dan de huidige: je plan staat bovenaan en het codeveld
-verschijnt pas als je erom vraagt. Alle controles slagen. Nog niet
-gepubliceerd.</p>
-<h3>Waarom</h3>
-<p>De voorbeelden moesten kloppen met de nieuwe app en samen een duidelijk
-verhaal vertellen over alle apparaten.</p>
+<p>De kaarten bij Uitbreidingen in de app misten een kleur per categorie. Joris wil dat een ontbrekend onderdeel meteen in de kit komt.</p>
 <h3>Bestanden</h3>
-<p>De voorbeeldpagina's voor telefoon, Android, Mac en web, plus de gedeelde
-balk om tussen ze te wisselen.</p>
+<p>De kaart-component, de app-schermen, de uitleg en de releasenotities. Geen afbeelding.</p>
 </article>
 
 <article>
-<h2>2026-09-30 Ontwerpsysteem volgt de nieuwe app</h2>
+<h2>2026-10-01 Release v33</h2>
 <h3>Wat</h3>
-<p>De iPhone-app heeft sinds 29 september geen aparte Loops-tab meer. Het
-ontwerpsysteem (de verzameling bouwstenen en regels voor het uiterlijk van
-Iris) beschreef dat nog wel. Daarom zijn twee nieuwe bouwstenen toegevoegd:
-een stapel gesprekken met hun loops erachter, die uitwaaiert tot losse
-kaarten, en een klein rondje voor een loop, met een letter en zes
-gekleurde boogjes. Ze zijn nagebouwd naar de echte app. De officiele
-uitgave is niet aangepast; het verschil staat uitgelegd in de teksten op de
-site. Alle tests slagen. Het pakket voor andere projecten heeft nu 54
-bouwstenen, maar is nog niet gepubliceerd en nog niet opgeslagen in de
-versiebeheer.</p>
+<p>De ontwerpbibliotheek Iris UI is uitgebracht als versie 33 en staat nu online op okayiris.github.io/irisui. De gepubliceerde versie is gemaakt uit een schone kopie, zonder het interne Ringlab. Daar staat dus niets van op de site.</p>
+<p>Vlak voor de release vond de eindcontrole 14 fouten. Die zijn opgelost: links naar het Lab zijn uit de openbare voorbeelden gehaald, pagina's hebben nu één hoofdkop en één hoofdgebied, en de orb heeft op twee plekken de juiste maat. Daarna was alles schoon: 118 pagina's en 160 voorbeeldschermen. De live site toont v33.</p>
 <h3>Waarom</h3>
-<p>De beschrijving klopte niet meer met hoe de app nu werkt.</p>
-<h3>Bestanden</h3>
-<p>De bouwstenen en hun stijl, de uitlegteksten op de site (onder meer over
-de onderste knoppenbalk en twee voorbeeldpagina's) en de voorbeelden die
-bij het ontwerpsysteem horen.</p>
+<p>Joris vroeg om een nieuwe versie van de UI-kit. Het Lab is alleen voor ons en mag niet mee naar buiten.</p>
+<h3>Nog niet gedaan</h3>
+<p>De hoofdlijn is niet naar GitHub gestuurd en het losse pakket is niet gepubliceerd (dat bestond nog nooit). Twee onafgemaakte wijzigingen van een andere sessie zijn bewust niet meegenomen.</p>
 </article>
 
 <article>
-<h2>2026-09-30 Voorbeeldpagina: Iris als klikbare app</h2>
+<h2>2026-10-01 Lichte en donkere weergave voor Iris</h2>
 <h3>Wat</h3>
-<p>Er is een nieuwe pagina waarop je Iris kunt uitproberen alsof het een echte
-app is, in een telefoonkader. Er zitten tien schermen in, zoals de dagoverzicht,
-boodschappen, het praatscherm, het profiel en de schermen voor laden, leeg en
-fout. Ook is er een overzicht met alle schermen naast elkaar. Bij elk scherm
-staat een paneel met wat goed gaat (groen) en wat nog een vraag is (geel). Op
-de site zijn een menuknop en een knop op de beginpagina toegevoegd. Bij het
-bouwen vielen twee fouten in het ontwerpsysteem op: een venster dat boven op
-een scherm hoort te komen, belandt nu eronder, en een bepaald onderdeel wordt
-per pagina geteld in plaats van per scherm. De eerste is voor nu omzeild.
-Nog niet online gezet.</p>
-<p><img src=".playwright/screenshots/werklog/2026-09-30-examples-app.png" alt="Het boodschappenscherm in de voorbeeld-app" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
+<p>Iris heeft nu een lichte en een donkere uitvoering. Standaard volgt ze de
+instelling van je apparaat. Wil je zelf kiezen, dan kan dat met een schakelaar
+bovenin de website: Auto, Licht of Donker. De keuze wordt onthouden. Alle
+kleuren, de kleuren van de onderwerpen en de fases, de voorbeeldschermen en de
+uitleg op de site wisselen mee. De automatische controle meet nu ook in beide
+uitvoeringen of tekst goed genoeg leesbaar blijft. De uitleg over kleuren bevat
+nu beide waarden.</p>
+<p>Nog niet af: de ring met de fases en de telefoonmodellen in de voorbeelden
+blijven donker. De accentkleuren in licht zijn goed leesbaar, maar halen niet
+de strengere eigen norm.</p>
+<p><img src=".playwright/screenshots/werklog/2026-10-01-light-mode.png" alt="Iris in de lichte weergave" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
 <h3>Waarom</h3>
-<p>De site bestond vooral uit tekst en had weinig voorbeelden. Joris wil het
-ontwerp als een echte app kunnen testen en de regels daarachter scherper
-maken.</p>
+<p>Joris besloot dat Iris niet langer alleen donker hoeft te zijn. Veel mensen
+werken overdag liever met een lichte weergave.</p>
 <h3>Bestanden</h3>
-<p>Een nieuwe voorbeeldpagina en kleine aanpassingen aan het menu en de
-beginpagina van de site. De controles slagen.</p>
+<p>De kleurdefinities van het ontwerpsysteem, de onderdelen van de site met de
+schakelaar, de automatische controle en de uitleg en overdrachtsdocumenten.</p>
 </article>
 
 <article>
-<h2>2026-09-30 Ontwerpsysteem als pakket voor andere projecten</h2>
+<h2>2026-10-01 Vegen tussen tabbladen</h2>
 <h3>Wat</h3>
-<p>Het Iris-ontwerpsysteem (alle 52 bouwstenen, plus kleuren, lettertypen en
-stijlen) is nu in te pakken tot een los pakket met de naam @okayiris/ui. Een
-ander project kan het daarna met een enkel commando binnenhalen. Het pakket is
-uitgeprobeerd in een leeg testproject: het installeert, de controles slagen en
-de onderdelen verschijnen goed in de browser. De website zelf ziet er hetzelfde
-uit. Ook is vastgezet dat de website zelf nooit per ongeluk online als pakket
-kan worden gezet.</p>
+<p>In de app wissel je nu van tabblad door met je vinger opzij te vegen. Heeft
+het scherm eigen tabbladen (zoals Vandaag en Alles), dan wisselen die. Anders
+wisselt de tabbalk onderaan, op een van de hoofdschermen. De gekleurde
+markering in de tabbalk schuift mee met je vinger. Veeg je binnen een lijst die
+zelf opzij scrolt, een carrousel, een invulveld of een uitschuifvenster, dan
+blijft het gebaar daar en wisselt het tabblad niet. Getest van Vandaag naar
+Bellen naar Camera en weer terug.</p>
 <h3>Waarom</h3>
-<p>Zodat het ontwerp maar op een plek hoeft te worden onderhouden en in andere
-projecten hergebruikt kan worden.</p>
+<p>Joris merkte dat tabbladen nog niet met vegen werkten, terwijl je dat in
+een telefoon-app verwacht.</p>
 <h3>Bestanden</h3>
-<p>Een nieuw bouwscript, een kleine aanpassing aan de instellingen van het
-project en een klein stukje van het ontwerpsysteem. Het pakket is nog niet
-gepubliceerd: daarvoor ontbreken nog een npm-account en een organisatie met de
-naam okayiris.</p>
+<p>Het onderdeel dat de hele app-omlijsting verzorgt (de bestanden van het
+ontwerpsysteem voor apps).</p>
 </article>
+
+<article>
+<h2>2026-10-01 Buurregels in het ontwerpsysteem en een fotoblok</h2>
+<h3>Wat</h3>
+<p>In de uitleg over betekenis staat nu een stuk "Neighbours" met zes regels voor
+wat naast elkaar mag: één "wat nu" per scherm, een woord herhaalt niet wat de
+lijst al zegt, één druk blokje per rij, rustige buren naast de themakeuze,
+een patroon alleen achter een paneel, en een getal zegt altijd wat het telt.
+De controle van een app toetst die regels nu ook.</p>
+<p>Daarnaast is er een nieuw onderdeel "Picture": een foto als echte inhoud,
+met een bijschrift.</p>
+<h3>Waarom</h3>
+<p>De regels komen uit het werk aan het Ringlab en horen in het
+ontwerpsysteem. Foto's als inhoud ontbraken nog.</p>
+<h3>Bestanden</h3>
+<p>De uitlegpagina over betekenis en de onderdelen en opmaak van het
+ontwerpsysteem.</p>
+</article>
+
+<article>
+<h2>2026-10-01 Zijmenu blijft staan bij het klikken</h2>
+<h3>Wat</h3>
+<p>Het menu links sprong bij elke klik op een link terug naar boven. Nu onthoudt
+de pagina hoe ver je in het menu was gescrold en zet het na het laden weer op
+dezelfde plek. Uitgeprobeerd in Chrome: menu ver omlaag gescrold, op "Select"
+geklikt, en de nieuwe pagina toont het menu nog op dezelfde plek met "Select"
+gemarkeerd.</p>
+<h3>Waarom</h3>
+<p>Elke menulink laadt een hele nieuwe pagina, en een nieuwe pagina begint
+altijd bovenaan.</p>
+<h3>Bestanden</h3>
+<p>Het gedeelde script van de site. Verder niets veranderd.</p>
+</article>
+
+<article>
+<h2>2026-10-01 Dev-server herlaadde zichzelf eindeloos</h2>
+<h3>Wat</h3>
+<p>De voorbeeldpagina in de browser ververste zichzelf elke paar seconden. Dat
+is opgelost: de ontwikkelserver let niet meer op de bestanden die hij zelf
+aanmaakt. Echte wijzigingen worden nog gewoon opgepikt. Nagekeken door tien
+seconden mee te luisteren: er werd niets meer opnieuw opgebouwd.</p>
+<h3>Waarom</h3>
+<p>Het bouwen maakte bestanden aan, de server zag die nieuwe bestanden en
+begon weer te bouwen, een eindeloze lus.</p>
+<h3>Bestanden</h3>
+<p>Het startscript van de ontwikkelserver. Er is niets zichtbaars veranderd.</p>
+</article>
+
+<article>
+<h2>2026-10-01 Frost F5 en home in warm zand</h2>
+<h3>Wat</h3>
+<p>Het ijswoord op het weerscherm is nu variant F5. Ijsvarens groeien vanuit de
+onderste hoeken naar een schoon, ijswit woord, zonder doos eromheen. Tik erop en
+ze groeien opnieuw. Het onderwerp "thuis" heeft nu een eigen kleur: warm zand,
+in plaats van het geel dat voor "wachten" is.</p>
+<h3>Waarom</h3>
+<p>Joris koos vanochtend F5 uit de zes nieuwe ijsvarianten. Hij wilde dat geel
+alleen nog "wachten" betekent. De open vragen hierover in eerdere blokken van
+vandaag zijn daarmee opgelost.</p>
+<h3>Bestanden</h3>
+<p>De bouwsteen voor thema-woorden en zijn stijl.</p>
+<p><img src=".playwright/screenshots/werklog/2026-10-01-frost-f5.png" alt="Het ijswoord met ijsvarens" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
+</article>
+
+<article>
+<h2>2026-10-01 Keuzes uitgevoerd: kleuren en drie nieuwe bouwstenen</h2>
+<h3>Wat</h3>
+<p>De kleuren per onderwerp zijn aangepast, zodat ze de regels niet meer
+breken: mail is nu blauwgrijs, sport oranje en taken zijn groenblauw. Paars is
+er alleen nog voor "aan" en de ring, rood alleen voor iets dat iets wegneemt.
+Het woord heeft geen gekleurd vlak meer erachter.</p>
+<p>Er zijn drie nieuwe bouwstenen, elk met een eigen pagina, uitleg en een
+werkende demo. MacPill: een bolletje, een balk die uitschuift, een regel met de
+status en de weg terug, en een teller. VaultAsk: een vraag om toestemming die
+laat zien wie het vraagt, vanaf waar, waarom, wat het doet en hoe ver het
+reikt, met de keuze toestaan of nee. TableApp: zoeken, filterknoppen, rijen, een
+regel met het aantal, en een rij die een zijpaneel opent.</p>
+<p>Later is besloten dat het roze voor "wacht op jou" in de chatstapel en de
+kringstapel blijft. Een fasekleur mag buiten de ring staan als hij een stap in
+een loop aanduidt, en dat staat nu in de uitleg. Mijn eerdere omzetting is
+teruggedraaid. In de widget krijgt het vinkje voor "klaar" de kleur van het
+onderwerp in plaats van paars, en de kop "MONDAY" is gedimd in plaats van rood.
+In de tabel "Which Iris, how big" mogen meerdere bolletjes naast elkaar staan,
+want dat is uitleg; daar staat nu een zin over.</p>
+<p>De tabel-bouwsteen is daarna in een appvenster gezet en gecontroleerd op de
+pagina "What Iris did". Daar waren vier fouten. De titel was afgeknipt, want
+hij schoof te ver naar links; hij staat nu netjes langs de rand. Het zoekveld
+werd breder tijdens het typen; het heeft nu een vaste breedte. Het paneel met
+details schuift nu in vanaf de zijkant van het hele venster, niet alleen boven
+de lijst, en een pagina kan nu zelf een rij openen. Een lange stap in de
+details springt door naar de volgende regel in plaats van af te breken met
+puntjes.</p>
+<p>Daarna besloot de eigenaar ook "uitleg" en "feest" om te kleuren. Uitleg gaat
+van paars naar een koel, zacht geel, dat duidelijk anders is dan de kleur van
+"wacht", zodat een onderwerp nooit leest als "wacht". Feest gaat van roze naar
+koraalroze, net niet rood. Beide zijn goed leesbaar op de achtergrond en op hun
+eigen vlak. Het randpatroon "wacht op jou" gebruikt nu de kleur van "wacht" in
+plaats van roze.</p>
+<p>Het woord "Party" op het Neon-scherm van de voorbeeld-app was verdwenen. Het
+woord had eerder een omhulsel gekregen om het gekleurde vlak weg te halen. In
+een rooster dat alles in het midden zet, kromp dat omhulsel tot niets, en dan
+was er geen plek meer om het woord te tekenen. Het omhulsel is nu altijd zo
+breed als beschikbaar, overal waar een woord in zo'n rooster staat.</p>
+<h3>Waarom</h3>
+<p>Dit volgt op de controleronde. De kleuren per onderwerp botsten met de
+kleurregels, en de eigenaar heeft gekozen hoe dat opgelost wordt en welke
+drie onderdelen echte bouwstenen worden.</p>
+<h3>Bestanden</h3>
+<p>De bouwstenen en hun stijl, de uitlegteksten en de pagina's op de site,
+en de kleurregels in de basis van het ontwerp.</p>
+</article>
+
+<article>
+<h2>2026-10-01 IrisApp als venster</h2>
+<h3>Wat</h3>
+<p>Apps in het ontwerpsysteem krijgen nu de vorm van een venster. Links staat
+een navigatiebalk, ernaast de pagina (niet breder dan 760). Zijpanelen schuiven
+van rechts in en meldingen staan in het midden. Met een enkele toets zet je de
+navigatiebalk aan of uit.</p>
+<h3>Waarom</h3>
+<p>De webversie, de Mac-instellingen, de kluis en Chrome bouwden alle vier
+dezelfde schil apart na. Joris koos voor een gezamenlijke vensterschil.</p>
+<h3>Nog onderweg</h3>
+<p>Joris koos ook: de kleuren per onderwerp schuiven op, het woord zonder doosje
+eromheen, en drie onderdelen (MacPill, TableApp, VaultAsk) worden echte
+bouwstenen. Daar zijn al hulpjes mee bezig.</p>
+<h3>Erbij gekomen</h3>
+<p>Een lijst kan nu doorzocht worden op een getypte tekst of op een bepaald
+veld. Een actie kan na een korte wachttijd vanzelf starten. Eén knop kan
+rechtsboven in de kop staan. En een lege lijst telt als "nee" (niet als "ja").</p>
+<p>Waarom: bij het overzetten van de webversie, de Mac-instellingen en het
+Chrome-paneel naar het venster ging het zoeken verloren, ook het antwoord na
+het versturen en een knop die bovenaan zichtbaar moest blijven. Dat is nu
+hersteld. Ook de Android-versie kreeg een paar reparaties.</p>
+<p>Daarna: een tekstveld doet na Enter meteen zijn werk, met de getypte tekst
+erbij, en een leeg veld blijft nu echt leeg (niet "0"). Zo krijgt het
+webvoorbeeld na het versturen een antwoord. Zoeken en de knoppen Stop en Sluiten
+zijn ook teruggezet.</p>
+<p>Verder: elke knop of keuze in een app-beschrijving die een actie meekrijgt, doet nu echt iets. Zo kan het toestemmingsscherm van de kluis (toestaan, weigeren, altijd toestaan) binnen een app werken. Daardoor kon de kluis op de telefoon nog niet op dat scherm bouwen. Joris koos ook: de uitleg-kleur wordt zachtgeel en de feest-kleur koraalroze (een hulpje is bezig).</p>
+<p>Stand: alle hulpjes zijn klaar en alles is lokaal opgeslagen, niets is online gezet. Het woord "Party" op het telefoonvoorbeeld bleef leeg sinds het woord een omhulsel kreeg. Dat is opgelost en op een schermafdruk nagekeken: het woord staat er nu in koraal, zonder doos. Dit was nog open en is opgelost: "thuis" kreeg een eigen kleur (warm zand) en de ijsvariant F5 is gekozen voor het weerscherm.</p>
+<p><img src=".playwright/screenshots/werklog/2026-10-01-irisapp-window.png" alt="Een app als venster met navigatiebalk links" style="max-width:100%;border-radius:8px;border:1px solid var(--border)"></p>
+</article>
+
 
 </body>
 </html>

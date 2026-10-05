@@ -3,6 +3,75 @@
 // the component when these parts move into the artifact.
 
 export const extDocs: Record<string, string> = {
+  Gauge: `# Gauge
+
+The release's Stat with a meter under it: one number, its word, and how full the number is. Where a Stat answers
+"how much", a Gauge answers "how much, and how close is the line".
+
+## When
+
+- A dashboard tile whose number is a limit: storage, memory, this week's usage, a disk that fills up.
+- Two to four in a grid, above the chart. A Gauge without a meter is the Stat, so a row of tiles may mix them.
+- Never for a number that cannot fill up. A count of houses is a Stat.
+
+## The parts
+
+\`value\` and \`label\` are the release's Stat: one number, one word. \`unit\` rides beside the number ("of 8 GB"),
+\`note\` is one quiet line under the word (what changed since last week, or what happens when it is full).
+\`progress\` is 0..1 and draws the meter; without it the tile is the Stat itself. \`lines\` are the marks a value
+is measured against, 0..1 each (the 80% and 90% of a disk). \`tone\` colours the number and the meter: \`ok\`,
+\`wait\` or \`error\`, in the status colours only. \`topic\` is the release Stat's own tint.
+
+## Rules
+
+- One number and one word, like the Stat. The note is a line, not a sentence.
+- Colour follows the level, and the level has a word: a red number alone says nothing.
+- The meter is the release's Progress, so it is the same bar as everywhere else in the system.
+`,
+  Bars: `# Bars
+
+Rows that say which one is the biggest: a name, a bar, the number, biggest first.
+
+## When
+
+- "Which one is it": the houses that used the most, the campaigns that cost the most, the slowest checks.
+- One series only. Two series in one row are a chart, and a chart is not this.
+- Four to twelve rows. More belongs behind a "view all", fewer is a table.
+
+## The parts
+
+\`rows\` is \`{ label, value, href?, tone?, title? }\`; \`href\` makes the name a link, \`tone\` puts the row's bar in a
+status colour for a value that is over its line, \`title\` is the line a hover shows. \`format\` prints the number (the right column), \`max\` is what a
+full bar means (without it the biggest row is full), \`empty\` is the line when there are no rows.
+
+## Rules
+
+- The biggest row is the full bar, so the bars compare to each other, not to a scale the reader cannot see.
+- Hairlines between the rows, never a frame around the list: it goes on a Card.
+- The number is right-aligned in mono, so a column of them lines up.
+`,
+  Days: `# Days
+
+One column per day, oldest left, the last one bright: a count over a fortnight.
+
+## When
+
+- Something that happens per day and is worth watching: alerts, calls, sign-ups, jobs that ran.
+- A fortnight, or a week. A month of columns on a phone is unreadable.
+- Where the shape matters more than the numbers. The numbers belong in a Bars list.
+
+## The parts
+
+\`days\` is \`{ label, value, title? }\`: the label under the column (the day), the value, and the line a hover
+shows (the count, from \`format\`). \`height\` is the column height in px. The last column is the bright one, so
+"how are we doing today" is the first thing the eye finds.
+
+## Rules
+
+- A day with nothing still gets a column (a hairline high), never a gap: the fortnight stays one shape.
+- The label under the column is the day number, in 10.5px mono faint.
+- Motion is the bar's colour on hover, nothing moves on its own.
+`,
   MacPill: `# MacPill
 
 Iris on the Mac desktop. At rest it is only her orb, low in the middle of the screen. When the hand rests on it, a

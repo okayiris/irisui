@@ -108,10 +108,10 @@
         if (props.side) return h2(
           "figure",
           { className: "ia-pic ia-pic-side" + (props.flip ? " ia-pic-flip" : "") },
-          h2("div", { className: "ia-pic-img", style: { aspectRatio: props.ratio ?? 1 } }, img),
+          h2("div", { className: "ia-pic-img", style: { aspectRatio: String(props.ratio ?? 1) } }, img),
           words
         );
-        return h2("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : "") + (props.title ? " ia-pic-over" : ""), style: { aspectRatio: props.ratio ?? 16 / 10 } }, img, words);
+        return h2("figure", { className: "ia-pic" + (props.wide ? " ia-pic-wide" : "") + (props.title ? " ia-pic-over" : ""), style: { aspectRatio: String(props.ratio ?? 16 / 10) } }, img, words);
       }
       case "Rail":
         return h2(
@@ -134,7 +134,8 @@
         return h2("div", { className: "ia-stack" }, kids);
       case "Row": {
         let trailing = props.trailing;
-        if (b) trailing = h2(I.Toggle, { on: !!val });
+        if (b) trailing = h2(I.Toggle, { on: !!val, onChange: () => {
+        } });
         else if (props.value != null) trailing = h2("span", { className: "ia-value" + (props.pill ? " ia-pill" : "") + (/await|missing|overdue|sign|waits|late|draft|pending|review/i.test(String(props.value)) ? " ia-act" : "") + (/^[\d€:.,\s/%-]+(\s?\w{0,6})?$/.test(String(props.value)) ? " ia-num" : "") }, props.value);
         const ic = p.icon && typeof p.icon === "object" ? h2(Part, { p: p.icon, ctx, item }) : props.icon ? icon(props.icon) : void 0;
         return h2(I.Row, {
@@ -154,7 +155,11 @@
       case "Chip":
         return h2(I.Chip, { ...props, on: b ? val === props.value : props.on, onClick: b ? () => set(b, props.value) : act }, props.label);
       case "Chips":
-        return h2("div", { className: "ia-chips" }, (props.items ?? []).map((l, i) => h2(I.Chip, { key: l, topic: props.topic, on: val === l, onClick: () => set(b, l) }, l)));
+        return h2("div", { className: "ia-chips" }, (props.items ?? []).map((l, i) => h2(I.Chip, { key: l, topic: props.topic, on: val === l, onClick: () => {
+          set(b, l);
+          if (p.on) run(fill(p.on, { ...state, [b]: l }));
+        } }, l)));
+      // with on: a tap is the choice and the next step
       case "Segmented":
       case "Tabs":
       case "Steps":
@@ -447,14 +452,21 @@
     const tabOf = (sid) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
     const activeTab = Math.max(0, [...stack].reverse().map(tabOf).find((i) => i >= 0) ?? 0);
     const railAt = spec.rail ? Math.max(0, spec.rail.findIndex((r) => stack.includes(r.to))) : -1;
-    const wide = !!spec.rail || frame === "window";
+    const tv = frame === "tv";
+    const wide = !!spec.rail || frame === "window" || tv;
     const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
     const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
     const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2], "--k-button": `oklch(from ${tk[0]} .82 .12 h)` } : void 0;
     return h2(
       "div",
-      { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, "data-theme": spec.theme, style: tint },
-      spec.rail ? h2("div", { className: "ia-rail-col" }, h2(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) => ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
+      { className: "ia-app" + (spec.rail ? tv ? " ia-tv" : " ia-win" : ""), "data-frame": tv ? "tv" : wide ? "window" : frame, "data-theme": spec.theme, style: tint },
+      spec.rail && tv ? h2(
+        "nav",
+        { className: "ia-tvnav", "aria-label": spec.name },
+        h2("span", { className: "ia-tvnav-name" }, spec.name),
+        spec.rail.map((r, i) => h2("button", { key: i, type: "button", className: "ia-tvnav-item" + (i === railAt ? " on" : ""), "aria-current": i === railAt ? "page" : void 0, onClick: () => run(`tab:${i}`) }, r.label))
+      ) : null,
+      spec.rail && !tv ? h2("div", { className: "ia-rail-col" }, h2(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) => ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
       spec.backdrop ? h2("div", { className: "ia-backdrop", "aria-hidden": "true" }, h2(Part, { p: spec.backdrop, ctx })) : null,
       h2(
         "section",
@@ -655,6 +667,9 @@
     const [hovered, setOpen] = useState(false);
     const open = shown ?? hovered;
     const timer = useRef(null);
+    const host = useRef(null);
+    const body = useRef(null);
+    const [pos, setPos] = useState(null);
     const id = useId();
     const show = useCallback(() => {
       window.clearTimeout(timer.current);
@@ -664,19 +679,47 @@
       window.clearTimeout(timer.current);
       setOpen(false);
     }, []);
+    const place = useCallback(() => {
+      const a = host.current?.getBoundingClientRect(), b = body.current?.getBoundingClientRect();
+      if (!a || !b) return;
+      const above = a.top > b.height + 12;
+      setPos({
+        x: Math.max(8, Math.min(a.left + a.width / 2 - b.width / 2, window.innerWidth - b.width - 8)),
+        y: above ? a.top - b.height - 8 : a.bottom + 8,
+        above
+      });
+    }, []);
+    useEffect(() => {
+      if (!open) return;
+      place();
+      const onKey = (e) => e.key === "Escape" && setOpen(false);
+      const onMove = () => place();
+      document.addEventListener("keydown", onKey);
+      window.addEventListener("scroll", onMove, true);
+      window.addEventListener("resize", onMove);
+      return () => {
+        document.removeEventListener("keydown", onKey);
+        window.removeEventListener("scroll", onMove, true);
+        window.removeEventListener("resize", onMove);
+      };
+    }, [open, place]);
     useEffect(() => () => window.clearTimeout(timer.current), []);
     return h3(
       "span",
       {
         className: "ix-tip",
-        "data-open": open ? "1" : "0",
+        "data-open": open && pos ? "1" : "0",
         onMouseEnter: show,
         onMouseLeave: hide,
         onFocus: show,
         onBlur: hide
       },
-      h3("span", { className: "ix-tip-anchor", "aria-describedby": open ? id : void 0 }, children),
-      h3("span", { className: "ix-tip-body", role: "tooltip", id }, label)
+      h3("span", { className: "ix-tip-anchor", ref: host, "aria-describedby": open ? id : void 0 }, children),
+      h3(
+        "span",
+        { className: "ix-tip-body", ref: body, role: "tooltip", id, "data-above": pos?.above ? "1" : void 0, style: pos ? { left: pos.x, top: pos.y } : void 0 },
+        label
+      )
     );
   }
   function Menu({
@@ -1759,6 +1802,12 @@
     }
     return best;
   }
+  function lightAround(el) {
+    const own = el.closest("[data-scheme]")?.getAttribute("data-scheme");
+    if (own) return own === "light";
+    const mode = document.documentElement.dataset.mode;
+    return mode ? mode === "light" : Boolean(window.matchMedia?.("(prefers-color-scheme: light)").matches);
+  }
   function paintPhoto(el, pair, kind, word, threshold) {
     const { photo } = pair, W = photo.width, H = photo.height;
     if (kind === "parallax") {
@@ -1770,10 +1819,13 @@
     }
     const out = canvasOf(W, H), ctx = out.getContext("2d");
     if (kind === "duotone") {
-      const f = pixelsOf(photo), b = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
-      const a = b.map((v) => Math.round(v * 0.16 + 7 * 0.84));
+      const f = pixelsOf(photo), k = rgbOf(tokenOf(el, "--k") || tokenOf(el, "--accent"));
+      const light = lightAround(el);
+      const a = light ? k.map((v) => Math.round(v * 0.6)) : k.map((v) => Math.round(v * 0.16 + 7 * 0.84));
+      const b = light ? k.map((v) => Math.round(v + (255 - v) * 0.9)) : k;
       for (let i = 0; i < f.data.length; i += 4) {
-        const L = smooth(0.05, 0.95, (0.2126 * f.data[i] + 0.7152 * f.data[i + 1] + 0.0722 * f.data[i + 2]) / 255);
+        const L0 = smooth(0.05, 0.95, (0.2126 * f.data[i] + 0.7152 * f.data[i + 1] + 0.0722 * f.data[i + 2]) / 255);
+        const L = light ? Math.pow(L0, 0.45) : L0;
         for (let c = 0; c < 3; c++) f.data[i + c] = a[c] + (b[c] - a[c]) * L;
       }
       ctx.putImageData(f, 0, 0);
@@ -2753,6 +2805,88 @@
       h3("i")
     );
   }
+  var BaseRow = window.IrisUi?.Row;
+  function Row(props) {
+    if (!BaseRow) return null;
+    const { onClick, ...rest } = props ?? {};
+    if (!onClick) return h3(BaseRow, rest);
+    return h3("button", { type: "button", className: "ix-row-btn", onClick }, h3(BaseRow, rest));
+  }
+  var BaseStat = window.IrisUi?.Stat;
+  var BaseProgress = window.IrisUi?.Progress;
+  var TONE = { ok: "var(--ok)", wait: "var(--wait)", error: "var(--error)" };
+  function Gauge({
+    value,
+    label,
+    unit,
+    note,
+    progress,
+    lines,
+    tone,
+    topic
+  }) {
+    if (progress == null && !unit && !note && !tone && !lines?.length) return h3(BaseStat ?? "div", { value, label, topic });
+    const kleur = tone ? TONE[tone] : "var(--accent)";
+    const v = Math.max(0, Math.min(1, progress ?? 0));
+    return h3(
+      "div",
+      { className: "iris-stat ix-gauge", style: { ...topicVars(topic) ?? {}, "--ix-tone": kleur } },
+      h3("div", { className: "ix-gauge-head" }, h3("b", null, value), unit ? h3("span", { className: "ix-gauge-unit" }, unit) : null),
+      h3("span", { className: "ix-gauge-label" }, label),
+      progress != null ? h3(
+        "span",
+        { className: "ix-gauge-bar" },
+        BaseProgress ? h3(BaseProgress, { value: v }) : h3("span", { className: "iris-bar" }, h3("i", { style: { width: `${v * 100}%` } })),
+        ...(lines ?? []).map((l) => h3("i", { className: "ix-gauge-line", style: { left: `${Math.max(0, Math.min(1, l)) * 100}%` } }))
+      ) : null,
+      note ? h3("span", { className: "ix-gauge-note" }, note) : null
+    );
+  }
+  function Bars({
+    rows = [],
+    format = String,
+    max,
+    empty = "Nothing here yet."
+  }) {
+    if (!rows.length) return h3("p", { className: "ix-bars-empty" }, empty);
+    const top = max ?? Math.max(1, ...rows.map((r) => r.value));
+    return h3(
+      "div",
+      { className: "ix-bars" },
+      rows.map(
+        (r) => h3(
+          "div",
+          { className: "ix-bars-row", key: r.label, title: r.title },
+          h3("span", { className: "ix-bars-name" }, r.href ? h3("a", { href: r.href }, r.label) : r.label),
+          h3(
+            "span",
+            { className: "ix-bars-track", style: r.tone ? { "--k": TONE[r.tone] } : void 0 },
+            BaseProgress ? h3(BaseProgress, { value: top > 0 ? r.value / top : 0 }) : h3("span", { className: "iris-bar" }, h3("i", { style: { width: `${top > 0 ? r.value / top * 100 : 0}%` } }))
+          ),
+          h3("span", { className: "ix-bars-value" }, format(r.value))
+        )
+      )
+    );
+  }
+  function Days({
+    days = [],
+    format = String,
+    height = 90
+  }) {
+    const top = Math.max(1, ...days.map((d) => d.value));
+    return h3(
+      "div",
+      { className: "ix-days", style: { height } },
+      days.map(
+        (d, i) => h3(
+          "span",
+          { className: "ix-days-col", key: d.label, title: d.title ?? `${d.label}: ${format(d.value)}`, "data-now": i === days.length - 1 ? "1" : void 0 },
+          h3("span", { className: "ix-days-bar" }, h3("i", { style: { height: `${d.value ? Math.max(8, d.value / top * 100) : 2}%` } })),
+          h3("span", { className: "ix-days-label" }, d.label)
+        )
+      )
+    );
+  }
   for (const C of [window.WebGL2RenderingContext, window.WebGLRenderingContext]) {
     const shaderSource = C?.prototype?.shaderSource;
     if (!shaderSource || shaderSource.irisFixed) continue;
@@ -2801,6 +2935,10 @@
     MacPill,
     VaultAsk,
     TableApp,
+    ...BaseRow ? { Row } : {},
+    Gauge,
+    Bars,
+    Days,
     ...BaseWord ? { Word } : {},
     ...BaseIcon ? { Icon } : {},
     ...BaseThemeWord && BaseWord ? { ThemeWord } : {},

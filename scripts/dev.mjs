@@ -174,6 +174,8 @@ let timer = null;
 for (const dir of ["src", "public", "scripts"]) {
   watch(join(ROOT, dir), { recursive: true }, (_event, file) => {
     if (!file || ignore.test(file) || !watching) return;
+    // The build itself writes public/ds/ext.js and ext.css (scripts/build-ext.mjs): not a change, or it loops.
+    if (dir === "public" && /^ds\/ext\.(js|css)$/.test(file)) return;
     clearTimeout(timer);
     timer = setTimeout(build, debounce);
   });

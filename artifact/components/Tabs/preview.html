@@ -4,11 +4,11 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "Three angles": () => { const [i, setI] = React.useState(0); return h("div", { style: { display: "grid", gap: 14 } },
     h(Tabs, { items: ["Today", "Loops", "Kept"], active: i, onSelect: setI }),
-    h("div", { style: { fontSize: 14, color: "var(--dim)" } }, "Showing: " + ["Today", "Loops", "Kept"][i])); },
+    h("div", { role: "tabpanel", style: { fontSize: 15 } }, ["The dentist at 9:30, lunch with Tom at 13:00", "Six loops, two waiting on you", "Twelve things she kept for you"][i])); },
   };
 })();
 

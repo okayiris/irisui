@@ -4,7 +4,7 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "Closed, above the strip": () => h("div", { style: { display: "grid", alignContent: "end", minHeight: 150, paddingTop: 30 } },
     h(CircleStack, { items: [
@@ -15,15 +15,12 @@
     ] }),
     h(Card, null, h("div", { style: { fontSize: 15 } }, "The dentist at 9:30, lunch with Tom at 13:00"))),
     "Fanned out": () => {
-  const [picked, setPicked] = React.useState("");
-  return h("div", { style: { display: "grid", gap: 8 } },
-    h(CircleStack, { open: true, onSelect: setPicked, items: [
+  return h(CircleStack, { open: true, items: [
       { id: "debtors", title: "Debtors", line: "Van Dijk is 34 days late", unread: 1, loops: [{ title: "Van Dijk", step: 3 }, { title: "Bakker", step: 2 }, { title: "Peters", step: 4 }, { title: "Jansen", step: 1 }] },
       { id: "groceries", title: "Groceries", line: "Saturday delivery, 8 on the list", loops: [{ title: "Groceries", step: 1 }] },
       { id: "renovation", title: "Renovation", line: "Comparing 3 quotes" },
       { id: "dentist", title: "Dentist", line: "Pick a time" },
-    ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)", paddingLeft: 8 } }, picked ? "Opens: " + picked : "Tap a circle"));
+    ] });
 },
   };
 })();

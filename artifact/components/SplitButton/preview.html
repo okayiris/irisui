@@ -4,17 +4,15 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "Send, or send another way": () => { const [said, setSaid] = React.useState(null);
-  return h("div", { style: { display: "grid", gap: 12, minHeight: 150 } },
-    h(SplitButton, { onSelect: () => setSaid("sent"), items: [
-      { label: "Send as a mail", onSelect: () => setSaid("mail") },
-      { label: "Send as a text", onSelect: () => setSaid("text") },
+    "Send, or send another way": () => h("div", { style: { minHeight: 180 } },
+    h(SplitButton, { items: [
+      { label: "Send as a mail" },
+      { label: "Send as a text" },
       { kind: "sep" },
-      { label: "Schedule for tomorrow", onSelect: () => setSaid("tomorrow") },
-    ] }, "Send it"),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, said ? "Chose: " + said : "Nothing chosen yet")); },
+      { label: "Schedule for tomorrow" },
+    ] }, "Send it")),
     "In a topic": () => h(Topic, { name: "parcel" }, h(SplitButton, { size: "sm", variant: "accent", items: [ { label: "Track it" }, { label: "Open the carrier's site" } ] }, "Track parcel")),
   };
 })();

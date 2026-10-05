@@ -4,12 +4,12 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "How far she listens": () => { const [v, setV] = React.useState(60); return h("div", { style: { display: "grid", gap: 18 } },
     h(Slider, { value: v, onChange: setV, label: "Listening distance", unit: "m" }),
     h("div", { style: { fontSize: 13, color: "var(--dim)" } }, v > 75 ? "Far: she hears the whole house" : v < 25 ? "Near: only right in front of the phone" : "About a room")); },
-    "In a topic": () => { const [v, setV] = React.useState(3); return h(Topic, { name: "sport" }, h(Slider, { value: v, onChange: setV, min: 1, max: 7, label: "Days a week", format: (n) => n + "×" })); },
+    "In a topic": () => { const [v, setV] = React.useState(3); return h(Topic, { name: "health" }, h(Slider, { value: v, onChange: setV, min: 1, max: 7, label: "Walks a week", format: (n) => n + "×" })); },
   };
 })();
 

@@ -4,20 +4,19 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
     "Sort and filter": () => {
   const [picked, setPicked] = React.useState(null);
-  return h("div", { style: { display: "grid", gap: 14, minHeight: 200, alignContent: "start" } },
-    h(Menu, { label: "Sort", items: [
+  return h("div", { style: { minHeight: 250 } },
+    h(Menu, { label: "Sort", defaultOpen: true, items: [
       { label: "Newest first", checked: picked === "Newest first", onSelect: () => setPicked("Newest first") },
       { label: "By name", checked: picked === "By name", onSelect: () => setPicked("By name") },
       { kind: "label", label: "Show" },
       { label: "Only unread", checked: picked === "Only unread", onSelect: () => setPicked("Only unread") },
       { kind: "sep" },
       { label: "Delete all", danger: true, onSelect: () => setPicked("Delete all") },
-    ] }),
-    h("div", { style: { fontSize: 13, color: "var(--dim)" } }, picked ? "Chose: " + picked : "Nothing chosen yet"));
+    ] }));
 },
     "A menu on a Row": () => h(Row, { icon: h(Icon, { name: "wave" }), title: "Voice", subtitle: "Dutch, warm and clear", trailing: h(Menu, { label: "Alex", align: "end", items: [ { label: "Alex", checked: true }, { label: "Calmer" }, { label: "No voice" } ] }) }),
   };

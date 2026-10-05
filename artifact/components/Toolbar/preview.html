@@ -4,17 +4,16 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "Docked, in a screen": () => h(Toolbar, { title: "This week", items: [
+    "Docked, in a screen": () => { const [unread, setUnread] = React.useState(true);
+  return h(Toolbar, { title: "This week", items: [
     { label: "New", icon: h(Icon, { name: "sparkles", size: 16 }) },
-    { label: "Sort", icon: h(Icon, { name: "loop", size: 16 }) },
-    { label: "Only unread", active: true },
-    { label: "Unpair", danger: true },
-  ], trailing: h(Badge, { count: 3 }, h(Icon, { name: "phone", size: 18 })) }),
+    { label: "Only unread", active: unread, onSelect: () => setUnread(!unread) },
+  ] }); },
     "Floating over content": () => h(Toolbar, { variant: "floating", items: [
     { label: "Read out", icon: h(Icon, { name: "speaker", size: 16 }), active: true },
-    { label: "Mark", icon: h(Icon, { name: "loop", size: 16 }) },
+    { label: "Keep" },
     { label: "Delete", danger: true },
   ] }),
   };

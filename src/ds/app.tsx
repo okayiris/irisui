@@ -163,7 +163,8 @@ function Part({ p, ctx, item }: { p: Part; ctx: Any; item?: Any }): Any {
       let trailing = props.trailing;
       // Bound: the row flips the key, and the switch only shows it. A tap on the switch reaches the row too, so a
       // second set here would flip it straight back where updates are not batched (preact).
-      if (b) trailing = h(I.Toggle, { on: !!val });
+      // A no-op onChange keeps the switch controlled: left to itself it holds its own state and stays off.
+      if (b) trailing = h(I.Toggle, { on: !!val, onChange: () => {} });
       // A value that asks something of you (awaiting signature, overdue, missing) takes the accent; the rest stays dim.
       // Numbers, times and amounts in the mono house font; a value that asks for action in the accent.
       // pill: a status as a small tinted pill, so a list of states scans at a glance.
@@ -312,7 +313,7 @@ function Talk({ s, ctx }: { s: Screen; ctx: Any }) {
 /* --------------------------------------------------------------------- app */
 
 export function IrisApp({ spec, start, onNavigate, onState, onAction, frame = "phone" }: {
-  spec: AppSpec; start?: string | string[]; onNavigate?: (id: string) => void; onState?: (state: Record<string, Any>) => void; frame?: "phone" | "window";
+  spec: AppSpec; start?: string | string[]; onNavigate?: (id: string) => void; onState?: (state: Record<string, Any>) => void; frame?: "phone" | "window" | "tv";
   /** A verb the app does not know ("act:book"): the host does it and may answer with more actions ("close;push:done"), also later (a promise). */
   onAction?: (verb: string, arg: string, state: Record<string, Any>) => string | void | Promise<string | void>;
 }) {
@@ -400,14 +401,18 @@ export function IrisApp({ spec, start, onNavigate, onState, onAction, frame = "p
   const tabOf = (sid: string) => spec.tabs?.findIndex((t) => t.to === sid) ?? -1;
   const activeTab = Math.max(0, [...stack].reverse().map(tabOf).find((i) => i >= 0) ?? 0);
   const railAt = spec.rail ? Math.max(0, spec.rail.findIndex((r) => stack.includes(r.to))) : -1;
-  const wide = !!spec.rail || frame === "window";
+  // A tv is wide too, but its menu runs along the top (as on a tv, where the remote moves left and right first).
+  const tv = frame === "tv";
+  const wide = !!spec.rail || frame === "window" || tv;
   const sheet = layer.sheet ? spec.screens[layer.sheet] : null, dialog = layer.dialog ? spec.screens[layer.dialog] : null;
 
   // One accent per app: the app's topic colour becomes its accent, so the tab bar, chips, links and focus all speak it.
   const tk = spec.topic ? I.design?.TOPIC?.[spec.topic] : null;
   const tint = tk ? { "--accent": tk[0], "--k": tk[0], "--k2": tk[1], "--kd": tk[2], "--k-button": `oklch(from ${tk[0]} .82 .12 h)` } : undefined;
-  return h("div", { className: "ia-app" + (spec.rail ? " ia-win" : ""), "data-frame": wide ? "window" : frame, "data-theme": (spec as Any).theme, style: tint },
-    spec.rail ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
+  return h("div", { className: "ia-app" + (spec.rail ? (tv ? " ia-tv" : " ia-win") : ""), "data-frame": tv ? "tv" : wide ? "window" : frame, "data-theme": (spec as Any).theme, style: tint },
+    spec.rail && tv ? h("nav", { className: "ia-tvnav", "aria-label": spec.name }, h("span", { className: "ia-tvnav-name" }, spec.name),
+      spec.rail.map((r, i) => h("button", { key: i, type: "button", className: "ia-tvnav-item" + (i === railAt ? " on" : ""), "aria-current": i === railAt ? "page" : undefined, onClick: () => run(`tab:${i}`) }, r.label))) : null,
+    spec.rail && !tv ? h("div", { className: "ia-rail-col" }, h(I.NavRail, { label: spec.name, items: spec.rail.map((r, i) =>
       ({ label: r.label, icon: icon(r.icon, 18), active: i === railAt, onSelect: () => run(`tab:${i}`) })) })) : null,
     spec.backdrop ? h("div", { className: "ia-backdrop", "aria-hidden": "true" }, h(Part, { p: spec.backdrop, ctx })) : null,
     h("section", { ref: scroller, className: "ia-scroll" + (spec.tabs && !talking ? " ia-has-tabs" : ""), "aria-label": s.title,

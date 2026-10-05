@@ -1,0 +1,27 @@
+<!-- @dsCard group="Overlays" height=420 -->
+<!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
+  window.__dsPreview = {
+    "Use a login": () => { const [said, setSaid] = React.useState(null);
+  return said ? h("p", { role: "status", style: { fontSize: 15 } }, said)
+    : h(Card, { padding: 18 }, h(VaultAsk, { title: "Iris wants your shop.example.com login", who: "Iris, your assistant", from: "Chrome on this Mac, shop.example.com",
+      why: "You asked her to order the groceries for Saturday", does: "Fills in your password on shop.example.com", scope: "use", biometric: "Touch ID",
+      onAllow: () => setSaid("Allowed once. Touch ID confirmed."), onAlways: () => setSaid("Allowed for this site."), onDeny: () => setSaid("Nothing was shared. Iris is told no.") })); },
+    "Nobody said why": () => h(Card, { padding: 18 }, h(VaultAsk, { title: "Iris wants a card", who: "Iris, your assistant", from: "Her own house", scope: "use", onAllow: () => {}, onDeny: () => {} })),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

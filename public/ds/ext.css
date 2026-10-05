@@ -163,18 +163,16 @@
 /* ---------- Tooltip ---------- */
 
 .ix-tip {
-  position: relative;
-  display: inline-flex;
+  display: contents;
 }
 
 .ix-tip-body {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translate(-50%, 4px);
+  position: fixed;
+  transform: translateY(4px);
   z-index: 40;
   width: max-content;
-  max-width: 22ch;
+  max-width: min(22rem, 80vw);
+  white-space: pre-line;
   padding: 6px 10px;
   border-radius: 9px;
   background: var(--sheet-bg);
@@ -189,7 +187,7 @@
 
 .ix-tip[data-open="1"] .ix-tip-body {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: translateY(0);
 }
 
 .ix-tip-body::after {
@@ -934,7 +932,7 @@
 }
 
 .ix-tip-anchor {
-  display: inline-flex;
+  display: contents;
 }
 
 .ix-search-field {
@@ -1927,14 +1925,25 @@
 /* ---------- Fixes to shipped parts, until they land in the release ---------- */
 
 /* A Row is its own card. Inside a Card (a group of settings) it drops its glass and the rows share one surface,
-   split by hairlines: one box, not a box of boxes. */
-.iris-card > .iris-row {
+   split by hairlines: one box, not a box of boxes.
+
+   The additions put a row that opens something inside a real button (src/ds/ext.tsx, Row: a div is not reachable
+   with a keyboard), so a row sits one level deeper than it did: card > button > row. The direct-child rules above
+   only caught the shallow case, and every row in a group kept its own glass, border and radius on top of the
+   card's (measured in the design lab: three rows, each 1px border, glass fill and an 18px radius, inside a card
+   that has its own). Any depth inside the card now counts, and the hairline goes on the button that carries the
+   row, so the split line still spans the card. */
+.iris-card .iris-row {
   background: none;
   border: 0;
   border-radius: 0;
 }
-.iris-card > .iris-row + .iris-row {
+.iris-card .iris-row + .iris-row,
+.iris-card .ix-row-btn + .ix-row-btn {
   box-shadow: inset 0 1px 0 var(--line);
+}
+.iris-card .ix-row-btn:hover .iris-row.iris-press {
+  background: light-dark(rgba(3, 105, 161, 0.04), rgba(180, 225, 255, 0.04));
 }
 .ix-sheet-body > .iris-row {
   background: none;
@@ -2737,6 +2746,12 @@
   z-index: -1;
   pointer-events: none;
 }
+/* A row that opens something says so: the release draws its arrow in --faint (3.6:1 on the dark ground, less on
+   light). An affordance nobody sees is not one, so in an app it takes --dim (7.6:1), the same colour the House
+   rules give a label. */
+.ia-app .iris-row-arrow {
+  color: var(--dim);
+}
 /* Secondary text in an app reads for everyone: a little larger and lighter than the release's sub line. */
 .ia-app .iris-row-sub {
   font-size: 13px;
@@ -2845,6 +2860,11 @@ textarea.ix-textarea {
 .ia-pic-side .ia-pic-words { position: static; background: none; padding: 16px; color: var(--fg); }
 .ia-pic-side .ia-pic-eyebrow { color: var(--k, var(--accent)); }
 .ia-pic-side .ia-pic-title { font-size: 19px; }
+/* Light: the caption sits on a light shade with dark ink, the way the photo itself is a light print there. */
+:root[data-mode="light"] .ia-pic figcaption { color: var(--fg); background: linear-gradient(transparent, color-mix(in srgb, var(--bg) 88%, transparent)); }
+:root[data-mode="light"] .ia-pic-over .ia-pic-words { background: linear-gradient(transparent, color-mix(in srgb, var(--bg) 62%, transparent) 40%, color-mix(in srgb, var(--bg) 94%, transparent)); }
+:root[data-mode="light"] .ia-pic-eyebrow { color: color-mix(in srgb, var(--k, var(--accent)) 70%, #000); }
+:root[data-mode="light"] .ia-pic-side .ia-pic-words { background: none; }
 
 /* ---------- light: the release's own fixed colours ----------
  * bundle.css draws some parts with fixed dark values instead of tokens. Each is restated here with light-dark(light,
@@ -2969,6 +2989,67 @@ textarea.ix-textarea {
   color-mix(in srgb, var(--k, var(--accent)) 5%, #f2f4f7); }
 :root[data-mode="light"] .ia-app .iris-card:not(.iris-row) { background: linear-gradient(165deg, color-mix(in srgb, var(--k, var(--accent)) 9%, #ffffff), #ffffff 65%); box-shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 12px 28px -14px color-mix(in srgb, var(--k, var(--accent)) 45%, transparent); }
 
+/* ---------- Gauge ----------
+ * The release's Stat with a meter under it: the same tile, one number and its word, plus how full the number is
+ * and the quiet line that says what changed. Every value is a token; the tone comes in as --ix-tone. */
+.ix-gauge b { color: var(--ix-tone, var(--accent)); }
+.ix-gauge-head { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.ix-gauge-unit { font: 400 var(--text-sub); color: var(--dim); }
+.ix-gauge-label { display: block; font: 400 var(--text-sub); color: var(--dim); }
+.ix-gauge-bar { position: relative; display: block; margin-top: 10px; }
+.ix-gauge-bar .ix-gauge-line { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--ix-tone, var(--accent)); opacity: .55; }
+.ix-gauge-note { display: block; margin-top: 6px; font: 400 var(--text-sub); color: var(--dim); }
+
+/* ---------- Bars ----------
+ * Rows that say which one is the biggest: the name, the bar, the number. Hairlines between them, never a frame:
+ * the caller puts a list like this on a Card. */
+.ix-bars { display: grid; }
+.ix-bars-row { display: grid; grid-template-columns: minmax(6rem, 14rem) minmax(0, 1fr) 4.5rem; gap: var(--gap); align-items: center; padding: 6px 0; border-top: 1px solid var(--edge); }
+.ix-bars-row:first-child { border-top: 0; }
+.ix-bars-row:hover { background: var(--state-hover); }
+.ix-bars-name { font: 400 var(--text-body); color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ix-bars-name a { color: inherit; }
+.ix-bars-value { text-align: right; font: 400 var(--text-value); color: var(--dim); font-variant-numeric: tabular-nums; }
+.ix-bars-empty { margin: 0; font: 400 var(--text-body); color: var(--dim); }
+@media (max-width: 40rem) { .ix-bars-row { grid-template-columns: minmax(0, 1fr) 4.5rem; } .ix-bars-track { grid-row: 2; grid-column: 1 / -1; } }
+
+/* ---------- Days ----------
+ * One column per day, oldest left, the last one bright: a count over a fortnight. The label under the column is
+ * the day, the line a hover shows carries the number. */
+.ix-days { display: flex; gap: 4px; align-items: flex-end; }
+.ix-days-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; cursor: help; }
+.ix-days-bar { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.ix-days-bar i { width: 100%; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--accent) 35%, transparent); transition: background var(--motion-base) var(--ease-house); }
+.ix-days-col:hover .ix-days-bar i, .ix-days-col[data-now="1"] .ix-days-bar i { background: var(--accent); }
+.ix-days-label { font: 400 var(--text-label); color: var(--faint); }
+
+/* ---------- Rhythm: two blocks under each other ----------
+ * --gap is the space "between cards on a page" (tokens.css) and nothing applied it, so a page that put one part
+ * under another had them touch: two cards read as one broken surface (the admin panel's Releases page, 02-10-2026).
+ * The kit keeps its block-level parts apart itself now, instead of every page remembering to.
+ *
+ * A :where() list, so this has no weight of its own: a page that wants something else just says so.
+ *
+ * A container that lays its own children out already owns that space. Give it data-rhythm="off" (the admin panel's
+ * .dash grid does, and a plugin's own card grid should) and the spacing there is the container's gap, not this
+ * margin. Without it a card in a grid would be pushed down inside its own cell, which is crooked, not tidy. */
+:where(.iris-card, .ix-appbar, .ix-empty) + :where(.iris-card, .ix-appbar, .ix-empty) { margin-block-start: var(--gap); }
+:where([data-rhythm="off"]) > :where(.iris-card, .ix-appbar, .ix-empty) + :where(.iris-card, .ix-appbar, .ix-empty) { margin-block-start: 0; }
+
+/* ---------- Row as a button ----------
+ * The release's Row with a click handler is wrapped in a real button (src/ds/ext.tsx): the button itself draws
+ * nothing, the row inside keeps its own card look. The house floor still gives it hover, press and the focus ring. */
+.ix-row-btn { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+
+/* The app's tab bar: the release fills its glass with rgba(20, 26, 34, .72), a *dark* half-transparent fill that knows
+   only one scheme. On a light page that draws a milky bar with the rows showing through it (measured and seen: rows and
+   their pills ghosting behind the tabs). The bar takes the scheme's own surface, opaque enough that what is under it
+   stays under it, and a hairline edge so it reads as a bar. */
+.ia-app .iris-tabbar-glass {
+  background: light-dark(rgba(250, 252, 253, .94), rgba(16, 20, 27, .9));
+  box-shadow: inset 0 1px 0 var(--line);
+}
+
 /* ---------------------------------------------------------------------- Directions
 
    A direction is a look the parts already follow: every part takes its surface, edge, radius, type and accent from the
@@ -3062,3 +3143,61 @@ textarea.ix-textarea {
 [data-style="terminal"] .iris-row-title { font-size: 15px; }
 [data-style="terminal"] .iris-row-title::before { content: "> "; color: var(--accent); }
 [data-style="terminal"] .iris-btn { border-style: dashed; }
+
+
+/* ---------- IrisApp on a tv: the menu along the top, larger type, a safe margin for the screen's edge ---------- */
+.ia-tv {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.ia-tvnav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 64px 10px;
+}
+.ia-tvnav-name {
+  font: 600 20px/1 var(--font-display, inherit);
+  color: var(--fg);
+  margin-right: 24px;
+}
+.ia-tvnav-item {
+  font: 500 17px/1 inherit;
+  color: var(--dim);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: transform .15s ease, background-color .15s ease, color .15s ease;
+}
+.ia-tvnav-item.on {
+  color: var(--fg);
+  background: color-mix(in oklab, var(--fg) 12%, transparent);
+}
+/* On a tv the remote moves a focus: it has to be seen from the sofa. */
+.ia-tvnav-item:focus-visible,
+.ia-tv .ia-scroll :focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  transform: scale(1.06);
+}
+.ia-tv .ia-scroll {
+  position: relative;
+  inset: auto;
+  height: 100%;
+  padding: 16px 64px 48px;
+  zoom: 1.2;
+}
+.ia-tv .ia-screen {
+  max-width: 960px;
+}
+.ia-tv .ia-bento {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (prefers-reduced-motion: reduce) {
+  .ia-tvnav-item { transition: none; }
+  .ia-tvnav-item:focus-visible, .ia-tv .ia-scroll :focus-visible { transform: none; }
+}

@@ -297,6 +297,36 @@ for (const p of pages) {
       links: Array.from(document.querySelectorAll("a[href]"))
         .map((a) => a.getAttribute("href"))
         .filter((h) => h && h.startsWith("/") && !h.startsWith("//")),
+      // Two block-level parts under each other never touch (src/ds/ext.css, "Rhythm: two blocks under each
+      // other"), and a container that lays its own children out gives that space itself: inside such a container
+      // the block must not pay the gap a second time (data-rhythm="off"). Measured, because a page that glues
+      // two cards together looks fine in a diff and broken in a browser (the admin panel's Releases page,
+      // 02-10-2026).
+      glued: (() => {
+        const BLOK = ".iris-card, .ix-appbar, .ix-empty";
+        const uit = [];
+        for (const el of document.querySelectorAll(BLOK)) {
+          const vorige = el.previousElementSibling;
+          if (!vorige || !vorige.matches(BLOK)) continue;
+          const a = vorige.getBoundingClientRect(), b = el.getBoundingClientRect();
+          if (a.height < 8 || b.height < 8) continue;
+          if (Math.min(a.right, b.right) - Math.max(a.left, b.left) <= 0) continue;   // next to each other, not under
+          if (b.top - a.bottom < 2) uit.push(`${vorige.className} + ${el.className}`);
+        }
+        return uit;
+      })(),
+      crooked: (() => {
+        const BLOK = ".iris-card, .ix-appbar, .ix-empty";
+        const uit = [];
+        for (const el of document.querySelectorAll(BLOK)) {
+          const ouder = el.parentElement;
+          if (!ouder) continue;
+          const s = getComputedStyle(ouder);
+          const eigenGat = /grid|flex/.test(s.display) && parseFloat(s.rowGap || s.gap || "0") > 0;
+          if (eigenGat && parseFloat(getComputedStyle(el).marginBlockStart) > 0) uit.push(el.className);
+        }
+        return uit;
+      })(),
     };
   });
 
@@ -312,6 +342,8 @@ for (const p of pages) {
   if (info.imagesWithoutAlt) failures.push(`${p}: ${info.imagesWithoutAlt} image(s) without alt`);
   if (info.namelessControls) failures.push(`${p}: ${info.namelessControls} control(s) with no accessible name`);
   if (info.positiveTabindex) failures.push(`${p}: ${info.positiveTabindex} element(s) with a positive tabindex`);
+  if (info.glued.length) failures.push(`${p}: kit blocks touch, with no gap between them (${info.glued.slice(0, 3).join(" | ")})`);
+  if (info.crooked.length) failures.push(`${p}: a block inside a container with its own gap pays the space twice (${info.crooked.slice(0, 3).join(" | ")})`);
   if (consoleErrors.length) failures.push(`${p}: ${consoleErrors.slice(0, 2).join(" | ")}`);
 
   // Every internal link must land on a file that is in the build: a public site with a dead link is broken.

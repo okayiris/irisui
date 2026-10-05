@@ -39,6 +39,10 @@ never write a raw value where a token exists.
 5. Labels take `--label` (7.6:1), never `--faint` (3.6:1) — the gate measures this.
 6. Sentence case. No emoji, no exclamation marks, no em dashes.
 7. Take the house `Button` from `window.IrisUi` instead of making one.
+8. Two block-level parts under each other keep `--gap` apart, and the kit does that itself (src/ds/ext.css,
+   "Rhythm"): a page that puts a Card under a Card gets the space without asking. A container that lays its own
+   children out (a grid, a flex column with a gap) owns that space instead and says `data-rhythm="off"`, or its
+   cards pay it twice and sit crooked. The gate measures both.
 
 ## How to check your work
 

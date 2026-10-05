@@ -4,15 +4,13 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "Bottom, choosing a voice": () => { const [open, setOpen] = React.useState(true);
+    "Bottom, choosing a voice": () => { const [open, setOpen] = React.useState(true); const [voice, setVoice] = React.useState("Alex");
+  const pick = (title, subtitle) => h(Row, { key: title, title, subtitle, onClick: () => setVoice(title),
+    trailing: voice === title ? h("span", { "aria-label": "Chosen", style: { color: "var(--accent)", fontSize: 17 } }, "✓") : null });
   return h(Sheet, { open, onClose: () => setOpen(false), title: "Voice", sub: "How she sounds on this device",
-    children: [
-      h(Row, { key: "a", title: "Alex", subtitle: "Dutch, warm and clear", trailing: h(Toggle, { on: true }) }),
-      h(Row, { key: "b", title: "Calmer", subtitle: "Dutch, softer" }),
-      h(Row, { key: "c", title: "No voice", subtitle: "She only writes here" }),
-    ] }); },
+    children: [ pick("Alex", "Dutch, warm and clear"), pick("Calmer", "Dutch, softer"), pick("No voice", "She only writes here") ] }); },
     "Side, on a wide window": () => { const [open, setOpen] = React.useState(true);
   return h(Sheet, { open, onClose: () => setOpen(false), side: "end", title: "Details", sub: "The invoice she read",
     children: [ h(Card, { key: "a" }, h("div", { style: { fontSize: 17 } }, "Van Dijk Contractors"), h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 3 } }, "€ 1.240,00 · 14 days")),

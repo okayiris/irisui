@@ -4,14 +4,9 @@
 <script>
 (() => {
   const h = React.createElement;
-  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack } = window.IrisUi;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
   window.__dsPreview = {
-    "The word behind the person": () => {
-  const [edge, setEdge] = React.useState(0.5);
-  return h("div", { style: { display: "grid", gap: 12, maxWidth: 380 } },
-    h(Photo, { kind: "back", word: "CALM", threshold: edge, alt: "A figure in front of two ridges at dusk" }),
-    h(Slider, { label: "Where the near part starts", min: 5, max: 90, value: Math.round(edge * 100), onChange: (v) => setEdge(v / 100) }));
-},
+    "The word behind the person": () => h("div", { style: { maxWidth: 380 } }, h(Photo, { kind: "back", word: "CALM", alt: "A figure in front of two ridges at dusk" })),
     "Parallax and duotone": () => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 } },
     h(Photo, { kind: "parallax", alt: "A figure in front of two ridges, moving with the pointer" }),
     h(Photo, { kind: "duotone", topic: "money", alt: "The same scene in the money topic's two colours" }),

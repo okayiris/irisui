@@ -1,0 +1,27 @@
+<!-- @dsCard group="Brand" height=300 -->
+<!-- IrisUi additions: this preview needs ext.css and ext.js beside tokens.css, bundle.css and bundle.js. -->
+<div id="root" style="background:var(--bg);color:var(--fg);padding:16px;display:grid;gap:20px;font-family:var(--font-text)"></div>
+<script>
+(() => {
+  const h = React.createElement;
+  const { Icon, SectionLabel, Card, Row, Toggle, Button, ButtonGroup, Chip, Field, Segmented, CheckList, Progress, Stat, Skeleton, Orb, TalkOrb, Orb3D, THINKING, StatusPill, TabBar, Topic, Widget, Menu, Dialog, Sheet, Snackbar, Tooltip, Badge, Slider, TextArea, Select, SearchField, Tabs, Steps, EmptyState, Toolbar, DatePicker, TimePicker, AppBar, NavRail, SplitButton, Carousel, Mark, Edge, EdgeText, Divider, CircleStack, LoopBubble, Photo, BorderPattern, ChatStack, MacPill, VaultAsk, TableApp, Gauge, Bars, Days } = window.IrisUi;
+  window.__dsPreview = {
+    "Lock screen size": () => h("div", { style: { display: "grid", justifyItems: "center", gap: 18, padding: "36px 16px", maxWidth: 300, borderRadius: 32, background: "var(--glass)", border: "1px solid var(--edge)" } },
+    h("div", { style: { font: "200 56px/1 var(--font-text)", fontVariantNumeric: "tabular-nums" } }, "9:41"),
+    h(Mark, { size: 64 }),
+    h("div", { style: { fontSize: 13, color: "var(--label)" } }, "Look at your phone to open")),
+    "Three sizes": () => h("div", { style: { display: "flex", flexWrap: "wrap", gap: 32, alignItems: "center", padding: 16 } }, h(Mark, { size: 48 }), h(Mark, { size: 64 }), h(Mark, { size: 96 })),
+    "Which Iris, how big": () => h("div", { style: { display: "flex", gap: 36, alignItems: "center", flexWrap: "wrap", padding: 12, font: "var(--text-sub)", color: "var(--dim)" } }, ...[["Orb 22", h(Orb, { size: 22 })], ["Orb 34", h(Orb, { size: 34, state: "listening" })], ["Mark 64", h(Mark, { size: 64 })], ["TalkOrb talking", h(TalkOrb, { size: 120, state: "talking" })], ["TalkOrb thinking", h(TalkOrb, { size: 120, state: "thinking" })], ["Orb3D", h(Orb3D, { size: 180 })]].map(([t, el]) => h("div", { key: t, style: { display: "grid", justifyItems: "center", gap: 22 } }, el, t))),
+  };
+})();
+
+(() => {
+  const h = React.createElement, P = window.__dsPreview, root = document.getElementById("root");
+  for (const k of Object.keys(P)) {
+    const cel = document.createElement("div");
+    cel.innerHTML = '<div style="font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px 2px">' + k + '</div><div></div>';
+    root.appendChild(cel);
+    ReactDOM.createRoot(cel.lastChild).render(h(window.IrisUi.PreviewI18nProvider, null, h(P[k])));
+  }
+})();
+</script>

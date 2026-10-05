@@ -1,6 +1,6 @@
 # The added parts, in the artifact's shape
 
-26 parts this project added to the Iris design system, ready to publish into the Design
+35 parts this project added to the Iris design system, ready to publish into the Design
 System artifact as `project/components/<Name>/`:
 
 - **Menu** (Controls) — A list of choices on its own surface: a filter, a sort, a set of actions, anchored to the thing it belongs to.
@@ -23,12 +23,21 @@ System artifact as `project/components/<Name>/`:
 - **NavRail** (Navigation) — The wide-window version of the tab bar: a rail of sections that collapses to icons.
 - **SplitButton** (Controls) — One action, and the caret that opens the others that belong to it.
 - **Carousel** (Surfaces) — A strip of cards you swipe or scroll sideways, with dots that say where you are.
+- **Mark** (Brand) — Her ring as a still, sharp mark, from the brand kit's 1024px render with its glow. For a logo, a lock screen, an empty page.
+- **Edge** (Brand) — The apps' light patterns along an edge: round her orb while she thinks, along a screen while it reloads. The TalkOrb and the Orb3D think with it.
+- **EdgeText** (Brand) — A word as a neon sign: the Edge light runs along the outline of every letter. SVG and CSS only.
 - **Divider** (Surfaces) — A hairline that groups what is above it from what is below.
 - **CircleStack** (Navigation) — Every chat with its loops as a circle, stacked behind the strip: where the loops live now that the iPhone app has no Loops tab.
 - **LoopBubble** (Feedback) — One loop, small: its first letter in a disc and the six phases round it, the current one lit.
 - **Photo** (Surfaces) — A photo with a depth map: a word behind the person, duotone in the topic's colours, or parallax in four depth layers. No photo ships: without a src it paints its own neutral scene with a matching depth map, and without a depth map it guesses one (lower and central is nearer).
 - **BorderPattern** (Feedback) — A pattern running along a rounded edge, one per moment: refreshing, listening, thinking, working, speaking, a question waiting, news, saving.
 - **ChatStack** (Navigation) — Every chat with its loops as a card in its topic's colour, stacked with depth; a tap fans them out, a tap on one opens that chat with its loops and actions.
+- **MacPill** (Brand) — Iris on the Mac desktop: her orb, a bar of buttons that grows out from behind it, her words above and one state line under it.
+- **VaultAsk** (Overlays) — The vault's question, the same on every device: who asks, from where, why, what it does and how far it reaches, then allow or no.
+- **TableApp** (App layouts) — A list you search, filter and open: search in the AppBar, filter chips, the rows on one Card, a count line, a row that opens a Sheet.
+- **Gauge** (App layouts) — The release's Stat with a meter under it: one number, its word, and how full it is.
+- **Bars** (Feedback) — Rows that say which one is the biggest: a name, a bar, the number, biggest first.
+- **Days** (Feedback) — One column per day, oldest left, the last one bright: a count over a fortnight.
 
 Each folder holds a `README.md` in the system's own voice and a `preview.html` with one cell per variant.
 The previews need `ext.css` and `ext.js` (from `public/ds/`) beside the release's `bundle.css` and

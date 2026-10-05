@@ -856,6 +856,90 @@ const SPECS: Spec[] = [
       },
     ],
   },
+  {
+    name: "Gauge",
+    group: "App layouts",
+    height: 220,
+    summary: "The release's Stat with a meter under it: one number, its word, and how full it is.",
+    props: [
+      { name: "value", type: "ReactNode", required: true },
+      { name: "label", type: "string", required: true },
+      { name: "unit", type: "string" },
+      { name: "note", type: "string" },
+      { name: "progress", type: "number" },
+      { name: "lines", type: "number[]" },
+      { name: "tone", type: "'ok' | 'wait' | 'error'" },
+      { name: "topic", type: "TopicName" },
+    ],
+    variants: [
+      {
+        label: "A limit that fills up",
+        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(9rem, 1fr))", gap: "var(--gap)" } },
+    h(Gauge, { value: "42%", label: "storage", progress: 0.42, note: "+3% this week" }),
+    h(Gauge, { value: "86%", label: "memory", unit: "of 8 GB", progress: 0.86, tone: "wait", lines: [0.8, 0.9] }),
+    h(Gauge, { value: "96%", label: "week limit", progress: 0.96, tone: "error", lines: [0.8, 0.9], note: "every turn is refused now" }))`,
+      },
+      {
+        label: "Plain, without a meter",
+        code: `() => h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(9rem, 1fr))", gap: "var(--gap)" } },
+    h(Gauge, { value: 12, label: "houses" }),
+    h(Gauge, { value: 3, label: "devices", note: "+1 this week" }))`,
+      },
+    ],
+  },
+  {
+    name: "Bars",
+    group: "Feedback",
+    height: 260,
+    summary: "Rows that say which one is the biggest: a name, a bar, the number, biggest first.",
+    props: [
+      { name: "rows", type: "{ label: string; value: number; href?: string; tone?: 'ok' | 'wait' | 'error'; title?: string }[]", required: true },
+      { name: "format", type: "(value: number) => string" },
+      { name: "max", type: "number" },
+      { name: "empty", type: "string" },
+    ],
+    variants: [
+      {
+        label: "Most used",
+        code: `() => h(Card, null, h(SectionLabel, null, "Most used, 7 days"), h(Bars, { format: (v) => v + " min", rows: [
+    { label: "anna", value: 148, href: "#" },
+    { label: "tom", value: 96, href: "#" },
+    { label: "huis", value: 41, href: "#" },
+    { label: "noah", value: 12, href: "#" },
+  ] }))`,
+      },
+      {
+        label: "One over the line",
+        code: `() => h(Card, null, h(SectionLabel, null, "Storage"), h(Bars, { max: 100, format: (v) => v + "%", rows: [
+    { label: "anna", value: 92, tone: "error" },
+    { label: "tom", value: 71, tone: "wait" },
+    { label: "huis", value: 24 },
+  ] }))`,
+      },
+    ],
+  },
+  {
+    name: "Days",
+    group: "Feedback",
+    height: 220,
+    summary: "One column per day, oldest left, the last one bright: a count over a fortnight.",
+    props: [
+      { name: "days", type: "{ label: string; value: number; title?: string }[]", required: true },
+      { name: "format", type: "(value: number) => string" },
+      { name: "height", type: "number" },
+    ],
+    variants: [
+      {
+        label: "A fortnight",
+        code: `() => h(Card, null, h(SectionLabel, null, "Alerts, per day"), h(Days, { format: (v) => v + (v === 1 ? " alert" : " alerts"), days: [
+    { label: "20", value: 0 }, { label: "21", value: 2 }, { label: "22", value: 0 }, { label: "23", value: 1 },
+    { label: "24", value: 4 }, { label: "25", value: 0 }, { label: "26", value: 3 }, { label: "27", value: 1 },
+    { label: "28", value: 0 }, { label: "29", value: 0 }, { label: "30", value: 2 }, { label: "01", value: 5 },
+  ] }))`,
+      },
+    ],
+  },
+
 ];
 
 export const EXT_COMPONENTS: Component[] = SPECS.map((s) => ({
